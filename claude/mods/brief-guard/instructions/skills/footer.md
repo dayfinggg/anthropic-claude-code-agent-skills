@@ -1,0 +1,1 @@
+Apply this skill for the rest of the task. Before the first change, read the files it points to whose topic the task touches, such as the section for the language or framework at hand and the examples file. Before the final answer, check the result against its checklist and fix what fails.

@@ -1,0 +1,1 @@
+{ "name": "brief-guard", "version": "0.1.0", "description": "Replaces Claude Code prompt blocks that conflict with the Brief output style", "types": "./types/index.d.ts" }

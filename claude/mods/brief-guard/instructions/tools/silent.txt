@@ -1,0 +1,17 @@
+Read
+Edit
+Write
+NotebookEdit
+Grep
+Glob
+Bash
+PowerShell
+WebFetch
+WebSearch
+Skill
+Agent
+ToolSearch
+TaskStop
+mcp__Claude_Browser__*
+mcp__claude-in-chrome__*
+mcp__computer-use__*

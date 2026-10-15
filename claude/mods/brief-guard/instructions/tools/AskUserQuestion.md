@@ -1,0 +1,1 @@
+The question, the header, and each option's label and description, the mark of the recommended option included, are written in the language of the user's latest typed message, and their sentences join their parts with commas, linking words, or a new sentence, with no colon, semicolon, or long dash.

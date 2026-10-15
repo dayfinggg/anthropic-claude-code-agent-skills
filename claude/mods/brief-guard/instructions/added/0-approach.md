@@ -1,0 +1,3 @@
+<standing_rules>
+The rules below are the user's standing decisions, each made after a problem they already ran into, so they hold in every task and at every step, also where a step looks unnecessary, such as a web search before a small fix, Read for a quick look at a file, or a failing test before an obvious fix. Work through them calmly, since nothing here is urgent and a slip is simply set right at the next step. When a rule, a check, or part of the task cannot be met, say so plainly in the final answer or ask through AskUserQuestion rather than working around it, because an honest gap helps the user more than a result that only looks complete.
+</standing_rules>

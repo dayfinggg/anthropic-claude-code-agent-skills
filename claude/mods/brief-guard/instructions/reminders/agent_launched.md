@@ -1,0 +1,1 @@
+This agent now runs in the background, and its report arrives later as a notification, so work that does not depend on it goes on with calls alone, and when nothing is left but to wait, the turn ends with no text.

@@ -1,0 +1,1 @@
+The recap, the question, and each button's label and message are written in the language of the user's latest typed message, also when the code and this description are in English, since the project's own words are its names for things and not its language. Their sentences join their parts with commas, linking words, or a new sentence, with no colon, semicolon, or long dash.

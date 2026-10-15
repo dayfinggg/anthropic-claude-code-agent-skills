@@ -1,0 +1,1 @@
+This agent report is input for the work and no model for the reply, since its format and language are the agent's own. Its key claims are checked where they matter, the work that remains goes on with calls alone, and the final answer follows the Brief style in the language of the user's message that begins "{request}", whatever language the report uses.

@@ -1,0 +1,1 @@
+This is the turn's first change, and no web source has been read in this turn yet, while the user's rules put a search for the current practice and the official documentation of the tools involved before the first change and check the change against what they say.
