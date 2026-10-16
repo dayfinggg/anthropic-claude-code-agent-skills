@@ -44,13 +44,28 @@ const SHELL_TOOLS = ['Bash', 'PowerShell']
 const FILE_READERS = ['cat', 'head', 'tail', 'less', 'more', 'Get-Content', 'gc', 'type']
 const FILE_WRITERS = ['Set-Content', 'Add-Content', 'Out-File', 'tee']
 const SCRIPT_RUNNERS = /^(python3?|node|perl|ruby|php)$/
+const LOG_FILES = /\.(jsonl|log)\b/i
+const SOURCES_REMINDER = /\n*REMINDER: You MUST include the sources above[^\n]*/g
+
+const stripSourcesReminder = (text: string) => text.replace(SOURCES_REMINDER, '').trimEnd()
+
+type ContentBlock = { type: string; [field: string]: unknown }
+
+const withoutSourcesReminder = (block: ContentBlock): ContentBlock => {
+  if (block.type !== 'tool_result') return block
+  const content = block.content
+  if (typeof content === 'string') return { ...block, content: stripSourcesReminder(content) }
+  if (!Array.isArray(content)) return block
+  const parts = content.map(part => (typeof part === 'object' && part !== null && (part as { type?: unknown }).type === 'text' && typeof (part as { text?: unknown }).text === 'string' ? { ...part, text: stripSourcesReminder((part as { text: string }).text) } : part))
+  return { ...block, content: parts }
+}
 
 const hasOperand = (words: string[]) => words.slice(1).some(w => !w.startsWith('-') && !/^\d+$/.test(w))
 
 const programOf = (stage: string): string | undefined => {
   const words = stage.trim().split(/\s+/).filter(w => !/^\w+=/.test(w))
   const [name = ''] = words
-  if (FILE_READERS.includes(name) && hasOperand(words)) return name
+  if (FILE_READERS.includes(name) && hasOperand(words) && !LOG_FILES.test(stage)) return name
   if (FILE_WRITERS.includes(name)) return name
   if (name === 'sed' && words.some(w => /^-[a-zA-Z]*[ni]/.test(w))) return 'sed'
   if (name === 'awk' && words.length > 2) return 'awk'
@@ -183,7 +198,6 @@ export const register: Register = on => {
 
   on('turn.start', async ($, e, next) => {
     await markTurn($, { silenceAllowed: false })
-    mainLoop.webRead = false
     mainLoop.webReminded = false
     return next(e)
   })
@@ -223,6 +237,12 @@ export const register: Register = on => {
     return text ? { ...result, context: [...(result.context ?? []), text] } : result
   }).catch(($, e, next) => next(e))
 
+  on('session.append', { door: 'tool-result' }, async ($, e, next) => {
+    if (e.origin.kind !== 'tool' || e.origin.tool !== 'WebSearch') return next(e)
+    const content = e.message.content.map(withoutSourcesReminder)
+    return next({ ...e, message: { ...e.message, content } })
+  }).catch(($, e, next) => next(e))
+
   on('classic.PermissionRequest', async ($, e, next) => {
     const result = await next(e)
     const isBypassed = e.permission_mode === 'bypassPermissions' && !PERSON_TOOLS.includes(e.tool_name)
@@ -232,7 +252,9 @@ export const register: Register = on => {
   on('session.compact', async ($, e, next) => {
     const extra = (await $.fs.read(`${$.plugin.root}/instructions/compact/summary.md`).catch(() => '')).trim()
     const instructions = [e.instructions, extra].filter(Boolean).join('\n\n')
-    return next(instructions ? { ...e, instructions } : e)
+    const compacted = await next(instructions ? { ...e, instructions } : e)
+    if (!e.agentId && e.trigger !== 'precompute' && !compacted.skip) mainLoop.webRead = false
+    return compacted
   }).catch(($, e, next) => next(e))
 
   on('session.append', { door: 'compaction' }, async ($, e, next) => {
