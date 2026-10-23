@@ -119,6 +119,7 @@ const hasOpenStep = (input: object) =>
   !('items' in input) || !Array.isArray(input.items) || input.items.some(item => typeof item === 'object' && item !== null && 'status' in item && item.status !== 'completed')
 
 const takeStalePlan = (tool: string, input: object) => {
+  if (tool === WRAP_UP_TOOL) markStyleDue()
   if (tool === PLAN_TOOL) Object.assign(plan, { isOpen: hasOpenStep(input), callsSinceUpdate: 0, reminded: false })
   else if (tool === WRAP_UP_TOOL) plan.isOpen = false
   else if (plan.isOpen) plan.callsSinceUpdate += 1
@@ -160,6 +161,21 @@ const trackNarration = (content: readonly ContentBlock[]) => {
   if (hasToolUse && (hasText || mainLoop.textAwaitingCall)) mainLoop.narrated = true
   if (hasToolUse) mainLoop.textAwaitingCall = false
   else if (hasText) mainLoop.textAwaitingCall = true
+}
+
+const STYLE_REMINDER_EVERY = 10
+const style = { due: true, stepsSince: 0 }
+
+const markStyleDue = () => {
+  style.due = true
+}
+
+const takeStyleReminder = () => {
+  style.stepsSince += 1
+  if (!style.due && style.stepsSince < STYLE_REMINDER_EVERY) return false
+  style.due = false
+  style.stepsSince = 0
+  return true
 }
 
 const takeNarration = () => {
@@ -224,6 +240,7 @@ export const register: Register = on => {
   on('prompt.attachment', async ($, e, next) => {
     if (DROPPED_REMINDERS.includes(e.type)) return { text: null }
     if (e.type === MCP_INSTRUCTIONS) return next({ ...e, text: e.text.replace(STATUS_LINE_REQUEST, '') })
+    if (e.type === 'output_style' && !takeStyleReminder()) return { text: null }
     const path = `${$.plugin.root}/instructions/reminders/${e.type}.md`
     const { request } = await readTurn($)
     return (await $.fs.exists(path)) ? { text: fillLines(await $.fs.read(path), { request }) } : next(e)
@@ -242,7 +259,10 @@ export const register: Register = on => {
 
   on('prompt.submit', async ($, e, next) => {
     const request = USER_ORIGINS.includes(e.origin.kind) ? excerptOf(e.text) : ''
-    if (request) await markTurn($, { request })
+    if (request) {
+      await markTurn($, { request })
+      markStyleDue()
+    }
     if (e.origin.kind !== NOTIFICATION_ORIGIN) {
       const startNote = request && !e.command ? (await $.fs.read(`${$.plugin.root}/instructions/reminders/task_start.md`).catch(() => '')).trim() : ''
       return next(startNote ? { ...e, context: [...(e.context ?? []), startNote] } : e)
@@ -254,6 +274,7 @@ export const register: Register = on => {
 
   on('turn.start', async ($, e, next) => {
     await markTurn($, { silenceAllowed: false })
+    markStyleDue()
     mainLoop.textAwaitingCall = false
     mainLoop.narrated = false
     return next(e)
@@ -322,6 +343,7 @@ export const register: Register = on => {
     if (!e.agentId && e.trigger !== 'precompute' && !compacted.skip) {
       mainLoop.webReadSinceLastLanguage = false
       mainLoop.changedLanguages.clear()
+      markStyleDue()
     }
     return compacted
   }).catch(($, e, next) => next(e))
