@@ -3,7 +3,7 @@ export type Icon = { svg: string; emoji: string }
 export type LimitIcon = Icon & { label: string }
 
 function lucide(body: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="-2 1 28 28"><g fill="none" stroke="#e8e8e8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">${body}</g></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="-2 1 28 28"><g fill="none" stroke="#808080" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">${body}</g></svg>`
 }
 
 const HOURGLASS: Icon = {
