@@ -10,15 +10,18 @@ import type {
   TurnUsage,
 } from 'claude-code'
 
-import type { LimitGauge, TokenTotals, UsageSummary } from '../types'
+import type { LimitGauge, TokenKind, TokenTally, TokenTotals, UsageSummary } from '../types'
 import { CACHE_READ_ICON, CACHE_WRITE_ICON, COST_ICON, iconForLimit, INPUT_ICON, OUTPUT_ICON } from './icons'
 import type { Icon } from './icons'
+import { priceForModel } from './pricing'
 
 const SEPARATOR = '   '
 const HIDDEN_LIMITS = new Set(['spend_limit'])
-const ICON_SIZE = 16
+const ICON_SIZE = 14
 const BAR_CELLS = 10
-const BAR_LINE = '─'
+const BAR_FILLED = '▰'
+const BAR_EMPTY = '▱'
+const TOKENS_PER_MILLION = 1_000_000
 const FILL_COLORS = [
   { from: 0.8, color: '#ef4444' },
   { from: 0.7, color: '#f97316' },
@@ -26,8 +29,9 @@ const FILL_COLORS = [
 ]
 
 const summary = atom({ plugin: 'usage-line', key: 'summary' } as const, null as UsageSummary)
-const NO_TOKENS: TokenTotals = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }
-const tokenTotals = atom({ plugin: 'usage-line', key: 'tokenTotals' } as const, NO_TOKENS)
+const NO_TALLY: TokenTally = { tokens: 0, usd: 0 }
+const NO_TOKENS: TokenTotals = { input: NO_TALLY, output: NO_TALLY, cacheRead: NO_TALLY, cacheWrite: NO_TALLY }
+const tokenUsage = atom({ plugin: 'usage-line', key: 'tokenUsage' } as const, NO_TOKENS)
 
 type BandItem = { key: string; icon: Icon; label: string; draw: (Text: ElementConstructor<TextProps>) => RenderChildren }
 
@@ -44,7 +48,7 @@ export const register: Register = on => {
     const { usage } = response
 
     if (usage !== null) {
-      await update($, tokenTotals, totals => addUsage(totals ?? NO_TOKENS, usage))
+      await update($, tokenUsage, totals => addUsage(totals ?? NO_TOKENS, usage))
     }
 
     if (e.agentId === undefined) {
@@ -67,7 +71,7 @@ export const register: Register = on => {
       return next(e)
     }
 
-    const rows = bandRows(usage, await read($, tokenTotals))
+    const rows = bandRows(usage, await read($, tokenUsage))
 
     if (e.surface === 'desktop') {
       const { Box, Svg, Text } = $.ui.resolve(e)
@@ -124,10 +128,10 @@ function bandRows(usage: NonNullable<UsageSummary>, tokens: TokenTotals): BandIt
   const cost: BandItem[] =
     usage.costUsd === null ? [] : [valueItem('cost', COST_ICON, 'Cost', formatUsd(usage.costUsd))]
   const tokenItems = [
-    valueItem('input', INPUT_ICON, 'Input', formatTokenCount(tokens.input)),
-    valueItem('output', OUTPUT_ICON, 'Output', formatTokenCount(tokens.output)),
-    valueItem('cache-read', CACHE_READ_ICON, 'Cache read', formatTokenCount(tokens.cacheRead)),
-    valueItem('cache-write', CACHE_WRITE_ICON, 'Cache write', formatTokenCount(tokens.cacheWrite)),
+    valueItem('input', INPUT_ICON, 'Input', formatTally(tokens.input)),
+    valueItem('output', OUTPUT_ICON, 'Output', formatTally(tokens.output)),
+    valueItem('cache-read', CACHE_READ_ICON, 'Cache read', formatTally(tokens.cacheRead)),
+    valueItem('cache-write', CACHE_WRITE_ICON, 'Cache write', formatTally(tokens.cacheWrite)),
   ]
 
   return [limits, [...cost, ...tokenItems]].filter(row => row.length > 0)
@@ -138,11 +142,17 @@ function valueItem(key: string, icon: Icon, label: string, value: string): BandI
 }
 
 function addUsage(totals: TokenTotals, usage: TurnUsage): TokenTotals {
+  const price = priceForModel(usage.model)
+  const add = (kind: TokenKind, tokens: number): TokenTally => ({
+    tokens: totals[kind].tokens + tokens,
+    usd: totals[kind].usd + (price === undefined ? 0 : (tokens * price[kind]) / TOKENS_PER_MILLION),
+  })
+
   return {
-    input: totals.input + usage.input_tokens,
-    output: totals.output + usage.output_tokens,
-    cacheRead: totals.cacheRead + usage.cache_read_input_tokens,
-    cacheWrite: totals.cacheWrite + usage.cache_creation_input_tokens,
+    input: add('input', usage.input_tokens),
+    output: add('output', usage.output_tokens),
+    cacheRead: add('cacheRead', usage.cache_read_input_tokens),
+    cacheWrite: add('cacheWrite', usage.cache_creation_input_tokens),
   }
 }
 
@@ -151,8 +161,8 @@ function drawGauge(Text: ElementConstructor<TextProps>, limit: LimitGauge) {
   const filledCells = Math.min(BAR_CELLS, Math.max(0, Math.round(limit.fill * BAR_CELLS)))
 
   return [
-    <Text color={color}>{BAR_LINE.repeat(filledCells)}</Text>,
-    <Text dimColor>{BAR_LINE.repeat(BAR_CELLS - filledCells)}</Text>,
+    <Text color={color}>{BAR_FILLED.repeat(filledCells)}</Text>,
+    <Text dimColor>{BAR_EMPTY.repeat(BAR_CELLS - filledCells)}</Text>,
     ' ',
     <Text color={color}>{limit.value}</Text>,
   ]
@@ -187,8 +197,8 @@ function formatUsd(usd: number): string {
   return `$${usd.toFixed(2)}`
 }
 
-function formatTokenCount(tokens: number): string {
-  return `${formatTokens(tokens)} tok`
+function formatTally(tally: TokenTally): string {
+  return `${formatTokens(tally.tokens)} tok (${formatUsd(tally.usd)})`
 }
 
 function formatTokens(tokens: number): string {
