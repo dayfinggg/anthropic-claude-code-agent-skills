@@ -73,10 +73,14 @@ const programOf = (stage: string): string | undefined => {
   return undefined
 }
 
+const REMOTE_PROGRAMS = /\b(ssh|scp|docker|kubectl)\b/
+
 const localFileProgram = (command: string): string | undefined => {
-  if (/\b(ssh|scp|docker|kubectl)\b/.test(command)) return undefined
-  const body = command.replace(/<<-?\s*'?(\w+)'?[\s\S]*?\n\1\b/g, '<<heredoc')
+  const body = command
+    .replace(/<<-?\s*'?(\w+)'?[\s\S]*?\n\1\b/g, '<<heredoc')
+    .replace(/'[^']*'|"[^"]*"/g, ' quoted ')
   for (const part of body.split(/&&|\|\||;|\n/)) {
+    if (REMOTE_PROGRAMS.test(part)) continue
     const [first = '', ...piped] = part.split('|')
     const found = programOf(first.replace(/^\s*(cd\s+\S+|\(|\{)\s*/, '')) ?? piped.map(stage => programOf(stage)).find(p => p === 'tee' || p === 'Out-File' || p === 'Set-Content' || p === 'Add-Content')
     if (found) return found
@@ -103,16 +107,65 @@ const REFERENCE_DIRS = ['reference', 'references']
 const SKILL_OWN_FILES = /^(skill|license|readme)\b/i
 
 type SkillReferences = { files: string[]; read: Set<string>; reminded: boolean }
+const PROSE_FILES = /^(md|mdx|markdown|txt|rst)$/
+const PLAN_TOOL = 'mcp__ccd_turn__update_plan'
+const WRAP_UP_TOOL = 'mcp__ccd_turn__wrap_up'
+const CALLS_BEFORE_PLAN_REMINDER = 30
+
+type PlanState = { isOpen: boolean; callsSinceUpdate: number; reminded: boolean }
+const plan: PlanState = { isOpen: false, callsSinceUpdate: 0, reminded: false }
+
+const hasOpenStep = (input: object) =>
+  !('items' in input) || !Array.isArray(input.items) || input.items.some(item => typeof item === 'object' && item !== null && 'status' in item && item.status !== 'completed')
+
+const takeStalePlan = (tool: string, input: object) => {
+  if (tool === PLAN_TOOL) Object.assign(plan, { isOpen: hasOpenStep(input), callsSinceUpdate: 0, reminded: false })
+  else if (tool === WRAP_UP_TOOL) plan.isOpen = false
+  else if (plan.isOpen) plan.callsSinceUpdate += 1
+  if (!plan.isOpen || plan.reminded || plan.callsSinceUpdate < CALLS_BEFORE_PLAN_REMINDER) return 0
+  plan.reminded = true
+  return plan.callsSinceUpdate
+}
+
 type LoopState = {
-  webRead: boolean
-  webReminded: boolean
+  webReadSinceLastLanguage: boolean
+  changedLanguages: Set<string>
   skillReferences: Map<string, SkillReferences>
+  textAwaitingCall: boolean
+  narrated: boolean
 }
 
 const mainLoop: LoopState = {
-  webRead: false,
-  webReminded: false,
+  webReadSinceLastLanguage: false,
+  changedLanguages: new Set(),
   skillReferences: new Map(),
+  textAwaitingCall: false,
+  narrated: false,
+}
+
+const languageOf = (path: string) => /\.([A-Za-z0-9]+)$/.exec(path)?.[1]?.toLowerCase() ?? ''
+
+const takeUnresearchedLanguage = (path: string) => {
+  const language = languageOf(path)
+  if (!language || PROSE_FILES.test(language) || mainLoop.changedLanguages.has(language)) return ''
+  mainLoop.changedLanguages.add(language)
+  const researched = mainLoop.webReadSinceLastLanguage
+  mainLoop.webReadSinceLastLanguage = false
+  return researched ? '' : language
+}
+
+const trackNarration = (content: readonly ContentBlock[]) => {
+  const hasText = content.some(block => block.type === 'text' && typeof block.text === 'string' && block.text.trim() !== '')
+  const hasToolUse = content.some(block => block.type === 'tool_use')
+  if (hasToolUse && (hasText || mainLoop.textAwaitingCall)) mainLoop.narrated = true
+  if (hasToolUse) mainLoop.textAwaitingCall = false
+  else if (hasText) mainLoop.textAwaitingCall = true
+}
+
+const takeNarration = () => {
+  const narrated = mainLoop.narrated
+  mainLoop.narrated = false
+  return narrated
 }
 let skillCallerAgentId: string | undefined
 
@@ -190,7 +243,10 @@ export const register: Register = on => {
   on('prompt.submit', async ($, e, next) => {
     const request = USER_ORIGINS.includes(e.origin.kind) ? excerptOf(e.text) : ''
     if (request) await markTurn($, { request })
-    if (e.origin.kind !== NOTIFICATION_ORIGIN) return next(e)
+    if (e.origin.kind !== NOTIFICATION_ORIGIN) {
+      const startNote = request && !e.command ? (await $.fs.read(`${$.plugin.root}/instructions/reminders/task_start.md`).catch(() => '')).trim() : ''
+      return next(startNote ? { ...e, context: [...(e.context ?? []), startNote] } : e)
+    }
     const template = await $.fs.read(`${$.plugin.root}/instructions/reminders/task_notification.md`).catch(() => '')
     const note = fillLines(template, { request: (await readTurn($)).request })
     return next(note ? { ...e, context: [...(e.context ?? []), note] } : e)
@@ -198,7 +254,8 @@ export const register: Register = on => {
 
   on('turn.start', async ($, e, next) => {
     await markTurn($, { silenceAllowed: false })
-    mainLoop.webReminded = false
+    mainLoop.textAwaitingCall = false
+    mainLoop.narrated = false
     return next(e)
   })
 
@@ -210,18 +267,20 @@ export const register: Register = on => {
     const command = 'command' in e && typeof e.command === 'string' ? e.command : ''
     const filePath = 'file_path' in e && typeof e.file_path === 'string' ? e.file_path : ''
     if (e.tool === 'Read' && filePath) markReferenceRead(mainLoop.skillReferences, filePath)
-    if (WEB_TOOLS.test(String(e.tool))) mainLoop.webRead = true
+    if (WEB_TOOLS.test(String(e.tool))) mainLoop.webReadSinceLastLanguage = true
     const isChange = CHANGE_TOOLS.includes(String(e.tool))
     const shellProgram = SHELL_TOOLS.includes(String(e.tool)) ? localFileProgram(command) : undefined
     const unreadSkill = isChange ? takeUnremindedSkills(mainLoop.skillReferences) : undefined
-    const needsWeb = isChange && !mainLoop.webRead && !mainLoop.webReminded
-    if (needsWeb) mainLoop.webReminded = true
+    const unresearchedLanguage = isChange ? takeUnresearchedLanguage(filePath) : ''
+    const staleCalls = takeStalePlan(String(e.tool), e)
     const names = [
+      takeNarration() && 'narration',
       result.isError && 'tool_error',
       e.tool === 'Agent' && (isLaunchOnly(result.result) ? 'agent_launched' : 'agent_result'),
       shellProgram && 'shell_files',
       unreadSkill && 'skill_refs',
-      needsWeb && 'web_sources',
+      unresearchedLanguage && 'web_sources',
+      staleCalls && 'plan_stale',
     ].filter((name): name is string => Boolean(name))
     if (!names.length) return result
     const templates = await Promise.all(
@@ -232,9 +291,16 @@ export const register: Register = on => {
       program: shellProgram ?? '',
       skill: unreadSkill?.names ?? '',
       files: unreadSkill?.files.join('\n') ?? '',
+      language: unresearchedLanguage,
+      calls: staleCalls ? String(staleCalls) : '',
     }
     const text = fillLines(templates.join('\n'), values)
     return text ? { ...result, context: [...(result.context ?? []), text] } : result
+  }).catch(($, e, next) => next(e))
+
+  on('session.append', { door: 'response' }, async ($, e, next) => {
+    if (!e.agentId) trackNarration(e.message.content as readonly ContentBlock[])
+    return next(e)
   }).catch(($, e, next) => next(e))
 
   on('session.append', { door: 'tool-result' }, async ($, e, next) => {
@@ -253,7 +319,10 @@ export const register: Register = on => {
     const extra = (await $.fs.read(`${$.plugin.root}/instructions/compact/summary.md`).catch(() => '')).trim()
     const instructions = [e.instructions, extra].filter(Boolean).join('\n\n')
     const compacted = await next(instructions ? { ...e, instructions } : e)
-    if (!e.agentId && e.trigger !== 'precompute' && !compacted.skip) mainLoop.webRead = false
+    if (!e.agentId && e.trigger !== 'precompute' && !compacted.skip) {
+      mainLoop.webReadSinceLastLanguage = false
+      mainLoop.changedLanguages.clear()
+    }
     return compacted
   }).catch(($, e, next) => next(e))
 
@@ -286,8 +355,9 @@ export const register: Register = on => {
     const readNote = async (name: string) => (await $.fs.read(`${dir}/${name}`).catch(() => '')).trim()
     const isDeferred = matchesAny(await readList('deferred.md'), e.tool)
     const ownGuidance = /^[\w-]+$/.test(e.tool) ? await readNote(`${e.tool}.md`) : ''
+    const screenNote = matchesAny(await readList('screen.txt'), e.tool) ? await readNote('screen.md') : ''
     const callNote = matchesAny(await readList('silent.txt'), e.tool) ? await readNote('silent.md') : ''
-    const guidance = [ownGuidance, callNote].filter(Boolean).join('\n\n')
+    const guidance = [ownGuidance, screenNote, callNote].filter(Boolean).join('\n\n')
     const result = await next(e)
     const described = guidance ? { ...result, description: `${result.description}\n\n${guidance}` } : result
     return isDeferred ? { ...described, isDeferred: true } : described

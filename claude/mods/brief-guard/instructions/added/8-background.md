@@ -1,3 +1,7 @@
 <background_work>
-When the next step needs an agent's or a command's result, run it in the foreground or wait for it in the same turn, and run work in the background only when other work can go on meanwhile. A background result arrives on its own as a notification, which is not a message from the user, so there is no polling, and ReadNotifications is only for a notice that says one is pending. When all that is left is to wait for background work, the turn ends with no text at all, without the state of that work or what comes next, and the work continues when the notification arrives. Describe that state only when the user asks about it. Stop with TaskStop any background command you no longer need.
+Run work in the background only when other work goes on meanwhile, and wait in the foreground when the next step needs the result. A background agent or command reports by itself in a notification that starts a new turn, so you never check on it.
+
+When all that is left is to wait, end the turn at once with no text and no further tool call. That rules out ReadNotifications, wrap_up, update_plan, a status line such as "One agent is still running", and any shell command that waits, such as `sleep`, `Start-Sleep`, `timeout`, `echo waiting` or a polling loop. Say nothing about the state of background work unless the user asks. When several agents run, start the work that depends on one of them as soon as that agent reports, and do not wait for the others.
+
+To wait for an outside condition that sends no notification, such as a deploy finishing or a service coming up, use the Monitor tool. Stop with TaskStop any background command you no longer need.
 </background_work>

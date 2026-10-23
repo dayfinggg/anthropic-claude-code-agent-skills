@@ -1,15 +1,6 @@
 # Project structure
 
-These layouts are starting points. An existing project's structure wins. For large systems, group by business capability first (orders, billing, users) and put the layers inside each capability, so the top level shows what the system does.
-
-## Contents
-
-- Python
-- TypeScript
-- Java
-- C#
-- Go
-- Enforcing dependency direction
+Starting points only. An existing project's structure wins.
 
 ## Python
 
@@ -48,7 +39,7 @@ com.example.shop.orders.adapters.out.persistence
 com.example.shop.config                    Spring configuration as composition root
 ```
 
-Keep Spring, JPA, and Jackson annotations out of `domain` and `application`. Map JPA entities to domain objects in the persistence adapter.
+Keep Spring, JPA, and Jackson annotations out of `domain` and `application`, and map JPA entities to domain objects in the persistence adapter.
 
 ## C#
 
@@ -73,11 +64,9 @@ internal/
 cmd/shop/main.go      composition root
 ```
 
-Define interfaces in the package that uses them, which is the Go way to point dependencies inward.
+Define interfaces in the package that uses them.
 
-## Enforcing dependency direction
-
-Rules that only live in documentation drift, so check them in CI.
+## Enforcing dependency direction in CI
 
 | Language | Tool |
 |---|---|

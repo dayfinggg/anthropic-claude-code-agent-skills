@@ -1,38 +1,16 @@
 # Changelog and README
 
-The changelog rules follow Keep a Changelog 1.1.0 at keepachangelog.com/en/1.1.0, which is a published convention. The README outline is recommended practice, because no official README standard exists.
+## Changelog rules
 
-## Contents
+These follow Keep a Changelog 1.1.0 at keepachangelog.com/en/1.1.0.
 
-- Keep a Changelog principles
-- Changelog template
-- Writing entries
-- From commits to entries
-- Releasing and yanking
-- README outline
-- README rules
-
-## Keep a Changelog principles
-
-- Changelogs are for humans, not machines.
-- Every version has an entry.
-- Changes of the same type are grouped.
-- Versions and sections are linkable.
-- The latest version comes first.
-- Each version shows its release date.
-- The file says whether the project follows Semantic Versioning.
-- The file is called `CHANGELOG.md`. Some projects use `HISTORY`, `NEWS`, or `RELEASES`, and an existing name stays.
-
-The six types of change are these.
-
-| Type | Use for |
-|---|---|
-| Added | New features |
-| Changed | Changes in existing functionality |
-| Deprecated | Features that will be removed soon |
-| Removed | Features removed in this version |
-| Fixed | Bug fixes |
-| Security | Fixed vulnerabilities |
+- Entries are written for humans. Each states in a sentence the effect a user or integrator notices, and commit history is only a list of candidates.
+- The newest version comes first, with its release date in ISO 8601 form `YYYY-MM-DD`.
+- `## [Unreleased]` stays at the top, gets entries in the same change as the behavior, and its entries move under the version heading at release.
+- Groups are Added, Changed, Deprecated, Removed, Fixed, and Security. Empty groups are left out.
+- Every deprecation, removal, and breaking change is listed with what to use instead, because a changelog that mentions only some changes can be as dangerous as none.
+- Every version has an entry and a link, and the header says whether the project follows Semantic Versioning.
+- A pulled release stays in the file, marked `[YANKED]`.
 
 ## Changelog template
 
@@ -64,22 +42,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.4.0]: https://github.com/example-org/example-app/compare/v1.3.0...v1.4.0
 ```
 
-- Version headings use the form `## [1.4.0] - 2026-10-02`, with the date in ISO 8601 order of year, month, and day.
-- Link definitions at the bottom point each version to a comparison with the previous tag, and `Unreleased` to a comparison of the latest tag with `HEAD`. Use the comparison URL form of the project's hosting service.
-- Leave out type headings that have no entries.
-
-## Writing entries
-
-- Describe the effect on a user or integrator, not the implementation. "Search results are sorted by relevance" helps, "Refactor SearchService" does not.
-- Start with the affected feature, command, endpoint, or setting, and put identifiers in code font.
-- For a breaking change, state what breaks and what to do instead, and link the migration guide when one exists.
-- List every deprecation and removal. A changelog that mentions only some changes can be as dangerous as none at all.
-- Leave out changes nobody outside the team notices, such as refactoring, test changes, and CI changes.
-- Add the entry under `Unreleased` in the same change as the behavior, so the release needs no reconstruction from memory.
+- Link definitions point each version to a comparison with the previous tag, and `Unreleased` to the latest tag compared with `HEAD`, in the URL form of the project's hosting service.
+- The file is `CHANGELOG.md`. An existing name such as `HISTORY`, `NEWS`, or `RELEASES` stays.
+- Start each entry with the affected feature, command, endpoint, or setting, with identifiers in code font. For a breaking change, link the migration guide when one exists.
+- Leave out changes nobody outside the team notices, such as refactoring, tests, and CI.
 
 ## From commits to entries
 
-Commit log diffs are full of noise, so never paste `git log` output into the changelog. When the project uses Conventional Commits, read the history since the last tag as a list of candidates and rewrite each relevant one by hand. This mapping is a starting point, not part of either convention.
+When the project uses Conventional Commits, read the history since the last tag as a list of candidates and rewrite each relevant commit by hand. Merge several commits about one feature into one entry. This mapping is a starting point, not part of either convention.
 
 | Commit type | Usual changelog type |
 |---|---|
@@ -89,21 +59,17 @@ Commit log diffs are full of noise, so never paste `git log` output into the cha
 | `perf` | Changed, when users notice the difference |
 | `refactor`, `test`, `ci`, `build`, `style`, `chore`, `docs` | Usually no entry |
 
-Merge several commits about one feature into one entry. The writing-commit-messages skill owns the commit messages themselves.
+## Releasing
 
-## Releasing and yanking
+1. The releasing-software skill chooses the version number.
+2. Move the entries under `Unreleased` to a heading such as `## [1.5.0] - 2026-10-20`, and leave an empty `## [Unreleased]` above it.
+3. Update the link definitions for the new version and for `Unreleased`.
 
-1. Choose the new version number. The releasing-software skill owns that decision.
-2. Move the entries under `Unreleased` to a new heading with the version and the release date, and leave an empty `## [Unreleased]` above it.
-3. Update the link definitions at the bottom for the new version and for `Unreleased`.
-
-A release pulled because of a serious bug or security issue stays in the file with the `[YANKED]` tag, as in `## [0.0.5] - 2014-12-13 [YANKED]`, so readers notice it.
-
-Improving an existing changelog is welcome. Add missing releases and missing notes on breaking changes when you find them.
+A yanked release keeps its heading with the tag, as in `## [0.0.5] - 2014-12-13 [YANKED]`. Add missing releases and missing breaking change notes when you find them.
 
 ## README outline
 
-GitHub's documentation lists what a README typically covers, namely what the project does, why it is useful, how to get started, where to get help, and who maintains and contributes to it. GitHub shows a README from `.github/`, the repository root, or `docs/`, in that order of priority. The outline below turns this into a default order.
+No official README standard exists, so this outline is recommended practice. It follows what GitHub's documentation says a README typically covers. GitHub shows a README from `.github/`, the repository root, or `docs/`, in that order of priority.
 
 ```markdown
 # Project name
@@ -135,12 +101,8 @@ A link to CONTRIBUTING.md.
 The license name with a link to the LICENSE file.
 ```
 
-Add a section only when the project needs it, such as supported versions or a security policy link. Skip sections that would be empty.
-
-## README rules
-
-- The README is a landing page. It holds only what a reader needs to get started and to find the rest, and longer material moves to its own page under `docs/`.
-- The quickstart is a short tutorial path that ends in visible output. Option tables and API details go to reference pages.
-- Use relative links for files in the repository, which GitHub recommends because they keep working in clones and on other branches.
-- Badges are optional. Keep only those the project maintains and that tell the reader something current.
+- Add a section such as supported versions or a security policy link only when the project needs it, and skip sections that would be empty.
+- The quickstart ends in visible output. Option tables and API details go to reference pages.
+- Use relative links for repository files, which GitHub recommends because they keep working in clones and on other branches.
+- Keep only badges the project maintains and that tell the reader something current.
 - Run the install and quickstart commands in a clean environment before writing them.

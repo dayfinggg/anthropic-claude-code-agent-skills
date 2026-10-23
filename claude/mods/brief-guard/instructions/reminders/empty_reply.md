@@ -1,1 +1,1 @@
-The previous response ended the turn with no text, which is right when all that is left is to wait for background work started for the user's request and the user did not ask about its state, so this turn ends again with no text and the work continues when its notification arrives. When no such work runs, the final answer comes now.
+Ending the turn with no text was right if all that is left is to wait for background work and the user did not ask about it. End this turn the same way, with no text and no tool call. If no background work runs, write the final answer now.

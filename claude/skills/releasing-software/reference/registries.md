@@ -1,10 +1,9 @@
 # Registries
 
-Trusted publishing setup per registry, taken from each registry's own documentation. Registries change these details, so confirm them on the linked page before writing a workflow. The action SHAs below point at the release named in the comment, and need to be re-resolved before use.
+Trusted publishing setup per registry, from each registry's documentation. Confirm the details on the linked page before writing a workflow, and re-resolve the action SHAs. Every workflow sets `permissions: contents: read` at the top.
 
 ## Contents
 
-- Shape of every publish job
 - npm
 - PyPI
 - crates.io
@@ -12,13 +11,6 @@ Trusted publishing setup per registry, taken from each registry's own documentat
 - NuGet
 - Maven Central
 - Container registries
-
-## Shape of every publish job
-
-- The workflow sets `permissions: contents: read` at the top, and only the publishing job adds `id-token: write`.
-- The publishing job runs in a GitHub environment with required reviewers, and the trusted publisher on the registry names that environment.
-- The publishing job downloads the artifact the build job made. crates.io and RubyGems are the exception, because their publish commands package the source themselves, so that job checks out the tagged commit with `persist-credentials: false`.
-- The registry gets no token from secrets. After the first trusted publish, the user disallows token publishing where the registry offers it and revokes old tokens.
 
 ## npm
 
@@ -33,26 +25,6 @@ Source is [docs.npmjs.com/trusted-publishers](https://docs.npmjs.com/trusted-pub
 - **Afterwards.** In the package's Settings, under Publishing access, choose "Require two-factor authentication and disallow tokens". Trusted publishers keep working. Revoke the old automation tokens and delete the `NPM_TOKEN` secret.
 - **Private dependencies.** Trusted publishing covers only publishing. Installing private packages in the same workflow still needs a read-only granular token.
 
-```yaml
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: npm
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: "24"
-          registry-url: "https://registry.npmjs.org"
-          package-manager-cache: false
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: package
-      - run: npm publish ./*.tgz
-```
-
 ## PyPI
 
 Sources are [docs.pypi.org/trusted-publishers](https://docs.pypi.org/trusted-publishers/), [docs.pypi.org/attestations/producing-attestations](https://docs.pypi.org/attestations/producing-attestations/), and the [pypa/gh-action-pypi-publish README](https://github.com/pypa/gh-action-pypi-publish).
@@ -60,7 +32,6 @@ Sources are [docs.pypi.org/trusted-publishers](https://docs.pypi.org/trusted-pub
 - **Token.** The OIDC token is exchanged for an API token that is valid for 15 minutes.
 - **Registry setup.** Add a trusted publisher on the PyPI project with the owner, repository, workflow file name, and the environment, which PyPI strongly encourages. The Python Packaging User Guide adds manual approval on the `pypi` environment.
 - **Workflow.** `id-token: write` at job level, which PyPI strongly encourages over workflow level. Use `pypa/gh-action-pypi-publish` with no `user` or `password`. It cannot use trusted publishing from inside a reusable workflow, so the publishing job lives in a top-level workflow.
-- **Separate jobs.** Build the distributions in one job, upload `dist/` with `actions/upload-artifact`, and publish from a second job that downloads it, as both the action README and the Python Packaging User Guide recommend.
 - **Attestations.** The action generates and uploads attestations by default through its `attestations` input. Leave it on. GitLab CI/CD and Google Cloud need a manual `pypi-attestations sign` step instead.
 - **TestPyPI.** Use a separate trusted publisher on test.pypi.org and `repository-url: https://test.pypi.org/legacy/`.
 - **Afterwards.** Long-lived API tokens stay valid until someone revokes them, so ask the user to revoke them and delete the `PYPI_API_TOKEN` secret.

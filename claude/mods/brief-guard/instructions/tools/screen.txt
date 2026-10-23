@@ -1,0 +1,7 @@
+mcp__claude-in-chrome__computer
+mcp__claude-in-chrome__browser_batch
+mcp__claude-in-chrome__form_input
+mcp__Claude_Browser__computer
+mcp__Claude_Browser__browser_batch
+mcp__Claude_Browser__form_input
+mcp__computer-use__*

@@ -1,29 +1,10 @@
 # MADR 4.0.0 templates
 
-MADR 4.0.0 was released on 2024-09-17. The full and minimal templates below are copied unchanged from the `template` folder of the `adr/madr` repository at tag `4.0.0` (`adr-template.md` and `adr-template-minimal.md`), including the original wording and typos of the placeholders. The default skeleton is assembled from their headings with shortened placeholders. Use them when the repository has no ADR format of its own.
-
-## Contents
-
-- Conventions
-- Default skeleton for a new record
-- Full template
-- Minimal template
-
-## Conventions
-
-- Files live in `docs/decisions/`, and MADR allows subfolders to group records by category.
-- File names follow `NNNN-title-with-dashes.md`, where `NNNN` is a consecutive number and the title is lowercase with dashes.
-- The heading holds the title only, without the number, as in MADR's own records.
-- Lists use `*` as the marker and placeholders use curly braces, as in the templates.
-- The front matter fields are `status`, `date`, `decision-makers`, `consulted`, and `informed`, and every one of them is optional.
-- The status values are `proposed`, `rejected`, `accepted`, `deprecated`, and `superseded by ADR-NNNN`.
-- `date` is the day the decision was last updated, in `YYYY-MM-DD` form.
-- Links to other records go under More Information as relative Markdown links, as in `[ADR-0008](0008-add-status-field.md)`.
-- Required sections are the title, Context and Problem Statement, Considered Options, and Decision Outcome. Decision Drivers, Consequences, Confirmation, Pros and Cons of the Options, and More Information are optional.
+The full and minimal templates are copied unchanged from the `template` folder of `adr/madr` at tag `4.0.0`, typos included. MADR allows subfolders of `docs/decisions/` to group records by category. Lists use `*`, and links to other records are relative, as in `[ADR-0008](0008-add-status-field.md)`. The status values are `proposed`, `rejected`, `accepted`, `deprecated`, and `superseded by ADR-NNNN`.
 
 ## Default skeleton for a new record
 
-This is the minimal template plus the `status` and `date` fields and the optional sections used most often. Remove every section that stays empty.
+The minimal template plus `status`, `date`, and the optional sections used most often. Remove every section that stays empty.
 
 ```markdown
 ---

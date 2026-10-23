@@ -1,1 +1,1 @@
-The purpose of the command goes in the description field.
+The purpose of the command goes in the description field. Read local files with Read, never with cat, head, tail, sed -n or awk, and change them with Edit or Write. Never run a command only to wait, such as `sleep`, `timeout`, `echo waiting` or a polling loop. Wait for an agent or a background command by ending the turn, and wait on an outside condition with the Monitor tool.

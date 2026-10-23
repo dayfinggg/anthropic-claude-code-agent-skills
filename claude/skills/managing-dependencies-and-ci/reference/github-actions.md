@@ -1,76 +1,62 @@
 # GitHub Actions hardening
 
-Project conventions and the GitHub documentation win over this file. The commit SHAs in the templates were resolved from each action's release tags when this file was written. Look up the current release and its commit before you copy them.
+The commit SHAs in the templates point at the release in each comment. Resolve the current release and its commit before copying them.
 
 ## Contents
 
 - Permissions
 - Pinning actions
-- Script injection
-- Privileged triggers
-- Contributors and governance
-- Secrets and OIDC
-- Checks on every pull request
+- Untrusted input and privileged triggers
+- Repository settings
+- Secrets
+- Pull request checks
 - Hardened workflow template
 - Dependabot template
 - Scorecard audit list
 
 ## Permissions
 
-- **Read-only at the top.** Every workflow starts with `permissions: contents: read`. A job that needs a write scope gets its own `permissions` block.
-- **Job blocks replace, not add.** When a `permissions` block lists any scope, every unlisted scope becomes `none`. Repeat `contents: read` in a job block whenever the job also checks out code.
-- **Known grants.** CodeQL upload needs `security-events: write`. OIDC needs `id-token: write`. For any other scope, read the action's documentation and grant only what it names.
-- **No token at all.** Use `permissions: {}` for a job that needs no access through the token.
-- **Repository default.** Set the repository's default workflow permissions to the read-only option, so a workflow without a `permissions` block gets no write access.
-- **Checkout credentials.** `actions/checkout` writes the token into the local git config by default. Pass `persist-credentials: false` unless a later step pushes with git.
+- A job `permissions` block replaces the workflow block, and every scope it leaves out becomes `none`. Repeat `contents: read` in a job block when the job checks out code.
+- CodeQL upload needs `security-events: write` and OIDC needs `id-token: write`. For other scopes, grant only what the action's documentation names.
+- `permissions: {}` for a job that needs no token access.
+- Set the repository's default workflow permissions to read-only.
+- `actions/checkout` stores the token in the local git config, so pass `persist-credentials: false` unless a later step pushes with git.
 
 ## Pinning actions
 
-- **Full SHA with a version comment.** Write `uses: owner/repo@<40-character-sha> # vX.Y.Z`. GitHub calls a full-length commit SHA the only way to use an action as an immutable release, and Dependabot rewrites the comment together with the SHA when the comment sits on the same line.
-- **Resolve the commit yourself.** Run `git ls-remote --tags https://github.com/owner/repo.git` and take the commit for the release tag. For an annotated tag, use the line ending in `^{}`, which is the commit the tag points to.
-- **Every action from another repository.** Pin GitHub's own actions and reusable workflows the same way, so one rule covers the whole file. GitHub offers repository and organization policies that require SHA pinning.
-- **Images too.** Pin `container` and `services` images by digest.
-- **Look before adopting.** Read the source of a new third-party action, and prefer actions from the vendor of the tool they wrap.
+- Resolve the commit with `git ls-remote --tags https://github.com/owner/repo.git`. For an annotated tag, take the line ending in `^{}`.
+- Pin GitHub's own actions and reusable workflows the same way, and pin `container` and `services` images by digest.
+- Read the source of a new third-party action, and prefer actions from the vendor of the wrapped tool.
 
-## Script injection
+## Untrusted input and privileged triggers
 
-- **Untrusted values.** Issue and pull request titles and bodies, comments, review text, branch names, commit messages, and author names are written by whoever opens the issue or pull request.
-- **Through `env`, never inline.** Assign an expression such as `${{ github.event.pull_request.title }}` to an environment variable such as `TITLE` on the step and use `"$TITLE"`, quoted, in the script. An inline `${{ }}` is pasted into the script before the shell runs, so its content becomes code.
-- **Prefer an action with inputs.** An action that receives the value as an input argument avoids the shell entirely.
-- **Scan for it.** CodeQL with the `actions` language flags vulnerable workflows.
+- Untrusted values include issue and pull request titles and bodies, comments, review text, branch names, commit messages, and author names. An inline `${{ }}` is pasted into the script before the shell runs, so its content becomes code. An action that takes the value as an input avoids the shell entirely.
+- CodeQL with the `actions` language flags vulnerable workflows.
+- `pull_request_target` runs regardless of fork approval settings. `actions/checkout` v7.0.1 checks out fork pull request code under these triggers only with `allow-unsafe-pr-checkout: true`, which stays unset.
+- When a later step needs write access, run it in a separate `workflow_run` workflow that treats the first run's artifacts as untrusted data.
 
-## Privileged triggers
+## Repository settings
 
-- **What makes them dangerous.** `pull_request_target` and `workflow_run` run in the context of the base repository with its token and secrets. `pull_request_target` runs regardless of fork approval settings.
-- **Never run pull request code there.** Do not check out, build, install, or execute code from the pull request in these workflows. `actions/checkout` v7.0.1 checks out fork pull request code under these triggers only with `allow-unsafe-pr-checkout: true`, which you never set.
-- **Split the work.** Build and test contributions with `pull_request`, which gives fork pull requests a read-only token and no other secrets. When a later step needs write access, run it in a separate `workflow_run` workflow that treats the artifacts of the first run as untrusted data.
+- Under Actions, General, set "Approval for running fork pull request workflows from contributors" to "Require approval for all external contributors", and review `.github/workflows` changes before approving.
+- `.github/CODEOWNERS` gets `/.github/workflows/ @owner/team`, with code owner review required on the default branch.
+- Leave "Allow GitHub Actions to create and approve pull requests" off.
+- Protect the default branch with required reviews and status checks, and block force pushes.
+- Public repositories use no self-hosted runners. Where self-hosted runners are needed, make them ephemeral.
 
-## Contributors and governance
+## Secrets
 
-- **Approval for outside contributors.** In the repository settings under Actions, General, set "Approval for running fork pull request workflows from contributors" to "Require approval for all external contributors". Review every change under `.github/workflows` before approving a run.
-- **CODEOWNERS.** Add `/.github/workflows/ @owner/team` to `.github/CODEOWNERS` and require code owner review on the default branch.
-- **No self-approval by bots.** Leave "Allow GitHub Actions to create and approve pull requests" off.
-- **Branch protection.** Protect the default branch with required reviews and required status checks, and block force pushes.
-- **Runners.** Do not use self-hosted runners for public repositories. Where self-hosted runners are needed, make them ephemeral.
+- Register derived values for masking with `::add-mask::`.
+- Anyone with write access can read all repository secrets, so production secrets belong to an environment with required reviewers.
+- After a leak, delete the log and rotate the secret.
+- Repository push protection for secret scanning is off by default, so turn it on.
 
-## Secrets and OIDC
+## Pull request checks
 
-- **OIDC for cloud access.** The deploy job gets `id-token: write` and exchanges the token for short-lived cloud credentials, valid for that job only. No cloud access keys go into secrets.
-- **One secret per value.** Never store a JSON, YAML, or XML blob as a secret, because masking works on exact values. Register any derived value for masking with `::add-mask::`.
-- **Scope.** Anyone with write access to a repository can read all its secrets. Put production secrets in an environment with required reviewers, and reference them only from the job that deploys.
-- **Leaks.** If a secret reaches a log, delete the log and rotate the secret.
-- **Scanning.** Enable secret scanning and push protection for the repository. Repository push protection is off by default.
-
-## Checks on every pull request
-
-- **Tests and linters** for every language in the repository.
-- **SAST.** CodeQL for the repository's languages plus `actions`.
-- **Dependency review.** `actions/dependency-review-action` fails a pull request that introduces a vulnerable version and reports changes to indirect dependencies in lockfiles. It runs on public repositories, and on private repositories with GitHub Code Security or GitHub Advanced Security. Elsewhere, run the ecosystem's audit command.
-- **Required status checks.** Mark these jobs as required in branch protection so a failing check blocks the merge.
+`actions/dependency-review-action` fails a pull request that introduces a vulnerable version and reports indirect changes in lockfiles. It runs on public repositories, and on private ones with GitHub Code Security or Advanced Security. Elsewhere, run the ecosystem's audit command.
 
 ## Hardened workflow template
 
-`.github/workflows/ci.yml` for a Node.js project. Replace the install, lint, and test steps with the commands for the project's ecosystem.
+`.github/workflows/ci.yml` for a Node.js project. Swap the install, lint, and test steps for the project's ecosystem.
 
 ```yaml
 name: CI
@@ -131,7 +117,7 @@ jobs:
 
 ## Dependabot template
 
-`.github/dependabot.yml` covering the application ecosystem, the base image, and the workflows. Version updates wait 3 days after a release by default and security updates do not wait, so no `cooldown` block is needed.
+The default 3 day cooldown already applies to version updates, so there is no `cooldown` block.
 
 ```yaml
 version: 2
@@ -163,22 +149,20 @@ updates:
 
 ## Scorecard audit list
 
-Use the OpenSSF Scorecard checks as the audit list for a repository, highest risk first.
-
 | Check | Risk | What to look at |
 |---|---|---|
-| Dangerous-Workflow | Critical | Untrusted checkout under privileged triggers and script injection in workflows |
+| Dangerous-Workflow | Critical | Untrusted checkout under privileged triggers and script injection |
 | Webhooks | Critical | Repository webhooks have a secret |
-| Binary-Artifacts | High | No generated executables committed to the repository |
+| Binary-Artifacts | High | No generated executables committed |
 | Branch-Protection | High | Default and release branches require review and status checks and block force pushes |
 | Code-Review | High | Changes are reviewed by a human before merge |
 | Dependency-Update-Tool | High | Dependabot or Renovate is configured |
 | Maintained | High | Recent commits and responses to issues |
-| Signed-Releases | High | Release assets carry signatures or provenance, which the releasing-software skill covers |
+| Signed-Releases | High | Release assets carry signatures or provenance, covered by the releasing-software skill |
 | Token-Permissions | High | Read-only top-level permissions and writes only per job |
 | Vulnerabilities | High | No open known vulnerabilities in the project or its dependencies, per OSV |
 | Fuzzing | Medium | Fuzzing or property-based tests exist |
-| Packaging | Medium | The project publishes packages from a workflow |
+| Packaging | Medium | Packages are published from a workflow |
 | Pinned-Dependencies | Medium | Workflows, Dockerfiles, and scripts pin dependencies by hash |
 | SAST | Medium | A static analysis tool such as CodeQL runs on pull requests |
 | SBOM | Medium | An SBOM exists in the repository or the release |

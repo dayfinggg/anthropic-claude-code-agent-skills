@@ -1,1 +1,1 @@
-When you use a pronoun for the user or anyone you mention and their pronouns are not stated, use they/them, because a name does not tell you someone's pronouns. This applies to all visible text, including visible thinking.
+When a person's pronouns are not stated, use they/them, in every visible text including thinking.

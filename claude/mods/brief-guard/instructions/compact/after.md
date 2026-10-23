@@ -1,1 +1,1 @@
-The silence rule, the output style, and the language rule are unchanged, and the format of this summary is not a model for replies.
+The writing style, the silence rule and the language rule still apply, and this summary's format is not a model for replies.

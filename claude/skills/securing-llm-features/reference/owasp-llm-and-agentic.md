@@ -1,19 +1,14 @@
 # OWASP LLM and Agentic risks mapped to code rules
 
-Project conventions and the official pages linked below win over this file. Risk names are as published by the OWASP GenAI Security Project. The Agentic names were checked against the official PDF of the OWASP Top 10 for Agentic Applications 2026, version 2026, December 2025.
+Risk names are as published by the OWASP GenAI Security Project, the Agentic ones checked against the official PDF of December 2025. Apply every row the feature touches. Organizational measures such as training and red-team programs are left out.
 
 ## Contents
 
-- How to use this file
 - OWASP Top 10 for LLM Applications 2025
 - OWASP Top 10 for Agentic Applications 2026
 - OWASP cheat sheets
 - MCP security rules
 - Sources
-
-## How to use this file
-
-Find the risks that match the feature, then apply the code rules in the same row. OWASP repeats some controls across risks, such as least privilege and human approval, so apply every row the feature touches. Organizational measures such as training, red-team programs, and model training pipelines are left out, because they are not decisions made while writing application code.
 
 ## OWASP Top 10 for LLM Applications 2025
 
@@ -47,40 +42,20 @@ Find the risks that match the feature, then apply the code rules in the same row
 
 ## OWASP cheat sheets
 
-**LLM Prompt Injection Prevention Cheat Sheet.**
+Rules from the two cheat sheets that the SKILL.md rules do not already cover.
 
-- Distinguish direct injection from indirect injection hidden in content the model reads, such as web pages, code comments, commit messages, and issue descriptions.
-- Separate instructions from data with clearly labelled sections. The cheat sheet states that labels do not enforce the boundary and that its filters are illustrative layers, not a complete defense.
-- Validate output for leaked system prompts, exposed keys, and other policy violations before returning it.
-- Gate consequential tool actions behind human approval decided by the operation, target, arguments, and caller's authority, not by keywords in the prompt, and verify the approval for the exact action at execution.
-- Grant minimal permissions, prefer read-only database accounts, and validate tool calls against the user's permissions and session.
-- Treat encodings such as Base64, hex, and Unicode smuggling as attack vectors to detect.
-
-**AI Agent Security Cheat Sheet.**
-
-- Give agents only the tools their task needs, scope each tool to read or write and to specific resources, and never use wildcard permissions.
-- Enforce authorization in the execution component outside the model's context, and fail closed for unknown tools or missing approval requirements.
-- Check and consume approvals atomically, bind them to the exact tool call, and reissue them when the target or parameters change. Bind approvals to an expiry, protect them against replay, and require step-up authentication for critical actions.
-- Validate and sanitize data before storing it in agent memory. Isolate memory per user and session, set expiry and size limits, and check the integrity of long-term memory.
-- Validate tool calls with schema-checked structured output, filter sensitive data from output, and apply rate and scope limits.
-- Enforce token, cost, retry, and tool-chain limits, and never allow unlimited recursion, retries, or tool chaining.
-- Log all agent decisions, tool calls, and outcomes, and for high-risk actions also the risk classification, authorization outcome, approval ID, result, and policy version. Track token use and cost per session or user. Redact sensitive fields first.
-- In multi-agent systems, a valid message signature does not grant permission for the requested action. The receiver enforces the sender's permissions, and messages carry a unique ID and a bounded validity window.
-- Run adversarial tests before release and after any change to prompts, tools, memory, retrieval, policies, or model provider.
+- **LLM Prompt Injection Prevention.** Labels between instructions and data do not enforce the boundary, and the cheat sheet's filters are illustrative layers, not a complete defense. Validate output for leaked system prompts and keys before returning it. Decide approval by operation, target, arguments, and the caller's authority, not by prompt keywords. Treat Base64, hex, and Unicode smuggling as attack vectors to detect.
+- **AI Agent Security.** Scope each tool to read or write and to specific resources, without wildcard permissions. Fail closed for unknown tools or missing approval requirements. Check and consume approvals atomically, and require step-up authentication for critical actions. Check the integrity of long-term memory. Limit retries and tool chaining as well as tokens and cost. For high-risk actions also log the risk classification and policy version. Inter-agent messages carry a unique ID and a bounded validity window. Re-run adversarial tests after any change to prompts, tools, memory, retrieval, policies, or model provider.
 
 ## MCP security rules
 
-From the Model Context Protocol specification pages on tools and on security best practices.
+From the Model Context Protocol specification pages on tools and security best practices, beyond the SKILL.md rules.
 
-- Servers must validate all tool inputs, implement access controls, rate-limit tool invocations, and sanitize tool outputs.
-- Clients should prompt for confirmation on sensitive operations, show tool inputs to the user before calling the server, validate tool results before passing them to the model, set timeouts for tool calls, and log tool usage.
-- Clients must treat tool annotations as untrusted unless they come from trusted servers.
-- Servers must not accept tokens that were not issued for the server, so token passthrough to downstream APIs is forbidden.
-- Servers must not treat possession of a state handle as authentication. Bind handles server-side to the user taken from the verified token, and generate them with a secure random generator.
-- Servers meant to run locally should use the `stdio` transport, or require an authorization token or a restricted IPC channel when they use HTTP.
-- Clients that fetch URLs from servers should require HTTPS, block private and link-local address ranges, and validate redirect targets. Clients must reject dangerous schemes such as `javascript:` and `file:` in authorization URLs and must not open URLs through a shell.
-- Use a progressive, least-privilege scope model and avoid wildcard or omnibus scopes.
-- Clients that combine tools from several servers should disambiguate names, for example by prefixing them with a server identifier.
+- Clients show tool inputs before calling the server, validate tool results before passing them to the model, set timeouts, and log tool usage.
+- State handles come from a secure random generator and are bound server-side to the user from the verified token.
+- A local server on HTTP may use a restricted IPC channel instead of an authorization token.
+- Clients that fetch server-supplied URLs require HTTPS, block private and link-local ranges, and validate redirect targets. They reject `javascript:` and `file:` in authorization URLs and open no URL through a shell.
+- Scopes grow progressively from least privilege, without wildcard or omnibus scopes.
 
 ## Sources
 

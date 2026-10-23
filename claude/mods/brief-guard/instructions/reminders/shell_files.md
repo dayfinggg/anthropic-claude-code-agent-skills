@@ -1,1 +1,1 @@
-That shell command read or changed a local file with {program}. Local files are read with Read and changed with Edit or Write.
+That shell command read or changed a local file with {program}. Use Read for local files and Edit or Write to change them.
