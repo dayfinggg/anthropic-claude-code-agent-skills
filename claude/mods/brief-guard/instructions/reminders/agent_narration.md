@@ -1,0 +1,1 @@
+Your last message had text beside a tool call or before one. From here on a message with a tool call has no text block, your reasoning stays in thinking, and the only text of your run is the final report.

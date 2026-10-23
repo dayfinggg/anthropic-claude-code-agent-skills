@@ -43,6 +43,8 @@ const excerptOf = (text: string) =>
 const SHELL_TOOLS = ['Bash', 'PowerShell']
 const FILE_READERS = ['cat', 'head', 'tail', 'less', 'more', 'Get-Content', 'gc', 'type']
 const FILE_WRITERS = ['Set-Content', 'Add-Content', 'Out-File', 'tee']
+const ECHO_WRITERS = ['printf', 'echo']
+const FILE_REDIRECT = /(^|[^\d&])>>?\s*(?!\/dev\/null|&)\S/
 const SCRIPT_RUNNERS = /^(python3?|node|perl|ruby|php)$/
 const LOG_FILES = /\.(jsonl|log)\b/i
 const SOURCES_REMINDER = /\n*REMINDER: You MUST include the sources above[^\n]*/g
@@ -67,6 +69,7 @@ const programOf = (stage: string): string | undefined => {
   const [name = ''] = words
   if (FILE_READERS.includes(name) && hasOperand(words) && !LOG_FILES.test(stage)) return name
   if (FILE_WRITERS.includes(name)) return name
+  if (ECHO_WRITERS.includes(name) && FILE_REDIRECT.test(stage)) return `${name} >`
   if (name === 'sed' && words.some(w => /^-[a-zA-Z]*[ni]/.test(w))) return 'sed'
   if (name === 'awk' && words.length > 2) return 'awk'
   if (SCRIPT_RUNNERS.test(name) && words.slice(1).some(w => w === '-' || /^-[a-zA-Z]*[ceE]$/.test(w) || w.startsWith('<<'))) return `inline ${name}`
@@ -155,12 +158,30 @@ const takeUnresearchedLanguage = (path: string) => {
   return researched ? '' : language
 }
 
-const trackNarration = (content: readonly ContentBlock[]) => {
+type NarrationState = { textAwaitingCall: boolean; narrated: boolean }
+const agentNarration = new Map<string, NarrationState>()
+
+const trackNarration = (content: readonly ContentBlock[], state: NarrationState = mainLoop) => {
   const hasText = content.some(block => block.type === 'text' && typeof block.text === 'string' && block.text.trim() !== '')
   const hasToolUse = content.some(block => block.type === 'tool_use')
-  if (hasToolUse && (hasText || mainLoop.textAwaitingCall)) mainLoop.narrated = true
-  if (hasToolUse) mainLoop.textAwaitingCall = false
-  else if (hasText) mainLoop.textAwaitingCall = true
+  if (hasToolUse && (hasText || state.textAwaitingCall)) state.narrated = true
+  if (hasToolUse) state.textAwaitingCall = false
+  else if (hasText) state.textAwaitingCall = true
+}
+
+const agentNarrationOf = (agentId: string) => {
+  const known = agentNarration.get(agentId)
+  if (known) return known
+  const fresh = { textAwaitingCall: false, narrated: false }
+  agentNarration.set(agentId, fresh)
+  return fresh
+}
+
+const takeAgentNarration = (agentId: string) => {
+  const state = agentNarrationOf(agentId)
+  const narrated = state.narrated
+  state.narrated = false
+  return narrated
 }
 
 const STYLE_REMINDER_EVERY = 10
@@ -290,8 +311,16 @@ export const register: Register = on => {
   on('tool.call', async ($, e, next) => {
     if (e.tool === SKILL_TOOL) skillCallerAgentId = e.agentId
     const result = await next(e)
-    if (e.agentId || result.deny !== undefined) return result
+    if (result.deny !== undefined) return result
     const command = 'command' in e && typeof e.command === 'string' ? e.command : ''
+    if (e.agentId) {
+      const agentProgram = SHELL_TOOLS.includes(String(e.tool)) ? localFileProgram(command) : undefined
+      const agentNames = [takeAgentNarration(e.agentId) && 'agent_narration', agentProgram && 'shell_files'].filter((name): name is string => Boolean(name))
+      if (!agentNames.length) return result
+      const agentTemplates = await Promise.all(agentNames.map(name => $.fs.read(`${$.plugin.root}/instructions/reminders/${name}.md`).catch(() => '')))
+      const note = fillLines(agentTemplates.join('\n'), { program: agentProgram ?? '' })
+      return note ? { ...result, context: [...(result.context ?? []), note] } : result
+    }
     const filePath = 'file_path' in e && typeof e.file_path === 'string' ? e.file_path : ''
     if (e.tool === 'Read' && filePath) markReferenceRead(mainLoop.skillReferences, filePath)
     if (WEB_TOOLS.test(String(e.tool))) mainLoop.webReadSinceLastLanguage = true
@@ -328,7 +357,7 @@ export const register: Register = on => {
   }).catch(($, e, next) => next(e))
 
   on('session.append', { door: 'response' }, async ($, e, next) => {
-    if (!e.agentId) trackNarration(e.message.content as readonly ContentBlock[])
+    trackNarration(e.message.content as readonly ContentBlock[], e.agentId ? agentNarrationOf(e.agentId) : mainLoop)
     return next(e)
   }).catch(($, e, next) => next(e))
 
