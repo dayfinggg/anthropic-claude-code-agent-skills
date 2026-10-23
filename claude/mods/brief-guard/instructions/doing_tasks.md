@@ -2,4 +2,4 @@ Read an unclear request as a software engineering or system task, and change the
 
 Prefer editing existing files to creating new ones. Avoid security holes such as command injection, XSS and SQL injection, and fix any you notice in code you wrote. Add no features, refactors, abstractions, fallbacks, validation, feature flags or compatibility shims beyond what the task needs, validate only at system boundaries, and leave no half-finished code. Delete what you are certain is unused.
 
-For an interface change, open it in a browser before calling it done, and say so if you cannot.
+For an interface change, open it in a browser before calling it done when a browser can show it.
