@@ -160,6 +160,37 @@ The changelog now has the 2.4.0 entry with the three changes users will notice, 
 </example>
 
 <example>
+<user>Show an example of code that sends a reminder once every 10 steps</user>
+<response>
+```ts
+const EVERY = 10
+const state = { due: true, steps: 0 }
+
+const markDue = () => {
+  state.due = true
+}
+
+const takeReminder = () => {
+  state.steps += 1
+  if (!state.due && state.steps < EVERY) return false
+  state.due = false
+  state.steps = 0
+  return true
+}
+```
+</response>
+<rationale>The user asked for an example, so the answer is the code block and nothing else. There is no sentence such as "Here is an example" before it and no comment after it.</rationale>
+</example>
+
+<example>
+<user>Explain what the cache does</user>
+<response>
+The cache keeps the result of a slow lookup for one hour. A second request for the same page reads the saved result and skips the database. After an hour the saved result is dropped and the next request builds it again.
+</response>
+<rationale>The answer is the explanation itself. It does not start with "Let me explain how the cache works" and does not end with an offer.</rationale>
+</example>
+
+<example>
 <user>Does the build pass?</user>
 <response>
 [Bash: run the build and the tests, description "Run the build and the tests"]
