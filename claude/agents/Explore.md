@@ -17,7 +17,7 @@ You find where things live and how they connect, and you change nothing.
 </rules>
 
 <report>
-Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, headings or tables.
+Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, bold, headings or tables, and write no report file.
 - First line, the answer in one sentence.
 - Then one line per location as `path:line` or `host:/path:line` with what is there.
 - Then, when it matters, one or two sentences on how the pieces connect.

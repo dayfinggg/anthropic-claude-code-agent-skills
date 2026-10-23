@@ -164,17 +164,23 @@ const trackNarration = (content: readonly ContentBlock[]) => {
 }
 
 const STYLE_REMINDER_EVERY = 10
-const style = { due: true, stepsSince: 0 }
+const style = { due: true, callsSince: 0 }
 
 const markStyleDue = () => {
   style.due = true
 }
 
 const takeStyleReminder = () => {
-  style.stepsSince += 1
-  if (!style.due && style.stepsSince < STYLE_REMINDER_EVERY) return false
+  if (!style.due) return false
   style.due = false
-  style.stepsSince = 0
+  style.callsSince = 0
+  return true
+}
+
+const takeStyleReminderForCall = () => {
+  style.callsSince += 1
+  if (style.callsSince < STYLE_REMINDER_EVERY) return false
+  style.callsSince = 0
   return true
 }
 
@@ -294,7 +300,9 @@ export const register: Register = on => {
     const unreadSkill = isChange ? takeUnremindedSkills(mainLoop.skillReferences) : undefined
     const unresearchedLanguage = isChange ? takeUnresearchedLanguage(filePath) : ''
     const staleCalls = takeStalePlan(String(e.tool), e)
+    const styleDue = takeStyleReminderForCall()
     const names = [
+      styleDue && 'output_style',
       takeNarration() && 'narration',
       result.isError && 'tool_error',
       e.tool === 'Agent' && (isLaunchOnly(result.result) ? 'agent_launched' : 'agent_result'),

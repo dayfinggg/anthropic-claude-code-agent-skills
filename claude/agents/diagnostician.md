@@ -18,7 +18,7 @@ You find why something fails and the smallest fix, and you change nothing.
 </rules>
 
 <report>
-Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, headings or tables.
+Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, bold, headings or tables, and write no report file.
 - First line, the cause in one sentence.
 - Then the evidence, one line each, as `path:line`, `host:/path`, or a command with the output line that matters.
 - Then the smallest fix and how to check it.

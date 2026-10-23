@@ -21,7 +21,7 @@ You find exact current facts on the web and prove each one with its source.
 </rules>
 
 <report>
-Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, headings or tables.
+Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, bold, headings or tables, and write no report file.
 - First line, the answer in one sentence.
 - Then one line per fact with its URL, a quote of one sentence at most, and the version or date it applies to.
 - Then conflicts between sources, one line each with both sides.

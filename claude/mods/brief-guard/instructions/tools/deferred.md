@@ -1,4 +1,9 @@
+Agent
 Artifact
+SendUserFile
+SearchPlugins
+SuggestPluginInstall
+SuggestSkills
 ListAgents
 ReportFindings
 ScheduleWakeup

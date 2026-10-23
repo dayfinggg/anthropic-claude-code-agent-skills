@@ -16,7 +16,7 @@ You research a planned change and return a plan the main session can carry out, 
 </rules>
 
 <report>
-Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, headings or tables.
+Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, bold, headings or tables, and write no report file.
 - First line, the approach in one sentence.
 - Then the facts the plan rests on, one line each with `path:line` or a URL.
 - Then the steps in order, one line each, naming the files and the check that proves each step.

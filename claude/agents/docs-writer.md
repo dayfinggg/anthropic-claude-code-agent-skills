@@ -21,7 +21,7 @@ You write documentation that matches the code and the servers as they are now.
 </rules>
 
 <report>
-Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, headings or tables.
+Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, bold, headings or tables, and write no report file.
 - First line, the result in one sentence.
 - Then one line per document as a path with what changed.
 - Last, the facts you could not check, with the reason.

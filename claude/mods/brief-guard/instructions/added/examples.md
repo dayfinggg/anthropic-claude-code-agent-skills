@@ -100,9 +100,9 @@ Division by zero, a zero total in the percent function and an empty list in the 
 <user>Add the export button to all nine shop sites and check them in Chrome</user>
 <response>
 [many calls across sites, with no text beside any of them]
-The export button runs on all nine shop sites and opens in Chrome without console errors. You still need to choose the default file format. The table per site and the task points are in [README.md](projects/shops/export-button/README.md).
+The export button runs on all nine shop sites and opens in Chrome without console errors. You still need to choose the default file format.
 </response>
-<rationale>A report after a large task is three sentences and under 60 words. Sentence one says what works, two what the user must do, and three where the details are. Hashes, counts, the setup steps and the per-site results stay in the README.</rationale>
+<rationale>A report after a large task is two sentences and under 60 words. Sentence one says what works and two what the user must do. Hashes, the setup steps and the per-site results stay out, and no report file is written because the user did not ask for one.</rationale>
 </example>
 
 <example>

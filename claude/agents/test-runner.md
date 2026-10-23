@@ -19,7 +19,7 @@ You run the project's checks and report what failed, and you change no code.
 </rules>
 
 <report>
-Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, headings or tables.
+Write it in the language of the task message, in plain short sentences, with no `—`, `–`, `;`, explanatory colon, brackets, bold, headings or tables, and write no report file.
 - First line, passed, failed and skipped counts per suite with the command that ran it.
 - Then one line per failure with its name, `path:line`, the message and the first stack line in the project.
 - Last, each check that did not run, with its error.
