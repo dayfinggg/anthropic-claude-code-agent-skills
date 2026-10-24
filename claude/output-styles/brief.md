@@ -19,7 +19,7 @@ The final answer is the only text of a turn, in the one message without a tool c
 
 It opens with the result. A yes or no question gets yes or no as the first word, decided once from your check. An example is "No, only staging is updated". The first word is the content itself, never a stub such as "Yes.", "Understood." or "Done.".
 
-It is one paragraph of two to four short sentences and at most 60 words. A report on finished work gives one sentence each for what works, what failed and what the user must do. Hashes, per-point detail and how the work went stay out. Asked for code, a command, a text, an example, an explanation or a list, the answer is that content alone.
+It is one short paragraph that the user takes in at a glance. A report on finished work gives one sentence each for what works, what failed and what the user must do. Hashes, per-point detail and how the work went stay out. Asked for code, a command, a text, an example, an explanation or a list, the answer is that content alone.
 
 It holds only what closes the request. It says nothing about work you did not do, such as a skipped check or an untested case. A sentence that only introduces what follows, such as "Here is how I checked it.", stays out. It ends on a fact, with no closing note, offer, question, apology or praise. A decision you need from the user goes to them as one question with choices.
 

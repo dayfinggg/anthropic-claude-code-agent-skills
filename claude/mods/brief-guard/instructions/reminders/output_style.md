@@ -1,1 +1,1 @@
-Reminder of the user's rules. Every text for the user is in the language of their message that begins "{request}". A message with a tool call holds only calls, and progress notes stay in your thinking. The final answer is two to four short sentences, at most 60 words, with the result first. Its prose has no `(`, `)`, `:`, `;`, `—` or `–`.
+Every text for the user is in the language of their message that begins "{request}".
