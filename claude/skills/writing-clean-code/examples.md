@@ -1,6 +1,6 @@
-# Over-engineering (Python)
+# Over-engineering in Python
 
-The task was "add a function that returns the VAT for a price at 20 percent".
+The task was to add a function that returns the VAT for a price at 20 percent.
 
 Too much
 
@@ -32,13 +32,16 @@ class TaxCalculatorFactory:
 Enough
 
 ```python
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 VAT_RATE = Decimal("0.20")
+CENT = Decimal("0.01")
 
 
 def vat_for(price: Decimal) -> Decimal:
-    return price * VAT_RATE
+    return (price * VAT_RATE).quantize(CENT, rounding=ROUND_HALF_UP)
 ```
+
+Money results are rounded to the currency's minor unit. Use the rounding mode the business requires.
 
 Add the strategy pattern when a second tax type actually exists.

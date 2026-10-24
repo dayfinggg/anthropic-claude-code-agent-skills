@@ -4,61 +4,60 @@ Read the engine version from the `.uproject` file and follow that version's docu
 
 ## C++ and Blueprints
 
-- Follow Epic's coding standard, with prefixes `A` for actors, `U` for other UObjects, `F` for structs and plain classes, `E` for enums, `I` for interfaces, `T` for templates, and `b` for booleans. Output parameters start with `Out`.
-- Hold UObject references in `UPROPERTY()` members as `TObjectPtr<T>` so garbage collection tracks them. Use `TWeakObjectPtr` for references that must not keep an object alive, and `TSoftObjectPtr` or `TSoftClassPtr` for assets loaded on demand.
-- Use Unreal containers and smart pointers (`TArray`, `TMap`, `TSharedPtr`, `TUniquePtr`) in engine-facing code.
-- Create components in the constructor with `CreateDefaultSubobject`, and do gameplay setup in `BeginPlay`.
-- Set `PrimaryActorTick.bCanEverTick = false` unless the actor needs ticking, and prefer timers or events.
-- Check pointers with `IsValid()`, and log with `UE_LOG` on a project log category.
-- Put systems and performance-critical logic in C++, expose tunables with `UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "...")` and logic with `UFUNCTION(BlueprintCallable)`, and let designers build content in Blueprints derived from those bases.
-- Use Enhanced Input with Input Actions and Input Mapping Contexts. For multiplayer, replicate state with `Replicated` or `ReplicatedUsing` and validate client requests on the server.
+- Hold UObject references in `UPROPERTY()` members as `TObjectPtr<T>`, so garbage collection tracks them.
+- Use `TWeakObjectPtr` for references that must not keep an object alive.
+- Use `TSoftObjectPtr` or `TSoftClassPtr` for assets loaded on demand.
+- Create components in the constructor with `CreateDefaultSubobject`. Do gameplay setup in `BeginPlay`.
+- Set `PrimaryActorTick.bCanEverTick = false` unless the actor needs ticking. Prefer timers or events.
+- Put systems and performance-critical logic in C++.
+- Expose tunables with `UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay")`.
+- Expose logic with `UFUNCTION(BlueprintCallable)`.
+- Use Enhanced Input with Input Actions and Input Mapping Contexts.
+- In multiplayer, replicate state with `Replicated` or `ReplicatedUsing`. Validate client requests on the server.
 
 ## Asset naming
 
-Prefixes from Epic's recommended naming conventions.
-
-| Prefix | Asset |
-|---|---|
-| `SM_` | Static mesh |
-| `SK_` | Skeletal mesh |
-| `M_` | Material |
-| `MI_` | Material instance |
-| `MF_` | Material function |
-| `T_` | Texture, with suffixes such as `_D` base color, `_N` normal, `_ORM` packed maps |
-| `BP_` | Blueprint |
-| `ABP_` | Animation Blueprint |
-| `AS_` / `AM_` | Animation sequence / montage |
-| `NS_` | Niagara system |
-| `WBP_` | Widget Blueprint |
+Follow the project's existing prefixes. Without any, use Epic's recommended set, which Epic marks as optional.
+Mesh and material prefixes are `SM_` static mesh, `SK_` skeletal mesh, `M_` material, `MI_` material instance, and `T_` texture.
+Other prefixes are `BP_` Blueprint, `ABP_` Animation Blueprint, `WBP_` Widget Blueprint, and `FXS_` Niagara system.
+Texture suffixes such as `_N` vary between projects, so match the project.
 
 Move and rename assets only inside the editor, because references break otherwise.
 
 ## Materials
 
-- Build a few master materials with parameters and use material instances for variations.
+- Build a few master materials with parameters. Use material instances for variations.
 - Use static switches sparingly, because each combination compiles a new shader permutation.
-- Use Substrate, the layered material framework, when the project has it enabled.
+- Use Substrate only when the project has it enabled. Its toon mode is experimental in 5.8.
 
 ## Rendering features
 
-- **Nanite** suits high-polygon static meshes and, in recent versions, foliage, replacing manual LODs for them.
-- **Lumen** provides dynamic global illumination and reflections. Lumen Lite, in beta in 5.8, is about twice as fast as Lumen high quality.
-- **MegaLights**, production-ready in 5.8, allows many shadowed dynamic lights.
+- **Nanite** suits high-polygon static meshes and replaces manual LODs for them.
+- **Lumen** provides dynamic global illumination and reflections.
 - **Virtual Shadow Maps** pair with Nanite.
 - Pick features per target platform, and check the scalability settings for each.
 
+Status in 5.8, which the 5.8 release notes state.
+
+| Feature | Status |
+|---|---|
+| MegaLights | Production ready |
+| Lumen Lite | Beta |
+| Interchange USD import | Production ready for assets, experimental for levels |
+
 ## Importing
 
-- Import at correct scale with transforms applied in the source tool, and check next to the mannequin.
-- Set normal map compression to `Normalmap`, and flip the green channel for OpenGL-convention sources.
+- Import at correct scale with transforms applied in the source tool. Check next to the mannequin.
+- Set normal map compression to `Normalmap`.
 - Use the Interchange import framework where the project uses it, with saved presets.
 
 ## Editor scripting
 
-- Use the Python editor scripting plugin for batch asset work, such as `unreal.EditorAssetLibrary` and `unreal.EditorAssetSubsystem`, and Editor Utility Widgets for tools artists run.
+- Use the Python editor scripting plugin for batch asset work, such as `unreal.EditorAssetLibrary` and `unreal.EditorAssetSubsystem`.
+- Use Editor Utility Widgets for tools artists run.
 - Run scripts on a copy or under source control, because asset changes are hard to undo.
 
-## Performance
+## Large worlds
 
-- Profile with `stat unit`, `stat gpu`, and Unreal Insights before changing anything.
+- Profile with `stat unit`, `stat gpu`, and Unreal Insights.
 - Use HLODs and World Partition for large worlds, and instanced static meshes for repeated objects.

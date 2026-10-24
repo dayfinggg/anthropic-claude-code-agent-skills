@@ -2,56 +2,32 @@
 
 ## Changelog rules
 
-These follow Keep a Changelog 1.1.0 at keepachangelog.com/en/1.1.0.
+These follow Keep a Changelog 1.1.x at keepachangelog.com/en/1.1.0.
+The full file layout is in the second pair of [examples.md](../examples.md).
 
-- Entries are written for humans. Each states in a sentence the effect a user or integrator notices, and commit history is only a list of candidates.
-- The newest version comes first, with its release date in ISO 8601 form `YYYY-MM-DD`.
-- `## [Unreleased]` stays at the top, gets entries in the same change as the behavior, and its entries move under the version heading at release.
-- Groups are Added, Changed, Deprecated, Removed, Fixed, and Security. Empty groups are left out.
-- Every deprecation, removal, and breaking change is listed with what to use instead, because a changelog that mentions only some changes can be as dangerous as none.
-- Every version has an entry and a link, and the header says whether the project follows Semantic Versioning.
-- A pulled release stays in the file, marked `[YANKED]`.
-
-## Changelog template
-
-```markdown
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Added
-
-- Export of invoices as CSV from the invoice list.
-
-## [1.4.0] - 2026-10-02
-
-### Changed
-
-- Search results are sorted by relevance instead of by date.
-
-### Fixed
-
-- Login no longer fails for email addresses that contain a plus sign.
-
-[unreleased]: https://github.com/example-org/example-app/compare/v1.4.0...HEAD
-[1.4.0]: https://github.com/example-org/example-app/compare/v1.3.0...v1.4.0
-```
-
-- Link definitions point each version to a comparison with the previous tag, and `Unreleased` to the latest tag compared with `HEAD`, in the URL form of the project's hosting service.
-- The file is `CHANGELOG.md`. An existing name such as `HISTORY`, `NEWS`, or `RELEASES` stays.
-- Start each entry with the affected feature, command, endpoint, or setting, with identifiers in code font. For a breaking change, link the migration guide when one exists.
+- Use Keep a Changelog 1.1.x unless the project already uses another format.
+- Write entries for humans. Treat commit history only as a list of candidates.
+- State the effect a user notices, never a commit subject or a hash.
+- Add the entry under `## [Unreleased]` in the same change as the behavior.
+- List every deprecation, removal, and breaking change with what to use instead.
+- Put the newest version first, with its release date as `YYYY-MM-DD`.
+- Keep `## [Unreleased]` at the top. Move its entries under the version heading at release.
+- Use the groups Added, Changed, Deprecated, Removed, Fixed, and Security. Leave out empty groups.
+- Start each entry with the affected feature, command, endpoint, or setting, with identifiers in code font.
+- For a breaking change, say what to do instead and link the migration guide when one exists.
 - Leave out changes nobody outside the team notices, such as refactoring, tests, and CI.
+- Give every version an entry and a link definition, and say in the header whether the project follows Semantic Versioning.
+- Point each version link to a comparison with the previous tag. Point `Unreleased` to the latest tag compared with `HEAD`.
+- Keep a pulled release in the file and mark it `[YANKED]`, as in `## [0.0.5] - 2014-12-13 [YANKED]`.
+- Keep the file name `CHANGELOG.md`, or an existing name such as `HISTORY`, `NEWS`, or `RELEASES`.
 
 ## From commits to entries
 
-When the project uses Conventional Commits, read the history since the last tag as a list of candidates and rewrite each relevant commit by hand. Merge several commits about one feature into one entry. This mapping is a starting point, not part of either convention.
+When the project uses Conventional Commits, read the history since the last tag and rewrite each relevant commit by hand.
+Merge several commits about one feature into one entry.
+This mapping is a starting point and not part of either convention.
 
-| Commit type | Usual changelog type |
+| Commit type | Usual changelog group |
 |---|---|
 | `feat` | Added, or Changed when it alters existing behavior |
 | `fix` | Fixed, or Security when it closes a vulnerability |
@@ -61,48 +37,20 @@ When the project uses Conventional Commits, read the history since the last tag 
 
 ## Releasing
 
-1. The releasing-software skill chooses the version number.
-2. Move the entries under `Unreleased` to a heading such as `## [1.5.0] - 2026-10-20`, and leave an empty `## [Unreleased]` above it.
-3. Update the link definitions for the new version and for `Unreleased`.
+1. Let the releasing-software skill choose the version number.
+2. Move the entries under `Unreleased` to a heading such as `## [1.5.0] - 2026-10-20`.
+3. Leave an empty `## [Unreleased]` above it.
+4. Update the link definitions for the new version and for `Unreleased`.
 
-A yanked release keeps its heading with the tag, as in `## [0.0.5] - 2014-12-13 [YANKED]`. Add missing releases and missing breaking change notes when you find them.
+## README rules
 
-## README outline
+No official README standard exists, so this is recommended practice.
+GitHub shows a README from `.github/`, the repository root, or `docs/`, in that order of priority.
 
-No official README standard exists, so this outline is recommended practice. It follows what GitHub's documentation says a README typically covers. GitHub shows a README from `.github/`, the repository root, or `docs/`, in that order of priority.
-
-```markdown
-# Project name
-
-One or two sentences on what the project does and who it is for.
-
-## Install
-
-The shortest supported install command and the requirements it needs.
-
-## Quickstart
-
-The smallest working example, with its real output.
-
-## Documentation
-
-Links to tutorials, how-to guides, reference, and explanation pages.
-
-## Get help
-
-Where to ask questions and report bugs.
-
-## Contributing
-
-A link to CONTRIBUTING.md.
-
-## License
-
-The license name with a link to the LICENSE file.
-```
-
-- Add a section such as supported versions or a security policy link only when the project needs it, and skip sections that would be empty.
-- The quickstart ends in visible output. Option tables and API details go to reference pages.
-- Use relative links for repository files, which GitHub recommends because they keep working in clones and on other branches.
-- Keep only badges the project maintains and that tell the reader something current.
+- Hold the purpose, install, a short quickstart, links into `docs/`, help, contributing, and the license.
+- Use the sections Install, Quickstart, Documentation, Get help, Contributing, and License, after a one or two sentence summary.
+- Add a section such as supported versions or a security policy link only when the project needs it.
+- End the quickstart in visible output. Send option tables and API details to reference pages.
+- Use relative links for repository files, because they keep working in clones and on other branches.
+- Keep only badges the project maintains and that show something current.
 - Run the install and quickstart commands in a clean environment before writing them.

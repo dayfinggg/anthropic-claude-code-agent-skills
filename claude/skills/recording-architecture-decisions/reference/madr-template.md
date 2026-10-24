@@ -1,154 +1,71 @@
-# MADR 4.0.0 templates
+# MADR template
 
-The full and minimal templates are copied unchanged from the `template` folder of `adr/madr` at tag `4.0.0`, typos included. MADR allows subfolders of `docs/decisions/` to group records by category. Lists use `*`, and links to other records are relative, as in `[ADR-0008](0008-add-status-field.md)`. The status values are `proposed`, `rejected`, `accepted`, `deprecated`, and `superseded by ADR-NNNN`.
+This template follows the MADR 4.0.0 full template with shorter placeholders. Lists use `*`. Links to other records are relative, as in `[ADR-0008](0008-add-status-field.md)`.
 
-## Default skeleton for a new record
+Remove every section that stays empty. A minimal record needs only the title, context, considered options, and decision outcome. The `status` list is open in MADR, so follow the repository's values.
 
-The minimal template plus `status`, `date`, and the optional sections used most often. Remove every section that stays empty.
+## Filling the template
 
-```markdown
----
-status: "{proposed | rejected | accepted | deprecated | … | superseded by ADR-0123"
-date: {YYYY-MM-DD when the decision was last updated}
----
+- The heading holds only the title, naming problem and solution.
+- Start with context that ends in the question decided.
+- Then give considered options and the decision outcome.
+- A record stands alone without linked material.
+- Add drivers when forces compete.
+- Add consequences almost always.
+- Add confirmation when a test, architecture rule, or review can check compliance.
+- Name drivers with ISO/IEC 25010:2023 characteristics such as reliability, security, maintainability, or performance efficiency.
+- Make drivers measurable.
+- Consequences include costs such as new operational work.
+- Record the important trade-offs and the confidence level of the decision.
 
-# {short title, representative of solved problem and found solution}
-
-## Context and Problem Statement
-
-{Describe the context and problem statement, e.g., in free form using two to three sentences or in the form of an illustrative story. You may want to articulate the problem in form of a question and add links to collaboration boards or issue management systems.}
-
-## Decision Drivers
-
-* {decision driver 1, e.g., a force, facing concern, …}
-* {decision driver 2, e.g., a force, facing concern, …}
-
-## Considered Options
-
-* {title of option 1}
-* {title of option 2}
-
-## Decision Outcome
-
-Chosen option: "{title of option 1}", because {justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force {force} | … | comes out best (see below)}.
-
-### Consequences
-
-* Good, because {positive consequence, e.g., improvement of one or more desired qualities, …}
-* Bad, because {negative consequence, e.g., compromising one or more desired qualities, …}
-
-### Confirmation
-
-{Describe how the implementation of/compliance with the ADR can/will be confirmed.}
-
-## More Information
-
-{Links to other decisions and resources.}
-```
-
-## Full template
+## Template
 
 ```markdown
 ---
-# These are optional metadata elements. Feel free to remove any of them.
-status: "{proposed | rejected | accepted | deprecated | … | superseded by ADR-0123"
-date: {YYYY-MM-DD when the decision was last updated}
-decision-makers: {list everyone involved in the decision}
-consulted: {list everyone whose opinions are sought (typically subject-matter experts); and with whom there is a two-way communication}
-informed: {list everyone who is kept up-to-date on progress; and with whom there is a one-way communication}
+status: "proposed"
+date: YYYY-MM-DD
+decision-makers: {everyone involved in the decision}
+consulted: {experts with two-way communication}
+informed: {people kept up to date with one-way communication}
 ---
 
-# {short title, representative of solved problem and found solution}
+# {short title naming the problem and the solution}
 
 ## Context and Problem Statement
 
-{Describe the context and problem statement, e.g., in free form using two to three sentences or in the form of an illustrative story. You may want to articulate the problem in form of a question and add links to collaboration boards or issue management systems.}
+{Two to three sentences that end in the question this record decides. Link boards or issues.}
 
-<!-- This is an optional element. Feel free to remove. -->
 ## Decision Drivers
 
-* {decision driver 1, e.g., a force, facing concern, …}
-* {decision driver 2, e.g., a force, facing concern, …}
-* … <!-- numbers of drivers can vary -->
+* {force or concern, stated so it can be measured}
 
 ## Considered Options
 
-* {title of option 1}
-* {title of option 2}
-* {title of option 3}
-* … <!-- numbers of options can vary -->
+* {option 1}
+* {option 2}
 
 ## Decision Outcome
 
-Chosen option: "{title of option 1}", because {justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force {force} | … | comes out best (see below)}.
+Chosen option: "{option 1}", because {justification}.
 
-<!-- This is an optional element. Feel free to remove. -->
 ### Consequences
 
-* Good, because {positive consequence, e.g., improvement of one or more desired qualities, …}
-* Bad, because {negative consequence, e.g., compromising one or more desired qualities, …}
-* … <!-- numbers of consequences can vary -->
+* Good, because {improved quality}
+* Bad, because {compromised quality or new cost}
 
-<!-- This is an optional element. Feel free to remove. -->
 ### Confirmation
 
-{Describe how the implementation of/compliance with the ADR can/will be confirmed. Are the design that was decided for and its implementation in line with the decision made? E.g., a design/code review or a test with a library such as ArchUnit can help validate this. Not that although we classify this element as optional, it is included in many ADRs.}
+{How a test, architecture rule, or review checks compliance.}
 
-<!-- This is an optional element. Feel free to remove. -->
 ## Pros and Cons of the Options
 
-### {title of option 1}
+### {option 1}
 
-<!-- This is an optional element. Feel free to remove. -->
-{example | description | pointer to more information | …}
+* Good, because {argument}
+* Neutral, because {argument}
+* Bad, because {argument}
 
-* Good, because {argument a}
-* Good, because {argument b}
-<!-- use "neutral" if the given argument weights neither for good nor bad -->
-* Neutral, because {argument c}
-* Bad, because {argument d}
-* … <!-- numbers of pros and cons can vary -->
-
-### {title of other option}
-
-{example | description | pointer to more information | …}
-
-* Good, because {argument a}
-* Good, because {argument b}
-* Neutral, because {argument c}
-* Bad, because {argument d}
-* …
-
-<!-- This is an optional element. Feel free to remove. -->
 ## More Information
 
-{You might want to provide additional evidence/confidence for the decision outcome here and/or document the team agreement on the decision and/or define when/how this decision the decision should be realized and if/when it should be re-visited. Links to other decisions and resources might appear here as well.}
-```
-
-## Minimal template
-
-```markdown
-# {short title, representative of solved problem and found solution}
-
-## Context and Problem Statement
-
-{Describe the context and problem statement, e.g., in free form using two to three sentences or in the form of an illustrative story. You may want to articulate the problem in form of a question and add links to collaboration boards or issue management systems.}
-
-## Considered Options
-
-* {title of option 1}
-* {title of option 2}
-* {title of option 3}
-* … <!-- numbers of options can vary -->
-
-## Decision Outcome
-
-Chosen option: "{title of option 1}", because {justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force {force} | … | comes out best (see below)}.
-
-<!-- This is an optional element. Feel free to remove. -->
-### Consequences
-
-* Good, because {positive consequence, e.g., improvement of one or more desired qualities, …}
-* Bad, because {negative consequence, e.g., compromising one or more desired qualities, …}
-* … <!-- numbers of consequences can vary -->
+{Links to related records, confidence level, and when to revisit the decision.}
 ```

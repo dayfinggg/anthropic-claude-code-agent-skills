@@ -1,72 +1,38 @@
 # Project structure
 
-Starting points only. An existing project's structure wins.
+An existing project's structure wins. Use these notes only for new modules.
 
-## Python
+## Contents
 
-```
-src/shop/
-  orders/
-    domain/          entities, value objects, domain errors
-    application/     use cases, ports (typing.Protocol), request and response dataclasses
-    adapters/        repositories, API clients, controllers, presenters
-  infrastructure/    framework app, ORM setup, settings
-  main.py            composition root
-tests/
-  orders/unit/       domain and use case tests with fakes
-  orders/integration/ adapter tests against real services
-```
+- Default layout
+- Language rules
+- Enforcing dependency direction
 
-## TypeScript
+## Default layout
+
+Each business module has the same three folders. The composition root sits outside all modules.
 
 ```
 src/
   orders/
     domain/
-    application/     use cases and port interfaces
-    adapters/        http controllers, repositories, gateways
-  infrastructure/    server setup, database client, config
-  main.ts            composition root
+    application/     use cases and ports
+    adapters/        controllers, repositories, gateways
+  infrastructure/    framework setup, database client, config
+  main                composition root
 ```
 
-## Java
+## Language rules
 
-```
-com.example.shop.orders.domain
-com.example.shop.orders.application        use cases, port interfaces
-com.example.shop.orders.adapters.in.web    controllers
-com.example.shop.orders.adapters.out.persistence
-com.example.shop.config                    Spring configuration as composition root
-```
+- Python. Declare ports with `typing.Protocol` and requests and responses as dataclasses.
+- TypeScript. Declare ports as interfaces in `application`.
+- Java. Keep Spring, JPA, and Jackson annotations out of `domain` and `application`. Map JPA entities to domain objects in the persistence adapter.
+- C#. Use one project per layer so the compiler enforces direction. Domain references nothing. Application references Domain. Infrastructure references Application. The API project references both and holds the DI setup.
+- Go. Define an interface in the package that uses it, and only once a consumer needs it. Put repository code in a sub-package such as `postgres/` and handlers in `http/`. Put `main.go` under `cmd/`.
 
-Keep Spring, JPA, and Jackson annotations out of `domain` and `application`, and map JPA entities to domain objects in the persistence adapter.
+## Enforcing dependency direction
 
-## C#
-
-```
-Shop.Domain           class library, no project references
-Shop.Application      references Domain, holds use cases and port interfaces
-Shop.Infrastructure   references Application, holds EF Core, external clients
-Shop.Api              references Application and Infrastructure, holds controllers and DI setup
-```
-
-Separate projects make the compiler enforce the dependency rule.
-
-## Go
-
-```
-internal/
-  orders/
-    order.go          domain types and rules
-    service.go        use cases, plus the interfaces they consume
-    postgres/         repository implementation
-    http/             handlers
-cmd/shop/main.go      composition root
-```
-
-Define interfaces in the package that uses them.
-
-## Enforcing dependency direction in CI
+Run the check in CI and after each local change.
 
 | Language | Tool |
 |---|---|
@@ -75,3 +41,5 @@ Define interfaces in the package that uses them.
 | Java | ArchUnit tests |
 | C# | separate projects, or NetArchTest |
 | Go | separate packages under `internal`, plus depguard in golangci-lint |
+
+Add a first rule that fails when `domain` or `application` imports an ORM, HTTP, or framework package.

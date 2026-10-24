@@ -1,68 +1,58 @@
 ---
 name: planning-implementation
-description: Plans a coding task in a larger codebase before editing, settles open decisions with the user, agrees on a short plan, then implements and verifies it. Invoked as /planning-implementation with the task.
+description: Plans a multi-file coding task, settles open decisions with the user, then implements and verifies it. Use to plan, design an approach, or implement a feature, refactor, or migration.
 disable-model-invocation: true
 argument-hint: "[task description]"
 ---
 
 # Planning before implementation
 
-Task: $ARGUMENTS
+The user's task follows this line. If it is empty, ask for the task first.
 
-When the change fits in one sentence and touches one or two files, say that no plan is needed, ask at most one question if something is truly ambiguous, and implement it. Use the process below for work across several files or modules, with an unclear approach, in unfamiliar code, or costly to undo.
+$ARGUMENTS
+
+Read references/plan-details.md before writing the plan or reviewing a large diff.
+
+## Size the work
+
+If the diff fits in one sentence and touches one or two files, say no plan is needed and implement.
+
+Plan when the work spans several files, the approach is unclear, the code is unfamiliar, or the change is costly to undo.
+
+## Explore
+
+Read the code before deciding anything. Use a subagent for broad searches. Name the patterns and files to copy.
 
 ## Decisions
 
-Explore the code first, then list every decision the task depends on and sort each one.
-
 - **Settled** by the code, the conventions, or the request. Follow that answer.
-- **Routine**, meaning a careful engineer on the team would just decide it. Decide it and record it as an assumption.
-- **Material**, meaning the answers lead to different work, the choice is hard to reverse, it rests on business rules or preferences only the user knows, or it touches security, data, or public interfaces. Ask about these.
+- **Routine** when a careful engineer would just decide it. Decide it and record it as an assumption.
+- **Material** when the answers lead to different work, the choice is hard to reverse, or only the user knows the rule. Ask about these.
 
-When the project does not dictate the language of a new component, recommend a memory-safe one, as CISA and NSA guidance urges. Propose rewriting existing C or C++ code only when the user asks.
+Security, data, public interfaces, and a new language or framework are always material.
 
 ## Questions
 
-Ask with AskUserQuestion, up to four independent questions per call, each with two to four options. Put the recommended option first, mark it "(Recommended)", and say what each option costs or risks. A question that depends on another answer waits for the next round. Stop asking when the remaining points would not change the plan, and when the user says to decide yourself, take the recommended answers as assumptions.
+Ask with AskUserQuestion. Use up to four questions per call and two to four options each.
 
-When two or three approaches are viable, compare them briefly on fit with the existing code, complexity, risk, reversibility, and effort, and recommend one.
+- Put the recommended option first and label it Recommended.
+- Say what each option costs or risks.
+- Hold a question that depends on another answer for the next round.
+- Stop when the remaining points would not change the plan.
+- If the user says to decide yourself, take the recommended answers as assumptions.
 
-## Plan
+## Approval
 
-Present the plan in this shape, as short as the task allows.
-
-```markdown
-## Goal
-What will be true when this is done.
-
-## Decisions
-- Decision, with the chosen option and a short reason
-- Assumption, decided without asking
-
-## Approach
-How it works, in a few sentences.
-
-## Changes
-- path/to/file: what changes and why
-- New interfaces, schemas, or migrations
-
-## Out of scope
-What will not be done.
-
-## Risks
-What might break and how it is handled.
-For changes touching authentication, permissions, external input, or money, the threats and their mitigations.
-
-## Steps
-1. A small step that leaves the code working and can be checked
-2. ...
-
-## Verification
-The commands and end-to-end check that prove the whole task works.
-```
-
-Threats belong in the plan because OWASP Top 10 2025 lists insecure design (A06) as a risk separate from implementation bugs. Add a step to record an architecturally significant decision with the recording-architecture-decisions skill, and a telemetry step with the adding-observability skill for a new service, endpoint, or job. For work spanning several sessions, offer to save the plan as a file in the repository. Wait for the user's approval before editing any file.
+Do not edit any file until the user approves the plan. Use plan mode when it is available. A session with bypass permissions does not enforce plan mode, so this rule is the only gate.
 
 ## Implementation
 
-Follow the steps and run the relevant checks after each one. When the code contradicts the plan or a new material decision appears, pause, explain what changed, and ask. Make routine adjustments yourself and list them at the end. Report done only when the verification passes, with the evidence.
+- For a bug or a behavior change, write the failing test first and confirm it fails. Then fix the cause.
+- Run the relevant checks after each step, not only at the end.
+- When the code contradicts the plan or a new material decision appears, pause, explain what changed, and ask.
+- Make routine adjustments yourself and list them at the end.
+- After two failed corrections on the same issue, stop. Re-plan with what you learned.
+
+## Finish
+
+Report done only when the verification passes. Show the command output as evidence.

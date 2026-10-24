@@ -1,48 +1,39 @@
 ---
 name: designing-user-interfaces
-description: Builds and reviews web and mobile interfaces to WCAG 2.2 AA with design tokens. Use when creating or changing screens, components, layouts, CSS, or interface copy, implementing a design, or reviewing accessibility.
+description: Builds and reviews web and mobile UI to WCAG 2.2 AA with design tokens. Use for screens, components, layouts, CSS, forms, dark mode, Figma handoff, SwiftUI or Compose views, UI copy, accessibility.
 ---
 
 # Designing user interfaces
 
-The project's design system, brand guide, or Figma file wins over this skill, and its tokens and components come first.
+The project's design system, brand guide, or Figma file wins over this skill. Use its tokens and components first.
 
-## Layout and type
+- Each screen has one primary action, and it is the most prominent element.
+- Space on a 4 or 8 unit scale. Keep body lines near 45 to 75 characters.
+- Lay out mobile first. Use one or two typefaces and five to seven sizes.
+- Body text is at least 16 CSS pixels on the web and 17 pt on iOS. Line height is 1.4 to 1.6.
+- Name colors by role, such as `surface` and `danger`. Give each a light and a dark value.
+- Text contrast is at least 4.5:1. Large text, at 24 CSS pixels or 18.66 bold, needs 3:1.
+- Icons need 3:1. Color is never the only signal.
+- Style focus with `:focus-visible`. The indicator is at least 2 CSS pixels thick with 3:1 contrast.
+- Every field has a visible label. Placeholders are hints only.
+- Use the right input types and `autocomplete` values.
+- Validate on blur or submit. Show the error beside the field with the fix, and keep the entered data.
+- Buttons name the result, as in "Save changes", not "OK" or "Submit".
+- Touch targets are at least 44 by 44 pt on iOS and 48 by 48 dp on Android.
+- Design empty, loading, error, and edge states.
+- Render untrusted data as text, with `textContent` or the framework's escaping.
+- Spend visual boldness on one element and keep the rest calm.
 
-- Each screen has one primary action, the most prominent element.
-- Spacing follows a 4 or 8 unit scale. Body text lines run about 45 to 75 characters.
-- Lay out mobile first. Content reflows without horizontal scrolling down to 320 CSS pixels and works at 200 percent zoom.
-- Use one or two typefaces and five to seven sizes. Body text is at least 16 CSS pixels on the web and 17 pt on iOS, with line height 1.4 to 1.6.
+## Verify before finishing
 
-## Color
-
-- Colors are semantic tokens by role, such as `surface`, `text-primary`, and `danger`, never by hue. Dark mode gets its own tuned palette.
-- Text contrast is at least 4.5:1. Large text (24 CSS pixels, or 18.66 bold), icons, input borders, and focus indicators need 3:1.
-- Color is never the only signal, and the accent color marks only interactive and important elements.
-
-## Components and states
-
-- Interactive components have default, hover, focus, pressed, disabled, and loading states, plus selected or error where relevant.
-- Buttons name the result, as in "Save changes", not "OK" or "Submit". Destructive actions look distinct and sit apart. Prefer undo to a confirmation dialog for reversible actions.
-- Touch targets are at least 44 by 44 pt on Apple platforms, 48 by 48 dp on Android, and 24 by 24 CSS pixels on the web, with 44 preferred for touch.
-- Design every screen's empty, loading, error, and edge states, such as very long names, one item, thousands of items, and offline. Waits over about one second get skeletons or progress without layout jumps.
-
-## Forms and motion
-
-- Every field has a visible label, and placeholders are hints only. Use the right input types and `autocomplete` values.
-- Validate on blur or submit, not per keystroke, show the error next to the field with how to fix it, and keep the entered data. When most fields are required, mark the optional ones.
-- Motion explains change in roughly 150 to 300 milliseconds, never blocks input, and becomes a fade or nothing under reduced motion.
-
-## Security
-
-Render untrusted data only through the framework's escaping, never `innerHTML`, `dangerouslySetInnerHTML`, `v-html`, or raw template output. Links and image sources from user data allow only `https` and `http`. Stay compatible with a strict CSP, with no inline scripts or handlers.
-
-## Avoiding a generic look
-
-Unless the brand asks for them, avoid cream or beige page backgrounds, italic accent words in headlines, numbered "01 02 03" section labels, monospace labels for ordinary text, pill-shaped buttons everywhere, decorative gradients, and gratuitous glassmorphism. Derive the look from the product's purpose, audience, and brand.
+1. Run axe or Lighthouse. They find only part of the issues.
+2. Walk the whole flow with only a keyboard.
+3. Check 320 CSS pixels wide and 400 percent zoom.
+4. Check reduced motion, dark mode, and increased contrast.
 
 ## Reference files
 
-- [reference/accessibility.md](reference/accessibility.md), read before building or reviewing any screen.
+- [reference/accessibility.md](reference/accessibility.md), read for WCAG 2.2 criteria, ARIA, modals, native app accessibility, and EU scope.
 - [reference/platforms.md](reference/platforms.md), read the section for the target platform.
 - [reference/design-systems.md](reference/design-systems.md), read when tokens or a Figma file are involved.
+- [reference/details.md](reference/details.md), read for component states, motion, HTML injection rules, and generic looks to avoid.

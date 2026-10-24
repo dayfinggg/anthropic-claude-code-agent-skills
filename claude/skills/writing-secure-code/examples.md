@@ -1,70 +1,14 @@
 # Secure code examples
 
-These pairs are illustrative.
+Three pairs show failures that a quick read tends to miss.
 
-## Insecure direct object reference (TypeScript)
+## Contents
 
-Before
+- Fail-open authorization in C#
+- Partial writes and leaked errors in Go
+- JWT validation in Python
 
-```typescript
-router.get("/invoices/:invoiceId", requireLogin, async (req, res) => {
-  const invoice = await invoices.findById(req.params.invoiceId);
-  if (!invoice) {
-    return res.status(404).end();
-  }
-  res.json(toInvoiceResponse(invoice));
-});
-```
-
-After
-
-```typescript
-router.get("/invoices/:invoiceId", requireLogin, async (req, res) => {
-  const invoice = await invoices.findByIdForCustomer(req.params.invoiceId, req.user.customerId);
-  if (!invoice) {
-    return res.status(404).end();
-  }
-  res.json(toInvoiceResponse(invoice));
-});
-```
-
-Login proves who the caller is, not which invoices they may read (CWE-639, CWE-862). The scoped query makes a foreign invoice look exactly like a missing one.
-
-## Shell command injection (Python)
-
-Before
-
-```python
-import subprocess
-
-
-def clone_repository(repo_url: str, target_dir: str) -> None:
-    subprocess.run(f"git clone --depth 1 {repo_url} {target_dir}", shell=True, check=True)
-```
-
-After
-
-```python
-import subprocess
-from urllib.parse import urlsplit
-
-ALLOWED_GIT_HOSTS = frozenset({"github.com", "gitlab.com"})
-
-
-def clone_repository(repo_url: str, target_dir: str, timeout_seconds: float) -> None:
-    parts = urlsplit(repo_url)
-    if parts.scheme != "https" or parts.hostname not in ALLOWED_GIT_HOSTS:
-        raise ValueError(f"Repository URL not allowed: {repo_url}")
-    subprocess.run(
-        ["git", "clone", "--depth", "1", "--", repo_url, target_dir],
-        check=True,
-        timeout=timeout_seconds,
-    )
-```
-
-Without a shell, `;` and `$(...)` are plain text, and `--` keeps a value that starts with a dash from becoming an option such as `--upload-pack` (CWE-78, CWE-88). The allow-list blocks other transports and internal hosts.
-
-## Fail-open authorization (C#)
+## Fail-open authorization in C#
 
 Before
 
@@ -100,9 +44,9 @@ public async Task<bool> CanEditAsync(string userId, string documentId)
 }
 ```
 
-An outage granted edit rights to everyone (CWE-636). The check now denies when it cannot decide, and it catches only the expected failure, so other errors reach the global handler (CWE-396).
+An outage granted edit rights to everyone. This is CWE-636. The check now denies when it cannot decide. It catches only the expected failure, so other errors reach the global handler.
 
-## Partial writes and leaked errors (Go)
+## Partial writes and leaked errors in Go
 
 Before
 
@@ -114,18 +58,8 @@ func (s *TransferService) Transfer(ctx context.Context, from, to string, amountM
 	return s.accounts.Credit(ctx, to, amountMinor)
 }
 
-func (h *TransferHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	req, err := decodeTransferRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if err := h.service.Transfer(r.Context(), req.From, req.To, req.AmountMinor); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusNoContent)
-}
+// In the handler, a failed transfer answers with the raw error.
+http.Error(w, err.Error(), http.StatusInternalServerError)
 ```
 
 After
@@ -143,24 +77,14 @@ func (s *TransferService) Transfer(ctx context.Context, from, to string, amountM
 	})
 }
 
-func (h *TransferHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	req, err := decodeTransferRequest(r)
-	if err != nil {
-		http.Error(w, "The transfer request is invalid.", http.StatusBadRequest)
-		return
-	}
-	if err := h.service.Transfer(r.Context(), req.From, req.To, req.AmountMinor); err != nil {
-		h.logger.ErrorContext(r.Context(), "transfer failed", "error", err)
-		http.Error(w, "The transfer could not be completed.", http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusNoContent)
-}
+// In the handler, the client gets a fixed message and the log gets the details.
+h.logger.ErrorContext(r.Context(), "transfer failed", "error", err)
+http.Error(w, "The transfer could not be completed.", http.StatusInternalServerError)
 ```
 
-A failed credit left the debit in place, and the raw error could show SQL or account details (A10 2025, CWE-209). Both steps now commit or roll back together, and the client gets a fixed message while details go to the log.
+A failed credit left the debit in place. The raw error could show SQL or account details, which is CWE-209. Both steps now commit or roll back together.
 
-## JWT validation (Python)
+## JWT validation in Python
 
 Before
 
@@ -191,4 +115,4 @@ def subject_of(token: str, public_key: str, issuer: str, audience: str) -> str:
     return claims["sub"]
 ```
 
-The fixed algorithm list stops the token from choosing `none` or an HMAC algorithm keyed with the public key (CWE-347). Required claims reject tokens that never expire, and issuer and audience checks reject tokens minted for another service. PyJWT raises a subclass of `jwt.InvalidTokenError` for each failure, which the caller maps to 401.
+The fixed algorithm list stops the token from choosing `none`. It also stops an HMAC algorithm keyed with the public key. This is CWE-347. Required claims reject tokens that never expire. Issuer and audience checks reject tokens minted for another service. PyJWT raises a subclass of `jwt.InvalidTokenError` for each failure. The caller maps it to 401.

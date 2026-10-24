@@ -1,1 +1,0 @@
-Describe a click, key press or typed text only in the action_summary field, where the user already sees it. The message that carries this call has no text, so a line such as "Click the Save button" or "Now open the menu" never goes beside it, after a screenshot or anywhere else.

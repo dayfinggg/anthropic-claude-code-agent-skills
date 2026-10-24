@@ -1,1 +1,1 @@
-The agent runs in the background and its report arrives by itself as a notification. Go on with other work using calls alone. When nothing is left but to wait, end the turn with no text and no further call, and do not call ReadNotifications or wrap_up.
+The agent's report arrives by itself as a notification. Go on with other work, and when only waiting is left, end the turn with no text and no call.

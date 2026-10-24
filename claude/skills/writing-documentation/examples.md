@@ -79,7 +79,8 @@ See [Contributing to tidecache](CONTRIBUTING.md).
 tidecache is released under the [MIT License](LICENSE).
 ````
 
-The argument table moves to reference, the eviction design to explanation, and the install alternatives go because a quickstart needs one path.
+The argument table moves to reference and the eviction design to explanation.
+The install alternatives go, because a quickstart needs one path.
 
 ## Git log dump rewritten as a changelog
 

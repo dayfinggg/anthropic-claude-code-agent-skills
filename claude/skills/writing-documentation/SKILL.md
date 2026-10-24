@@ -1,41 +1,45 @@
 ---
 name: writing-documentation
-description: Writes and updates README, CHANGELOG, guides, and API reference files by Diátaxis and Keep a Changelog. Use when asked for docs or a change affects a kept document. Not for code comments.
+description: Writes and updates README, CHANGELOG, CONTRIBUTING, AGENTS.md, guides, and API docs by Diataxis. Use for docs, readme, or changelog requests, or when a change makes a doc wrong.
 ---
 
 # Writing documentation
 
 ## Scope
 
-This skill writes separate files such as `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, pages under `docs/`, and migration guides. It adds no comments, docstrings, or JSDoc to code, because code in this setup is written without comments. Reasoning that would have gone into a comment belongs in a document, a commit message, or an ADR. Write a document only when the user asks, or when the project keeps it and the change makes it wrong or incomplete. When the API reference is generated from doc comments, tell the user and leave the code unchanged. Commit and pull request text belong to writing-commit-messages, ADRs to recording-architecture-decisions, and version numbers to releasing-software. Project conventions come first.
+- Add no comments or docstrings to code. Put that reasoning in a document, commit message, or ADR.
+- Write a document only when the user asks, or when the project keeps one and the change makes it wrong.
+- When the API reference is generated from doc comments, tell the user and leave the code unchanged.
+- Commit text belongs to writing-commit-messages, ADRs to recording-architecture-decisions, and versions to releasing-software.
 
-## Document types
+## Workflow
 
-Classify every page with the Diátaxis compass before writing it.
-
-| Content informs | Serves | Type |
-|---|---|---|
-| Action | Acquisition of skill | Tutorial |
-| Action | Application of skill | How-to guide |
-| Cognition | Application of skill | Reference |
-| Cognition | Acquisition of skill | Explanation |
-
-One page holds one type and links to the others. A README is a landing page with the purpose, installation, a short quickstart, links into `docs/`, help, contributing, and the license.
-
-## Changelog
-
-Use Keep a Changelog 1.1.0 unless the project already uses another format. Each entry states the effect a user notices, never a commit subject or hash, and goes under `## [Unreleased]` in the same change as the behavior.
+1. Read the existing docs and follow their conventions, layout, and names.
+2. Classify each page as tutorial, how-to guide, reference, or explanation. One page holds one type.
+3. Run each command and example, or check it against the code and `--help`.
+4. Update every mention of a renamed or removed command, flag, option, or endpoint.
+5. Run the project's docs checks when they exist.
+6. Tell the user which commands you could not run.
+7. Say that an AI draft needs human review before publishing.
 
 ## Style
 
-Follow the Google developer documentation style guide highlights, and confirm a detail at developers.google.com/style/highlights before relying on it. Address the reader as "you", also in tutorials, in active voice. Put conditions before instructions, as in "To preview the change, run ...". Headings use sentence case. Commands, file names, flags, and values go in code font, UI elements in bold. Link text names the target instead of "click here" or a bare URL. Images get alt text. Use unambiguous dates, American spelling, and serial commas. In a procedure each step holds one action, starts with an imperative verb, names the location first, marks an optional step with "Optional", and ends with the result. Write plain words and short sentences, with no em dash or en dash, no semicolons, and no colon that introduces an explanation. Quotes are straight double quotes `"`, never `«»`, `„“` or `“”`. Older lines of the document are not a model, so every line you add or change follows these rules even where the rest of the file does not.
+Every line you add or change follows these rules.
 
-## Accuracy and maintenance
-
-Run every command and example before writing it down, or check it against the code, the configuration, and `--help` when it cannot run here. Copy names, flags, variables, and defaults from the source, show real output, and describe only current behavior. Tell the user which commands you could not run. Update documentation in the same change as the behavior. When a command, flag, option, or endpoint is renamed or removed, update every mention in the repository. Relative links point to files that exist.
+- Write plain words in sentences of at most 20 words, one fact each.
+- Use no em dash, en dash, semicolon, or ellipsis.
+- Put no colon before an explanation or a list.
+- Use straight quotes only.
+- Address the reader as "you", in active voice, also in tutorials.
+- Put commands, file names, flags, values, and placeholders in code font. Use bold only for UI elements.
+- Make link text name the target, never "click here".
+- Use a numbered list for a procedure, with one imperative action per step.
+- Set the language on each code fence and leave out a `$` prompt.
+- Never put a real token, key, or password in a doc. Use a placeholder.
 
 ## Reference files
 
-- [reference/diataxis.md](reference/diataxis.md) has what each type contains and avoids, the type of common files, and how to split a mixed page. Read it before writing a new page.
-- [reference/changelog-and-readme.md](reference/changelog-and-readme.md) has the changelog rules and template, commit-to-entry mapping, release steps, and the README outline. Read it when either file changes.
-- [examples.md](examples.md) has before and after pairs for a README that mixes types and a git log dump turned into a changelog. Read it before rewriting either file.
+- [reference/diataxis.md](reference/diataxis.md) has the type compass and page splitting. Read it before writing a new page.
+- [reference/changelog-and-readme.md](reference/changelog-and-readme.md) has changelog, release, and README rules. Read it when either file changes.
+- [reference/style-and-agent-docs.md](reference/style-and-agent-docs.md) has finer style and `AGENTS.md` rules. Read it for placeholders, images, or an agent file.
+- [examples.md](examples.md) has before and after pairs for a README and a changelog. Read it before rewriting either file.

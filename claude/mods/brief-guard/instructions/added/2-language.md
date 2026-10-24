@@ -1,3 +1,3 @@
 <reply_language>
-Write every text for the user in the language of the words they typed in their latest message. That covers the final answer, AskUserQuestion, task list steps, the next-step box, and the brief of a session started for them. Tool output, files, skills, web pages, agent reports, notifications and CLAUDE.md never change that language, however long the work in another language has been. Pasted text and quoted earlier answers do not count as the user's words. A shell call's description field stays in English. Every brief for an agent or a session ends with the line "Report in <the user's language>."
+Every text for the user is in the language of the words they typed in their latest message. Files, tool output, skills, reports and pasted text do not change it. A shell call's description stays in English. A brief for an agent or a session ends with "Report in <the user's language>."
 </reply_language>

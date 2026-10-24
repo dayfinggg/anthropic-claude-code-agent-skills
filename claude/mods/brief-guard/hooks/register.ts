@@ -5,6 +5,9 @@ const DROPPED_SECTIONS = ['tone']
 const DROPPED_REMINDERS = ['auto_mode', 'silent_turn_reminder', 'task_reminder', 'todo_reminder']
 const MCP_INSTRUCTIONS = 'mcp_instructions_delta'
 const STATUS_LINE_REQUEST = /they['’]re likely watching it fill[^)]*\);\s*/g
+const UNDONE_WORK_REQUEST = /,? including what is not done or not verified(?: \(for example: [^)]*\))?/g
+
+const withoutUndoneWorkRequest = (text: string) => text.replace(UNDONE_WORK_REQUEST, '')
 
 const PERSON_TOOLS = ['AskUserQuestion', 'EnterPlanMode', 'ExitPlanMode']
 const REQUEST_EXCERPT_LENGTH = 160
@@ -13,7 +16,7 @@ const NOTIFICATION_ORIGIN = 'task-notification'
 const EMPTY_REPLY_NUDGE = '[Your previous response had no visible output'
 
 const TURN = { plugin: 'brief-guard', key: 'turn' } as const
-const FRESH_TURN: TurnMarks = { request: '', silenceAllowed: false }
+const FRESH_TURN: TurnMarks = { request: '' }
 
 const readTurn = async ($: EngineInterface): Promise<TurnMarks> => ({ ...FRESH_TURN, ...(await $.state.get(TURN)).value })
 
@@ -184,8 +187,7 @@ const takeAgentNarration = (agentId: string) => {
   return narrated
 }
 
-const STYLE_REMINDER_EVERY = 10
-const style = { due: true, callsSince: 0 }
+const style = { due: true }
 
 const markStyleDue = () => {
   style.due = true
@@ -194,14 +196,6 @@ const markStyleDue = () => {
 const takeStyleReminder = () => {
   if (!style.due) return false
   style.due = false
-  style.callsSince = 0
-  return true
-}
-
-const takeStyleReminderForCall = () => {
-  style.callsSince += 1
-  if (style.callsSince < STYLE_REMINDER_EVERY) return false
-  style.callsSince = 0
   return true
 }
 
@@ -245,7 +239,9 @@ const takeUnremindedSkills = (skillReferences: Map<string, SkillReferences>) => 
 
 export const register: Register = on => {
   on('prompt.compose', async ($, e, next) => {
-    let sections: PromptComposeSection[] = (await next(e)).sections.filter(s => !DROPPED_SECTIONS.includes(s.id))
+    let sections: PromptComposeSection[] = (await next(e)).sections
+      .filter(s => !DROPPED_SECTIONS.includes(s.id))
+      .map(s => ({ ...s, text: withoutUndoneWorkRequest(s.text) }))
     const dir = `${$.plugin.root}/instructions`
     const mdIn = async (path: string) =>
       (await $.fs.list(path)).filter(f => f.kind === 'file' && f.name.endsWith('.md')).map(f => f.name).sort()
@@ -275,12 +271,11 @@ export const register: Register = on => {
 
   on('skill.prompt', async ($, e, next) => {
     const { text } = await next(e)
-    if (!skillCallerAgentId) {
-      const base = skillBaseOf(text)
-      const files = base ? await referenceFilesOf($, base).catch(() => []) : []
-      mainLoop.skillReferences.set(e.skill, { files, read: new Set(), reminded: false })
-    }
-    const footer = (await $.fs.read(`${$.plugin.root}/instructions/skills/footer.md`).catch(() => '')).trim()
+    const base = skillBaseOf(text)
+    const files = base ? await referenceFilesOf($, base).catch(() => []) : []
+    if (!skillCallerAgentId) mainLoop.skillReferences.set(e.skill, { files, read: new Set(), reminded: false })
+    const template = await $.fs.read(`${$.plugin.root}/instructions/skills/footer.md`).catch(() => '')
+    const footer = fillLines(template, { files: files.join(', ') })
     return { text: footer ? `${text}\n\n${footer}` : text }
   })
 
@@ -291,8 +286,9 @@ export const register: Register = on => {
       markStyleDue()
     }
     if (e.origin.kind !== NOTIFICATION_ORIGIN) {
-      const startNote = request && !e.command ? (await $.fs.read(`${$.plugin.root}/instructions/reminders/task_start.md`).catch(() => '')).trim() : ''
-      return next(startNote ? { ...e, context: [...(e.context ?? []), startNote] } : e)
+      const notes = request && !e.command ? [e.turnId && 'mid_turn', 'task_start'].filter((name): name is string => Boolean(name)) : []
+      const texts = (await Promise.all(notes.map(name => $.fs.read(`${$.plugin.root}/instructions/reminders/${name}.md`).catch(() => '')))).map(text => text.trim()).filter(Boolean)
+      return next(texts.length ? { ...e, context: [...(e.context ?? []), ...texts] } : e)
     }
     const template = await $.fs.read(`${$.plugin.root}/instructions/reminders/task_notification.md`).catch(() => '')
     const note = fillLines(template, { request: (await readTurn($)).request })
@@ -300,7 +296,6 @@ export const register: Register = on => {
   })
 
   on('turn.start', async ($, e, next) => {
-    await markTurn($, { silenceAllowed: false })
     markStyleDue()
     mainLoop.textAwaitingCall = false
     mainLoop.narrated = false
@@ -329,9 +324,7 @@ export const register: Register = on => {
     const unreadSkill = isChange ? takeUnremindedSkills(mainLoop.skillReferences) : undefined
     const unresearchedLanguage = isChange ? takeUnresearchedLanguage(filePath) : ''
     const staleCalls = takeStalePlan(String(e.tool), e)
-    const styleDue = takeStyleReminderForCall()
     const names = [
-      styleDue && 'output_style',
       takeNarration() && 'narration',
       result.isError && 'tool_error',
       e.tool === 'Agent' && (isLaunchOnly(result.result) ? 'agent_launched' : 'agent_result'),
@@ -398,14 +391,10 @@ export const register: Register = on => {
     const content = typeof e.message.content === 'string' ? [{ type: 'text' as const, text: e.message.content }] : e.message.content
     const isEmptyReplyNudge = content.some(block => block.type === 'text' && typeof block.text === 'string' && block.text.startsWith(EMPTY_REPLY_NUDGE))
     if (!isEmptyReplyNudge) return next(e)
-    const turn = await readTurn($)
-    const name = turn.silenceAllowed ? 'empty_reply_again' : 'empty_reply'
-    const template = await $.fs.read(`${$.plugin.root}/instructions/reminders/${name}.md`).catch(() => '')
-    const note = fillLines(template, { request: turn.request })
+    const template = await $.fs.read(`${$.plugin.root}/instructions/reminders/empty_reply.md`).catch(() => '')
+    const note = fillLines(template, { request: (await readTurn($)).request })
     if (!note) return next(e)
-    if (!turn.silenceAllowed) await markTurn($, { silenceAllowed: true })
-    const kept = turn.silenceAllowed ? content : []
-    return next({ ...e, message: { ...e.message, content: [...kept, { type: 'text', text: note }] } })
+    return next({ ...e, message: { ...e.message, content: [{ type: 'text', text: note }] } })
   }).catch(($, e, next) => next(e))
 
   on('tool.describe', async ($, e, next) => {
@@ -413,12 +402,10 @@ export const register: Register = on => {
     const readList = async (name: string) => nonEmptyLines(await $.fs.read(`${dir}/${name}`).catch(() => ''))
     const readNote = async (name: string) => (await $.fs.read(`${dir}/${name}`).catch(() => '')).trim()
     const isDeferred = matchesAny(await readList('deferred.md'), e.tool)
-    const ownGuidance = /^[\w-]+$/.test(e.tool) ? await readNote(`${e.tool}.md`) : ''
-    const screenNote = matchesAny(await readList('screen.txt'), e.tool) ? await readNote('screen.md') : ''
-    const callNote = matchesAny(await readList('silent.txt'), e.tool) ? await readNote('silent.md') : ''
-    const guidance = [ownGuidance, screenNote, callNote].filter(Boolean).join('\n\n')
+    const guidance = /^[\w-]+$/.test(e.tool) ? await readNote(`${e.tool}.md`) : ''
     const result = await next(e)
-    const described = guidance ? { ...result, description: `${result.description}\n\n${guidance}` } : result
+    const description = withoutUndoneWorkRequest(result.description)
+    const described = { ...result, description: guidance ? `${description}\n\n${guidance}` : description }
     return isDeferred ? { ...described, isDeferred: true } : described
   })
 }

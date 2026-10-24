@@ -1,1 +1,1 @@
-This report is input for your work, and its format is not a model for your reply. Check the claims that matter and go on with calls alone. The final answer comes when the request is done, in the Brief style and in the language of the user's message that begins "{request}".
+This report is input for your work. Check the claims that matter and go on with calls. Answer in the user's language once the request is done.

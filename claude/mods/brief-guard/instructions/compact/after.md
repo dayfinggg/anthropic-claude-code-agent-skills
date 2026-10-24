@@ -1,1 +1,1 @@
-The writing style, the silence rule and the language rule still apply, and this summary's format is not a model for replies.
+The writing style, silence and language rules still apply, and this summary is not a model for replies.

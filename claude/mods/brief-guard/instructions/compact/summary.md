@@ -1,1 +1,1 @@
-Write the summary in the language the user writes in. Quote every message the user typed word for word, and keep every instruction about how replies look and how the work is done, including the active output style. Leave out every line the assistant wrote beside a tool call, because those lines broke the user's rules.
+Write the summary in the user's language. Quote every message the user typed word for word. Keep every instruction about how replies look and how the work is done. Leave out lines the assistant wrote beside tool calls.

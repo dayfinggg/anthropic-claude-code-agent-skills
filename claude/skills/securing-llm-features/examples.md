@@ -1,6 +1,6 @@
 # LLM feature security examples
 
-Illustrative pairs.
+Illustrative before and after pairs.
 
 ## Contents
 
@@ -37,7 +37,7 @@ export function AssistantMessage({ answer }: { answer: string }) {
 }
 ```
 
-`skipHtml` drops raw HTML, the default URL transform allows only safe schemes, and dropping images stops an injected image URL from leaking data when the browser loads it (LLM05).
+`skipHtml` drops raw HTML. The default URL transform allows only safe schemes, so do not override `urlTransform`. Dropping images stops an injected image URL from leaking data when the browser loads it.
 
 ## Delete tool behind human approval (TypeScript)
 
@@ -89,6 +89,11 @@ export class ApprovalError extends Error {
   }
 }
 
+export interface DeletionRequest {
+  approvalId: string;
+  projectName: string;
+}
+
 export class ProjectDeletions {
   constructor(
     private readonly projects: ProjectRepository,
@@ -96,18 +101,19 @@ export class ProjectDeletions {
     private readonly approvalTtlMs: number,
   ) {}
 
-  async request(userId: string, projectId: string): Promise<string> {
+  async request(userId: string, projectId: string): Promise<DeletionRequest | undefined> {
     const project = await this.projects.findOwnedBy(userId, projectId);
     if (!project) {
-      return `Project ${projectId} was not found.`;
+      return undefined;
     }
+    const approvalId = randomUUID();
     await this.pending.save({
-      id: randomUUID(),
+      id: approvalId,
       userId,
       projectId: project.id,
       expiresAt: Date.now() + this.approvalTtlMs,
     });
-    return `Deletion of project "${project.name}" is waiting for the user's confirmation.`;
+    return { approvalId, projectName: project.name };
   }
 
   async confirm(userId: string, approvalId: string): Promise<void> {
@@ -120,11 +126,16 @@ export class ProjectDeletions {
 }
 
 export function deleteProjectTool(deletions: ProjectDeletions, userId: string) {
-  return (input: { projectId: string }): Promise<string> => deletions.request(userId, input.projectId);
+  return async (input: { projectId: string }): Promise<string> => {
+    const pending = await deletions.request(userId, input.projectId);
+    return pending
+      ? `Deletion of "${pending.projectName}" awaits the user's confirmation. The app shows a confirm button for approval ${pending.approvalId}.`
+      : `Project ${input.projectId} was not found.`;
+  };
 }
 ```
 
-The model can only ask for a deletion. The user ID comes from the session, ownership is checked in the query, and the user's own confirm request deletes through an approval bound to one project that expires and is consumed once (LLM06, ASI02, ASI09).
+The model can only request a deletion. The user ID comes from the session and ownership is checked in the query. The app UI sends the approval ID to `confirm` when the user clicks. The approval binds one project, expires, and is consumed once.
 
 ## Retrieved documents labelled as data and scoped to the tenant (Python)
 
@@ -176,7 +187,7 @@ def build_prompt(index: DocumentIndex, tenant_id: str, question: str, limit: int
     return Prompt(system=SYSTEM_PROMPT, user=f"{wrapped}\n\nQuestion: {question}")
 ```
 
-The session's tenant ID filters the vector search itself (LLM08), each document is escaped so it cannot close its element, and the system prompt labels the elements as data (LLM01).
+The session's tenant ID filters the vector search itself. Each document is escaped so it cannot close its element. The system prompt labels the elements as data. This is app-side RAG, so the labels lower risk but do not enforce anything. When the model fetches documents through a tool, return them in a `tool_result` as JSON.
 
 ## Step, token, and time budget on an agent loop (TypeScript)
 
@@ -203,6 +214,7 @@ export interface ModelTurn {
 
 export interface CallOptions {
   signal: AbortSignal;
+  maxOutputTokens?: number;
 }
 
 export interface ModelClient {
@@ -236,6 +248,8 @@ export interface AgentBudget {
   maxSteps: number;
   maxTotalTokens: number;
   maxDurationMs: number;
+  maxOutputTokens: number;
+  toolTimeoutMs: number;
 }
 
 export class BudgetExceededError extends Error {
@@ -250,10 +264,10 @@ export async function runAgent(
   messages: Message[],
   budget: AgentBudget,
 ): Promise<string> {
-  const signal = AbortSignal.timeout(budget.maxDurationMs);
+  const runSignal = AbortSignal.timeout(budget.maxDurationMs);
   let usedTokens = 0;
   for (let step = 1; step <= budget.maxSteps; step++) {
-    const turn = await model.next(messages, { signal });
+    const turn = await model.next(messages, { signal: runSignal, maxOutputTokens: budget.maxOutputTokens });
     usedTokens += turn.usage.inputTokens + turn.usage.outputTokens;
     if (usedTokens > budget.maxTotalTokens) {
       throw new BudgetExceededError("maxTotalTokens", usedTokens);
@@ -261,10 +275,11 @@ export async function runAgent(
     if (turn.toolCalls.length === 0) {
       return turn.text;
     }
-    messages.push(turn.message, ...(await tools.runAll(turn.toolCalls, { signal })));
+    const toolSignal = AbortSignal.any([runSignal, AbortSignal.timeout(budget.toolTimeoutMs)]);
+    messages.push(turn.message, ...(await tools.runAll(turn.toolCalls, { signal: toolSignal })));
   }
   throw new BudgetExceededError("maxSteps", budget.maxSteps);
 }
 ```
 
-The budget comes from configuration, one deadline covers model and tool calls, and the run stops with an error that names the limit (LLM10, ASI08).
+The budget comes from configuration. One deadline covers the run and each tool call has its own timeout. The run stops with an error that names the limit. Cost and delegation depth are counted the same way as tokens.

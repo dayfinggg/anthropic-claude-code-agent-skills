@@ -1,8 +1,8 @@
 # Resilience examples
 
-Illustrative. Copy the reasoning, not the exact shape.
+Copy the reasoning, not the exact shape.
 
-## Idempotent message handler (Python and SQL)
+## Idempotent message handler in Python and SQL
 
 Before
 
@@ -63,4 +63,4 @@ def handle_payment_captured(conn: psycopg.Connection, message: Message) -> None:
     message.ack()
 ```
 
-A redelivery after a crash between commit and acknowledgement used to credit the account twice. The producer's message ID is now claimed in the same transaction as the credit, the primary key makes a concurrent duplicate lose, and a redelivered message is acknowledged without a second credit.
+A crash between the commit and the acknowledgement used to credit the account twice on redelivery. The handler now claims the producer's message ID in the same transaction as the credit. The primary key makes a concurrent duplicate lose. A redelivered message is acknowledged without a second credit.

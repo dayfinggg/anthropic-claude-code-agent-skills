@@ -1,1 +1,1 @@
-Ending the turn with no text was right if all that is left is to wait for background work and the user did not ask about it. End this turn the same way, with no text and no tool call. If no background work runs, write the final answer now.
+Ending the turn with no text was right while only background work is left and the user did not ask. End this turn the same way, with no text and no tool call. If no background work runs, write the final answer now.

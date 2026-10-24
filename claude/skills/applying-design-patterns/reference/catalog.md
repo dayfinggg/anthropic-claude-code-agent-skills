@@ -17,7 +17,12 @@ Refactoring names come from the refactoring.com catalog for Refactoring 2nd Edit
 | Facade | A central place that grows into a large class | None named. Extract Function and Move Function, or Hide Delegate | Remove Middle Man or Inline Class |
 | Composite | Leaves may be forced to offer child operations | None named. Extract Superclass for the shared interface | Collapse Hierarchy when only one level deep |
 | Singleton | Hidden global state, initialization order problems, tests that share state | Avoid it | Replace Query with Parameter at each reader, then delete the accessor |
+| Interface with one implementation | An extra file and a hop with no second behavior | Not applicable | None named. Inline Class or Collapse Hierarchy, or delete the interface by hand |
 
 Null Object fits only when every caller reacts to absence the same way. When callers differ or absence is an error, use an optional type, a result type, or an error. Keep the source returning null so code that must tell can still tell.
 
-Builder as a class fits mainly languages without named arguments, such as Java and Go. The C++ Core Guidelines allow one Singleton exception, a function-local static for initialization on first use.
+Builder as a class fits mainly languages without named arguments, such as Java and Go.
+
+Avoid Singleton. C++ Core Guidelines I.3 calls singletons complicated global objects in disguise. Create the instance in the composition root and pass it in.
+
+A pattern in a published API used outside the repository is a contract. Report it to the user instead of removing it.

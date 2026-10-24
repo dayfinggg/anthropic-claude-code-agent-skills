@@ -1,1 +1,2 @@
-Apply this skill for the rest of the task. Before the first change, read its reference files whose topic the task touches. When the change uses a library, tool or interface that is new to this session, also search its current official documentation, because the skill does not replace it. Before the final answer, check the result against the skill's checklist.
+Before the first change, open with Read the reference files of this skill that the task touches. A grep shows lines without the rules around them. Check the result against the skill before the final answer.
+The reference files of this skill are {files}.
