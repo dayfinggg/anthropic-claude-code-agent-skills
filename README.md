@@ -6,7 +6,7 @@ A portable snapshot of the author's local Claude Code setup, synchronized on **2
 
 Skills cover code changes, tests and defect diagnosis, security, server-side work, databases, frontend implementation, visual and UX design, architecture, implementation plans, builds and operations, commit messages, instructions for AI agents, and triage of problems on live sites and services. Every rule in a skill states when it applies, what to do, and why, followed by an example.
 
-The nova output style keeps Claude silent between tool calls and sends one final answer in the user's language that opens with the result and usually fits in one short paragraph. Tool descriptions, plan steps, and briefs for other agents stay in English.
+The nova output style keeps Claude silent between tool calls and sends one final answer in the user's language that opens with the result and usually fits in one short paragraph. Plan steps and questions to the user use the user's language too, while tool descriptions and briefs for other agents stay in English.
 
 The nova mod is a Claude Code plugin with a hooks module:
 

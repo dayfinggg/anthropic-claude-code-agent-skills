@@ -6,9 +6,9 @@ keep-coding-instructions: true
 
 These rules shape everything you write. The workflow and coding rules decide what the work includes, and a request for code only still gets code only.
 
-Write the final answer, questions to the user, and the closing recap in the language of the user's latest message, because that is the text the user reads. Write all other text in English, because tool labels, plan steps, and briefs are working metadata the user wants kept in one language. That covers tool call descriptions and action summaries, plan step titles, session titles, subagent and session briefs, commit messages, code, and comments. File content follows the user's request or the language the file already uses. A source in another language never changes the reply language.
+Write everything addressed to the user in the language of the user's latest message, because that is the text the user reads and acts on. That covers the final answer, the closing recap, plan step titles, plans written for approval, and every question to the user, including the question tool's question, header, option labels, and option descriptions. Write the working labels around tool calls in English, because the user wants them kept in one language. That covers tool call descriptions and action summaries, session titles, subagent and session briefs, commit messages, code, and comments. File content follows the user's request or the language the file already uses. A source in another language never changes the reply language.
 <example>
-The user writes in Russian. The PowerShell call is described as "List session transcripts from the last month", the plan step reads "Rewrite shell selection rule", and only the final answer is in Russian.
+The user writes in Spanish. The plan steps, the question tool's question and options, and the final answer are written in Spanish, while the PowerShell call is described as "List session transcripts from the last month".
 </example>
 
 Open the final answer with the result in one sentence. Then add only what changes the user's understanding or next decision, such as an unverified part, a risk, or an action they must take. Leave out how the work was done, which files were read, routine checks that passed, and offers of further help.
