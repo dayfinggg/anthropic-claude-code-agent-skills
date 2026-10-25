@@ -1,20 +1,25 @@
-# Claude Code Agents and Skills
+# Claude Code Agent Skills
 
 English · [Українська](README.uk.md) · [Русский](README.ru.md)
 
-A portable snapshot of the author's local Claude Code setup, synchronized on **2026-10-15**. It contains **18 engineering skills, 14 specialist agents, the Brief output style, and 2 mods**, plus portable settings.
+A portable snapshot of the author's local Claude Code setup, synchronized on **2026-10-26**. It contains **13 engineering skills, the nova output style, and the nova mod**, plus portable settings.
 
-Skills cover clean and secure code, testing, documentation, architecture, design patterns, implementation plans, HTTP APIs, databases, interfaces, 3D, observability, resilient services, dependencies and CI, releases, commit messages, and LLM security. Agents provide codebase exploration, planning, web research, diagnosis, implementation, review, security audits, database analysis, documentation, test runs, and verification. The Brief output style keeps every final answer to one short, plain paragraph.
+Skills cover code changes, tests and defect diagnosis, security, server-side work, databases, frontend implementation, visual and UX design, architecture, implementation plans, builds and operations, commit messages, instructions for AI agents, and triage of problems on live sites and services. Every rule in a skill states when it applies, what to do, and why, followed by an example.
 
-The two mods are Claude Code plugins with a hooks module:
+The nova output style keeps Claude silent between tool calls and sends one final answer in the user's language that opens with the result and usually fits in one short paragraph. Tool descriptions, plan steps, and briefs for other agents stay in English.
 
-- **brief-guard** replaces the Claude Code prompt blocks that conflict with the Brief output style. It swaps system prompt sections and reminders for the texts in its `instructions` folder, adds the author's standing rules, extends tool descriptions, carries the rules through compaction, adds a short note to a request typed while a turn runs, and adds reminders after tool errors, agent results, shell commands that read or write local files, text written beside a tool call, a task list that has not moved for 30 calls, and changes made before a skill's reference files or the documentation of a new language were read. In `bypassPermissions` mode it also allows every permission request that still reaches you, except `AskUserQuestion`, `EnterPlanMode`, and `ExitPlanMode`.
-- **usage-line** shows plan limits, cost, and token totals above the prompt: the 5-hour and 7-day limits as gauges that change color as they fill, the session cost in US dollars, and the input, output, cache read, and cache write tokens.
+The nova mod is a Claude Code plugin with a hooks module:
+
+- It replaces the system prompt sections for task work, tools, workflow, skills, and research with its own rule files, where every rule carries a reason and an example.
+- It reminds Claude to load a matching skill when code is edited before any skill was loaded, and to remove comments it added without a request.
+- It returns Claude to the task once when the turn ends while temporary files it wrote in that turn still exist.
+- On Windows it keeps the Bash tool deferred so local commands run in PowerShell, and it drops the desktop app's empty-reply prompt while background work is still running, so no status message is written.
+- It removes the parts of the Agent tool description that encourage delegating side tasks, and it adds short reminders after plan updates and long commands.
 
 This is a personal configuration, not an official Anthropic distribution. Credentials, account state, chat history, projects, sessions, plugins, synced skills, caches, and machine paths are not included.
 
 > [!WARNING]
-> When your settings don't set them, the installer adds `"permissions": { "defaultMode": "bypassPermissions" }` and `"skipDangerousModePermissionPrompt": true`. Claude Code then runs every tool call without asking and skips the confirmation dialog for that mode, and brief-guard allows the remaining permission requests. The [permission modes documentation](https://code.claude.com/docs/en/permission-modes#skip-all-checks-with-bypasspermissions-mode) recommends this mode only for isolated environments, such as containers and virtual machines without internet access. Review [the settings](claude/settings.json) before installing, or set your own `permissions.defaultMode` first, because the installer keeps existing values.
+> When your settings don't set them, the installer adds `"permissions": { "defaultMode": "bypassPermissions" }` and `"skipDangerousModePermissionPrompt": true`. Claude Code then runs every tool call without asking and skips the confirmation dialog for that mode. The [permission modes documentation](https://code.claude.com/docs/en/permission-modes#skip-all-checks-with-bypasspermissions-mode) recommends this mode only for isolated environments, such as containers and virtual machines without internet access. Review [the settings](claude/settings.json) before installing, or set your own `permissions.defaultMode` first, because the installer keeps existing values.
 
 ## Install or replace an older setup
 
@@ -43,9 +48,9 @@ Requires a POSIX shell, `python3` for the settings merge, and a SHA-256 utility,
 sh scripts/install.sh
 ```
 
-Restart Claude Code after installation. The mods load through `CLAUDE_CODE_PLUGIN_DIRS`, which requires Claude Code v2.1.280 or later.
+Restart Claude Code after installation. The mod loads through `CLAUDE_CODE_PLUGIN_DIRS`, which requires Claude Code v2.1.280 or later.
 
-**Replace is the default.** The installer backs up and replaces all skills except `skills/synced`, all agents, the `output-styles` folder, and the `mods` folder, removing the old set. It keeps synced skills, credentials, sessions, projects, plugins, and unrelated files. Existing settings values are preserved and missing keys are added, except `outputStyle`, which becomes `Brief`, and `env.CLAUDE_CODE_PLUGIN_DIRS`, which lists the installed mod folders.
+**Replace is the default.** The installer backs up and replaces all skills except `skills/synced`, all agents, the `output-styles` folder, and the `mods` folder, removing the old set. No agents are bundled, so agents from an earlier version of this setup are removed after the backup. It keeps synced skills, credentials, sessions, projects, plugins, and unrelated files. Existing settings values are preserved and missing keys are added, except `outputStyle`, which becomes `nova`, and `env.CLAUDE_CODE_PLUGIN_DIRS`, which lists the installed mod folder.
 
 ## Update
 
@@ -63,16 +68,15 @@ Updates require internet access, with `curl` and `tar` additionally required for
 
 ## Contents and installation details
 
-- [18 skills and their references](claude/skills)
-- [14 agent definitions](claude/agents)
-- [Brief output style](claude/output-styles/brief.md)
-- [brief-guard](claude/mods/brief-guard) and [usage-line](claude/mods/usage-line) mods
+- [13 skills and their references](claude/skills)
+- [nova output style](claude/output-styles/nova.md)
+- [nova mod](claude/mods/nova)
 - [Portable settings](claude/settings.json)
 - [Installation modes, backups, and custom locations](docs/installation.md)
 
-The payload files are copied byte for byte from the local setup. The settings copy leaves out `env.CLAUDE_CODE_PLUGIN_DIRS`, which the installer writes for each platform, and each mod's `.claude-plugin/types` folder is left out because [Claude Code generates those type definitions](https://code.claude.com/docs/en/plugins/mods/create#get-the-types-for-your-build) for the version it runs.
+The payload files are copied byte for byte from the local setup. The settings copy leaves out `env.CLAUDE_CODE_PLUGIN_DIRS`, which the installer writes for each platform, and the mod's `.claude-plugin/types` folder is left out because [Claude Code generates those type definitions](https://code.claude.com/docs/en/plugins/mods/create#get-the-types-for-your-build) for the version it runs. The empty `claude/agents` folder holds only a `.gitkeep` file, so the installer still manages that folder.
 
-Claude Code keeps its configuration in `~/.claude`, or in the folder named by `CLAUDE_CONFIG_DIR`, as described in [Environment variables](https://code.claude.com/docs/en/env-vars) and [Explore the .claude directory](https://code.claude.com/docs/en/claude-directory). Personal subagents load from its `agents` folder ([Create custom subagents](https://code.claude.com/docs/en/sub-agents)), skills from `skills/<skill-name>/SKILL.md` ([Extend Claude with skills](https://code.claude.com/docs/en/skills)), and output styles from `output-styles` ([Output styles](https://code.claude.com/docs/en/output-styles)). `CLAUDE_CODE_PLUGIN_DIRS` loads each listed folder the way `--plugin-dir` does, with absolute paths separated by `;` on Windows and `:` elsewhere ([Mods reference](https://code.claude.com/docs/en/plugins/mods/reference)).
+Claude Code keeps its configuration in `~/.claude`, or in the folder named by `CLAUDE_CONFIG_DIR`, as described in [Environment variables](https://code.claude.com/docs/en/env-vars) and [Explore the .claude directory](https://code.claude.com/docs/en/claude-directory). Skills load from `skills/<skill-name>/SKILL.md` ([Extend Claude with skills](https://code.claude.com/docs/en/skills)), and output styles from `output-styles` ([Output styles](https://code.claude.com/docs/en/output-styles)). `CLAUDE_CODE_PLUGIN_DIRS` loads each listed folder the way `--plugin-dir` does, with absolute paths separated by `;` on Windows and `:` elsewhere ([Mods reference](https://code.claude.com/docs/en/plugins/mods/reference)).
 
 ## Verify the installers
 

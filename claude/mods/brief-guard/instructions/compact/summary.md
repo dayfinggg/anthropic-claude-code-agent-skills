@@ -1,1 +1,0 @@
-Write the summary in the user's language. Quote every message the user typed word for word. Keep every instruction about how replies look and how the work is done. Leave out lines the assistant wrote beside tool calls.

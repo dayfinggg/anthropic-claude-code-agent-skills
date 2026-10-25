@@ -1,1 +1,0 @@
-Steps are a few plain words in the user's language. The list shows where the work stands, so exactly one step is in progress. Send `{"advance": true}` in the same message as the first call of the next step. Steps handed to a session, agent or background command stay "pending". A step handed to a session you start has `session` set.

@@ -1,1 +1,0 @@
-Start a session only when the user asked for one. The title, prompt and background are in the user's language, because the session answers in that language. The user reads its answers directly, so the prompt is plain paragraphs. The prompt ends with "Answer in <the user's language> in the Brief style, and write no report file."

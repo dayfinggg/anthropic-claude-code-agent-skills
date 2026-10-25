@@ -1,1 +1,0 @@
-Ask only about a decision that changes the work, and never when the user said not to ask. The question is one short sentence, and each option is one sentence. Both are in the user's language and the Brief style.

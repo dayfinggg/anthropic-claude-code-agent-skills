@@ -1,1 +1,0 @@
-Call this once the whole request is done, never while an agent or background command for it runs. The recap, question and buttons are in the user's language and the Brief style. They hold only what was done, so a line such as "nothing committed" or "README not written" stays out. This replaces the request above to name what is not done or not verified.

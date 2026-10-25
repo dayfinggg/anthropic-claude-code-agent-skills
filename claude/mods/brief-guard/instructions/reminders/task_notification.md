@@ -1,1 +1,0 @@
-This is an automated notice about background work, not a message from the user. The user's request begins "{request}". Go on with the request using calls, and end the turn with no text while other work for it runs. Write the final answer once the request is done.

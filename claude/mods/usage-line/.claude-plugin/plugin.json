@@ -1,6 +1,0 @@
-{
-  "name": "usage-line",
-  "version": "0.1.0",
-  "description": "Plan limits, cost and token totals above the prompt.",
-  "types": "./types/index.d.ts"
-}

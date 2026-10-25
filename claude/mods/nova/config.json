@@ -1,0 +1,135 @@
+{
+  "discoveryTool": "ToolSearch",
+  "promptSectionFiles": {
+    "doing_tasks": "instructions/coding.md",
+    "tools": "instructions/tools.md",
+    "act_dont_rederive": "instructions/workflow.md",
+    "skills_and_research": "instructions/skills-and-research.md"
+  },
+  "upfrontTools": [
+    "PowerShell",
+    "Skill",
+    "WebFetch",
+    "WebSearch"
+  ],
+  "deferredTools": [
+    "Agent",
+    "Artifact",
+    "CronCreate",
+    "CronDelete",
+    "CronList",
+    "DesignSync",
+    "EnterWorktree",
+    "ExitWorktree",
+    "ListAgents",
+    "ListMcpResourcesTool",
+    "Monitor",
+    "NotebookEdit",
+    "PushNotification",
+    "ReadMcpResourceDirTool",
+    "ReadMcpResourceTool",
+    "RemoteTrigger",
+    "ReportFindings",
+    "ScheduleWakeup",
+    "SendMessage",
+    "TaskStop",
+    "Workflow"
+  ],
+  "deferredPrefixes": [
+    "mcp__Claude_Browser__",
+    "mcp__claude_ai_Claude_Docs__",
+    "mcp__cloudflare__",
+    "mcp__cloudflare-docs__",
+    "mcp__visualize__"
+  ],
+  "windowsDeferredTools": [
+    "Bash"
+  ],
+  "removedPromptSections": [
+    "communication"
+  ],
+  "removedInstructionPatterns": [
+    "(?:^|\\n)- After answering from results, end with a \"Sources:\" list of the URLs you used as markdown links\\.(?:\\r?\\n|$)",
+    "(?:^|\\n) - Do not use a colon before tool calls\\.[^\\r\\n]*(?:\\r?\\n|$)",
+    "(?:^|\\n) - Independent tool calls can run in parallel within responses\\.[^\\r\\n]*(?:\\r?\\n|$)",
+    "If it's something important that changes what you're working on, or that the user really would like to know about, it's always okay to share it\\. ?",
+    "The user is often quite short on time, so make things as easy on them as possible, and only bother them when you know you need them! ?",
+    "say in one line which step you are starting on and which can run at the same time, each in its own session, and ",
+    "Bold title line and one sentence right before the call; ",
+    "Right before each session's tool call, in the same message, write a bold title line and one sentence on what it will do; ",
+    "say so in one line with what is left, and ",
+    "Treat feedback from hooks, including <user-prompt-submit-hook>, as coming from the user\\. ?",
+    "; treat hook output as user feedback",
+    "Sometimes you will get output from hooks in this case, and it's then best to treat hook output as if it's feedback from the user or the user's system\\. ?",
+    " \\(move it aside, rename it, or stash it\\)",
+    ", and stash \\(with `-u` for untracked\\) or commit anything you find first",
+    "The other benefit of delegation is to help you stay focused on the primary task at hand\\.[\\s\\S]*?you should thus use them intelligently\\.\\s*",
+    "In conclusion, it is best to use subagents for parallelizing your intelligence, for saving time, and for completing side-quests which do not block the main goal that you're actively working on\\. ?"
+  ],
+  "attachmentReminders": {
+    "output_style": {
+      "pattern": "^nova output style is active\\.",
+      "file": "instructions/reminders/response.md"
+    }
+  },
+  "toolReminders": {
+    "Write": "instructions/reminders/edit.md",
+    "Edit": "instructions/reminders/edit.md",
+    "NotebookEdit": "instructions/reminders/edit.md"
+  },
+  "toolReminderLimit": 2,
+  "toolDescriptionReminders": {
+    "Bash": "instructions/reminders/bash.md",
+    "TaskUpdate": "instructions/reminders/continue.md",
+    "TodoWrite": "instructions/reminders/continue.md"
+  },
+  "skillReminder": {
+    "file": "instructions/reminders/skill.md",
+    "editTools": [
+      "Write",
+      "Edit",
+      "MultiEdit"
+    ],
+    "codeFilePattern": "\\.(?:ts|tsx|js|jsx|mjs|cjs|mts|cts|py|rs|go|java|kt|kts|cs|cpp|cc|c|h|hpp|rb|php|swift|vue|svelte|css|scss|html|sql|sh|bash|ps1|psm1|lua|dart)$"
+  },
+  "emptyTurnNudge": {
+    "pattern": "^\\[Your previous response had no visible output\\.",
+    "reason": "Waiting for background work to finish."
+  },
+  "temporaryFileCheck": {
+    "file": "instructions/reminders/cleanup.md",
+    "pathPatterns": [
+      "/scratchpad/",
+      "/AppData/Local/Temp/",
+      "^/tmp/",
+      "^/var/tmp/"
+    ]
+  },
+  "contextReminders": {
+    "continuation": "instructions/reminders/continue.md"
+  },
+  "workflowReminders": {
+    "file": "instructions/reminders/continue.md",
+    "planTools": [
+      "TaskUpdate",
+      "TodoWrite",
+      "mcp__ccd_turn__update_plan"
+    ],
+    "minCallsBetween": 8,
+    "longCallMs": 60000,
+    "longCallLimit": 2
+  },
+  "removedAttachmentPatterns": {
+    "auto_mode": [
+      "You can do much of your work through the Bash tool when it is the simpler route:[^\\r\\n]*"
+    ],
+    "mcp_instructions_delta": [
+      "; they're likely watching it fill[^\\r\\n]*?\\(outline up; now <topic>\\)"
+    ]
+  },
+  "removedContextPatterns": {
+    "attachedProject": [
+      "The first time you create or edit a file there that the user is likely to want again \\(a page, a document, a script they will run again; not a file made only to answer one question\\), finish what they asked first\\. Then make the last sentence of that reply exactly this, in the language of your reply: \"If you want to keep this work, I can move this session to a folder you choose\\.\" Say it once only: if the conversation or its summary shows you already said it, or they declined, don't say it again\\. "
+    ]
+  }
+}
