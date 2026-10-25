@@ -15,7 +15,9 @@ type Configuration = {
   toolReminders?: Readonly<Record<string, string>>
   toolReminderLimit?: number
   toolDescriptionReminders?: Readonly<Record<string, string>>
+  windowsToolDescriptionReminders?: Readonly<Record<string, string>>
   contextReminders?: Readonly<Record<string, string>>
+  agentRules?: string
   workflowReminders?: {
     file: string
     planTools: readonly string[]
@@ -26,7 +28,7 @@ type Configuration = {
   skillReminder?: {
     file: string
     editTools: readonly string[]
-    codeFilePattern: string
+    filePattern: string
   }
   temporaryFileCheck?: {
     file: string
@@ -34,7 +36,12 @@ type Configuration = {
   }
   emptyTurnNudge?: {
     pattern: string
-    reason: string
+    file: string
+  }
+  narrationReminder?: {
+    file: string
+    closingTools: readonly string[]
+    limit: number
   }
 }
 
@@ -45,17 +52,28 @@ type LoopState = {
   lastReminderCall?: number
   skillReminded: boolean
   temporaryFiles: Set<string>
+  narrated: boolean
+  narrationReminders: number
 }
 
 const WINDOWS_PATH = /^[A-Za-z]:[\\/]/
+const ACTIVE_AGENT_STATUSES: readonly string[] = ['pending', 'running', 'waiting']
+const FINISHED_TASK = /<task-id>([^<]+)<\/task-id>[\s\S]*?<status>(?:completed|failed|killed|stopped)<\/status>/g
 
 function getLoopState(states: Map<string | undefined, LoopState>, agentId: string | undefined): LoopState {
   let state = states.get(agentId)
   if (!state) {
-    state = { edits: 0, calls: 0, longReminders: 0, skillReminded: false, temporaryFiles: new Set() }
+    state = {
+      edits: 0, calls: 0, longReminders: 0, skillReminded: false, temporaryFiles: new Set(),
+      narrated: false, narrationReminders: 0,
+    }
     states.set(agentId, state)
   }
   return state
+}
+
+function textOf(content: readonly unknown[]): string {
+  return content.map(block => stringField(block, 'text') ?? '').join('\n')
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -90,6 +108,19 @@ function isPlanAdvance(input: unknown): boolean {
   return input.advance === true || (Array.isArray(input.done) && input.done.length > 0) || typeof input.start === 'number'
 }
 
+async function skillLoaded($: CoreEngineInterface, skillAgents: ReadonlySet<string | undefined>, agentId: string | undefined): Promise<boolean> {
+  if (skillAgents.has(agentId)) return true
+  if (agentId !== undefined) return false
+  const messages = await $.session.messages()
+  return messages.some(message => message.toolUses.some(use => use.tool === 'Skill'))
+}
+
+async function backgroundWorkRunning($: CoreEngineInterface, backgroundCommands: ReadonlySet<string>): Promise<boolean> {
+  if (backgroundCommands.size > 0) return true
+  const agents = await $.agent.list()
+  return agents.some(agent => agent.parentId === undefined && ACTIVE_AGENT_STATUSES.includes(agent.status))
+}
+
 function readConfiguration($: CoreEngineInterface): Promise<Configuration> {
   return $.fs.read(`${$.plugin.root}/config.json`).then(text => JSON.parse(text) as Configuration)
 }
@@ -118,21 +149,42 @@ export const register: Register = on => {
   const loopStates = new Map<string | undefined, LoopState>()
   const removeInstructions = (text: string, patterns: readonly string[]) => patterns.reduce((result, pattern) => result.replace(new RegExp(pattern, 'g'), ''), text)
   const skillAgents = new Set<string | undefined>()
+  const backgroundCommands = new Set<string>()
   let discoveryAvailable = false
   let windowsHost = false
-  let backgroundRunning = false
 
   on('turn.start', async ($, event, next) => {
     loopStates.delete(event.agentId)
-    if (event.agentId === undefined) backgroundRunning = false
     return next(event)
   })
 
-  on('prompt.submit', async ($, event, next) => {
+  on('agent.spawn', async ($, event, next) => {
+    const config = await (configuration ??= readConfiguration($))
+    if (!config.agentRules || event.fork || event.resume) return next(event)
+    const rules = await readReminder($, config.agentRules, reminderFiles)
+    return next({ ...event, prompt: `${event.prompt.trimEnd()}\n\n${rules.trimEnd()}` })
+  })
+
+  on('turn.step', async function* ($, event, next) {
+    const result = yield* next(event)
+    if (event.agentId !== undefined) return result
+    const config = await (configuration ??= readConfiguration($))
+    const narration = config.narrationReminder
+    if (narration && result.answer.trim() && result.toolUses.some(use => !narration.closingTools.includes(use.name))) {
+      getLoopState(loopStates, undefined).narrated = true
+    }
+    return result
+  })
+
+  on('session.append', async ($, event, next) => {
+    const content = event.message.content
+    for (const match of textOf(content).matchAll(FINISHED_TASK)) backgroundCommands.delete(match[1]!)
     const config = await (configuration ??= readConfiguration($))
     const nudge = config.emptyTurnNudge
-    if (nudge && backgroundRunning && event.isMeta && new RegExp(nudge.pattern).test(event.text)) return { drop: nudge.reason }
-    return next(event)
+    if (!nudge || event.agentId !== undefined || event.message.type !== 'user' || !event.message.isMeta ||
+      !new RegExp(nudge.pattern).test(textOf(content)) || !await backgroundWorkRunning($, backgroundCommands)) return next(event)
+    const text = await readReminder($, nudge.file, reminderFiles)
+    return next({ ...event, message: { ...event.message, content: [{ type: 'text', text: text.trimEnd() }] } })
   })
 
   on('tool.call', async ($, event, next) => {
@@ -151,13 +203,25 @@ export const register: Register = on => {
       paths.push(path)
     }
     if (event.tool === 'Skill' && !result.isError) skillAgents.add(event.agentId)
+    const backgroundTask = !result.isError ? stringField(result.result, 'backgroundTaskId') : undefined
+    if (backgroundTask) backgroundCommands.add(backgroundTask)
+    const stoppedTask = event.tool === 'TaskStop' ? stringField(event, 'task_id') : undefined
+    if (stoppedTask) backgroundCommands.delete(stoppedTask)
     const filePath = stringField(event, 'file_path')
     const succeeded = !result.isError && !result.isReadOnly
     const skill = config.skillReminder
-    if (skill && filePath && succeeded && !state.skillReminded && !skillAgents.has(event.agentId) &&
-      skill.editTools.includes(event.tool) && new RegExp(skill.codeFilePattern, 'i').test(filePath)) {
+    if (skill && filePath && succeeded && !state.skillReminded && skill.editTools.includes(event.tool) &&
+      new RegExp(skill.filePattern, 'i').test(filePath) && !await skillLoaded($, skillAgents, event.agentId)) {
       state.skillReminded = true
       paths.push(skill.file)
+    }
+    const narration = config.narrationReminder
+    if (narration && state.narrated && event.agentId === undefined) {
+      state.narrated = false
+      if (state.narrationReminders < narration.limit) {
+        state.narrationReminders += 1
+        paths.push(narration.file)
+      }
     }
     const cleanup = config.temporaryFileCheck
     if (cleanup && filePath && succeeded && event.tool === 'Write' && stringField(result.result, 'type') === 'create' &&
@@ -185,7 +249,6 @@ export const register: Register = on => {
   on('classic.Stop', async ($, event, next) => {
     const config = await (configuration ??= readConfiguration($))
     const result = await next(event)
-    backgroundRunning = (event.background_tasks?.length ?? 0) > 0
     const check = config.temporaryFileCheck
     const state = loopStates.get(undefined)
     if (!check || !state || result.block !== undefined || event.stop_hook_active || event.background_tasks?.length) return result
@@ -210,7 +273,8 @@ export const register: Register = on => {
     const config = await (configuration ??= readConfiguration($))
     const result = await next(event)
     let description = removeInstructions(result.description, config.removedInstructionPatterns)
-    const reminder = config.toolDescriptionReminders?.[event.tool]
+    const reminder = config.toolDescriptionReminders?.[event.tool] ??
+      (windowsHost ? config.windowsToolDescriptionReminders?.[event.tool] : undefined)
     if (reminder) description += `\n\n${await readReminder($, reminder, reminderFiles)}`
     if (config.upfrontTools.includes(event.tool)) return { ...result, description, isDeferred: false }
     const defer = discoveryAvailable && event.tool !== config.discoveryTool && (

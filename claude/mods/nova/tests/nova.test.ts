@@ -19,7 +19,7 @@ const OPTIONS = {
   deferredPrefixes: ['external__'],
 }
 const SKILL_OPTIONS = {
-  skillReminder: { file: 'instructions/skill.md', editTools: ['Write', 'Edit'], codeFilePattern: '\\.(?:ts|py)$' },
+  skillReminder: { file: 'instructions/skill.md', editTools: ['Write', 'Edit'], filePattern: '\\.(?:ts|py)$' },
 }
 const SKILL_CALL = { tool: 'Skill', skill: 'coding' } as const
 const CODE_WRITE = { tool: 'Write', file_path: '/src/app.ts', content: 'export {}' } as const
@@ -27,11 +27,33 @@ const CLEANUP_OPTIONS = {
   temporaryFileCheck: { file: 'instructions/cleanup.md', pathPatterns: ['^/tmp/'] },
 }
 const STOP = { stop_hook_active: false } as const
-const RUNNING = [{ id: 'b1', type: 'subagent', status: 'running', description: 'Rewrite design skill' }]
 const NUDGE = '[Your previous response had no visible output. Please continue and produce a user-visible response.]'
-const HOST_NUDGE = { text: NUDGE, isMeta: true, wait: false, origin: { kind: 'sdk' } } as const
+const NARRATION_OPTIONS = {
+  narrationReminder: { file: 'instructions/narration.md', closingTools: ['WrapUp'], limit: 2 },
+}
+const READ_CALL = { tool: 'Read', file_path: '/docs/architecture.md' } as const
+const STEP = { turnId: 'main', index: 0, model: 'example', messageCount: 1 } as const
+
+async function runStep(stream: AsyncGenerator<unknown, unknown>) {
+  for (let item = await stream.next(); !item.done; item = await stream.next()) continue
+}
+
+function stepResult(answer: string, tools: readonly string[]) {
+  return { turnId: 'main', index: 0, answer, toolUses: tools.map(name => ({ name, input: {} })), stopReason: 'tool_use' as const, usage: null }
+}
+
 const NUDGE_OPTIONS = {
-  emptyTurnNudge: { pattern: '^\\[Your previous response had no visible output\\.', reason: 'Waiting for background work.' },
+  emptyTurnNudge: { pattern: '^\\[Your previous response had no visible output\\.', file: 'instructions/waiting.md' },
+}
+const AGENT = { id: 'a1', description: 'Rewrite docs', type: 'general-purpose', status: 'running' as const }
+
+function nudgeRow(text: string = NUDGE, door: 'note' | 'delivery' = 'note') {
+  return {
+    door,
+    origin: { kind: 'unclassified' as const },
+    uuid: `row-${text.length}-${door}`,
+    message: { type: 'user' as const, role: 'user' as const, isMeta: true as const, content: [{ type: 'text' as const, text }] },
+  }
 }
 
 const REMOVAL_OPTIONS = {
@@ -181,6 +203,7 @@ test('reminds once per turn when code changes before any skill loads', async ($,
   stubConfiguration(on, SKILL_OPTIONS, { 'skill.md': 'Load the governing skill.' })
   on('tool.call', () => ({ result: WRITE_RESULT }))
   on('turn.start', ($, event) => ({ turnId: event.turnId }))
+  on('session.messages', () => ({ value: [] }))
 
   expect((await $.tool.call({ ...CODE_WRITE, file_path: '/notes.md' })).context).toBeUndefined()
   expect((await $.tool.call(CODE_WRITE)).context).toEqual(['Load the governing skill.'])
@@ -206,9 +229,20 @@ test('does not count a failed skill call as a loaded skill', async ($, on) => {
   on('tool.call', ($, event) => event.tool === 'Skill'
     ? { result: 'Unknown skill.', text: 'Unknown skill.', isError: true }
     : { result: WRITE_RESULT })
+  on('session.messages', () => ({ value: [] }))
 
   await $.tool.call(SKILL_CALL)
   expect((await $.tool.call(CODE_WRITE)).context).toEqual(['Load the governing skill.'])
+})
+
+test('trusts a skill call already in the transcript after the mod reloads', async ($, on) => {
+  stubConfiguration(on, SKILL_OPTIONS, { 'skill.md': 'Load the governing skill.' })
+  on('tool.call', () => ({ result: WRITE_RESULT }))
+  on('session.messages', () => ({ value: [
+    { role: 'assistant' as const, text: '', toolUses: [{ tool_use_id: 't1', tool: 'Skill', input: { skill: 'coding' } }] },
+  ] }))
+
+  expect((await $.tool.call(CODE_WRITE)).context).toBeUndefined()
 })
 
 test('blocks the first stop while temporary files written this turn remain', async ($, on) => {
@@ -256,56 +290,125 @@ test('forgets temporary files from an earlier turn', async ($, on) => {
   expect(await $.classic.Stop(STOP)).toEqual({})
 })
 
-test('drops the empty-turn nudge while background work is still running', async ($, on) => {
-  stubConfiguration(on, NUDGE_OPTIONS)
-  on('classic.Stop', () => ({}))
-  on('prompt.submit', ($, event) => ({ text: event.text }))
+test('reminds once after a main-loop step that put text before a tool call', async ($, on) => {
+  stubConfiguration(on, NARRATION_OPTIONS, { 'narration.md': 'Send tool calls without text.' })
+  let step = stepResult('Now my own part.', ['Read', 'Read'])
+  on('turn.step', async function* () { return step })
+  on('tool.call', () => ({ result: 'File content.' }))
 
-  await $.classic.Stop({ ...STOP, background_tasks: RUNNING })
-
-  expect(await $.prompt.submit(HOST_NUDGE)).toEqual({ drop: 'Waiting for background work.' })
+  await runStep($.turn.step(STEP))
+  expect((await $.tool.call(READ_CALL)).context).toEqual(['Send tool calls without text.'])
+  expect((await $.tool.call(READ_CALL)).context).toBeUndefined()
+  step = stepResult('', ['Read'])
+  await runStep($.turn.step(STEP))
+  expect((await $.tool.call(READ_CALL)).context).toBeUndefined()
 })
 
-test('lets the same words through when the user typed them', async ($, on) => {
-  stubConfiguration(on, NUDGE_OPTIONS)
-  on('classic.Stop', () => ({}))
-  on('prompt.submit', ($, event) => ({ text: event.text }))
+test('stays quiet for a final answer and for text before a closing tool', async ($, on) => {
+  stubConfiguration(on, NARRATION_OPTIONS, { 'narration.md': 'Send tool calls without text.' })
+  let step = stepResult('The parser accepts comments now.', ['WrapUp'])
+  on('turn.step', async function* () { return step })
+  on('tool.call', () => ({ result: 'Done.' }))
 
-  await $.classic.Stop({ ...STOP, background_tasks: RUNNING })
-
-  expect((await $.prompt.submit({ text: NUDGE, wait: false, origin: { kind: 'composer' } })).text).toBe(NUDGE)
+  await runStep($.turn.step(STEP))
+  expect((await $.tool.call(READ_CALL)).context).toBeUndefined()
+  step = stepResult('The parser accepts comments now.', [])
+  await runStep($.turn.step(STEP))
+  expect((await $.tool.call(READ_CALL)).context).toBeUndefined()
 })
 
-test('passes the empty-turn nudge through when no background work remains', async ($, on) => {
-  stubConfiguration(on, NUDGE_OPTIONS)
-  on('classic.Stop', () => ({}))
-  on('prompt.submit', ($, event) => ({ text: event.text }))
-
-  await $.classic.Stop(STOP)
-
-  expect((await $.prompt.submit(HOST_NUDGE)).text).toBe(NUDGE)
-})
-
-test('lets other prompts through while background work runs', async ($, on) => {
-  stubConfiguration(on, NUDGE_OPTIONS)
-  on('classic.Stop', () => ({}))
-  on('prompt.submit', ($, event) => ({ text: event.text }))
-
-  await $.classic.Stop({ ...STOP, background_tasks: RUNNING })
-
-  expect((await $.prompt.submit({ ...HOST_NUDGE, text: 'Also check the logs.' })).text).toBe('Also check the logs.')
-})
-
-test('forgets running background work once a new main turn starts', async ($, on) => {
-  stubConfiguration(on, NUDGE_OPTIONS)
-  on('classic.Stop', () => ({}))
-  on('prompt.submit', ($, event) => ({ text: event.text }))
+test('ignores text in a subagent loop and caps reminders per turn', async ($, on) => {
+  stubConfiguration(on, NARRATION_OPTIONS, { 'narration.md': 'Send tool calls without text.' })
+  on('turn.step', async function* () { return stepResult('Checking the file.', ['Read']) })
+  on('tool.call', () => ({ result: 'File content.' }))
   on('turn.start', ($, event) => ({ turnId: event.turnId }))
 
-  await $.classic.Stop({ ...STOP, background_tasks: RUNNING })
-  await $.turn.start({ text: '', turnId: 'notification' })
+  await runStep($.turn.step({ ...STEP, agentId: 'child' }))
+  expect((await $.tool.call({ ...READ_CALL, agentId: 'child' })).context).toBeUndefined()
+  const contexts = []
+  for (let index = 0; index < 3; index += 1) {
+    await runStep($.turn.step(STEP))
+    contexts.push((await $.tool.call(READ_CALL)).context)
+  }
+  expect(contexts).toEqual([['Send tool calls without text.'], ['Send tool calls without text.'], undefined])
+  await $.turn.start({ text: 'Next task.', turnId: 'next' })
+  await runStep($.turn.step(STEP))
+  expect((await $.tool.call(READ_CALL)).context).toEqual(['Send tool calls without text.'])
+})
 
-  expect((await $.prompt.submit(HOST_NUDGE)).text).toBe(NUDGE)
+test('adds a Windows-only description reminder only on a Windows host', async ($, on) => {
+  stubConfiguration(on, { ...OPTIONS, windowsToolDescriptionReminders: { PosixShell: 'instructions/bash.md' } },
+    { 'bash.md': 'Use PowerShell for local commands.' })
+  on('tool.list', () => ({ value: [{ name: 'Discovery', description: 'Discover tools.', mcp: false }] }))
+  on('ui.invalidate', () => ({ value: undefined }))
+  on('session.start', ($, event) => ({ cwd: event.cwd }))
+  on('tool.describe', () => ({ description: 'POSIX shell.' }))
+  const describe = () => $.tool.describe({ tool: 'PosixShell', description: 'POSIX shell.', provider: { plugin: 'engine', tier: 'core' } })
+
+  await $.session.start({ ...SESSION, cwd: '/srv/app' })
+  expect((await describe()).description).toBe('POSIX shell.')
+  await $.session.start({ ...SESSION, cwd: 'D:\\work' })
+  expect((await describe()).description).toBe('POSIX shell.\n\nUse PowerShell for local commands.')
+})
+
+test('appends the agent rules to a new subagent brief but not to forks or resumed agents', async ($, on) => {
+  stubConfiguration(on, { agentRules: 'instructions/agent-rules.md' }, { 'agent-rules.md': 'Load matching skills first.' })
+  const prompts: string[] = []
+  on('agent.spawn', ($, event) => {
+    prompts.push(event.prompt)
+    return { model: 'example', agentId: `a${prompts.length}` }
+  })
+  const spawn = {
+    tool_use_id: 't1', prompt: 'Rewrite docs/web.md in English.', description: 'Rewrite web doc', subagentType: 'general-purpose',
+    provider: { plugin: 'engine', tier: 'core' as const }, parentModel: 'example', background: true, fork: false,
+  }
+
+  await $.agent.spawn(spawn)
+  await $.agent.spawn({ ...spawn, fork: true })
+  await $.agent.spawn({ ...spawn, prompt: 'Continue.', resume: { agentId: 'a1' } })
+
+  expect(prompts).toEqual(['Rewrite docs/web.md in English.\n\nLoad matching skills first.', 'Rewrite docs/web.md in English.', 'Continue.'])
+})
+
+test('turns the empty-turn nudge into a wait instruction while a main-loop agent runs', async ($, on) => {
+  stubConfiguration(on, NUDGE_OPTIONS, { 'waiting.md': 'Keep waiting without text.' })
+  on('agent.list', () => ({ value: [AGENT] }))
+
+  const stored = await $.session.append(nudgeRow())
+
+  expect(stored.message?.content).toEqual([{ type: 'text', text: 'Keep waiting without text.' }])
+})
+
+test('passes the nudge through when only finished or nested agents exist', async ($, on) => {
+  stubConfiguration(on, NUDGE_OPTIONS, { 'waiting.md': 'Keep waiting without text.' })
+  on('agent.list', () => ({ value: [{ ...AGENT, status: 'completed' as const }, { ...AGENT, id: 'a2', parentId: 'a1' }] }))
+
+  const stored = await $.session.append(nudgeRow())
+
+  expect(stored.message?.content).toEqual([{ type: 'text', text: NUDGE }])
+})
+
+test('treats a background command as running until its completion notice arrives', async ($, on) => {
+  stubConfiguration(on, NUDGE_OPTIONS, { 'waiting.md': 'Keep waiting without text.' })
+  on('agent.list', () => ({ value: [] }))
+  on('tool.call', () => ({ result: { stdout: '', stderr: '', interrupted: false, backgroundTaskId: 'b7' } }))
+
+  await $.tool.call({ tool: 'Bash', command: 'npm test', run_in_background: true })
+  expect((await $.session.append(nudgeRow())).message?.content).toEqual([{ type: 'text', text: 'Keep waiting without text.' }])
+  await $.session.append(nudgeRow('<task-notification>\n<task-id>b7</task-id>\n<status>completed</status>\n</task-notification>', 'delivery'))
+
+  expect((await $.session.append(nudgeRow())).message?.content).toEqual([{ type: 'text', text: NUDGE }])
+})
+
+test('leaves other hidden rows and subagent rows unchanged', async ($, on) => {
+  stubConfiguration(on, NUDGE_OPTIONS, { 'waiting.md': 'Keep waiting without text.' })
+  on('agent.list', () => ({ value: [AGENT] }))
+
+  const other = await $.session.append(nudgeRow('Also check the logs.'))
+  const nested = await $.session.append({ ...nudgeRow(), agentId: 'a1' })
+
+  expect(other.message?.content).toEqual([{ type: 'text', text: 'Also check the logs.' }])
+  expect(nested.message?.content).toEqual([{ type: 'text', text: NUDGE }])
 })
 
 test('preserves prompt sections', async ($, on) => {

@@ -79,22 +79,32 @@
   },
   "toolReminderLimit": 2,
   "toolDescriptionReminders": {
-    "Bash": "instructions/reminders/bash.md",
     "TaskUpdate": "instructions/reminders/continue.md",
     "TodoWrite": "instructions/reminders/continue.md"
+  },
+  "windowsToolDescriptionReminders": {
+    "Bash": "instructions/reminders/bash.md"
   },
   "skillReminder": {
     "file": "instructions/reminders/skill.md",
     "editTools": [
       "Write",
       "Edit",
-      "MultiEdit"
+      "MultiEdit",
+      "NotebookEdit"
     ],
-    "codeFilePattern": "\\.(?:ts|tsx|js|jsx|mjs|cjs|mts|cts|py|rs|go|java|kt|kts|cs|cpp|cc|c|h|hpp|rb|php|swift|vue|svelte|css|scss|html|sql|sh|bash|ps1|psm1|lua|dart)$"
+    "filePattern": "."
   },
   "emptyTurnNudge": {
     "pattern": "^\\[Your previous response had no visible output\\.",
-    "reason": "Waiting for background work to finish."
+    "file": "instructions/reminders/waiting.md"
+  },
+  "narrationReminder": {
+    "file": "instructions/reminders/narration.md",
+    "closingTools": [
+      "mcp__ccd_turn__wrap_up"
+    ],
+    "limit": 3
   },
   "temporaryFileCheck": {
     "file": "instructions/reminders/cleanup.md",
@@ -105,6 +115,7 @@
       "^/var/tmp/"
     ]
   },
+  "agentRules": "instructions/agent-rules.md",
   "contextReminders": {
     "continuation": "instructions/reminders/continue.md"
   },

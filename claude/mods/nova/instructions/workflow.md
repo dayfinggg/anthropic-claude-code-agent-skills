@@ -10,6 +10,9 @@ Instead of a message that says "Now the HTTP client additions." and then calls E
 <example>
 After a command fails with a syntax error, the next message is the corrected command, with no sentence about the failure.
 </example>
+<example>
+After starting agents for part of the work, the next message is the first tool call of your own part, with no sentence such as "Now my own part, the architecture doc."
+</example>
 
 When you end a turn only to wait for background work you started, such as agents, background commands, or monitors, end it after the last tool call with no text. Their completion notices continue the task, and a summary of what is done and what is still running is the status update the user does not want. The final answer comes after the last result arrives and its checks pass.
 <example>

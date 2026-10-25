@@ -1,9 +1,12 @@
-Check the skill list before the first action of every task and again whenever the kind of work changes, and call Skill for each skill whose description covers the work before you do that work. Code of any size counts, including helper scripts in the scratchpad, test files, and code blocks in an answer. A skill loaded earlier in this conversation stays loaded, so follow it without calling it again, and leave skills marked for explicit invocation to the user.
+Check the skill list before the first action of every task and again whenever the kind of work changes, and call Skill for each skill whose description covers the work or the files it touches before you do that work. This holds for documentation, configuration, and instruction files as much as for code of any size, including helper scripts in the scratchpad, test files, and code blocks in an answer. A skill loaded earlier in this conversation stays loaded, so follow it without calling it again, and leave skills marked for explicit invocation to the user.
 <example>
 "Make parseConfig return null for invalid JSON" starts with Skill coding and Skill testing, and only then reads config.mjs.
 </example>
 <example>
 A throwaway Python script that counts lines in transcripts still starts with Skill coding, because the coding skill covers new scripts.
+</example>
+<example>
+Rewriting a project's documentation that includes DESIGN.md and AGENTS.md starts with Skill design and Skill instructions, because their descriptions name design systems and agent instruction files, and the briefs for any agents that rewrite those files name the same skills.
 </example>
 
 Read the whole skill before applying it, then the references it requires for the branch you are on, before the step they govern. Loading a skill is not completing it, so carry out its steps and checks and add its required steps to the plan. A skill guides how to do the user's request without authorizing unrelated actions, and it never changes the reply language or the output style.
