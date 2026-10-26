@@ -398,6 +398,18 @@ test('treats a background command as running until its completion notice arrives
   expect((await $.session.append(nudgeRow())).message?.content).toEqual([{ type: 'text', text: NUDGE }])
 })
 
+test('reminds at the main-loop call that starts a background command', async ($, on) => {
+  stubConfiguration(on, { backgroundReminder: 'instructions/background.md' }, { 'background.md': 'End the turn while it runs.' })
+  let result: unknown = { stdout: '', stderr: '', interrupted: false, backgroundTaskId: 'b7' }
+  on('tool.call', () => ({ result }))
+  const command = { tool: 'Bash', command: 'npm test', run_in_background: true } as const
+
+  expect((await $.tool.call(command)).context).toEqual(['End the turn while it runs.'])
+  expect((await $.tool.call({ ...command, agentId: 'child' })).context).toBeUndefined()
+  result = { stdout: 'ok', stderr: '', interrupted: false }
+  expect((await $.tool.call({ ...command, run_in_background: false })).context).toBeUndefined()
+})
+
 test('leaves other hidden rows and subagent rows unchanged', async ($, on) => {
   stubConfiguration(on, NUDGE_OPTIONS, { 'waiting.md': 'Keep waiting without text.' })
   on('agent.list', () => ({ value: [AGENT] }))

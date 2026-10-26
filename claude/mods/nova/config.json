@@ -92,6 +92,7 @@
     "pattern": "^\\[Your previous response had no visible output\\.",
     "file": "instructions/reminders/waiting.md"
   },
+  "backgroundReminder": "instructions/reminders/background.md",
   "narrationReminder": {
     "file": "instructions/reminders/narration.md",
     "closingTools": [

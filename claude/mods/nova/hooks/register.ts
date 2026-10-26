@@ -24,6 +24,7 @@ type Configuration = {
     pattern: string
     file: string
   }
+  backgroundReminder?: string
   narrationReminder?: {
     file: string
     closingTools: readonly string[]
@@ -152,6 +153,7 @@ export const register: Register = on => {
     if (event.tool === 'Skill' && !result.isError) skillAgents.add(event.agentId)
     const backgroundTask = !result.isError ? stringField(result.result, 'backgroundTaskId') : undefined
     if (backgroundTask) backgroundCommands.add(backgroundTask)
+    if (backgroundTask && event.agentId === undefined && config.backgroundReminder) paths.push(config.backgroundReminder)
     const stoppedTask = event.tool === 'TaskStop' ? stringField(event, 'task_id') : undefined
     if (stoppedTask) backgroundCommands.delete(stoppedTask)
     const filePath = stringField(event, 'file_path')
