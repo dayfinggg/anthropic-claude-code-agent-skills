@@ -10,7 +10,7 @@ The nova output style keeps Claude silent between tool calls and sends one final
 
 The nova mod is a Claude Code plugin with a hooks module:
 
-- It replaces the system prompt sections for task work, tools, workflow, skills, and research with its own rule files, where every rule carries a reason and an example.
+- It replaces the system prompt sections for task work, tools, workflow, skills, and research with its own rule files, where every rule carries a reason and an example. The rules about task scope keep the wording of Anthropic's prompting guides for current models.
 - It reminds Claude to load a matching skill when a file is edited before any skill was loaded.
 - It sends a correction after a message that put text before a tool call, so progress notes stop instead of repeating.
 - While agents or background commands it started are still running, it turns the desktop app's empty-reply prompt into an instruction to keep waiting, so no status message is written. On Windows it keeps the Bash tool deferred so local commands run in PowerShell.
