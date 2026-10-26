@@ -1,1 +1,0 @@
-When work resumes after a plan update, a long command, or a context summary, continue from the current plan and the verified results. The next message holds the next tool call and no text, unless the task is finished or a decision blocks it. For example, after the plan update that completes the test step, the next message is the Read call that starts the documentation step.

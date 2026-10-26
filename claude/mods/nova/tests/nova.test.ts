@@ -2,17 +2,7 @@ import { expect, test } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 const SESSION = { cwd: '/', surface: null, isInteractive: false } as const
-const WRITE_CALL = { tool: 'Write', file_path: '/fixture.txt', content: 'content' } as const
 const WRITE_RESULT = { type: 'create' as const, filePath: '/fixture.txt', content: 'content', structuredPatch: [], originalFile: null }
-const TASK_CALL = { tool: 'TaskUpdate', taskId: 'phase', status: 'completed' } as const
-const TASK_RESULT = { success: true, taskId: 'phase', updatedFields: ['status'], statusChange: { from: 'in_progress', to: 'completed' } }
-const WORKFLOW_OPTIONS = {
-  file: 'instructions/continue.md',
-  planTools: ['TaskUpdate', 'TodoWrite'],
-  minCallsBetween: 3,
-  longCallMs: 60000,
-  longCallLimit: 2,
-}
 const OPTIONS = {
   discoveryTool: 'Discovery',
   deferredTools: ['Optional', 'Discovery'],
@@ -23,10 +13,6 @@ const SKILL_OPTIONS = {
 }
 const SKILL_CALL = { tool: 'Skill', skill: 'coding' } as const
 const CODE_WRITE = { tool: 'Write', file_path: '/src/app.ts', content: 'export {}' } as const
-const CLEANUP_OPTIONS = {
-  temporaryFileCheck: { file: 'instructions/cleanup.md', pathPatterns: ['^/tmp/'] },
-}
-const STOP = { stop_hook_active: false } as const
 const NUDGE = '[Your previous response had no visible output. Please continue and produce a user-visible response.]'
 const NARRATION_OPTIONS = {
   narrationReminder: { file: 'instructions/narration.md', closingTools: ['WrapUp'], limit: 2 },
@@ -245,49 +231,48 @@ test('trusts a skill call already in the transcript after the mod reloads', asyn
   expect((await $.tool.call(CODE_WRITE)).context).toBeUndefined()
 })
 
-test('blocks the first stop while temporary files written this turn remain', async ($, on) => {
-  stubConfiguration(on, CLEANUP_OPTIONS, { 'cleanup.md': 'Remove these temporary files.' })
-  const existing = new Set(['/tmp/probe.py', '/tmp/kept.txt', '/work/report.md'])
-  on('fs.exists', ($, event) => ({ value: existing.has(event.path.replace(/\\/g, '/').replace(/^[A-Za-z]:/, '')) }))
-  on('tool.call', ($, event) => {
-    const filePath = event.tool === 'Write' ? event.file_path : ''
-    return { result: { ...WRITE_RESULT, filePath, type: filePath === '/tmp/kept.txt' ? 'update' as const : 'create' as const } }
+test('preserves denied tool calls', async ($, on) => {
+  stubConfiguration(on, SKILL_OPTIONS, { 'skill.md': 'Load the governing skill.' })
+  on('tool.call', () => ({ deny: 'Permission denied.' }))
+
+  expect(await $.tool.call(CODE_WRITE)).toEqual({ deny: 'Permission denied.' })
+})
+
+test('leaves failed tool calls unchanged', async ($, on) => {
+  stubConfiguration(on, SKILL_OPTIONS, { 'skill.md': 'Load the governing skill.' })
+  on('tool.call', () => ({ result: 'Failed.', text: 'Failed.', isError: true }))
+  on('session.messages', () => ({ value: [] }))
+
+  expect(await $.tool.call(CODE_WRITE)).toEqual({ result: 'Failed.', text: 'Failed.', isError: true })
+})
+
+test('leaves a read-only result unchanged', async ($, on) => {
+  stubConfiguration(on, SKILL_OPTIONS, { 'skill.md': 'Load the governing skill.' })
+  on('tool.call', () => ({ result: WRITE_RESULT, isReadOnly: true }))
+  on('session.messages', () => ({ value: [] }))
+
+  expect(await $.tool.call(CODE_WRITE)).toEqual({ result: WRITE_RESULT })
+})
+
+test('does not carry a late tool reminder into a newer turn', async ($, on) => {
+  stubConfiguration(on, SKILL_OPTIONS, { 'skill.md': 'Load the governing skill.' })
+  on('session.messages', () => ({ value: [] }))
+  let release!: () => void
+  let entered!: () => void
+  const running = new Promise<void>(resolve => { entered = resolve })
+  on('tool.call', () => {
+    entered()
+    return new Promise<{ result: typeof WRITE_RESULT }>(resolve => {
+      release = () => resolve({ result: WRITE_RESULT })
+    })
   })
-  on('classic.Stop', () => ({}))
-
-  await $.tool.call({ ...WRITE_CALL, file_path: '/tmp/probe.py' })
-  await $.tool.call({ ...WRITE_CALL, file_path: '/tmp/kept.txt' })
-  await $.tool.call({ ...WRITE_CALL, file_path: '/work/report.md' })
-
-  expect(await $.classic.Stop(STOP)).toEqual({ block: 'Remove these temporary files.\n/tmp/probe.py' })
-  expect(await $.classic.Stop({ stop_hook_active: true })).toEqual({})
-  existing.delete('/tmp/probe.py')
-  expect(await $.classic.Stop(STOP)).toEqual({})
-})
-
-test('lets the turn stop while background work still uses temporary files', async ($, on) => {
-  stubConfiguration(on, CLEANUP_OPTIONS, { 'cleanup.md': 'Remove these temporary files.' })
-  on('fs.exists', () => ({ value: true }))
-  on('tool.call', () => ({ result: WRITE_RESULT }))
-  on('classic.Stop', () => ({}))
-
-  await $.tool.call({ ...WRITE_CALL, file_path: '/tmp/server.py' })
-  const running = [{ id: 'b1', type: 'shell', status: 'running', description: 'Preview server' }]
-
-  expect(await $.classic.Stop({ ...STOP, background_tasks: running })).toEqual({})
-})
-
-test('forgets temporary files from an earlier turn', async ($, on) => {
-  stubConfiguration(on, CLEANUP_OPTIONS, { 'cleanup.md': 'Remove these temporary files.' })
-  on('fs.exists', () => ({ value: true }))
-  on('tool.call', () => ({ result: WRITE_RESULT }))
-  on('classic.Stop', () => ({}))
   on('turn.start', ($, event) => ({ turnId: event.turnId }))
 
-  await $.tool.call({ ...WRITE_CALL, file_path: '/tmp/data.json' })
-  await $.turn.start({ text: 'Use the data in the next step.', turnId: 'next' })
-
-  expect(await $.classic.Stop(STOP)).toEqual({})
+  const pending = $.tool.call(CODE_WRITE)
+  await running
+  await $.turn.start({ text: 'New task.', turnId: 'next' })
+  release()
+  expect(await pending).toEqual({ result: WRITE_RESULT })
 })
 
 test('reminds once after a main-loop step that put text before a tool call', async ($, on) => {
@@ -619,6 +604,17 @@ test('removes only configured mode guidance while preserving permission instruct
   expect(result).toEqual({ text: 'Mode permissions stay.\nConfirm destructive actions.' })
 })
 
+test('omits a mode attachment that removal leaves without guidance', async ($, on) => {
+  stubConfiguration(on, { removedAttachmentPatterns: { auto_mode: ['Use a script instead of file tools\\.', '^Mode header:\\s*$'] } })
+  on('prompt.attachment', ($, event) => ({ text: event.text }))
+
+  const result = await $.prompt.attachment({
+    type: 'auto_mode', text: 'Mode header:\n\nUse a script instead of file tools.', origin: { kind: 'engine' },
+  })
+
+  expect(result).toEqual({ text: null })
+})
+
 test('does not filter the same words from unrelated attachments', async ($, on) => {
   stubConfiguration(on, { removedAttachmentPatterns: { auto_mode: ['Use a script instead of file tools\\.'] } })
   on('prompt.attachment', ($, event) => ({ text: event.text }))
@@ -680,238 +676,6 @@ test('does not restore a suppressed reminder', async ($, on) => {
   expect(result).toEqual({ text: null })
 })
 
-test('adds a bounded reminder without changing tool output or prior context', async ($, on) => {
-  stubConfiguration(on, {
-    toolReminders: { Write: 'instructions/edit.md' }, toolReminderLimit: 1,
-  }, { 'edit.md': 'Review the changed content silently.' })
-  const output = { result: WRITE_RESULT, text: 'Saved.', ref: 4, context: ['Prior context.'] }
-  on('tool.call', () => output)
-
-  const first = await $.tool.call(WRITE_CALL)
-  const second = await $.tool.call(WRITE_CALL)
-
-  expect(first).toEqual({ ...output, context: ['Prior context.', 'Review the changed content silently.'] })
-  expect(second).toEqual(output)
-  expect(output.context).toEqual(['Prior context.'])
-})
-
-test('resets reminder limits for new turns and keeps agent counters separate', async ($, on) => {
-  stubConfiguration(on, {
-    toolReminders: { Write: 'instructions/edit.md' }, toolReminderLimit: 1,
-  }, { 'edit.md': 'Review the change.' })
-  on('tool.call', () => ({ result: WRITE_RESULT }))
-  on('turn.start', ($, event) => ({ turnId: event.turnId }))
-
-  await $.turn.start({ text: 'First task.', turnId: 'first' })
-  expect((await $.tool.call(WRITE_CALL)).context).toEqual(['Review the change.'])
-  expect((await $.tool.call(WRITE_CALL)).context).toBeUndefined()
-  expect((await $.tool.call({ ...WRITE_CALL, agentId: 'child' })).context).toEqual(['Review the change.'])
-  await $.turn.start({ text: 'Next task.', turnId: 'next' })
-  expect((await $.tool.call(WRITE_CALL)).context).toEqual(['Review the change.'])
-  expect((await $.tool.call({ ...WRITE_CALL, agentId: 'child' })).context).toBeUndefined()
-})
-
-test('preserves denied tool calls', async ($, on) => {
-  stubConfiguration(on, {
-    toolReminders: { Write: 'instructions/edit.md' }, toolReminderLimit: 1,
-    workflowReminders: WORKFLOW_OPTIONS,
-  }, { 'edit.md': 'Review the change.' })
-  on('clock.now', () => ({ value: 0 }))
-  on('tool.call', () => ({ deny: 'Permission denied.' }))
-
-  expect(await $.tool.call(WRITE_CALL)).toEqual({ deny: 'Permission denied.' })
-})
-
-test('leaves failed tool calls unchanged', async ($, on) => {
-  stubConfiguration(on, {
-    toolReminders: { Write: 'instructions/edit.md' }, toolReminderLimit: 1,
-  }, { 'edit.md': 'Review the change.' })
-  on('tool.call', () => ({ result: 'Failed.', text: 'Failed.', isError: true }))
-
-  expect(await $.tool.call(WRITE_CALL)).toEqual({ result: 'Failed.', text: 'Failed.', isError: true })
-})
-
-test('leaves a read-only result unchanged', async ($, on) => {
-  stubConfiguration(on, {
-    toolReminders: { Write: 'instructions/edit.md' }, toolReminderLimit: 1,
-  }, { 'edit.md': 'Review the change.' })
-  on('tool.call', () => ({ result: WRITE_RESULT, isReadOnly: true }))
-
-  expect(await $.tool.call(WRITE_CALL)).toEqual({ result: WRITE_RESULT })
-})
-
-test('puts configured guidance beside a plan tool without changing its placement', async ($, on) => {
-  stubConfiguration(on, {
-    toolDescriptionReminders: { TaskUpdate: 'instructions/continue.md' },
-  }, { 'continue.md': 'Update the plan without narration.' })
-  on('tool.describe', () => ({ description: 'Original tool contract.', isDeferred: true }))
-
-  const result = await $.tool.describe({
-    tool: 'TaskUpdate', description: 'Original tool contract.', isDeferred: true,
-    provider: { plugin: 'engine', tier: 'core' },
-  })
-
-  expect(result).toEqual({ description: 'Original tool contract.\n\nUpdate the plan without narration.', isDeferred: true })
-})
-
-test('restores context guidance once per rebuild without replacing other context', async ($, on) => {
-  stubConfiguration(on, {
-    contextReminders: { continuation: 'instructions/continue.md' },
-  }, { 'continue.md': 'Resume the authorized task silently.' })
-  on('prompt.context', ($, event) => ({ blocks: event.blocks }))
-  const original = { blocks: [{ name: 'claudeMd', text: 'Original project instructions.' }] }
-  const expected = { blocks: [
-    ...original.blocks,
-    { name: 'nova:continuation', text: 'Resume the authorized task silently.' },
-  ] }
-
-  expect(await $.prompt.context(original)).toEqual(expected)
-  expect(await $.prompt.context(expected)).toEqual(expected)
-  expect(await $.prompt.context(original)).toEqual(expected)
-})
-
-test('reminds on a real plan status transition', async ($, on) => {
-  stubConfiguration(on, { workflowReminders: WORKFLOW_OPTIONS }, { 'continue.md': 'Continue silently.' })
-  on('clock.now', () => ({ value: 0 }))
-  const original = { result: TASK_RESULT, context: ['Existing context.'] }
-  on('tool.call', () => original)
-
-  expect(await $.tool.call(TASK_CALL)).toEqual({
-    ...original, context: ['Existing context.', 'Continue silently.'],
-  })
-})
-
-test('ignores task metadata changes and domain-level failures', async ($, on) => {
-  stubConfiguration(on, { workflowReminders: WORKFLOW_OPTIONS }, { 'continue.md': 'Continue silently.' })
-  on('clock.now', () => ({ value: 0 }))
-  on('tool.call', ($, event) => ({ result: event.tool === 'TaskUpdate' && event.taskId === 'failed'
-    ? { ...TASK_RESULT, success: false }
-    : { success: true, taskId: 'phase', updatedFields: ['subject'] } }))
-
-  expect((await $.tool.call({ ...TASK_CALL, taskId: 'failed' })).context).toBeUndefined()
-  expect((await $.tool.call({ tool: 'TaskUpdate', taskId: 'phase', subject: 'Renamed' })).context).toBeUndefined()
-})
-
-test('coalesces adjacent transitions but still reminds after one hundred tool calls', async ($, on) => {
-  stubConfiguration(on, { workflowReminders: WORKFLOW_OPTIONS }, { 'continue.md': 'Continue silently.' })
-  on('clock.now', () => ({ value: 0 }))
-  on('tool.call', ($, event) => ({ result: event.tool === 'TaskUpdate' ? TASK_RESULT : WRITE_RESULT }))
-
-  expect((await $.tool.call(TASK_CALL)).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call(TASK_CALL)).context).toBeUndefined()
-  const replies = []
-  for (let index = 0; index < 100; index += 1) replies.push(await $.tool.call(WRITE_CALL))
-  expect(replies.filter(reply => reply.context !== undefined)).toEqual([])
-  expect((await $.tool.call(TASK_CALL)).context).toEqual(['Continue silently.'])
-})
-
-test('recognizes TodoWrite transitions but ignores reordering and spinner text', async ($, on) => {
-  stubConfiguration(on, { workflowReminders: WORKFLOW_OPTIONS }, { 'continue.md': 'Continue silently.' })
-  on('clock.now', () => ({ value: 0 }))
-  const oldTodos = [
-    { content: 'Inspect', status: 'in_progress' as const, activeForm: 'Inspecting' },
-    { content: 'Verify', status: 'pending' as const, activeForm: 'Verifying' },
-  ]
-  on('tool.call', ($, event) => ({ result: { oldTodos, newTodos: event.tool === 'TodoWrite' ? event.todos : oldTodos } }))
-
-  expect((await $.tool.call({ tool: 'TodoWrite', todos: [oldTodos[1]!, oldTodos[0]!] })).context).toBeUndefined()
-  expect((await $.tool.call({ tool: 'TodoWrite', todos: [{ ...oldTodos[0]!, activeForm: 'Checking' }, oldTodos[1]!] })).context).toBeUndefined()
-  expect((await $.tool.call({ tool: 'TodoWrite', todos: [{ ...oldTodos[0]!, status: 'completed' }, oldTodos[1]!] })).context).toEqual(['Continue silently.'])
-})
-
-test('reminds when an input-driven plan tool advances a step but not when it only lists steps', async ($, on) => {
-  stubConfiguration(on, {
-    workflowReminders: { ...WORKFLOW_OPTIONS, planTools: ['PlanList'] },
-  }, { 'continue.md': 'Continue silently.' })
-  on('clock.now', () => ({ value: 0 }))
-  on('tool.call', () => ({ result: 'Plan updated.' }))
-  const callUntypedTool = (input: Record<string, unknown>) => $.tool.call(input as Parameters<typeof $.tool.call>[0])
-
-  expect((await callUntypedTool({ tool: 'PlanList', items: [{ content: 'Inspect', status: 'in_progress' }] })).context).toBeUndefined()
-  expect((await callUntypedTool({ tool: 'PlanList', advance: true })).context).toEqual(['Continue silently.'])
-})
-
-test('adds a reminder only after a long call finishes and limits repeated long calls', async ($, on) => {
-  stubConfiguration(on, {
-    workflowReminders: { ...WORKFLOW_OPTIONS, minCallsBetween: 0 },
-  }, { 'continue.md': 'Continue silently.' })
-  let now = 0
-  on('clock.now', () => ({ value: now }))
-  on('tool.call', () => {
-    now += 60000
-    return { result: WRITE_RESULT, isReadOnly: true }
-  })
-
-  expect((await $.tool.call(WRITE_CALL)).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call(WRITE_CALL)).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call(WRITE_CALL)).context).toBeUndefined()
-})
-
-test('keeps a long tool failure intact while reminding about silent recovery', async ($, on) => {
-  stubConfiguration(on, { workflowReminders: WORKFLOW_OPTIONS }, { 'continue.md': 'Continue silently.' })
-  let now = 0
-  on('clock.now', () => ({ value: now }))
-  on('tool.call', () => {
-    now = 60000
-    return { result: 'Failed.', isError: true, text: 'Failed.' }
-  })
-
-  expect(await $.tool.call(WRITE_CALL)).toEqual({
-    result: 'Failed.', isError: true, text: 'Failed.', context: ['Continue silently.'],
-  })
-})
-
-test('keeps boundary reminders isolated between main and agent turns', async ($, on) => {
-  stubConfiguration(on, { workflowReminders: WORKFLOW_OPTIONS }, { 'continue.md': 'Continue silently.' })
-  on('clock.now', () => ({ value: 0 }))
-  on('tool.call', () => ({ result: TASK_RESULT }))
-  on('turn.start', ($, event) => ({ turnId: event.turnId }))
-
-  expect((await $.tool.call(TASK_CALL)).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call({ ...TASK_CALL, agentId: 'child' })).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call(TASK_CALL)).context).toBeUndefined()
-  await $.turn.start({ text: 'New task.', turnId: 'next' })
-  expect((await $.tool.call(TASK_CALL)).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call({ ...TASK_CALL, agentId: 'child' })).context).toBeUndefined()
-})
-
-test('renews the reminder after a long call even when the plan just changed', async ($, on) => {
-  stubConfiguration(on, { workflowReminders: WORKFLOW_OPTIONS }, { 'continue.md': 'Continue silently.' })
-  let now = 0
-  on('clock.now', () => ({ value: now }))
-  on('tool.call', ($, event) => {
-    if (event.tool === 'TaskUpdate') return { result: TASK_RESULT }
-    now += 60000
-    return { result: WRITE_RESULT }
-  })
-
-  expect((await $.tool.call(TASK_CALL)).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call(WRITE_CALL)).context).toEqual(['Continue silently.'])
-  expect((await $.tool.call(TASK_CALL)).context).toBeUndefined()
-})
-
-test('does not carry a late tool reminder into a newer turn', async ($, on) => {
-  stubConfiguration(on, {
-    toolReminders: { Write: 'instructions/edit.md' }, toolReminderLimit: 1,
-  }, { 'edit.md': 'Review the change.' })
-  let release!: () => void
-  let entered!: () => void
-  const running = new Promise<void>(resolve => { entered = resolve })
-  on('tool.call', () => {
-    entered()
-    return new Promise<{ result: typeof WRITE_RESULT }>(resolve => {
-      release = () => resolve({ result: WRITE_RESULT })
-    })
-  })
-  on('turn.start', ($, event) => ({ turnId: event.turnId }))
-
-  const pending = $.tool.call(WRITE_CALL)
-  await running
-  await $.turn.start({ text: 'New task.', turnId: 'next' })
-  release()
-  expect(await pending).toEqual({ result: WRITE_RESULT })
-})
-
 test('removes configured presentation text from its context block only', async ($, on) => {
   stubConfiguration(on, { removedContextPatterns: { attachedProject: ['Offer relocation\\. '] } })
   on('prompt.context', ($, event) => ({ blocks: event.blocks }))
@@ -926,5 +690,3 @@ test('removes configured presentation text from its context block only', async (
     { name: 'claudeMd', text: 'Offer relocation. Preserve this user instruction.' },
   ])
 })
-
-

@@ -72,16 +72,6 @@
       "file": "instructions/reminders/response.md"
     }
   },
-  "toolReminders": {
-    "Write": "instructions/reminders/edit.md",
-    "Edit": "instructions/reminders/edit.md",
-    "NotebookEdit": "instructions/reminders/edit.md"
-  },
-  "toolReminderLimit": 2,
-  "toolDescriptionReminders": {
-    "TaskUpdate": "instructions/reminders/continue.md",
-    "TodoWrite": "instructions/reminders/continue.md"
-  },
   "windowsToolDescriptionReminders": {
     "Bash": "instructions/reminders/bash.md"
   },
@@ -106,33 +96,12 @@
     ],
     "limit": 3
   },
-  "temporaryFileCheck": {
-    "file": "instructions/reminders/cleanup.md",
-    "pathPatterns": [
-      "/scratchpad/",
-      "/AppData/Local/Temp/",
-      "^/tmp/",
-      "^/var/tmp/"
-    ]
-  },
   "agentRules": "instructions/agent-rules.md",
-  "contextReminders": {
-    "continuation": "instructions/reminders/continue.md"
-  },
-  "workflowReminders": {
-    "file": "instructions/reminders/continue.md",
-    "planTools": [
-      "TaskUpdate",
-      "TodoWrite",
-      "mcp__ccd_turn__update_plan"
-    ],
-    "minCallsBetween": 8,
-    "longCallMs": 60000,
-    "longCallLimit": 2
-  },
   "removedAttachmentPatterns": {
     "auto_mode": [
-      "You can do much of your work through the Bash tool when it is the simpler route:[^\\r\\n]*"
+      "Do your work through the \\S+ tool wherever it can accomplish the job:[^\\r\\n]*",
+      "You can do much of your work through the \\S+ tool when it is the simpler route:[^\\r\\n]*",
+      "^While bypass permissions mode is active:\\s*$"
     ],
     "mcp_instructions_delta": [
       "; they're likely watching it fill[^\\r\\n]*?\\(outline up; now <topic>\\)"

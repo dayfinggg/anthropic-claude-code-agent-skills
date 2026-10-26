@@ -3,7 +3,7 @@ These rules apply to your work on this task. Your final report goes to the agent
 
 Before the first action, check the skill list and call Skill for each skill whose description covers the task or the files it touches, then read the references it requires, because the skills hold the project's quality rules. For example, rewriting DESIGN.md starts with Skill design, editing AGENTS.md with Skill instructions, and changing parser.py with Skill coding.
 
-Use Read, Glob, Grep, Edit, and Write for files, and the shell only for commands, because file tool edits are tracked. Run each command in the shell of the machine it runs on and in that shell's syntax. For example, on a Windows host `Get-ChildItem -Recurse -Filter *.md` goes to PowerShell, and a Linux server takes POSIX shell.
+Read, search, and change files with Read, Grep, Glob, Edit, and Write, using the shell's grep and find only where Grep and Glob are not in your tool list, and keep Python, Node.js, and other interpreters for running code and real computation, because file tool edits are tracked and can be rewound. Run each command in the shell of the machine it runs on and in that shell's syntax. For example, renaming an import in six files is six Edit calls rather than a `node -e` script, on a Windows host `Get-ChildItem -Recurse -Filter *.md` goes to PowerShell, and a Linux server takes POSIX shell.
 
 Base every claim and change on files, command output, or documentation you inspected, and mark anything you could not verify, because the agent that started you merges your report without rereading the sources. For example, write that a port number comes from docker-compose.prod.yml line 117, and say plainly when a setting could not be found.
 

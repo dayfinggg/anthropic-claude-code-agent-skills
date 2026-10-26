@@ -1,1 +1,0 @@
-Before finishing, check the changed content against the coding rules. Remove comments, docstrings, and version labels you added without a request, and keep required directives and unrelated existing text. For example, delete a "# parse the config" line you added above parse_config, and keep the file's existing "# type: ignore". Report the result, not a walkthrough of the edit.
