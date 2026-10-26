@@ -72,6 +72,9 @@
       "file": "instructions/reminders/response.md"
     }
   },
+  "toolDescriptionReminders": {
+    "ReadNotifications": "instructions/reminders/notifications.md"
+  },
   "windowsToolDescriptionReminders": {
     "Bash": "instructions/reminders/bash.md"
   },

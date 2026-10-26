@@ -336,6 +336,19 @@ test('adds a Windows-only description reminder only on a Windows host', async ($
   expect((await describe()).description).toBe('POSIX shell.\n\nUse PowerShell for local commands.')
 })
 
+test('adds configured guidance to a tool description without changing its placement', async ($, on) => {
+  stubConfiguration(on, { toolDescriptionReminders: { Inbox: 'instructions/inbox.md' } },
+    { 'inbox.md': 'Background work reports its own completion.' })
+  on('tool.describe', () => ({ description: 'Read queued notifications.', isDeferred: true }))
+
+  const result = await $.tool.describe({
+    tool: 'Inbox', description: 'Read queued notifications.', isDeferred: true,
+    provider: { plugin: 'engine', tier: 'core' },
+  })
+
+  expect(result).toEqual({ description: 'Read queued notifications.\n\nBackground work reports its own completion.', isDeferred: true })
+})
+
 test('appends the agent rules to a new subagent brief but not to forks or resumed agents', async ($, on) => {
   stubConfiguration(on, { agentRules: 'instructions/agent-rules.md' }, { 'agent-rules.md': 'Load matching skills first.' })
   const prompts: string[] = []

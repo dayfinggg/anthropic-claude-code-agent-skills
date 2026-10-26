@@ -12,6 +12,7 @@ type Configuration = {
   removedAttachmentPatterns: Readonly<Record<string, readonly string[]>>
   removedContextPatterns?: Readonly<Record<string, readonly string[]>>
   attachmentReminders?: Readonly<Record<string, { pattern: string, file: string }>>
+  toolDescriptionReminders?: Readonly<Record<string, string>>
   windowsToolDescriptionReminders?: Readonly<Record<string, string>>
   agentRules?: string
   skillReminder?: {
@@ -187,7 +188,8 @@ export const register: Register = on => {
     const config = await (configuration ??= readConfiguration($))
     const result = await next(event)
     let description = removeInstructions(result.description, config.removedInstructionPatterns)
-    const reminder = windowsHost ? config.windowsToolDescriptionReminders?.[event.tool] : undefined
+    const reminder = config.toolDescriptionReminders?.[event.tool] ??
+      (windowsHost ? config.windowsToolDescriptionReminders?.[event.tool] : undefined)
     if (reminder) description += `\n\n${await readReminder($, reminder, reminderFiles)}`
     if (config.upfrontTools.includes(event.tool)) return { ...result, description, isDeferred: false }
     const defer = discoveryAvailable && event.tool !== config.discoveryTool && (
