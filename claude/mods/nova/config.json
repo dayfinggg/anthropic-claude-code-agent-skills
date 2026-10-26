@@ -93,6 +93,13 @@
     "file": "instructions/reminders/waiting.md"
   },
   "backgroundReminder": "instructions/reminders/background.md",
+  "largeContextReminder": {
+    "file": "instructions/reminders/large-context.md",
+    "tools": [
+      "mcp__ccd_turn__wrap_up"
+    ],
+    "minTokens": 300000
+  },
   "narrationReminder": {
     "file": "instructions/reminders/narration.md",
     "closingTools": [

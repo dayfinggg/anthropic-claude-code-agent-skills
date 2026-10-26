@@ -25,6 +25,11 @@ type Configuration = {
     file: string
   }
   backgroundReminder?: string
+  largeContextReminder?: {
+    file: string
+    tools: readonly string[]
+    minTokens: number
+  }
   narrationReminder?: {
     file: string
     closingTools: readonly string[]
@@ -154,6 +159,9 @@ export const register: Register = on => {
     const backgroundTask = !result.isError ? stringField(result.result, 'backgroundTaskId') : undefined
     if (backgroundTask) backgroundCommands.add(backgroundTask)
     if (backgroundTask && event.agentId === undefined && config.backgroundReminder) paths.push(config.backgroundReminder)
+    const large = config.largeContextReminder
+    if (large && event.agentId === undefined && !result.isError && large.tools.includes(event.tool) &&
+      ((await $.session.usage()).context.tokens ?? 0) >= large.minTokens) paths.push(large.file)
     const stoppedTask = event.tool === 'TaskStop' ? stringField(event, 'task_id') : undefined
     if (stoppedTask) backgroundCommands.delete(stoppedTask)
     const filePath = stringField(event, 'file_path')

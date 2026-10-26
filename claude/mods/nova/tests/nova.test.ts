@@ -410,6 +410,20 @@ test('reminds at the main-loop call that starts a background command', async ($,
   expect((await $.tool.call({ ...command, run_in_background: false })).context).toBeUndefined()
 })
 
+test('reminds at a closing call once the main-loop context is large', async ($, on) => {
+  stubConfiguration(on, { largeContextReminder: { file: 'instructions/large.md', tools: ['Read'], minTokens: 300000 } },
+    { 'large.md': 'Close in plain prose.' })
+  let tokens = 350000
+  on('session.usage', () => ({ value: { startedAt: 0, context: { tokens, window: 1000000 }, rateLimits: [] } }))
+  on('tool.call', () => ({ result: 'Shown.' }))
+
+  expect((await $.tool.call(READ_CALL)).context).toEqual(['Close in plain prose.'])
+  expect((await $.tool.call({ ...READ_CALL, agentId: 'child' })).context).toBeUndefined()
+  expect((await $.tool.call({ tool: 'Grep', pattern: 'x' })).context).toBeUndefined()
+  tokens = 120000
+  expect((await $.tool.call(READ_CALL)).context).toBeUndefined()
+})
+
 test('leaves other hidden rows and subagent rows unchanged', async ($, on) => {
   stubConfiguration(on, NUDGE_OPTIONS, { 'waiting.md': 'Keep waiting without text.' })
   on('agent.list', () => ({ value: [AGENT] }))
