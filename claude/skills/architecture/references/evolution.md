@@ -42,7 +42,7 @@ Moving 30 services from `config.yaml` to environment variables goes five service
 
 ## Finish the transition
 
-When deprecating a component, identify the remaining users, who owns their migration, and the evidence needed for removal, checking static references and relevant runtime use where it is observable, because unknown external consumers treated as absent break the day the component is deleted. State a deletion date or a complete removal only when the evidence covers those consumers.
+When deprecating a component, identify the remaining users, who owns their migration, and the evidence needed for removal, checking static references and relevant runtime use where it is observable, because unknown external consumers treated as absent break the day the component is deleted. Announce a deprecation with a migration contact and, where the owner can commit to one, a planned removal date, and treat the removal as complete only when the evidence covers those consumers.
 
 <example>
 A search finds no callers of `/v1/export` in the repository, but the access logs show three partner keys calling it weekly, so the endpoint is marked deprecated with a migration contact and stays.
@@ -51,5 +51,5 @@ A search finds no callers of `/v1/export` in the repository, but the access logs
 When the supported consumers have moved and removal is authorized, delete the obsolete implementation and the migration seam, use existing checks to block new dependencies on the retired path, and clean up the configuration and dependencies it leaves unused, because compatibility code with no obligation behind it still costs maintenance. Keep compatibility machinery only while its named obligation remains. Check builds and representative behavior after the removal.
 
 <example>
-After the last site moved to `render_v2`, delete `render_v1`, the `USE_V2_RENDER` flag, and its two environment entries, and add a lint rule that rejects imports of `render_v1`.
+After the last site moved to `render_v2`, delete `render_v1`, the `USE_V2_RENDER` flag, and its two environment entries, and because the project already runs a linter, add a rule that rejects imports of `render_v1`.
 </example>

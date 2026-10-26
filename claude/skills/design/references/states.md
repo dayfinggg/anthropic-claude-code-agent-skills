@@ -1,5 +1,14 @@
 # Controls and states
 
+## Contents
+
+- Design every state, not the screenshot
+- Make actions clear
+- Shape forms around the user
+- Explain empty and loading states
+- Match feedback to significance
+- Handle data-dense views
+
 ## Design every state, not the screenshot
 
 For each view, decide what appears while loading, when there is no data yet, when filters return nothing, when part of the data fails, on full failure, offline, without permission, and with one item or thousands, because a surface is designed only when its unhappy paths are designed and generated interfaces most often ship the populated happy path alone.
@@ -48,10 +57,10 @@ Keep a visible label for every field, because a placeholder is a format hint and
 `Email` sits above its field with the placeholder `name@company.com`, `type="email"`, and `autocomplete="email"`.
 </example>
 
-Validate most fields when the user leaves them, and fixed-length values such as codes and card numbers once the expected length is reached. Skip the flag on an empty field the user merely tabbed through. Remove an error the moment the value becomes valid, on each keystroke and not on blur, and add positive confirmation for fields people often get wrong, such as passwords, because early errors punish typing and late error removal makes valid input look broken.
+Validate most fields when the user leaves them, and values of known length, such as one-time codes, once that length is reached, unless the project's design system sets another timing, as GOV.UK does by validating on submit. Skip the flag on an empty field the user merely tabbed through. Remove an error the moment the value becomes valid, on each keystroke and not on blur, and add positive confirmation for fields people often get wrong, such as passwords, because early errors punish typing and late error removal makes valid input look broken.
 
 <example>
-The `Postcode` error appears on blur, disappears as soon as the fifth digit makes the value valid, and a card number is checked once 16 digits are in.
+The `Postcode` error appears on blur and disappears as soon as the value becomes valid, a six-digit code is checked at the sixth digit, and a card number is checked at the length its detected card network allows.
 </example>
 
 Place each error next to its field, say what is wrong and how to fix it in plain words, keep the user's input, and pair error color with an icon and text. After a failed submit on a long form, move focus to a summary or the first invalid field, and keep submit-time and server-side errors because inline validation does not replace them.

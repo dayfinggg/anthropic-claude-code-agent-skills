@@ -1,5 +1,13 @@
 # Accessibility and interaction
 
+## Contents
+
+- Choose the right behavior before the styling
+- Keep keyboard operation predictable
+- Handle overlays according to their purpose
+- Make names and feedback usable
+- Apply measured accessibility requirements
+
 ## Choose the right behavior before the styling
 
 Use a native control when it expresses the action, so a button performs an action, a link navigates, and a form supports submission, and keep headings, lists, landmarks, and data tables meaningful without CSS, because native elements bring keyboard behavior, focus, and semantics that a restyled generic element must rebuild. Style the native element instead of replacing it, and give informative images an equivalent description and decorative images empty alternative text.
@@ -62,15 +70,15 @@ Associate visible field labels with their controls, keep accessible names aligne
 The search input uses `<label for="q">`, the trash icon button has `aria-label="Delete invoice 1042"`, and the hint "Use 8 or more characters" is linked with `aria-describedby`.
 </example>
 
-After submission, connect specific errors to their fields and provide a way to reach them, using a linked error summary for a long form, and announce important result or progress changes without moving focus, because focus jumps interrupt the user and announcing every keystroke or rerender buries the messages that matter.
+After a failed submission, move focus to the error summary or the first invalid field and connect each specific error to its field, and announce success and progress through a status region without moving focus, because a failed submit needs the user to land on the errors while a routine update must not pull focus away.
 
 <example>
-A 20-field checkout form shows an error summary with links to `#email` and `#card-number`, "Saved" appears in a `role="status"` region, and the character counter is not announced.
+A failed 20-field checkout focuses an error summary with links to `#email` and `#card-number`, "Saved" appears in a `role="status"` region, and the character counter is not announced.
 </example>
 
 ## Apply measured accessibility requirements
 
-Give text at least `4.5:1` contrast, or `3:1` where the criterion's large-text definition applies, and give essential control and graphical indicators `3:1` against adjacent colors, because low contrast makes content unreadable for many users. Decorative borders are not such indicators, and the large-text exception comes from the definition and not from visual guesswork. Check the rendered colors with a contrast tool.
+Give text at least `4.5:1` contrast, or `3:1` for large text as WCAG defines it (18 pt, or 14 pt bold), and give essential control and graphical indicators `3:1` against adjacent colors, because low contrast makes content unreadable for many users. Decorative borders are not such indicators, and the large-text exception comes from the definition and not from visual guesswork. Check the rendered colors with a contrast tool.
 
 <example>
 `#767676` text on white measures `4.54:1` and passes, while a `#ccc` input border at `1.6:1` fails when it is the only cue for the field's edge.
@@ -82,7 +90,7 @@ Check text enlargement to `200%` and reflow of vertically scrolling content at a
 Zoom `FilterPanel` to `400%` in a `1280px` window and confirm there is no horizontal scrollbar, while the wide `PricingTable` may scroll inside its own region.
 </example>
 
-Make pointer targets at least `24 by 24 CSS pixels`, and apply the criterion's spacing, equivalent-control, inline, user-agent, and essential exceptions correctly, because small targets cause mistaken activations.
+Make pointer targets at least `24 by 24 CSS pixels`, the WCAG 2.2 Target Size (Minimum) level AA requirement, and apply its spacing, equivalent-control, inline, user-agent, and essential exceptions correctly, because small targets cause mistaken activations.
 
 <example>
 A `16px` close icon gets `min-width: 24px` and `min-height: 24px` through padding, so the icon stays small and the hit area grows.

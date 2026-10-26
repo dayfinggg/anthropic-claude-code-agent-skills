@@ -22,7 +22,7 @@ An `/internal/rebuild-index` endpoint on a Rails service that relied on the offi
 
 ## Distinguish a fix from an audit
 
-When asked to implement a feature or repair a defect, examine its reachable boundary and callers, reproduce the known failure before editing where tests exist, add the denied case and an allowed case, and run the relevant existing checks, because that shows the fix covers the reported path without breaking legitimate use. Keep the work to that path and its confirmed variants, because unrelated infrastructure, scanner installation, or a repository-wide audit changes the task the user asked for. Check that the negative case fails for the missing control before the fix, not for a broken fixture or an unavailable service.
+When asked to implement a feature or repair a defect, examine its reachable boundary and callers, reproduce the known failure before editing where tests exist, add the denied case and an allowed case, and run the relevant existing checks, because that shows the fix covers the reported path without breaking legitimate use. Keep the work to that path and the code that shares its root cause, and report other confirmed variants as follow-ups, because unrelated infrastructure, scanner installation, or a repository-wide audit changes the task the user asked for. Check that the negative case fails for the missing control before the fix, not for a broken fixture or an unavailable service.
 
 <example>
 For a report that `GET /api/orders/17/receipt` shows receipts to anonymous callers, the test first gets a 200 on a receipt, then the fix adds the missing owner check, and a second test keeps the customer able to read their own receipt.

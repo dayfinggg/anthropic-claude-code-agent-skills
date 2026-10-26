@@ -50,8 +50,8 @@ When long-running work must not occupy a request, consider a worker boundary wit
 PDF export returns `202` with a job id and a status endpoint, and a retried job reuses the same output file instead of producing a second one.
 </example>
 
-When independent consumers need to react to something that happened, evaluate events instead of synchronous knowledge of every consumer, and keep direct calls when an immediate result and simple sequencing fit better, because messaging moves coupling into contracts and time and does not eliminate it. Check that the events still make sense when delivered late, twice, or not at all.
+When independent consumers need to react to something that happened, evaluate events instead of synchronous knowledge of every consumer, and keep direct calls when an immediate result and simple sequencing fit better, because messaging moves coupling into contracts and time and does not eliminate it. Check that the events still make sense when delivered late, twice, or not at all, and that an event is published atomically with the state change it announces, for example through a transactional outbox.
 
 <example>
-`OrderPlaced` is published for the mailer and analytics to consume, while the price lookup that the checkout page needs immediately stays a direct call.
+`OrderPlaced` is written to an outbox table in the same transaction as the order and published from there for the mailer and analytics to consume, while the price lookup that the checkout page needs immediately stays a direct call.
 </example>

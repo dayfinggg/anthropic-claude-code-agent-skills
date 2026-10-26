@@ -8,10 +8,10 @@ When duplicate execution would be harmful, define which intended action is the s
 A `PUT /accounts/42/low-stock-alerts` request sets `enabled = true` and is safe to repeat, while `POST /accounts/42/credits` with `amount: 5` needs an operation identity because repeating it adds another 5.
 </example>
 
-For explicit keys, scope identity to the caller and operation, reuse the key for retries and not for a new intent, compare relevant parameters and reject a mismatched reuse, and specify retention and late-arrival behavior instead of choosing an arbitrary cache TTL, because identical payloads do not necessarily mean identical intent. Explicit keys retain intent at the cost of durable state and a finite replay horizon. Check two intentional identical purchases with different keys and simultaneous retries with the same key, including a changed amount or currency and replays before and after retention expires.
+For explicit keys, scope identity to the caller and operation, reuse the key for retries and not for a new intent, compare relevant parameters and reject a mismatched reuse with `422` and a retry that arrives while the first call is still running with `409`, and specify retention and late-arrival behavior instead of choosing an arbitrary cache TTL, because identical payloads do not necessarily mean identical intent. Explicit keys retain intent at the cost of durable state and a finite replay horizon. Check two intentional identical purchases with different keys and simultaneous retries with the same key, including a changed amount or currency and replays before and after retention expires.
 
 <example>
-Key `ord-7731-pay` first used with amount `1999` arrives again with `2999`, and the server returns `409 key_reused` instead of the stored result of the first call.
+Key `ord-7731-pay` first used with amount `1999` arrives again with `2999`, and the server returns `422 key_reused` instead of the stored result of the first call.
 </example>
 
 ## Close local crash gaps atomically
@@ -39,7 +39,7 @@ A Python checkout service writes `payment_attempts.idempotency_key` before calli
 When no safe receiver mechanism exists, reconcile uncertain outcomes by an authoritative lookup before retrying, including after an idempotency window has expired, because a fresh key turns an uncertain result into a possible second business effect, and authorization for one mutation does not cover an additional one. Stopping on uncertainty sacrifices availability for effect safety, and reconciliation needs durable identity and an authoritative lookup instead of a guess from similar-looking records.
 
 <example>
-A refund call that timed out is looked up with `GET /refunds?order_id=7731` before any new refund is issued, and a timed-out SMS send with no delivery lookup is logged as uncertain and not resent.
+A refund call that timed out is looked up with `GET /refunds?order_id=7731` before any new refund is issued.
 </example>
 
 ## Use an outbox for a required state-and-event boundary

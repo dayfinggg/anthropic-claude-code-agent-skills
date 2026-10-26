@@ -1,5 +1,16 @@
 # Migrations and data
 
+## Contents
+
+- Establish the transition, not just the final schema
+- Expand and contract when compatibility requires it
+- Choose DDL for the installed engine
+  - PostgreSQL
+  - MySQL
+  - SQLite
+- Make data work restartable and reconcilable
+- Separate three recovery questions
+
 ## Establish the transition, not just the final schema
 
 Use the project's migration mechanism, and correct an already applied shared migration with a new migration and not by rewriting its history, because other environments have already recorded the old version as run and will not run the edited file. Check that the new migration works from both the old and the corrected state.
@@ -14,7 +25,7 @@ Determine which application versions, workers, reports, CDC consumers, and exter
 Renaming `products.title` to `name` during a rolling deploy breaks the old release that still selects `title`, so `name` is added first and `title` stays until no running release reads it.
 </example>
 
-Before authorized execution, establish expected row changes, relation sizes, disk headroom, long transactions, replication lag, and lock sensitivity, and inspect the migration runner's transaction behavior and the engine's DDL semantics, because the same statement can hold a lock for milliseconds on a small table and minutes on a busy one. Rehearse with representative data and competing writes, and set observable stop conditions for blocking, errors, lag, and resource use. A successful empty-database migration does not validate the production transition.
+Before authorized execution, establish expected row changes, relation sizes, disk headroom, long transactions, replication lag, and lock sensitivity, and inspect the migration runner's transaction behavior and the engine's DDL semantics, because the same statement can hold a lock for milliseconds on a small table and minutes on a busy one. Rehearse with representative data and competing writes, set observable stop conditions for blocking, errors, lag, and resource use, and set the engine's lock timeout for the migration session so a blocked statement fails instead of queueing. A successful empty-database migration does not validate the production transition.
 
 <example>
 `ALTER TABLE readings ADD COLUMN validated TINYINT NOT NULL DEFAULT 0` is rehearsed on a restored copy with 3 million rows while a script inserts readings, and the production run stops if inserts wait longer than 5 seconds.
@@ -37,7 +48,7 @@ A nullable `client_id` column is added beside `client_name`, `client_name` stays
 Backfill historical data with explicit conversion rules, updating only eligible rows or rows whose source revision still matches, because an older batch snapshot would otherwise overwrite a newer application edit.
 
 <example>
-`UPDATE invoices i JOIN clients c ON c.name = i.client_name SET i.client_id = c.id WHERE i.client_id IS NULL` skips rows that the application already saved with a `client_id`.
+On MySQL, `UPDATE invoices i JOIN clients c ON c.name = i.client_name SET i.client_id = c.id WHERE i.client_id IS NULL` skips rows that the application already saved with a `client_id`.
 </example>
 
 Reconcile missing, conflicting, and rejected rows before switching reads or write authority, and keep the old shape usable while the supported rollback version still requires it, because switching on a partial backfill hides the rows that were left behind.
@@ -62,7 +73,7 @@ Old `invoices` rows have no `first_paid_at`, so the backfill leaves them `NULL` 
 
 ### PostgreSQL
 
-Check whether the exact alteration rewrites rows, scans existing data, or takes a restrictive table lock, because different `ALTER TABLE` forms have different lock behavior. For supported constraints, separate adding enforcement from validating existing rows with `NOT VALID` and a later validation, after checking which constraint kinds the installed version supports that form for. Check the enforcement and validation state afterwards.
+Check whether the exact alteration rewrites rows, scans existing data, or takes a restrictive table lock, because different `ALTER TABLE` forms have different lock behavior. For supported constraints, separate adding enforcement from validating existing rows with `NOT VALID` and a later validation, after checking which constraint kinds the installed version supports that form for. Set `lock_timeout` for the migration session, because a statement that waits for its lock then fails instead of queueing. Check the enforcement and validation state afterwards.
 
 <example>
 `ALTER TABLE order_items ADD CONSTRAINT order_items_order_fk FOREIGN KEY (order_id) REFERENCES orders (id) NOT VALID` is followed by `VALIDATE CONSTRAINT` in a separate step that scans `order_items` without blocking normal writes.
@@ -76,10 +87,10 @@ After a cancelled `CREATE INDEX CONCURRENTLY idx_bookings_room_id`, `\d bookings
 
 ### MySQL
 
-Determine the supported online algorithm and lock mode for the exact operation, storage engine, and server, since MySQL and MariaDB differ, and request the permitted behavior so that unsupported execution fails, because otherwise the server may silently copy a busy table while blocking writes. Online DDL can still wait on metadata locks and affect replication, and a cancelled or failed operation can be expensive to roll back. Check the observed lock and lag behavior in rehearsal.
+Determine the supported online algorithm and lock mode for the exact operation, storage engine, and server, since MySQL and MariaDB differ, and request the permitted behavior so that unsupported execution fails, because otherwise the server may silently copy a busy table while blocking writes. Online DDL can still wait on metadata locks and affect replication, and a cancelled or failed operation can be expensive to roll back. Set `lock_wait_timeout` for the session, or `WAIT n` on a MariaDB statement, so that a metadata-lock wait fails instead of queueing. Check the observed lock and lag behavior in rehearsal.
 
 <example>
-`ALTER TABLE sensors ADD INDEX idx_serial (serial), ALGORITHM=INPLACE, LOCK=NONE` errors at once if the server would need a table copy, whereas without those clauses it may block writes to `sensors`.
+On MySQL, `ALTER TABLE sensors MODIFY serial BIGINT, ALGORITHM=INPLACE, LOCK=NONE` errors at once because a column type change needs a table copy, whereas without those clauses the server copies `sensors` and blocks its writes.
 </example>
 
 Expect DDL to commit implicitly, and do not put DDL and corrective DML into one transaction and claim they share PostgreSQL-style rollback, because MySQL commits the open transaction around most DDL statements and atomic DDL only makes a single statement all-or-nothing. Inspect each statement's documented boundary and check failure between stages.
@@ -90,10 +101,22 @@ A migration that runs `BEGIN`, `ALTER TABLE`, a corrective `UPDATE`, and `ROLLBA
 
 ### SQLite
 
-Check `ALTER TABLE` support against the installed library version and not an old summary of SQLite limitations, and when a rebuild is necessary follow the official generalized procedure for that version, preserving dependent indexes, triggers, and views, because a hand-rolled table copy silently drops them. Change foreign-key mode outside an active transaction when required and restore enforcement afterwards. Do not edit `sqlite_schema` as a shortcut, because a wrong edit corrupts the database. Check both integrity and foreign keys at the end.
+Check `ALTER TABLE` support against the installed library version and not an old summary of SQLite limitations, because later releases support alterations that older summaries list as impossible.
+
+<example>
+Before planning a rebuild of `books` to remove `legacy_flag`, `SELECT sqlite_version()` and the matching `ALTER TABLE` documentation show whether `DROP COLUMN` is supported.
+</example>
+
+When a rebuild is necessary, follow the official generalized procedure for the installed version, preserving dependent indexes, triggers, and views, changing foreign-key mode outside an active transaction when required, and restoring enforcement afterwards, because a hand-rolled table copy silently drops dependents. Check both integrity and foreign keys at the end.
 
 <example>
 To change a column type in a SQLite-backed tool, the script creates `books_new`, copies the rows, drops `books`, renames the new table, recreates `idx_books_isbn`, and finishes with `PRAGMA foreign_key_check`.
+</example>
+
+Do not edit `sqlite_schema` as a shortcut, because a wrong edit corrupts the database.
+
+<example>
+A script that needs a `NOT NULL` on `books.isbn` runs the rebuild procedure and never `UPDATE sqlite_schema SET sql = ...`.
 </example>
 
 ## Make data work restartable and reconcilable
@@ -113,7 +136,7 @@ A legacy product CSV in Windows-1252 is loaded into `products_staging` as `utf8m
 For recurring imports, choose a stable source identity and an explicit update, ignore, or reject policy, because feeds are retried and overlap, and check that a replay creates no duplicates and does not overwrite newer destination edits. In PostgreSQL CSV loading, quoted empty strings and unquoted null markers can mean different things, so test both before importing data where missing and empty differ.
 
 <example>
-The supplier price import runs `INSERT ... ON DUPLICATE KEY UPDATE` on `supplier_sku` and sets only the supplier-owned columns, so rerunning the same file creates no duplicates and keeps local edits to `description`.
+On MySQL, the supplier price import runs `INSERT ... ON DUPLICATE KEY UPDATE` on `supplier_sku` and sets only the supplier-owned columns, so rerunning the same file creates no duplicates and keeps local edits to `description`.
 </example>
 
 Use the engine's supported bulk-loading facility when its behavior fits the task, because row-by-row inserts cost far more, and remember that PostgreSQL `COPY` is not a cross-engine command. Advice for loading an empty table does not authorize dropping live constraints or indexes, disabling logging, or breaking replication, because those protect a running system. Reassess statistics and real query plans after a substantial distribution change.

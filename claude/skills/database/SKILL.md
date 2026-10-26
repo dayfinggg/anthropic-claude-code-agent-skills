@@ -10,7 +10,7 @@ These rules decide how data storage is designed, changed, and checked. The refer
 Before an engine-dependent choice, establish the deployed engine and exact version (treat MySQL and MariaDB as different engines), the storage engine, the driver or ORM, the environment, and the workload, and read the installed version's documentation, because syntax, defaults, and locking differ between engines and between releases of one engine. Check which database each environment really connects to, because a staging configuration can point at the production database.
 
 <example>
-For a slow `bookings` query in a Rails app, run `SELECT VERSION()` and read `config/database.yml`, which shows MariaDB 10.11 in production while the local Docker image runs MySQL 8.0, so a plan checked locally says nothing about production.
+For a slow `bookings` query in a Rails app, run `SELECT VERSION()` and read `config/database.yml`, which shows MariaDB in production while the local Docker image runs MySQL, so a plan checked locally says nothing about production.
 </example>
 
 Do not transfer PostgreSQL semantics to MySQL, MariaDB, SQLite, or another store, because the same SQL text can behave differently there. Check each assumption against the installed engine's documentation or a test query before relying on it.
@@ -25,7 +25,7 @@ Inspect the actual plan for query, index, pagination, and locking decisions, and
 `EXPLAIN SELECT id, total FROM orders WHERE customer_id = 7 ORDER BY placed_at DESC LIMIT 20` shows `Using filesort` on the 300-row dev copy, so the report names an index on `(customer_id, placed_at)` as a candidate to confirm against production-sized data.
 </example>
 
-Run an analyzed plan only on a read-only statement or on isolated data, because `EXPLAIN ANALYZE` executes its statement, and a rollback does not undo the load, the locks, or the side effects of what ran. Before profiling in production, inspect the statement for side effects and obtain authorization.
+Run an analyzed plan only on a statement that was reviewed for side effects (functions, triggers, writable CTEs, locking clauses) or on isolated data, and obtain authorization before profiling in production, because `EXPLAIN ANALYZE` executes its statement, and a rollback removes the data changes but not the load, the lock waits it imposed on other sessions, consumed sequence values, or effects outside the database.
 
 <example>
 `EXPLAIN (ANALYZE) UPDATE invoices SET status = 'void' WHERE due_at < now() - interval '1 year'` run on production voids real invoices, so the plan comes from plain `EXPLAIN` or a restored copy.

@@ -1,5 +1,15 @@
 # Transactions and concurrency
 
+## Contents
+
+- Choose the invariant before the mechanism
+- Check isolation through an executable schedule
+- Apply the actual engine's semantics
+  - PostgreSQL
+  - MySQL InnoDB
+  - SQLite
+- Diagnose deadlocks and bound retries
+
 ## Choose the invariant before the mechanism
 
 Identify which reads and writes must succeed together, including implicit ORM flushes and every connection that takes part, and put the dependent database operations in one transaction while keeping network requests and user interaction outside its lock-holding interval, because a partial business change is hard to repair and a lock held across a slow call blocks other writers. A transaction method name alone does not prove the boundary. Check that a failure between the writes leaves no partial business change.
@@ -8,10 +18,28 @@ Identify which reads and writes must succeed together, including implicit ORM fl
 Placing an order inserts the `orders` row and its `order_items` rows inside one `with conn.transaction():` block on a single psycopg connection, and the call that sends the confirmation email runs after the block exits.
 </example>
 
-For one-row arithmetic or a state transition, prefer a supported atomic conditional update over reading a value and writing a literal back, because a concurrent writer can change the row between the read and the write. Put the guard in the write condition, increment the version in a version-checked edit, and inspect the affected-row count, since zero matches means a conflict or a missing row and not success. In MySQL the count is of changed rows unless the driver asks for matched rows, so the version increment keeps it meaningful. Re-read or return a conflict according to the user-visible contract, and check simultaneous contenders and the committed result.
+For one-row arithmetic or a state transition, prefer a supported atomic conditional update over reading a value and writing a literal back, because a concurrent writer can change the row between the read and the write. Check simultaneous contenders and the committed result.
+
+<example>
+Claiming a seat runs `UPDATE seats SET holder = :user WHERE id = 12 AND holder IS NULL`, and not a `SELECT` of `holder` followed by an `UPDATE` that writes the user.
+</example>
+
+Put the guard in the write condition, increment the version in a version-checked edit, and inspect the affected-row count, because zero matches means a conflict or a missing row and not success.
 
 <example>
 `UPDATE reservations SET status = 'confirmed', version = version + 1 WHERE id = 812 AND version = 7` is followed by a check that `RowsAffected()` is 1, because 0 means another request changed the row first.
+</example>
+
+On MySQL, ask the driver for matched rows or increment a version column so that the affected-row count stays meaningful, because the server reports changed rows by default and an update that writes identical values reports 0 although the row matched.
+
+<example>
+A Go service using `go-sql-driver/mysql` sets `clientFoundRows=true` in its DSN, so a repeated confirm of reservation 812 reports 1 affected row and not 0.
+</example>
+
+When the affected-row count shows a conflict, re-read and retry or return the conflict to the caller according to the user-visible contract, because the caller must learn whether its change was applied.
+
+<example>
+A `PUT /reservations/812` with a stale version returns 409 with the current version, while a background counter job re-reads the row and applies its change again.
 </example>
 
 Enforce uniqueness with a supported unique constraint or an atomic conditional create and not with an application precheck, because a precheck does not stop another writer between the check and the insert. Define whether a repeated request returns its previous result or performs another operation, since an upsert that increments a value is not idempotent merely because it is an upsert. Check duplicate delivery and an ambiguous response after commit.
@@ -25,7 +53,7 @@ A checkout handler that runs `SELECT COUNT(*)` on `payments` before inserting le
 Drive an isolation claim with separate connections and synchronization barriers and observe successful commits, returned values, blocking, and error codes, because a sleep-based test passes or fails by luck. Run only the schedules relevant to the changed invariant.
 
 <example>
-Two `mysql` client sessions that each run `BEGIN` and are advanced by hand in a fixed order reproduce the double booking of one seat, while a `Thread.sleep(1000)` in a JUnit test does not.
+Two sessions driven by a short script that releases each step in a fixed order reproduce the double booking of one seat, while a `Thread.sleep(1000)` in a JUnit test does not.
 </example>
 
 To test a read-modify-write path for a lost update, have both sessions read the value and both write the computed literal, because if both commit and the final value reflects only one change, the other update was lost. Compare an atomic increment or a version condition as the fix.
@@ -55,7 +83,7 @@ Two bookings for the `room-4` meeting room both see no overlap and insert `10:00
 For a cross-row rule, evaluate an enforceable constraint or a shared guard row used by every writer, with serializable transactions and bounded retries as another candidate, because locking only each writer's separate target row does not protect a rule that spans rows. Check the failure schedule again after the change, including inserts into a previously empty result set.
 
 <example>
-To cap a customer at 5 active subscriptions, every path that adds a subscription first locks that customer's `customers` row with `SELECT ... FOR UPDATE`, then counts and inserts.
+To cap a customer at 5 active subscriptions under Read Committed, every path that adds a subscription first locks that customer's `customers` row with `SELECT ... FOR UPDATE`, then counts and inserts.
 </example>
 
 ## Apply the actual engine's semantics
@@ -83,7 +111,7 @@ Editing an `invoices` row uses `SELECT ... FOR NO KEY UPDATE`, which does not bl
 Take a guard lock before reading the data it protects, because a lock acquired after a snapshot was taken does not refresh that snapshot. If the snapshot predates the lock, choose a fresh valid view or a mechanism that detects the conflict.
 
 <example>
-A coupon redemption path that calls `pg_advisory_xact_lock` after its first `SELECT` under Repeatable Read still decides on the old count, so the lock moves before that `SELECT`.
+A coupon redemption path that takes `pg_advisory_xact_lock` as the first statement of a Repeatable Read transaction still counts against a snapshot taken before the lock was granted, so it runs the lock, the count, and the insert in a Read Committed transaction, where each statement takes a fresh snapshot.
 </example>
 
 Use `SKIP LOCKED` for queue-style work distribution and not for business queries, because it silently omits locked rows and so returns an inconsistent answer.
@@ -123,7 +151,7 @@ A background sync and the Python readers of a desktop app share `local.db` in WA
 For a known short read-then-write unit, evaluate `BEGIN IMMEDIATE`, because a stale read snapshot cannot always be upgraded to a write transaction. On `SQLITE_BUSY_SNAPSHOT`, restart from a fresh transaction and not by retrying the write against stale reads, since the earlier reads no longer hold.
 
 <example>
-A counter update starts with `BEGIN IMMEDIATE` to take the write lock first, and on `SQLITE_BUSY_SNAPSHOT` it rolls back and repeats the read and the write.
+A counter update runs `BEGIN IMMEDIATE`, reads, and writes, and a second writer that gets `SQLITE_BUSY` from its own `BEGIN IMMEDIATE` retries it within the busy timeout, while a deferred transaction that read first and then fails with `SQLITE_BUSY_SNAPSHOT` rolls back and repeats the read as well as the write.
 </example>
 
 ## Diagnose deadlocks and bound retries
@@ -134,8 +162,20 @@ Reconstruct the wait cycle from the conflicting statements, acquired locks, tran
 `SHOW ENGINE INNODB STATUS` lists the `LATEST DETECTED DEADLOCK` with one transaction updating `accounts` then `ledger_entries` and the other doing the reverse, so both paths now update `accounts` first.
 </example>
 
-Retry only classified transient failures within a bounded attempt count and request deadline, and roll back before replaying an aborted unit, because endless retries amplify load and replaying a permanent error cannot succeed. Do not retry validation errors or permanent uniqueness conflicts. If a connection fails during commit the outcome may be unknown, so resolve it by the operation's idempotency key or authoritative business state before issuing another externally visible action.
+Retry only classified transient failures within a bounded attempt count and request deadline, because endless retries amplify load and replaying a permanent error cannot succeed. Do not retry validation errors or permanent uniqueness conflicts.
 
 <example>
-A deadlock gets up to 3 retries inside a 5 second request budget, while a dropped connection during `COMMIT` checks the `client_token` row before the notification email is sent again.
+A deadlock gets up to 3 retries inside a 5 second request budget, while a unique-key violation on `users.email` is returned to the caller at once.
+</example>
+
+Roll back before replaying an aborted unit, because the aborted attempt may still hold locks and its partial writes would otherwise mix with the replay.
+
+<example>
+After a lock-wait timeout the Go handler calls `tx.Rollback()` and only then re-runs the whole order placement in a new transaction.
+</example>
+
+If a connection fails during commit, resolve the unknown outcome by the operation's idempotency key or authoritative business state before issuing another externally visible action, because the commit may have succeeded and a blind replay would duplicate it.
+
+<example>
+A dropped connection during `COMMIT` checks the `client_token` row before the notification email is sent again.
 </example>

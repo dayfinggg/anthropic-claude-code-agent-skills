@@ -43,7 +43,7 @@ For "search is slow", fix the workload at 50 concurrent requests for `q=shoes` a
 When comparing a baseline and a candidate, match input sizes, data distribution, concurrency, build mode, cache policy, and environment, use the existing benchmark facilities under representative warm or cold conditions, and include the setup work that belongs to the user's latency, because differences in machine or conditions can outweigh the change. Check that the timed work is awaited, executed, and not optimized away.
 
 <example>
-Both runs use the release build on the same machine with a cold cache, and the benchmark loop consumes `result.len()` so the compiler cannot drop the call.
+Both runs use the release build on the same machine with a cold cache, and the benchmark loop passes `result` through `std::hint::black_box` (or the harness's equivalent) so the optimizer keeps the call.
 </example>
 
 When measurements are noisy, repeat comparable runs, report their spread with the chosen central or tail statistic, and interleave baseline and candidate runs when supported, because time-dependent drift otherwise favors whichever ran second. Avoid choosing the fastest sample or setting arbitrary millisecond thresholds, because both turn noise into a verdict. Call an improvement real only when it exceeds the observed noise and matters for the acceptance condition, and otherwise report the comparison as inconclusive.

@@ -8,12 +8,17 @@ When choosing a test boundary, name the fault it must detect and the dependencie
 A bug that depends on the `orders` table's unique constraint is tested through the repository against a real database container, not through `OrderService` with a mocked repository.
 </example>
 
-| When the risk concerns | Exercise | Reject as sufficient proof | Verify |
-|---|---|---|---|
-| Decisions or transformations | Public module API with relevant real logic | Private-helper tests that bypass the caller | Distinct outcomes and state transitions |
-| Query semantics, serialization, routing, or transactions | A narrow real integration | A fake implementing the behavior being questioned | Actual response or durable result |
-| Compatibility between independently changing services | Real consumer code and provider verification | A consumer mock or schema alone | Both sides accept the used message contract |
-| Application assembly or a critical user journey | The relevant execution chain | Unit tests with every connection replaced | The complete caller-visible outcome |
+When the risk is a decision or transformation, exercise it through the module's public API with the relevant real logic and check the distinct outcomes and state transitions, because a test of a private helper that bypasses the caller passes while the caller wires the helper wrongly.
+
+<example>
+A shipping-fee rule is tested through `ShippingCalculator.quote(cart)` for a domestic and an international cart, and not through its private `_zone_rate()`.
+</example>
+
+When the risk concerns query semantics, serialization, routing, transactions, application assembly, or a critical user journey, exercise a narrow real integration or the relevant execution chain and check the actual response, durable result, or complete caller-visible outcome, because a fake that implements the behavior in question, or a chain with every connection replaced, repeats the assumptions the test was meant to challenge.
+
+<example>
+A route that must reject a duplicate email is called through the HTTP client against the real app and database, and the test reads the `users` table afterward instead of relying on a fake `UserRepository` that raises `DuplicateError` on its own.
+</example>
 
 ## Keep fidelity where it matters
 
@@ -23,7 +28,7 @@ When an adapter depends on database or protocol semantics, run it against an iso
 A test for `UserRepository.upsert()` runs against a throwaway Postgres container and then reads the row with a fresh session, not with the object the session still holds.
 </example>
 
-When the risk is a shared service contract, exercise the real client's request construction and response handling and verify those interactions against the provider with the project's existing contract mechanism, because hand-built requests test the test and not the client, and a contract response says nothing about persistence. Check provider side effects in separate functional integration tests, and publish contracts or change shared brokers only when the request asks for it, because other teams' pipelines consume them.
+When the risk is a shared service contract, exercise the real client's request construction and response handling and verify those interactions against the provider with the project's existing contract mechanism, because hand-built requests test the test and not the client, a consumer mock or a schema alone shows only one side accepting the message, and a contract response says nothing about persistence. Check that both sides accept the message contract the client uses, check provider side effects in separate functional integration tests, and publish contracts or change shared brokers only when the request asks for it, because other teams' pipelines consume them.
 
 <example>
 The `BillingClient` contract test calls `client.create_invoice()` against the contract mock and the provider verification replays it on `billing-api`, while the check that the invoice row exists lives in a separate integration test.

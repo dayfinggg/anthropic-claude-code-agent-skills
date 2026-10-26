@@ -2,7 +2,7 @@
 
 ## Preserve the pipeline's contract
 
-When changing CI, inspect the events, branch rules, conditions, job dependencies, runner versions, permissions, caches, and artifacts, and determine whether each job tests a commit, a merge result, or a release tag, because a selective filter can silently skip required validation and a skipped job is not a passed check. Check that the intended jobs run on each affected event.
+When changing CI, inspect the events, branch rules, conditions, job dependencies, runner versions, permissions, caches, and artifacts, and determine whether each job tests a commit, a merge result, or a release tag, because a selective filter can silently skip required validation and a skipped job may report success or stay pending depending on the provider. Check that the intended jobs run on each affected event.
 
 <example>
 Adding a `paths` filter for `src/**` to the `pull_request` trigger in `.github/workflows/ci.yml` also skips the required lint job on a docs-only change, and branch protection then waits for a status that never arrives.
@@ -50,21 +50,21 @@ A GitLab `include` that follows `ref: main` of another project is changed to a r
 
 ## Scope credentials to the operation
 
-When existing infrastructure supports federated authentication, prefer short-lived credentials with constrained trust claims, limiting the repository, workflow, ref or environment, audience, and resource scope as supported, because OIDC removes a stored key but an overly broad trust policy still grants excessive access. Check that allowed and disallowed callers behave as intended in a safe environment, and add no cloud infrastructure only to use OIDC.
+When existing infrastructure supports federated authentication, prefer short-lived credentials with constrained trust claims, limiting the repository (by immutable ID where the provider supplies one), workflow, ref or environment, audience, and resource scope as supported, because OIDC removes a stored key but an overly broad trust policy still grants excessive access. Check that allowed and disallowed callers behave as intended in a safe environment.
 
 <example>
-A trust policy that matches the subject `repo:acme/shop:environment:production` accepts only jobs of that environment, and a branch workflow that requests the same role is refused.
+A trust policy for the `production` environment matches the `sub` claim that a test run of the repository actually emits and also requires the `repository_id` claim, so a renamed or re-created repository cannot inherit the role, and a branch workflow that requests the same role is refused.
 </example>
 
 For existing GitLab variables, distinguish environment scope, protection, masking, and hiding, because they solve different problems and masking cannot stop malicious job code from transmitting a secret. Check which event and branch can read each required variable, inspect transformed error output with harmless values, and keep unrestricted debug tracing off.
 
 <example>
-`DEPLOY_SSH_KEY` is scoped to the `production` environment and protected so only pipelines on the protected `main` branch receive it, while masking only hides it in job logs.
+`DEPLOY_TOKEN` is scoped to the `production` environment and protected so only pipelines on the protected `main` branch receive it, while masking only hides it in job logs.
 </example>
 
 ## Verify outputs and gates
 
-When handing a build artifact to release automation, tie it to its revision, builder, and integrity metadata and verify the expected identity before privileged consumption, because signatures and provenance establish origin and not application correctness. Keep existing signing and SBOM requirements, and add no new compliance workflow to an unrelated fix.
+When handing a build artifact to release automation, tie it to its revision, builder, and integrity metadata and verify the expected identity before privileged consumption, because signatures and provenance establish origin and not application correctness. Keep existing signing and SBOM requirements.
 
 <example>
 The deploy job downloads `inventory-<sha>.tar.gz` and compares its `sha256sum` with the checksum file written by the build job before unpacking into `/opt/inventory/releases`.

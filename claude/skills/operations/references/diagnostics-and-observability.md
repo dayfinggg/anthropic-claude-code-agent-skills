@@ -36,7 +36,7 @@ Before a `99.5%` availability target is wired into the deploy script as a gate, 
 
 ## Alert on an actionable risk
 
-When an existing alert is noisy or slow, evaluate its precision, missed failures, detection time, and reset time, and consider supported multiwindow burn-rate alerts for an established SLO, taking thresholds from the service's own history and not from a book, because the right thresholds depend on traffic and error budget. Check historical failure and recovery periods, zero traffic, missing series, and low traffic, since a longer duration can hide intermittent severe failures instead of improving confidence.
+When an existing alert is noisy or slow, evaluate its precision, missed failures, detection time, and reset time, and consider supported multiwindow burn-rate alerts for an established SLO, choosing burn-rate thresholds from the SLO's error budget and validating them against the service's own history, because the right thresholds depend on traffic and error budget. Check historical failure and recovery periods, zero traffic, missing series, and low traffic, since a longer duration can hide intermittent severe failures instead of improving confidence.
 
 <example>
 A `5xx` alert that fires on a single failed request during a quiet night is replayed against stored metrics from known outages and quiet nights, including a stretch with zero traffic, before its threshold or duration changes.
@@ -53,7 +53,7 @@ A booking API's health probe sends requests with `User-Agent` set to `synthetic-
 When a demonstrated blind spot requires instrumentation, reuse the existing logger, SDK, collector, field names, and alert routes, correlate logs and traces through existing identifiers, and check the installed SDK's semantic conventions before changing names, because more detail helps diagnosis but raises cost and can break downstream queries. Check real emitted records and the affected dashboard or alert.
 
 <example>
-A Go service that logs JSON with `slog` adds a `duration_ms` attribute next to the existing `request_id` and not a second logging library, and `tail -n 5 /var/log/inventory/app.log` shows the new field before any dashboard query is edited.
+A Go service that logs JSON with `slog` adds a `duration_ms` attribute next to the existing `request_id` and not a second logging library, and `tail -n 5 /var/log/inventory/app.log` on the server shows the new field before any dashboard query is edited.
 </example>
 
 When adding metric dimensions, estimate the active combinations and choose bounded attributes, keeping raw URLs and request IDs in logs or traces and not in metric labels, because every distinct value creates a new series. Size required per-tenant metrics deliberately with overflow checks, since raising a cap protects a query while increasing memory and backend cost, and check that filtered totals stay trustworthy when the installed SDK overflows.
@@ -65,7 +65,7 @@ The route template `/orders/{id}` is a metric label, while the raw `/orders/8421
 When telemetry may contain sensitive data, avoid collecting it instead of relying only on redaction, and inspect automatic instrumentation, exceptions, headers, bodies, and baggage, because hashing predictable identifiers is not reliable anonymization, and less data limits retrospective investigation but prevents disclosure. Exercise success and failure paths with harmless sentinel values and inspect the output.
 
 <example>
-After one login attempt with the wrong password `sentinel-pass-123` and one successful login, `Select-String -Path D:\logs\catalog\*.log -Pattern 'sentinel-pass-123'` returns nothing.
+After one login attempt with the wrong password `sentinel-pass-123` and one successful login, `Select-String -Path D:\logs\catalog\*.log -Pattern 'sentinel-pass-123'` on the server returns nothing.
 </example>
 
 ## Check health according to its consumer

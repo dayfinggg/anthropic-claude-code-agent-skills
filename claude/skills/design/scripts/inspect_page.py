@@ -14,7 +14,6 @@ SETTLE_JS = (HERE / "settle.js").read_text(encoding="utf-8")
 def check_focus(page, limit):
     results = []
     seen = set()
-    page.mouse.click(1, 1)
     for _ in range(limit):
         page.keyboard.press("Tab")
         info = page.evaluate(FOCUS_JS)

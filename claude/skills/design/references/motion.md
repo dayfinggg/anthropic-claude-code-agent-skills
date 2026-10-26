@@ -28,7 +28,7 @@ Keep most interface transitions between about `150` and `300ms`. Make small chan
 A dropdown opens in `180ms` and closes in `120ms`, and a full-screen sheet takes `400ms`.
 </example>
 
-Decelerate elements entering the screen, accelerate elements leaving permanently, and use ease-out for responses to user input, because feedback should start immediately. Springs give natural, interruptible motion, and Apple's reduced-motion guidance tightens springs rather than removing feedback. Recent Material releases moved components to spring physics, so check the installed version before choosing easing tokens.
+Decelerate elements entering the screen, accelerate elements leaving permanently, and use ease-out for responses to user input, because feedback should start immediately. Springs give natural, interruptible motion, and Apple's reduced-motion guidance tightens springs rather than removing feedback. Material's motion system is spring-based and its easing and duration tokens are no longer maintained, so use spring tokens where the platform offers them.
 
 <example>
 A drawer enters with `cubic-bezier(0.2, 0, 0, 1)` and leaves with an ease-in curve.

@@ -8,7 +8,7 @@ Translate the request into outcomes a user can observe, and keep behavior, appea
 "Saving the profile works" becomes "after editing the name and pressing Save, a reload shows the new name", and that check is kept apart from "the Save button looks right".
 </example>
 
-Use the repository's existing test framework and check commands, and for a tested behavior bug add the smallest regression test and watch it fail before fixing, asserting the public outcome and not internal component structure, because a test that was never seen failing does not show that the fix works. Keep a failing test as it is and change the implementation, and add no new testing framework for a narrow UI edit.
+Use the repository's existing test framework and check commands, and for a behavior bug run a covering test first or, when none covers it, add the smallest regression test and watch it fail for the expected reason before fixing, asserting the public outcome and not internal component structure, because a test that was never seen failing does not show that the fix works. Change the implementation and not the failing test unless the test's expectation is wrong, and then say why. Keep a new test only where the task asks for tests or the repository already keeps tests for this kind of change, and add no new testing framework for a narrow UI edit.
 
 <example>
 A new `it("keeps the typed note after a failed save")` in `ProfileForm.test.tsx` finds the field with `screen.getByLabelText("Note")` and fails before the fix.
@@ -22,10 +22,10 @@ Run the relevant tests, type checks, lint checks, and the build after the change
 
 ## Find every place a changed element renders
 
-Before implementing a change to a rendered element, find every template, view, feed, list, and breakpoint that renders it, including other views of the same data, and after implementing check each of them, because a change verified on one page often breaks another view of the same data. Search the repository for the component, partial, and class names, include other callers and multiple instances of a shared control, and check that IDs, local state, and focus do not collide. Check each render site at its own sizes and content and not only the one that prompted the change.
+Before implementing a change to a rendered element, find every template, view, feed, list, and breakpoint that renders it, including other views of the same data, and after implementing check each of them, because a change verified on one page often breaks another view of the same data. Search the repository for the component, partial, and class names, include other callers and multiple instances of a shared control, and check that IDs, local state, and focus do not collide. Check each render site at its own sizes and content and not only the one that prompted the change, and for a component with dozens of call sites check one render site per distinct variant, size, and content shape and name the sites not opened.
 
 <example>
-A product thumbnail was built as a wide rectangle because the card template showed it that way, but the search results render the same image square and the category list at `/category/all` was never opened. Searching for the partial first finds `product/card.html`, `search/results.html`, and `category/list.html`, and each is opened at phone and desktop widths afterwards.
+A thumbnail built wide for the card template turns out square in the search results, so searching for the partial first finds `product/card.html` and `search/results.html`, and each is opened at phone and desktop widths afterwards.
 </example>
 
 ## Use the actual browser facilities
@@ -56,7 +56,7 @@ For a narrow styling fix, compare the original and changed region with long cont
 After changing `.badge` padding, load a 60-character product name at `360px` and `1440px` and confirm that the surrounding grid and the network panel look as before.
 </example>
 
-For every other kind of change, run the closing check of each reference that applies, which covers transitions for state and forms, direct entry for routing, cold load for hydration, keyboard-only use for controls and overlays, and the repeated measurement for performance, because each class of defect shows up only under its own scenario. Treat these as conditional checks and not as a reason to expand every task into a full application audit.
+For every other kind of change, run the closing check of each reference that applies, which covers transitions for state and forms, direct entry for routing, cold load for hydration, keyboard-only use for controls and overlays, the repeated measurement for performance, the boundary check after structural edits for architecture, and the safe boundary check for browser security, because each class of defect shows up only under its own scenario. Treat these as conditional checks and not as a reason to expand every task into a full application audit.
 
 <example>
 A change to the orders search that also touched the URL runs the transitions check and the direct-entry check and skips the performance check.

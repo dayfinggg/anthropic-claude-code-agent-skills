@@ -22,10 +22,22 @@ For SQL plus a side cache, commit the authoritative database change before inval
 Reader A loads product 812 with the old name, an admin saves and the code runs `DEL product:812`, and then A runs `SET product:812` with the old name, which now stays until the TTL ends.
 </example>
 
-If that bounded inconsistency is acceptable, define the expiration and refresh contract explicitly. If it is unacceptable, use authoritative reads for the sensitive path or a verified version or generation mechanism that rejects stale fills, and make that mechanism coordinate with invalidation and survive its failure modes, because adding a random delay or deleting twice only narrows the window. This is an application design decision and not a guarantee that SQL and Redis provide together. Check lost invalidations, retry delivery, and fills started before a committed update.
+If that bounded inconsistency is acceptable, define the expiration and refresh contract explicitly, because the expiration is then the stated limit on how long an old value may stay.
+
+<example>
+Product list entries live at most 60 seconds, and the page contract says a renamed product may show its old name for that long.
+</example>
+
+If it is unacceptable, use authoritative reads for the sensitive path or a verified version or generation mechanism that rejects stale fills, because adding a random delay or deleting twice only narrows the window. This is an application design decision and not a guarantee that SQL and Redis provide together.
 
 <example>
 Readers fetch the cheap `version` column from PostgreSQL and then read `product:812:v7`, so a fill built from an older row lands under an old key that no reader requests.
+</example>
+
+Make the version or generation mechanism coordinate with invalidation and survive its failure modes, because a version that changes separately from the row can be lost or reordered, and a stale fill then stays valid. Check lost invalidations, retry delivery, and fills started before a committed update.
+
+<example>
+`products.version` is incremented in the same `UPDATE` that changes the row, so a crash after the commit cannot leave a changed row with the old version, and a fill that started before the update is stored under the old version's key.
 </example>
 
 When reliable invalidation must survive a process crash after database commit, consider an existing CDC feed or a transactional outbox, but only when the durability requirement justifies the mechanism, because an invalidation sent by the web process after commit is lost if the process dies in between. Make replay idempotent and preserve the ordering needed by each key. Check that a rolled-back database transaction emits no invalidation event.
@@ -71,7 +83,7 @@ Sessions lost at failover only log users out, while a prepaid API credit balance
 For a distributed lock, decide whether duplicate work is merely wasteful or corrupts a protected resource, because a lease can expire while its holder pauses, and checking expiry before writing cannot exclude a pause immediately after the check. If correctness depends on exclusive access, prefer an enforceable database invariant or a mechanism with explicit failure assumptions. When using fencing, the destination must reject stale monotonic tokens, since a random ownership token alone is not fencing. Check a paused former holder writing after a new holder succeeds.
 
 <example>
-A Redis `SET lock NX PX 30000` around the nightly report rebuild is fine because a duplicate rebuild only wastes CPU, while a lock around decrementing a wallet's `balance` is replaced by `UPDATE ... SET balance = balance - :cost WHERE balance >= :cost`.
+A Redis `SET report-rebuild-lock <token> NX PX 30000` around the nightly report rebuild is fine because a duplicate rebuild only wastes CPU, while a lock around decrementing a wallet's `balance` is replaced by `UPDATE ... SET balance = balance - :cost WHERE balance >= :cost`.
 </example>
 
 Do not treat Redis atomic operations as an atomic transaction with an external database, and check key placement and the supported transactional scope before grouping commands, because `MULTI` and Lua scripts cover only Redis keys and never the SQL write. If the invariant spans systems, identify the dual-write failure and use the narrowest verified consistency mechanism.

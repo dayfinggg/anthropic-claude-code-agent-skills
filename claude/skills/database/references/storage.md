@@ -8,7 +8,7 @@ When choosing or questioning a store, start from the operation that must become 
 A request to make the order history screen faster starts by counting that the endpoint runs 14 statements against PostgreSQL, and the fix is one join and an index, not a document store.
 </example>
 
-When queries need changing joins or relationships require database enforcement, evaluate a relational model first, because a fashionable storage category is not evidence that the current engine cannot serve them. Check the important queries and concurrent invariants on representative data.
+When queries need changing joins or relationships require database enforcement, evaluate a relational model first, because a storage category's popularity is not evidence that the current engine cannot serve them. Check the important queries and concurrent invariants on representative data.
 
 <example>
 Books, authors, and subjects in a library catalog stay in PostgreSQL tables, where `book_subjects` enforces which book has which subject and "books by subject" is a join.
@@ -55,7 +55,7 @@ A `CHECK (is_username_free(username))` function that queries `accounts` passes a
 Choose natural, surrogate, or composite keys from stability, width, external exposure, and the actual lookup patterns, and keep business uniqueness as a separate constraint when introducing a surrogate, because every reference and index inherits the key choice. In InnoDB the primary key is carried by every secondary index entry, so compare real index sizes and write behavior before changing a key representation, and judge each table on its own lookups instead of mandating UUIDs or integer identities everywhere.
 
 <example>
-Switching `shipments` from `INT UNSIGNED` to a random `CHAR(36)` UUID primary key on InnoDB inflates every secondary index, so the change first compares `INDEX_LENGTH` in `information_schema.TABLES` for both designs.
+Switching `shipments` from `INT UNSIGNED` to a random `CHAR(36)` UUID primary key on InnoDB inflates every secondary index, so the change first compares `INDEX_LENGTH` in `information_schema.TABLES` for both designs after `ANALYZE TABLE` on each.
 </example>
 
 Check existing data for violations before adding enforcement, and confirm that enforcement is actually on, because a constraint that cannot be added cleanly or is silently off gives false assurance. In SQLite, foreign-key enforcement is a per-connection setting that cannot change inside a transaction, so verify it on the connection that writes and do not infer it from an ORM relationship declaration.
@@ -67,7 +67,7 @@ A SQLite-backed script that calls `sqlite3.connect()` anew on each run executes 
 In MySQL and MariaDB, confirm the table's storage engine and look for the indexes that foreign keys create automatically before adding enforcement or duplicate indexes, because a MyISAM table accepts a `FOREIGN KEY` clause and ignores it. Check existing violations first.
 
 <example>
-Before adding a foreign key from `bookings.room_id`, `SHOW CREATE TABLE bookings` confirms `ENGINE=InnoDB`, and `LEFT JOIN rooms r ON r.id = b.room_id WHERE r.id IS NULL` lists the orphaned bookings.
+Before adding a foreign key from `bookings.room_id`, `SHOW CREATE TABLE bookings` confirms `ENGINE=InnoDB`, and `SELECT b.id FROM bookings b LEFT JOIN rooms r ON r.id = b.room_id WHERE b.room_id IS NOT NULL AND r.id IS NULL` lists the orphaned bookings.
 </example>
 
 ## Choose types from meaning

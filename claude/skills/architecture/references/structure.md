@@ -5,13 +5,13 @@
 When creating a project, establish its runtime, framework, build system, and delivery target before choosing directories, use their documented entry points and discovery rules, and add packages for current responsibilities, because imagined enterprise layers add navigation without owning anything. Check a real use case through the normal build, startup, and test paths.
 
 <example>
-A new FastAPI service starts as `app/main.py`, `app/routes/`, and `tests/`, runs with `uvicorn app.main:app`, and gets a `billing/` package only once billing code exists.
+A new FastAPI service starts as `app/main.py`, `app/routers/`, and `tests/`, runs in development with `fastapi dev`, and gets a `billing/` package only once billing code exists.
 </example>
 
 When the framework already supplies a useful layout, keep it unless a demonstrated problem justifies departing from it, tell required placement apart from harmless convention, and check the current framework documentation before moving discovered routes, migrations, resources, or generated sources, because runtimes and tools find these files by location. Check that the features are still discovered by the actual runtime and not only by the editor.
 
 <example>
-Moving `migrations/` out of the directory the ORM scans makes `python manage.py migrate` report nothing to apply, so run `python manage.py migrate --plan` after any such move.
+Moving `migrations/` out of the package Django scans makes `python manage.py migrate` report nothing to apply, so run `python manage.py showmigrations shop` after any such move and confirm that it lists the app's migrations and not `(no migrations)`.
 </example>
 
 ## Organizing existing code
@@ -22,10 +22,10 @@ When feature work is scattered across technical directories, consider grouping r
 `invoices/` holds its routes, model, and tests together, while `shared/db.py` stays outside because every feature uses it.
 </example>
 
-When reorganization is justified, separate location changes from behavior changes where feasible, and inspect imports, package exports, registration, runtime discovery, build inputs, and dependent jobs before moving files, because a commit that mixes a rename with a behavior change hides regressions inside the rename. Preserve published import paths, or treat their removal as a compatibility change. Check consumer builds and representative execution paths after each independently valid slice.
+When reorganization is justified, separate location changes from behavior changes where feasible, and inspect imports, package exports, registration, runtime discovery, build inputs, and dependent jobs before moving files, because a change that mixes a rename with a behavior change hides regressions inside the rename. Preserve published import paths, or treat their removal as a compatibility change. Check consumer builds and representative execution paths after each independently valid slice.
 
 <example>
-One commit moves `utils/dates.py` to `core/dates.py` and leaves a re-export in `utils/__init__.py`, a later commit changes behavior, and the paths in `.github/workflows` are checked before the move.
+The first slice moves `utils/dates.py` to `core/dates.py` and leaves a `utils/dates.py` that re-exports from it, the build and tests pass, and only then does a second slice change behavior, with the paths in `.github/workflows` checked before the move.
 </example>
 
 ## Naming components

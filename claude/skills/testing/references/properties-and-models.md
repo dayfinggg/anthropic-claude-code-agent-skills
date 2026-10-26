@@ -8,13 +8,17 @@ When a few known examples describe the required change, start with explicit or p
 Three parameterized rows cover the tax brackets of `compute_tax(income)`, while "sorting twice equals sorting once" over random lists uses the project's existing Hypothesis setup.
 </example>
 
-| When | Action | Refuse | Check |
-|---|---|---|---|
-| Outcome partitions have known answers | Use named table rows | Branching assertions and duplicated setup variants | Each row is collected and independently runnable |
-| A transformation preserves a domain guarantee | Generate valid inputs and assert that invariant | Checking only types when stronger guarantees matter | A realistic corruption would violate the assertion |
-| A reversible representation has a defined equivalence | Check roundtrip under that equivalence | Exact equality for lossy or normalized representations | Known independent examples still agree |
-| An exact oracle is expensive but input relations are known | Use a metamorphic relation | Assuming a transformation preserves behavior without evidence | Both original and transformed inputs satisfy the contract |
-| Results depend on earlier operations | Generate sequences with invariants or a small model | A second copy of the production algorithm | State and invariants agree after applicable transitions |
+When a transformation preserves a domain guarantee, generate valid inputs and assert that guarantee itself, and check that a realistic corruption would violate the assertion, because asserting only the output type passes for any wrong value of that type.
+
+<example>
+A generated list passed to `dedupe(items)` is checked to keep every distinct item in first-seen order and not merely to return a list, and dropping the last item makes the property fail.
+</example>
+
+When a representation is reversible only under a defined equivalence, check the roundtrip under that equivalence and keep known independent examples beside it, because exact equality fails for lossy or normalized forms, and a roundtrip alone passes when encoding and decoding are wrong in matching ways.
+
+<example>
+A `format_url(parse_url(u))` roundtrip is compared after lowercasing the scheme and host, because `HTTP://Example.COM/` is normalized, and one fixed pair, `"HTTP://Example.COM/a"` to `"http://example.com/a"`, anchors the result.
+</example>
 
 ## Generate the actual domain
 

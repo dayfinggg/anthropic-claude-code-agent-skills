@@ -1,5 +1,13 @@
 # Color and depth
 
+## Contents
+
+- Assign roles before hues
+- Build a palette with a dominant voice
+- Meet contrast with margin
+- Design each theme
+- Use depth to explain structure
+
 ## Assign roles before hues
 
 Define color by job and not by appearance, with named roles such as background, surface levels, primary action, text on primary, secondary text, border, focus, selected, success, warning, danger, and information. Pair every fill role with an "on" role for the text and icons placed on it, as Material does, and use roles only in their intended pairs, because contrast breaks when themes or contrast settings change.
@@ -34,13 +42,13 @@ Plan the neutrals carefully because they carry most of the surface. Eight to ten
 A teal brand tints its grays toward teal, so body text is `#1B2A2A` and not `#000`.
 </example>
 
-Generate and adjust ramps in a perceptual color space such as OKLCH or LCH, because lightness there tracks what the eye sees, so changing hue keeps contrast stable. Stripe's system guarantees small-text contrast between any two steps five levels apart, and Linear generates whole themes from a base, an accent, and a contrast value.
+Generate and adjust ramps in a perceptual color space such as OKLCH or LCH, because lightness there tracks what the eye sees, so changing hue keeps contrast close to stable. Stripe's system guarantees small-text contrast between any two steps five levels apart, and Linear generates whole themes from a base, an accent, and a contrast value.
 
 <example>
-Moving a ramp from blue to green at the same OKLCH lightness keeps the contrast between its steps unchanged.
+Moving a ramp from blue to green at the same OKLCH lightness keeps the contrast between its steps close to unchanged, within a few percent for soft colors, so the ratio is still measured on the final pair.
 </example>
 
-Provide sRGB values for wide-gamut colors where the difference matters, and check colors in the browser rather than trusting the numbers, because some OKLCH values fall outside a display's gamut and get clipped, which can shift hue.
+Provide sRGB values for wide-gamut colors where the difference matters, and check colors in the browser rather than trusting the numbers, because an out-of-gamut OKLCH value is clipped or gamut-mapped depending on the browser, which changes saturation and can shift hue.
 
 <example>
 A vivid `oklch()` accent gets an sRGB fallback, and both are compared in the rendered button.
@@ -54,7 +62,7 @@ Give text at least `4.5:1` against its background and large text at least `3:1`,
 White text over a hero photo is measured against the lightest area behind it, not against the photo's average.
 </example>
 
-Treat WCAG ratios as the reference and APCA only as an extra signal on top of passing WCAG ratios, because the contrast method for the next WCAG major version is still undecided, so check the current status before relying on it.
+Treat WCAG ratios as the reference and APCA only as an extra signal on top of passing WCAG ratios, because WCAG 2 ratios are what published accessibility standards test against.
 
 <example>
 A `4.2:1` pair is raised to pass even when an APCA calculator rates it acceptable.
@@ -100,7 +108,7 @@ Vary radius and depth by hierarchy, since a page panel, a card, a button, and a 
 A panel has `16px` radius and no shadow, buttons have `8px`, and chips are fully rounded.
 </example>
 
-Use translucency and blur only where they separate a functional layer from content. Apple confines translucent system materials to controls and navigation and warns against them in the content layer. Gradients and glows need a reason in the subject, not a gap to fill, because blur over content costs legibility and decoration spent on empty space adds nothing.
+Use translucency and blur only where they separate a functional layer from content. On Apple platforms Liquid Glass is reserved for controls and navigation, and the standard materials serve the content layer. Gradients and glows need a reason in the subject, not a gap to fill, because blur over content costs legibility and decoration spent on empty space adds nothing.
 
 <example>
 A sticky toolbar blurs the page scrolling under it, while the product cards stay opaque.

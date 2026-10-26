@@ -1,5 +1,18 @@
 # Language idioms and standards
 
+## Contents
+
+- Separate requirements from recommendations
+- Python
+- Go
+- Rust
+- JavaScript
+- TypeScript
+- PHP
+- C++
+- PowerShell
+- Other languages
+
 Read only the sections for languages being changed. For a boundary between two languages, read both sections.
 
 ## Separate requirements from recommendations
@@ -13,7 +26,7 @@ A project pinned to Python 3.9 cannot use `match`, and Go's error-return style i
 Style guides that recommend docstrings or comments do not override the rule against unrequested comments. When an enforced documentation check would fail, name the exact conflict in the answer instead of adding the prose or disabling the check, because each silent option breaks one of the two rules. Required notices and executable directives are not explanatory comments and stay.
 
 <example>
-When `pydocstyle` in CI demands a docstring on a new function nobody asked to document, the answer reports that conflict, and an existing `# noqa` or license header stays untouched.
+When Ruff's `D103` check in CI demands a docstring on a new function nobody asked to document, the answer reports that conflict, and an existing `# noqa` or license header stays untouched.
 </example>
 
 ## Python

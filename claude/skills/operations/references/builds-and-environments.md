@@ -5,7 +5,7 @@
 When local development works but CI fails, compare the source revision, working directory, OS, architecture, runtime, manager, and resolution settings, and look at the first failing stage instead of changing downstream code, because local caches and globally installed tools can hide missing inputs. Run the failing command under the intended build conditions before changing versions.
 
 <example>
-A Vite build that passes on Windows and fails on the Linux runner with `Could not resolve "./Header"` points to a case-sensitive path because the file is `header.vue`, so the import is corrected and the Node version stays.
+A Vite build that passes on Windows and fails on the Linux runner at the import `./Header.vue` points to a case-sensitive path because the file is `header.vue`, so the import is corrected to `./header.vue` and the Node version stays.
 </example>
 
 When repeatability matters, use declared toolchain versions and locked dependency inputs, and separate fetching dependencies from compilation when the tool supports it, because undeclared inputs are what make two builds differ. Stronger isolation costs setup and maintenance, so skip a new build system adopted only to claim hermeticity, and compare independent artifact digests only when byte-for-byte reproducibility is required, because a lockfile alone does not prove identical output.
@@ -25,7 +25,7 @@ A FastAPI service built with `python -m build` is installed from `dist/catalog-1
 When introducing or repairing a cache, include the toolchain, platform, lockfile, and build settings in its key, and keep credentials and trusted release outputs out of paths that untrusted jobs can write, because reusing more state saves time but can carry stale or attacker-controlled inputs into a release. Check that a cache miss still produces a working build, and clear only the failing cache instead of unrelated ones.
 
 <example>
-A GitHub Actions cache keyed with `${{ runner.os }}-ruby-3.3-${{ hashFiles('Gemfile.lock') }}` is exercised once with the cache removed to prove the build still passes from nothing.
+A GitHub Actions cache keyed with `${{ runner.os }}-ruby-<version>-${{ hashFiles('Gemfile.lock') }}` is exercised once with the cache removed to prove the build still passes from nothing.
 </example>
 
 ## Treat configuration as a release input
@@ -36,7 +36,7 @@ When changing environment configuration, identify each value's producer, precede
 A changed `LOG_LEVEL` in the `inventory-config` ConfigMap has no effect on running pods that read it as an environment variable, so the edit is followed by `kubectl rollout restart deployment/inventory-api` and a log line that shows the effective level.
 </example>
 
-When changing required settings, use the existing configuration parser and validate the semantic boundary by checking the units, ranges, paths, and resource identities that the task changes, because a syntax check cannot catch a nonexistent directory or a wrong unit. Add no speculative tunables or new configuration language, and check that missing and invalid values fail in the intended way.
+When changing required settings, use the existing configuration parser and validate the semantic boundary by checking the units, ranges, paths, and resource identities that the task changes, because a syntax check cannot catch a nonexistent directory or a wrong unit. Check that missing and invalid values fail in the intended way.
 
 <example>
 Raising `spring.servlet.multipart.max-file-size` to `20MB` starts cleanly, which proves only that the value parses, so a 15 MB upload through the real load balancer confirms the ceiling together with `max-request-size` and the balancer's own body limit.
@@ -53,7 +53,7 @@ A scheduled task that reads `C:\ProgramData\Billing\settings.ini` sees an edit o
 When an application needs credentials, keep its existing runtime injection and secret store and give access only to the process and environment that need them, because build-time convenience can embed credentials in assets, layers, source maps, or metadata. Inspect the resulting artifact using harmless test values, because printing a real value to prove injection puts it into logs and transcripts.
 
 <example>
-Build with `$env:API_KEY = 'test-sentinel-123'`, then run `Get-ChildItem dist -Recurse | Select-String 'test-sentinel-123'` to see whether the value ended up in the bundle.
+Build with `$env:API_KEY = 'test-sentinel-123'`, then search `dist` for `test-sentinel-123` to see whether the value ended up in the bundle.
 </example>
 
 For browser builds, treat every exposed environment variable as public and check the generated client assets against the framework's exposure rules, because Vite bundles `VITE_*` values at build time and a secret renamed to a similar name stays readable. Keep secrets on the server side of the boundary.
@@ -67,7 +67,7 @@ A payment secret placed in `VITE_PAYMENT_SECRET` appears in `dist/assets/index-*
 When a project already ships a container, inspect the context boundaries, ignore rules, base image, target architecture, runtime user, entry point, volumes, and writable paths, and use build stages when they remove compilers or development dependencies, because smaller images reduce exposure but a changed libc or architecture can break native modules. Build and run the final image with its real permissions and runtime dependencies.
 
 <example>
-Moving a Rails image from `ruby:3.3-slim` to `ruby:3.3-alpine` changes the libc, so native gems such as `nokogiri` and `pg` are rebuilt and the final image is started with `docker run --rm --user 1000 booking-app bundle exec puma`.
+Moving a Rails image from `ruby:<version>-slim` to `ruby:<version>-alpine` changes the libc, so native gems such as `nokogiri` and `pg` are rebuilt and the final image is started with `docker run --rm --user 1000 booking-app bundle exec puma`.
 </example>
 
 When pinning a base image by digest, verify the registry and digest together and keep a deliberate update path with a test of the updated image, because a pin stops silent replacement and also stops automatic security refreshes. Refresh the base with an explicit pull, because disabling the build cache does not fetch a newer base.

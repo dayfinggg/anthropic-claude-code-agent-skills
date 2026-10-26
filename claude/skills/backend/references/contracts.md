@@ -39,7 +39,7 @@ Installed Android app builds call `POST /api/subscribe` without `plan`, so the s
 Check added fields and enum values against consumers, especially generated clients and exhaustive switches, and coordinate producer and consumer rollout when compatibility is not bidirectional. Keep old behavior only where its maintenance cost is justified and skip a new version for harmless additions, because a version also costs migration and parallel operation.
 
 <example>
-Adding `"refunded"` to an order status breaks a C# switch expression on `order.Status` that has no `_` arm, since it throws `SwitchExpressionException`, while an optional `note` field needs no `/v2`.
+Adding `"refunded"` to an order status breaks a C# switch expression on `order.Status` that has no `_` arm, since it throws `SwitchExpressionException`, so the consumer is released with an `_` arm before the server starts sending `refunded`.
 </example>
 
 ## Paginate without inventing a snapshot
@@ -81,5 +81,5 @@ A bulk invoice PDF render that takes minutes behind a 30-second proxy limit retu
 Make a repeated submission return the existing operation instead of creating another business operation, because a client that lost the acceptance response will submit again. Check a lost acceptance response, duplicate submission, status expiry, worker failure, and cancellation racing completion.
 
 <example>
-A SaaS user clicks Generate on `POST /reports` twice after a lost response, and both calls return job `9f2c` because the submission identity is account, report type, and day.
+A SaaS user clicks Generate on `POST /reports` twice after a lost response, and both calls return job `9f2c` because the client sent the same `Idempotency-Key` on both attempts, while a new key with different filters creates a second job.
 </example>

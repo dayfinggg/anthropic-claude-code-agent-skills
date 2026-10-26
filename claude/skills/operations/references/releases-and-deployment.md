@@ -37,7 +37,7 @@ A single IIS host deploys by pointing the site at a new release folder with `Set
 For asynchronous workers, observe completed work and backlog and not only process health, using an observation window that covers meaningful work duration, because faster promotion shortens delivery but hides delayed failures. Check expected outputs, retries, duplicate effects, and queue behavior for the affected workflow.
 
 <example>
-After `docker compose up -d --no-deps worker` replaces the container, `docker compose ps` says `running`, but the checks that matter are that queue depth falls and the failed-job count stays flat while the slowest job type finishes.
+After `docker compose up -d --no-deps worker` replaces the container, `docker compose ps` shows `Up`, but the checks that matter are that queue depth falls and the failed-job count stays flat while the slowest job type finishes.
 </example>
 
 ## Prove compatibility in both directions

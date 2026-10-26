@@ -34,13 +34,13 @@ A dashboard with a refined palette but no empty or error state gets its `No resu
 ## Surface defaults
 
 - Purple or indigo to blue gradients on white, gradient text, and gradient washes used as decoration.
-- A warm cream background near `#F4F1EA` with a high-contrast serif and a terracotta accent near `#D97757`. That accent is closely tied to one AI assistant's own interface, so on a user's product it reads as a tell.
+- A warm cream background with a high-contrast serif and a terracotta accent, a combination many generated pages share.
 - A near-black background with one acid green or vermilion accent.
 - Glassmorphism and backdrop blur as ornament rather than as a layer that separates controls from content.
 - Zero-offset colored glows, hard offset block shadows outside a deliberately brutalist world, and the same `rgba(0,0,0,.1)` shadow under every element.
 - A thick colored left border on cards, callouts, and list items.
 - Emoji or Unicode glyphs standing in for icons, or icons mixed from several sets with different stroke weights.
-- Tinted near-black such as `#0B0B0B` standing in for a designed dark color, and pure gray text on colored surfaces.
+- Near-black such as `#0B0B0B` standing in for a designed dark color, and pure gray text on colored surfaces.
 
 ## Typography and copy defaults
 
@@ -48,7 +48,7 @@ A dashboard with a refined palette but no empty or error state gets its `No resu
 - Accenting one word of a headline with italic, bold, or a different color.
 - Monospace used as a costume for "technical" on labels that are not code, data, or measurements.
 - Meta strings joined with middle dots, labels built as a word plus a spaced em dash plus a fragment, and an arrow appended to every link and button.
-- Title Case on every heading and button when the product has not chosen it.
+- Title Case on every heading and button of a web product that has not chosen it.
 - Vague aspirational headlines, superlatives, hedging, and generic calls to action such as "Get started" or "Submit" where a specific verb fits.
 
 ## Functional defaults

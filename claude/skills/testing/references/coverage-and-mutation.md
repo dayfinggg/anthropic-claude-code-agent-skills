@@ -40,8 +40,8 @@ When reviewing mutation results, separate killed, survived, uncovered, timeout, 
 A score that rose from 71 to 80 percent is recounted after 12 of the newly killed mutants turn out to be syntax errors.
 </example>
 
-When a survivor is equivalent under the supported contract, record that reasoning in the task context and leave the production code and exclusions as they are, because distorting code or weakening exclusions to reach a perfect score trades real quality for a number. Recheck the contract where equivalence is uncertain and report the remaining limit, because a mutation score describes sampled faults and not every real defect.
+When a survivor is equivalent under the supported contract, state that reasoning in the final answer and leave the production code and exclusions as they are, because distorting code or weakening exclusions to reach a perfect score trades real quality for a number. Recheck the contract where equivalence is uncertain and report the remaining limit, because a mutation score describes sampled faults and not every real defect.
 
 <example>
-Changing `while i < n` to `while i != n` in a loop that increments `i` by one from `0` is equivalent, so the note says so and the loop stays unchanged.
+Changing `while i < n` to `while i != n` in a loop that increments `i` by one from `0` is equivalent for an integer `n >= 0`, so the final answer says so and the loop stays unchanged.
 </example>

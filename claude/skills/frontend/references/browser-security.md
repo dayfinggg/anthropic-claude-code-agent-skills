@@ -1,5 +1,13 @@
 # Browser security
 
+## Contents
+
+- Identify the trust boundary
+- Render content through safe destinations
+- Keep secrets and authorization out of client assumptions
+- Scope persisted and cross-window state
+- Check the actual boundary safely
+
 ## Identify the trust boundary
 
 Treat URL values, API responses, user content, browser storage, messages, and uploaded metadata as untrusted, and determine the destination context before rendering or acting on them, because type annotations and a successful JSON parse do not validate a remote object's contract.
@@ -38,6 +46,12 @@ For file previews, use the application's established preview mechanism and lifec
 
 <example>
 An effect cleanup calls `URL.revokeObjectURL(previewUrl)`, and an uploaded HTML file previews in an iframe with `sandbox` and without `allow-same-origin`.
+</example>
+
+Load third-party scripts and frames with the least authority they need, using `sandbox` and `allow` on frames and `integrity` with `crossorigin` on CDN scripts and stylesheets, because a third-party script runs with the page's authority, an unsandboxed frame can run scripts, open popups, and submit forms, and a CDN file can change after review.
+
+<example>
+A chart script from `https://cdn.example.com` is loaded with `integrity` and `crossorigin="anonymous"`, and a map frame gets `sandbox` with only the tokens it needs.
 </example>
 
 ## Keep secrets and authorization out of client assumptions

@@ -5,7 +5,7 @@
 When adding tests, identify a caller, its initial state, an action, and the promised result, and give priority to changed decisions and failures with material consequences, because a method-by-method inventory covers the code without saying what could break for a caller. Check that each case would tell a meaningful wrong outcome from the expected behavior.
 
 <example>
-For a new refund rule, write "an item returned after 31 days gets no refund" and "an item returned on day 30 gets a full refund", not one test per method of `RefundPolicy`.
+For a new refund rule, write "an item returned on day 30 gets a full refund" and "an item returned on day 31 gets no refund", not one test per method of `RefundPolicy`.
 </example>
 
 When selecting edge cases, partition the contract into outcome classes, test where outcomes change with the boundary and the values immediately around it, and add combinations only when inputs interact, because a Cartesian product of unrelated dimensions multiplies cases without adding information. Skip empty, null, or negative inputs that lie outside the supported domain unless rejection is the contract, because the test would pin down behavior nobody promised. Check that each chosen case reaches its intended partition.

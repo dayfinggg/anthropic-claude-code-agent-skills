@@ -9,7 +9,7 @@ These rules make each commit one readable, revertable change with a message the 
 
 ## Follow the repository's convention
 
-Before the first commit in a repository, read `git log --oneline -20`, the project's instruction files, any commitlint or CONTRIBUTING file, and the pull request template, and follow the convention they show for prefix, casing, and issue references, because a message that breaks the convention looks foreign in the history and can fail a hook. When the repository has no convention, use Conventional Commits.
+Before the first commit of a session in a repository, read `git log --oneline -20`, the project's instruction files, any commitlint or CONTRIBUTING file, and the pull request template, and follow the convention they show for prefix, casing, and issue references, because a message that breaks the convention looks foreign in the history and can fail a hook. When the history is empty or shows no consistent pattern and no project file names a convention, use Conventional Commits.
 
 <example>
 The history reads `Auth: ...`, `Search: ...`, `Billing: ...`, so the new subject starts with the same kind of area prefix instead of `fix(search):`.
@@ -23,7 +23,7 @@ The project rules say commit messages are in German, so the subject and body are
 
 ## Write the subject and body
 
-Make the subject one line that says what the commit changes, about 50 characters and never more than 72, with no trailing period, because `git log --oneline`, review tools, and notifications cut the subject near 72 characters and a subject that holds the explanation buries the change.
+Make the subject one line in the imperative mood that says what the commit changes, about 50 characters and never more than 72, with no trailing period, because review tools such as GitHub's commit list cut long subjects, Git's own guidance calls 50 characters the soft limit, and a subject that holds the explanation buries the change.
 
 <example>
 `Search: keep filters after changing page` is the subject, and the explanation of the old query code goes into the body.
@@ -35,19 +35,19 @@ Put a blank line after the subject and a body that says what problem existed, wh
 "The results page rebuilt its query from defaults on every page change, so filters were lost after page one. The page number is now added to the existing query instead."
 </example>
 
-Pass the subject and the body as separate arguments or through a file, using one `-m` for the subject and one more `-m` per body paragraph, or `-F` with a file or standard input, because a single `-m` holding the whole text becomes a one-line subject hundreds of characters long.
+Pass the message through a file, standard input, or a here-string so line breaks stay real, with the subject first, a blank line, then the body, because a literal `\n` inside one `-m` stays a backslash and turns the whole text into one long subject, and double-quoted arguments mangle backticks and `$`. Separate `-m` options per paragraph are fine for text without those characters.
 
 <example>
-`git commit -m "Search: keep filters after changing page" -m "The page change rebuilt the query from defaults, so filters were lost."`, or in a POSIX shell `git commit -F - <<'EOF'` followed by the message lines and `EOF`.
+In PowerShell, `@'` followed by the subject, a blank line, and the body, then `'@ | git commit -F -`. In a POSIX shell, `git commit -F - <<'EOF'` followed by the message lines and `EOF`.
 </example>
 
-Write in plain words and short sentences without em or en dashes, semicolons, or explanatory colons, keeping the colon only where the convention's prefix uses it, and use straight double quotes, because the history is read in the same plain style as every other text the user receives.
+Write in plain words and short sentences, and keep punctuation simple, with no em or en dashes and no semicolons and with colons only where the convention uses them, such as the subject prefix and trailers like `BREAKING CHANGE:` or `Signed-off-by:`, because a plain log is easy to scan.
 
 <example>
-"Fix empty search results. The query builder dropped the category filter after page one" instead of "Fix empty search results; the query builder — after the refactor — dropped the filter".
+Subject `Fix empty search results` with the body `The query builder dropped the category filter after page one.` instead of the single subject `Fix empty search results; the query builder dropped the category filter`.
 </example>
 
-Describe the change and its reason, not the tool or agent that produced it, and add no attribution lines unless the user asks, because the history belongs to the team and is read by people who do not care how the edit was typed.
+Describe the change and its reason, not the tool or agent that produced it, and add no attribution lines unless the user asks, while in Claude Code the `attribution` setting with empty `commit` and `pr` values removes the generated lines deterministically, because the history belongs to the team and is read by people who do not care how the edit was typed.
 
 <example>
 "Billing: retry a failed invoice email once" with no mention of an AI assistant and no `Co-Authored-By` line.
@@ -61,7 +61,7 @@ Keep one logical change per commit, with refactoring, formatting, and behavior c
 Reformatting `search_form.php` goes into one commit and the filter fix into the next, so the fix can be reverted alone.
 </example>
 
-Stage only your own paths with `git add -- <paths>`, use `git add -p` for a file that also holds someone else's edits, and read `git diff --cached` before committing, because a shared working tree often contains other people's unfinished work, local configuration, or secrets that must not ship. Avoid `git add -A`, `git add .`, and `git commit -a` in such trees.
+Stage only your own paths with `git add -- <paths>`, for a file that also holds someone else's edits answer `git add -p` through standard input with one answer per hunk, such as `"y`nn`n" | git add -p -- <path>` in PowerShell or `printf 'y\nn\n' | git add -p -- <path>` in a POSIX shell, and read `git diff --cached` before committing, because a shared working tree often contains other people's unfinished work, local configuration, or secrets that must not ship, and an agent shell has no terminal, so a bare `git add -p` prints its first prompt, stages nothing, and still exits 0. Avoid `git add -A`, `git add .`, and `git commit -a` in such trees.
 
 <example>
 `git status --short` shows the user's edited `.env.local`, so only `git add -- src/search/query.php` is staged.

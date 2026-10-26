@@ -8,6 +8,12 @@ When external data enters an operation, define the accepted types, required fiel
 The Go handler defaults an absent `page` to 1, otherwise requires exactly one `page` value that `strconv.Atoi` turns into a number from 1 to 500, and answers 400 for anything else, so `?page=abc`, `?page=1&page=2`, and `?page=99999999999` are rejected and do not turn into page 1.
 </example>
 
+When data from outside the trust boundary reaches a deserializer, XML parser, or template engine, choose a data-only format and the parser's safe mode, leave object construction, external entities, and DTDs off, and keep user text out of template source, because native deserialization and template evaluation run logic chosen by the sender. Check a type-tagged payload, an external-entity reference, and a template expression in a user field with an inert marker, and confirm each stays plain data.
+
+<example>
+The settings import calls `yaml.safe_load`, and an uploaded document with `!!python/object/apply:os.system ["echo MARKER"]` raises a constructor error and prints no `MARKER`.
+</example>
+
 ## Separate query data from query structure
 
 When data reaches SQL, bind values using the driver or ORM's parameter API, keep table, column, operator, and sort choices fixed or mapped to application-owned choices, and inspect raw fragments and dynamic SQL inside reached stored procedures, because parameterizing a procedure call does not secure SQL concatenated inside it. A bound query still needs tenant scoping and field authorization. Check metacharacters as literal values, an unknown sort option, and an existing foreign object identifier, and assert both the query's result scope and the absence of unauthorized mutation.
@@ -21,7 +27,7 @@ A psycopg query runs `SELECT id, name FROM products WHERE tenant_id = %s AND nam
 When a feature needs an operating-system operation, prefer its library API, and otherwise choose a fixed executable with separate arguments and no command interpreter, validate which operands and options the executable accepts, set execution limits, and restrict privileges, because a single argument can still select an output file, plugin, configuration, or additional network target, and an option terminator works only for programs that support it. Check leading option characters, spaces, and metacharacters through a harmless stub executable, and assert the exact arguments and intended destination and not merely that shell injection failed.
 
 <example>
-A Node thumbnail job calls `execFile('convert', [inputPath, '-resize', '800x', outputPath])` with both paths built by the server, and the stub test asserts that `argv` holds exactly those four items for an upload named `-write evil.txt`.
+A Node thumbnail job calls `execFile('magick', [inputPath, '-resize', '800x', outputPath])` with both paths built by the server, and the stub test asserts that `argv` holds exactly those four items for an upload named `-write evil.txt`.
 </example>
 
 When targeting Windows, verify whether the selected runtime invokes an interpreter for batch files, and prefer a native executable or library when operands are untrusted, because a process API's shell setting is not a universal guarantee for `.bat` or `.cmd`, and Unix quoting does not apply to Windows command parsing. Check the platform-specific launch path with inert arguments and a controlled fixture, and demonstrate parsing behavior with harmless payloads and not destructive ones.

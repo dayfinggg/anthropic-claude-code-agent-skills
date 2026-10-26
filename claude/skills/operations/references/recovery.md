@@ -11,7 +11,7 @@ Another administrator is already restarting Redis on the cache host, so `who` an
 When customer harm is ongoing, choose a narrow, understood mitigation with an observable result, and preserve logs, operation identifiers, and relevant state when feasible, because an emergency mitigation need not wait for perfect causality, yet its side effects still matter. Check whether it reduces the impact and whether further mutation should stop.
 
 <example>
-Suspending a runaway import with `kubectl patch cronjob nightly-import -p '{"spec":{"suspend":true}}'` stops the damage and leaves the data, while deleting the files it wrote would erase the evidence.
+Suspending the running import with `kubectl patch job nightly-import-29412000 -p '{"spec":{"suspend":true}}'` stops its pods and keeps the data, and suspending the `nightly-import` CronJob as well blocks the next run, while deleting the files it wrote would erase the evidence.
 </example>
 
 ## Distinguish recovery operations
@@ -37,16 +37,16 @@ When recovery assurance is requested, locate the existing recovery-time and reco
 Restoring last night's `pg_dump` archive with `pg_restore` into a scratch database named `booking_restore_test` measures restore time and row counts, and the result says that it does not exercise the failover path.
 </example>
 
-Before a restore the user requested, verify the backup identity, age, completeness, encryption-key access, target, available capacity, and application compatibility, and restore into an approved isolated destination first when feasible, because a completed backup job does not prove that the data is usable, and a drill that overwrites the live source loses the writes it was meant to protect. Check representative records, application reads and writes, and the measured recovery time.
+Before a restore the user requested, verify the backup identity, age, completeness, encryption-key access, target, available capacity, and application compatibility, and restore into an approved isolated destination first when feasible, because a completed backup job does not prove that the data is usable, and a drill that overwrites the live source loses the writes it was meant to protect. Before starting an application against a restored copy, switch off its outbound mail, webhooks, queue consumers, and scheduled jobs, because a restored copy that runs its cron entries acts on real customers. Check representative records, application reads and writes, and the measured recovery time.
 
 <example>
-`RESTORE VERIFYONLY FROM DISK = N'D:\Backups\ledger.bak'` confirms the backup is readable, `Get-PSDrive D` confirms room for the restore, and the backup loads into `ledger_restore_test` before anything touches `ledger`.
+`RESTORE VERIFYONLY FROM DISK = N'D:\Backups\ledger.bak'` confirms the backup is readable, `Get-PSDrive D` confirms room for the restore, and the backup loads into `ledger_restore_test`, where the app starts with the mail driver set to `log` and the scheduler disabled, before anything touches `ledger`.
 </example>
 
 When testing failover, follow the established procedure and check the replication lag, writer fencing, routing, credential availability, and the way back, because a faster cutover can sacrifice freshness, and a drill promoted to a production failover without authorization changes live traffic. Measure the recovery path and compare it with the existing objectives.
 
 <example>
-On a MySQL replica, the replica status statement that the installed version supports shows the lag before promotion, and the old primary is made read-only with `SET GLOBAL read_only = 1` so two writers never exist.
+On a MySQL replica, the replica status statement that the installed version supports shows the lag before promotion, and the old primary is made read-only with `SET PERSIST super_read_only = ON`, which also blocks accounts holding `SUPER` or `CONNECTION_ADMIN` and survives a restart, so two writers never exist.
 </example>
 
 ## Use and repair existing runbooks
@@ -57,8 +57,8 @@ When following a runbook, inspect prerequisites, target identifiers, required pe
 A runbook step `docker compose -f /srv/inventory/compose.yaml restart api` is checked against `docker compose -f /srv/inventory/compose.yaml config --services` to confirm that the service name still exists, and the output after the restart is compared with the line the runbook expects.
 </example>
 
-When the task includes runbook upkeep, correct the existing procedure where evidence showed a gap, and include only what identifies the target, acts safely, verifies recovery, and escalates, because more detail helps an unfamiliar responder but stale duplicated commands increase risk. Rehearse the changed path in an authorized environment, and write no new runbook, postmortem, or report just to complete ordinary development work.
+When the task includes runbook upkeep, correct the existing procedure where evidence showed a gap, and include only what identifies the target, acts safely, verifies recovery, and escalates, because more detail helps an unfamiliar responder but stale duplicated commands increase risk. Rehearse the changed path in an authorized environment.
 
 <example>
-The restore runbook for `shop` gets one corrected line with the new dump path `/srv/backups/shop/` and the check `ls -l /srv/backups/shop/ | tail -n 3`, and no new document.
+The restore runbook for `shop` gets one corrected line with the new dump path `/srv/backups/shop/` and the check `ls -l /srv/backups/shop/ | tail -n 3` on the server, and no new document.
 </example>

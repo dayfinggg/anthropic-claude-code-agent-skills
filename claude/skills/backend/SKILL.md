@@ -13,10 +13,10 @@ Keep the project's protocol, framework, deployment shape, and conventions unless
 A Rails app that needs a nightly stock export gets a cron-run task `rake export:stock`, not a message broker.
 </example>
 
-Before editing, trace the affected entry point through callers, authorization, state changes, external effects, and completion reporting, inspect schemas, client assumptions, worker settings, SDK behavior, and tests, and state what must remain true after a timeout, duplicate, crash, or concurrent call, because a design that holds only on the happy path fails at the first retry. Resolve a consequential contract difference between the two sides before implementing both.
+Before editing, trace the affected entry point through callers, authorization, state changes, external effects, and completion reporting, inspect schemas, client assumptions, worker settings, SDK behavior, and tests, and settle what must remain true after a timeout, duplicate, crash, or concurrent call and encode it in the plan step or a test, because a design that holds only on the happy path fails at the first retry. Resolve a consequential contract difference between the two sides before implementing both.
 
 <example>
-For a payment webhook handler that captures a card through a provider SDK, read the webhook route, the SDK's timeout and retry settings, and the proxy's idle limit, then settle what must hold when the capture times out after the provider already charged the card.
+For a payment webhook handler that captures a card through a provider SDK, read the webhook route, the SDK's timeout and retry settings, and the proxy's idle limit, then settle what must hold when the capture times out after the provider already charged the card and encode it in a test for that path.
 </example>
 
 Treat the ability to edit code as separate from authority to run live charges, sends, deployments, or job replays, and verify the authorized target, scope, and replay safety before an external mutation, with failure tests running against isolated fixtures, because a retry test that reaches the real provider repeats a real charge or message.

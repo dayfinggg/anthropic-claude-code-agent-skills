@@ -36,7 +36,7 @@ Whether the partner API allows 50 requests per second is checked before building
 
 ## Define a bounded spike
 
-When documentation and inspection cannot settle a consequential assumption, specify a focused investigation instead of a vague research phase. State the question and which option or dependent stage it controls, and choose the smallest permitted observation or experiment that could distinguish the outcomes, because a spike without a controlled decision produces findings nobody uses.
+When documentation and inspection cannot settle a consequential assumption, specify a focused investigation instead of a vague research phase. State the question and which option or dependent increment it controls, and choose the smallest permitted observation or experiment that could distinguish the outcomes, because a spike without a controlled decision produces findings nobody uses.
 
 <example>
 "Can the vendor sandbox return refunds within one second?" controls the choice between synchronous and queued refunds, and is answered by one timed test call to `/refunds`.
@@ -51,13 +51,13 @@ Under 1 s selects synchronous refunds, over 5 s selects queued refunds, anything
 During planning-only work, perform permitted read-only investigation and propose any experiment that writes or changes behavior, and during authorized implementation, isolate experimental changes from deliverable behavior and avoid live side effects, because a prototype left in the code, even a failed one, becomes an accidental dependency.
 
 <example>
-In a plan-only session, read the vendor's API docs and the `client.py` wrapper and propose the sandbox call, while in an implementation session put the probe in `scratch/probe_refunds.py` and delete it afterwards.
+In a plan-only session, read the vendor's API docs and the `client.py` wrapper and propose the sandbox call, while in an implementation session put the probe in the session's scratch directory outside the repository and delete it afterwards.
 </example>
 
-If the spike cannot reach the necessary system, name the missing access, data, or environment and keep dependent stages conditional, and treat an unrelated mock result as no evidence about the real dependency, because a mock only returns what it was written to say.
+If the spike cannot reach the necessary system, name the missing access, data, or environment and keep dependent increments conditional, and treat an unrelated mock result as no evidence about the real dependency, because a mock only returns what it was written to say.
 
 <example>
-With no sandbox credentials, the plan states "refund latency unverified, needs `VENDOR_SANDBOX_KEY`" and keeps the synchronous-refund stage conditional, rather than asserting latency from a stubbed response.
+With no sandbox credentials, the plan states "refund latency unverified, needs `VENDOR_SANDBOX_KEY`" and keeps the synchronous-refund increment conditional, rather than asserting latency from a stubbed response.
 </example>
 
 When the investigation resolves the question, stop it and update the affected choice and sequence. If it is inconclusive, narrow the question, choose a different viable option, or surface the exact decision needed, instead of widening it into open-ended exploration, because the spike exists to unblock a decision and further findings add cost without changing the plan.

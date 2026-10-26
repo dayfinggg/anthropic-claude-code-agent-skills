@@ -45,7 +45,7 @@ A service with six collaborators built in `main()` stays explicit, while a frame
 When selecting an external library or service, compare its capability with existing facilities and the cost of owning an alternative, and inspect compatibility promises, supported platforms, tests, transitive requirements, maintenance, licensing, and upgrade responsibility, because package popularity and a successful import do not establish long-term suitability. Check a representative integration using the project's supported versions.
 
 <example>
-Before adding `pdf-forge` to the export service, read its license, list its native transitive dependencies on the Windows build agent, and render one real invoice with the versions pinned in `requirements.txt`.
+Before adding `acme-pdf` to the export service, read its license, list its native transitive dependencies on the Windows build agent, and render one real invoice with the versions pinned in `requirements.txt`.
 </example>
 
 When a dependency becomes hard to replace, locate the leaked assumptions before proposing a wrapper and isolate only the assumptions the application should own, because a wrapper that mirrors the entire vendor API keeps the lock-in and adds maintenance. Check that the proposed alternative can satisfy that smaller contract, including the behavior that matters.

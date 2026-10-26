@@ -15,7 +15,7 @@ Before writing or changing a test, identify the behavior, its contract, and the 
 A change to `apply_coupon()` is checked by asserting the total for a 10 percent coupon on a `100.00` cart, not by asserting that the function returns a number.
 </example>
 
-When the work is a one-off and the project has no test infrastructure, use the existing runner or a direct behavior check, because adding TDD, a new framework, or a coverage quota only to follow a guideline costs setup the task did not ask for.
+When the work is a one-off, check the behavior directly or with the runner the project already has, because adding TDD, a new framework, or a coverage quota only to follow a guideline costs setup the task did not ask for.
 
 <example>
 A throwaway `fix-dates.ps1` script is checked by running it on a copy of `sample.csv` and comparing the output file, with no Pester suite added.
@@ -23,7 +23,7 @@ A throwaway `fix-dates.ps1` script is checked by running it on a copy of `sample
 
 ## Close the check
 
-After a fix, run the original scenario as well as the focused test, look at the neighboring behavior the change can reach, and remove temporary probes, because a focused test can pass while the reported symptom remains and leftover probes change later behavior. Say which checks ran, which did not, and which were inconclusive. Check the diff for leftover `print` calls, sleeps, and skipped tests.
+After a fix, run the original scenario as well as the focused test, look at the neighboring behavior the change can reach, and remove temporary probes, because a focused test can pass while the reported symptom remains and leftover probes change later behavior. Name the check that shows the fix works and any relevant check that did not run or was inconclusive. Check the diff for leftover `print` calls, sleeps, and skipped tests.
 
 <example>
 After fixing a 500 on `POST /orders`, replay the original `curl` request, run `tests/test_orders.py`, and report that the load-test script was not run.

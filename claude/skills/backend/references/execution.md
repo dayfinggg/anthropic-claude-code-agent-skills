@@ -25,13 +25,13 @@ A Node.js handler with a 30-second budget that spent 12 seconds on its first cal
 When a failure appears transient, establish whether the operation is safe to repeat or provably was not applied, and apply the service's documented failure semantics instead of a universal status-code allowlist, because an HTTP method name or a network timeout does not establish a provider's side-effect contract, and invalid input, cancellation, and permanent quota exhaustion do not become recoverable through repetition.
 
 <example>
-A timed-out SMS gateway `POST /messages` may already be delivered, so the notification service records it as uncertain and does not resend, while a timed-out `GET /messages/{id}` status poll is repeated freely and a `400 invalid_number` from the gateway is not retried at all.
+A timed-out SMS gateway `POST /messages` may already be delivered, so the notification service records it as uncertain and does not resend.
 </example>
 
 Inspect SDK, proxy, worker, and application retry policies together, choose one logical retry owner where feasible, bound attempts, elapsed time, and aggregate retry traffic, use backoff with jitter when clients could synchronize, and reuse existing tested policy mechanisms, because stacked policies multiply attempts and synchronized clients turn a recovery into a second outage. Stop when attempts no longer improve availability, and introduce a circuit breaker only for a demonstrated need, because it adds state and recovery behavior. Check persistent throttling, nested retry policies, cancellation during backoff, and recovery under many simultaneous clients, and count downstream attempts, not only top-level calls.
 
 <example>
-The payment SDK's built-in retry is set to `max_network_retries = 0` because the job queue already retries three times with jittered backoff, so one failing call causes 3 provider attempts instead of 12.
+The payment SDK's built-in retry is set to `max_network_retries = 0` because the job queue already makes three attempts with jittered backoff, so one failing call causes three provider attempts instead of twelve.
 </example>
 
 For HTTP `Retry-After`, support the documented delay or date form, and stop the attempt when the suggested wait exceeds the remaining deadline, because sleeping past the deadline wastes the request and retrying at once ignores the server's instruction.

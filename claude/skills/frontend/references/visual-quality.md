@@ -2,18 +2,18 @@
 
 ## Take visual choices from the design source
 
-Take visual choices such as palette, type scale, spacing scale, hierarchy, density, and motion from the project's design system or from the design skill, and use this reference for how those choices are implemented in CSS and component code, because two sources that decide the same visual question give conflicting defaults. When the project has no scale or token for a value, bring the value from the design skill's guidance and not from a number chosen inside one component.
+Take visual choices such as palette, type scale, spacing scale, hierarchy, density, and motion from the project's design system or from a design skill when one is installed, and use this reference for how those choices are implemented in CSS and component code, because two sources that decide the same visual question give conflicting defaults. When the project has no scale or token for a value, bring the value from the installed design skill's guidance and not from a number chosen inside one component.
 
 <example>
-A request for "tighter card spacing" reads the spacing tokens in `tokens.css` and uses `var(--space-3)`, and without a spacing scale the new value comes from the design skill and is added to `tokens.css`.
+A request for "tighter card spacing" reads the spacing tokens in `tokens.css` and uses `var(--space-3)`, and without a spacing scale the new value comes from the installed design skill and is added to `tokens.css`.
 </example>
 
 ## Reuse what the project already styles
 
-Inspect representative screens, theme files, tokens, assets, and reusable components before writing new styles, reuse a repeated intentional convention, and repair a repeated defect such as inaccessible contrast or clipped content instead of copying it, because consistency with a defect spreads the defect. Treat source inspection as showing likely decisions and confirm the rendered result in the browser.
+Inspect representative screens, theme files, tokens, assets, and reusable components before writing new styles, reuse a repeated intentional convention, and keep a repeated defect such as inaccessible contrast or clipped content out of the new styles instead of copying it, and mention the existing defect as a follow-up, because consistency with a defect spreads the defect. Treat source inspection as showing likely decisions and confirm the rendered result in the browser.
 
 <example>
-`Button.module.css` and three other components use `border-radius: var(--radius-2)`, so the new `Tag` uses it too, while the `#999` placeholder text that fails contrast is not copied.
+`Button.module.css` and three other components use `border-radius: var(--radius-2)`, so the new `Tag` uses it too, while the `#999` placeholder text that fails contrast is not copied and is mentioned as a follow-up.
 </example>
 
 When matching a supplied reference or mockup, compare it at the same viewport and content state, and check type metrics, spacing, alignment, cropping, and emphasis before adding any decoration, because a different viewport or different content hides the real differences.
@@ -79,7 +79,7 @@ A 12-column table scrolls inside an `overflow-x: auto` wrapper at `360px`, and a
 Check fixed and sticky UI with zoom, the virtual keyboard, and short viewports where relevant, and prefer natural growth and deliberate scrolling boundaries to clipping, because a fixed-height desktop composition can make essential controls unreachable on a phone.
 
 <example>
-A sticky footer holding the Pay button is opened at `320x568` with the on-screen keyboard up, and a `height: 100vh` panel becomes `min-height: 100dvh` so its content can grow.
+A sticky footer holding the Pay button is opened at `320x568` with the on-screen keyboard up, and a `height: 100vh` panel becomes `min-height: 100dvh` so its content can grow and it follows the browser toolbars, with the keyboard case checked separately because viewport units typically ignore the on-screen keyboard.
 </example>
 
 ## Implement interaction states in code
@@ -90,8 +90,8 @@ Implement the hover, focus, active, disabled, selected, and pending states a con
 `.btn:hover` changes only the background color, `:focus-visible` adds a `2px` outline with an offset, and the pending button swaps its label for a spinner at the same `min-width`.
 </example>
 
-Write motion so it can be interrupted and give it a variant for `prefers-reduced-motion`, taking durations and easing from the design system or the design skill, because users sensitive to motion turn the preference on and a transition that cannot be interrupted blocks input.
+Write motion so it can be interrupted and give it a variant for `prefers-reduced-motion`, taking durations and easing from the design system or an installed design skill, because users sensitive to motion turn the preference on and a transition that cannot be interrupted blocks input.
 
 <example>
-A drawer slide uses a CSS `transition` so a second click reverses it midway, and under `@media (prefers-reduced-motion: reduce)` it shows instantly.
+A drawer slide uses a CSS `transition` so a second click reverses it midway, and under `@media (prefers-reduced-motion: reduce)` it fades in instead of sliding.
 </example>

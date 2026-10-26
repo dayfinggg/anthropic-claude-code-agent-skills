@@ -48,6 +48,12 @@ When implementing recovery links or codes, use unpredictable, expiring, purpose-
 The reset email links to `$"{options.AppUrl}/reset?token={token}"` with `AppUrl` read from config and not from `Request.Host`, and the token comes from `RandomNumberGenerator.GetBytes(32)`, expires after 30 minutes, and is deleted on first use.
 </example>
 
+When integrating OAuth 2.0 or OpenID Connect sign-in, use the authorization code flow with PKCE, register exact redirect URIs and compare them as whole strings, bind each authorization request to the user's browser session, and compare the `iss` of the response with the issuer recorded before the redirect, because a pattern-matched redirect URI, an unbound request, or an unchecked issuer lets an attacker capture or swap authorization codes. Check a changed `redirect_uri`, a replayed `state`, a response from a different issuer, and a code redeemed with the wrong verifier, and confirm that none of them signs anyone in.
+
+<example>
+The Express callback loads the `state`, `code_verifier`, and expected `iss` stored in the session before the redirect, rejects the response when `state` or `iss` differs, sends the stored `code_verifier` with the code, and the identity provider lists only `https://app.shop.example/auth/callback` as a redirect URI.
+</example>
+
 ## Enforce session and token lifecycle
 
 When changing sessions, verify them on a trusted backend, rotate them after authentication or privilege change, enforce the configured idle and absolute expiry, and make logout, account disablement, and recovery invalidate authority according to the product's policy, because clearing a browser cookie alone does not revoke a stolen token. Self-contained tokens need an explicit revocation or bounded-lifetime design and not a claim of immediate revocation. Check the old session after rotation, logout, expiry, and disablement, and verify that valid users can still complete the intended sign-in flow.
@@ -59,5 +65,5 @@ After a successful login the Spring Security configuration keeps session fixatio
 When accepting JWTs, configure allowed algorithms, issuer-bound keys, expected audience, token purpose, and required time claims outside attacker-controlled token content, use the maintained verifier and not decoding plus manual claim checks, and keep validation rules distinct for access, identity, and recovery tokens, because a valid signature from the wrong context is still invalid authority. Check wrong audience, wrong token type, altered algorithm, expired claims, unknown keys, and key-discovery failure, and confirm that no failed verification falls back to an unsigned or partially verified identity.
 
 <example>
-The Python API calls `jwt.decode(token, key, algorithms=["RS256"], issuer="https://id.acme.example", audience="billing-api")` from the `PyJWT` package on every request, and a password-reset token with a recovery purpose claim is rejected by the API middleware.
+The Python API calls `jwt.decode(token, key, algorithms=["RS256"], issuer="https://id.acme.example", audience="billing-api", options={"require": ["exp"]})` from the `PyJWT` package on every request so a token without `exp` is rejected, and a password-reset token with a recovery purpose claim is rejected by the API middleware.
 </example>

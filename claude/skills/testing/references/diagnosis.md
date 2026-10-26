@@ -52,10 +52,10 @@ A failing `assert total == 90` changes to `95` only after the pricing spec confi
 
 ## Characterize legacy behavior
 
-When refactoring poorly understood code, capture and inspect representative existing outcomes before restructuring, including outputs, errors, ordering, and effects within the requested scope, and label these checks as characterization, because they record what the code does and not what it should do. Review each recorded outcome instead of approving it blindly, and keep a confirmed defect out of the intended contract. Check that every later difference is either a requested change or a regression.
+When refactoring poorly understood code, capture and inspect representative existing outcomes before restructuring, including outputs, errors, ordering, and effects within the requested scope, and label these checks as characterization, because they record what the code does and not what it should do. Keep the recordings in a scratch folder outside the repository unless the task asks for tests or the repository already keeps such tests, because a new permanent set of recordings is a change nobody requested. Review each recorded outcome instead of approving it blindly, and keep a confirmed defect out of the intended contract. Check that every later difference is either a requested change or a regression.
 
 <example>
-Before splitting `legacy_invoice.py`, record the output of `build_invoice()` for 12 real order files in `characterization/`, and pin the odd rounding of `0.005` as current behavior with a note that it looks like a bug.
+Before splitting `legacy_invoice.py`, record the output of `build_invoice()` for 12 sample order files in a scratch folder and compare it after each step, keep the odd rounding of `0.005` as current behavior, and say in the final answer that it looks like a bug.
 </example>
 
 When a dependency prevents exercising legacy logic, first look for an existing replacement or observation point, identify its enabling point such as construction, an argument, or a build-time selection, and use the narrowest behavior-preserving seam that reaches the code, because a broad redesign or a test-only production branch changes the code the test is meant to protect. Check that normal construction still selects the real dependency and that the test runs the same logic.

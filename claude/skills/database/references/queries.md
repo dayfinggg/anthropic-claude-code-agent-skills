@@ -1,5 +1,13 @@
 # Queries and pagination
 
+## Contents
+
+- Establish what is expensive
+- Correct estimates before forcing plans
+- Choose indexes for the real access path
+- Inspect ORM behavior instead of method names
+- Match pagination to its contract
+
 ## Establish what is expensive
 
 Capture the emitted statement, parameter types, representative values, row distribution, existing indexes, and observed latency, and separate database execution from connection waiting, network transfer, and object hydration, because a slow page is often not a slow query. Compare frequent and rare values before treating one fast sample as representative, and keep the change provisional when the actual plan or representative data is missing.
@@ -8,13 +16,7 @@ Capture the emitted statement, parameter types, representative values, row distr
 A slow report page is timed in three parts, 40 ms in the database, 15 ms on the wire, and 900 ms in Python building 2,000 ORM `Invoice` objects, so the fix lies in hydration and not in an index.
 </example>
 
-Before profiling, review the statement for functions, writable CTEs, triggers, and locking clauses, because an analyzed statement executes them. Start with estimated plans where the engine supports them, use isolated data for write profiling, and obtain authorization before profiling in production, because profiling itself adds load.
-
-<example>
-A `SELECT` that calls a PL/pgSQL function writing to an audit table also writes when it is analyzed, so the review finds the function before `EXPLAIN (ANALYZE)` runs.
-</example>
-
-In PostgreSQL, read `EXPLAIN` estimates first and use `EXPLAIN (ANALYZE, BUFFERS)` only where execution is safe and authorized, and distinguish row estimates from actual rows and loops, because a parent node's time includes its children and per-loop times must be multiplied by the loop count. Do not sum every node as independent elapsed time.
+In PostgreSQL, start with `EXPLAIN` estimates, as with any engine that supports estimated plans, and use `EXPLAIN (ANALYZE, BUFFERS)` only where execution is safe and authorized, and distinguish row estimates from actual rows and loops, because a parent node's time includes its children and per-loop times must be multiplied by the loop count. Do not sum every node as independent elapsed time.
 
 <example>
 A node showing `actual time=0.02..0.03 rows=1 loops=5000` costs about 150 ms, and its parent's time already includes that.
@@ -63,13 +65,25 @@ For `WHERE device_id = 7 AND recorded_at < :cutoff ORDER BY recorded_at DESC LIM
 If a predicate wraps an indexed column in a function, compare an equivalent range or a supported expression index while preserving time zone, collation, and null semantics, because the function hides the column from the index. For a calendar-day filter, derive half-open instant bounds before replacing the column-side date conversion. Check boundary results and the plan, not merely that the query mentions an indexed column.
 
 <example>
-`WHERE DATE(placed_at) = :day` becomes `placed_at >= :day AND placed_at < :day + INTERVAL 1 DAY`, and the midnight rows are compared before and after.
+`WHERE DATE(placed_at) = :day` becomes `placed_at >= :day_start AND placed_at < :next_day_start`, with both bounds computed in the application, and the midnight rows are compared before and after.
 </example>
 
-Add covering columns only when avoided table access outweighs the index width and write cost, because every added column makes each write maintain a wider index. PostgreSQL index-only scans still depend on visibility information and can perform heap fetches, InnoDB secondary indexes already carry the primary key, and SQLite has its own covering-index behavior. `INCLUDE`, partial indexes, and concurrent-build syntax are not portable recipes. Check actual reads, write latency, and index size before keeping the change.
+Add covering columns only when avoided table access outweighs the index width and write cost, because every added column makes each write maintain a wider index. Check actual reads, write latency, and index size before keeping the change.
+
+<example>
+Widening the index on `orders (customer_id)` with `status` and `total` to cover the account page is kept only if the plan shows the table reads gone and insert latency on `orders` stays within its budget.
+</example>
+
+Check how the installed engine covers a query before relying on an index-only plan, because PostgreSQL index-only scans still depend on visibility information and can perform heap fetches, InnoDB secondary indexes already carry the primary key, and SQLite has its own covering-index behavior.
 
 <example>
 On InnoDB an index on `(warehouse_id)` already contains `id`, so `SELECT id FROM shipments WHERE warehouse_id = 7` is covered without adding `id` to the index.
+</example>
+
+Write `INCLUDE`, partial-index, and concurrent-build syntax only for an engine whose documentation lists it, because these forms are not portable recipes.
+
+<example>
+`CREATE INDEX ON orders (customer_id) INCLUDE (total)` is PostgreSQL syntax, while a MySQL table gets the same cover by listing `total` as a second index column.
 </example>
 
 Inspect constraint-created indexes before adding duplicates, because primary keys and unique constraints already build one. PostgreSQL does not automatically index referencing foreign-key columns, whereas MySQL and MariaDB create a supporting index when none exists, and neither fact means every relationship needs an extra performance index.

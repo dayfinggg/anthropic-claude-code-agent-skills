@@ -36,10 +36,10 @@ In a Jest suite, `jest.useFakeTimers()` runs in `beforeEach` before the debounce
 
 ## Exercise concurrency deliberately
 
-When the defect depends on overlapping work, identify the interleaving it needs and the safety or liveness guarantee at stake, and coordinate entry, release, and completion with barriers, events, or a supported controlled scheduler, because sleeps only hope for the overlap, and serializing the contested operation or mocking its shared resource removes the race being tested. Assert on the observable result after all participating tasks have completed, with a bounded timeout so a deadlock fails the test instead of hanging it.
+When the defect depends on overlapping work, identify the interleaving it needs and the safety or liveness guarantee at stake, and coordinate entry, release, and completion with barriers, events, or a supported controlled scheduler, because sleeps only hope for the overlap, and serializing the contested operation or mocking its shared resource removes the race being tested. Join the participating tasks with a bounded timeout and assert that none is still running before asserting on the observable result, because a join that times out returns without an error and a deadlocked task would otherwise pass unnoticed.
 
 <example>
-Two `withdraw(80)` calls on a balance of `100` wait on a shared `threading.Barrier` before touching the account, and the test joins both threads with `timeout=5` before asserting a single success.
+Two `withdraw(80)` calls on a balance of `100` wait on a shared `threading.Barrier` before touching the account, and the test joins both threads with `timeout=5`, asserts that neither `is_alive()`, and then asserts a single success.
 </example>
 
 When using scheduler exploration, identify which operations the scheduler actually controls, capture a failing schedule, and replay it from a fresh state, because I/O, OS threads, and unsupported primitives can run outside its control and a claim of exhaustive coverage would then be false. Keep any remaining uncontrolled timing as a stated confidence limit.
@@ -56,16 +56,32 @@ When an unchanged revision both passes and fails, keep the failure before retryi
 A failure in CI run 4812 is saved with its log, `--randomly-seed=1234`, and `-n 4` before the job is triggered again.
 </example>
 
-| Observation | Distinguishing check | Reject | Verification after correction |
-|---|---|---|---|
-| Fails after particular neighbors | Replay that order and inspect leaked state | Deleting the neighbor | Both orderings and independent execution |
-| Fails only in parallel | Separate names and resources, then inspect true overlap | Globally serializing the suite as the fix | Normal worker configuration |
-| Fails near asynchronous completion | Trace action, event, and assertion ordering | Longer arbitrary sleeps | Bounded event or state-based completion |
-| A generated input cannot replay | Reset external state and capture all randomness | Suppressing the flaky error | Same input from a fresh state |
-| Environment or load differs | Compare resources, versions, and configuration | Weakening a product guarantee | Equivalent environment or an explicit remaining gap |
+When a test fails only after particular neighbors or only in parallel, replay that order or give each worker its own names and resources, inspect the leaked state or the true overlap, and verify both orderings, independent execution, and the normal worker configuration, because deleting the neighbor or serializing the whole suite hides the shared state without removing it.
+
+<example>
+`test_export` fails after `test_import` and under `pytest -n 4` because both write to one `/tmp/acme.csv`, so each test gets its own `tmp_path` and the fix is verified in both orders and with `-n 4`.
+</example>
+
+When a test fails near asynchronous completion, trace the order of the action, the event, and the assertion, and wait for a bounded event or an observable state, because a longer sleep only moves the failure to a slower machine and leaves the race in place.
+
+<example>
+A `test_sync` that asserted after `sleep(2)` waits for the `sync_done` event with a 10-second timeout and then asserts the row count.
+</example>
+
+When a generated input cannot be replayed, reset the external state and capture every source of randomness, then replay the same input from a fresh state, because suppressing the flaky error leaves an unexplained defect that returns with the next seed.
+
+<example>
+A failing run saves its seed and the fixture data it loaded, and the replay starts from a newly created database with both and fails the same way.
+</example>
+
+When the result differs with the environment or load, compare resources, versions, and configuration, and verify the fix in an equivalent environment or state the remaining gap, because weakening a product guarantee to pass the test hides a defect that real users meet.
+
+<example>
+A test that passes on a 16-core laptop and fails on a 2-CPU runner is compared on core count and time zone first, and the final answer says that the runner's memory limit was not reproduced.
+</example>
 
 When retries or quarantine are requested as a temporary mitigation, keep the original failure and a named owner for the follow-up, and distinguish the mitigation from a causal correction, because a silently skipped test or a failure converted to success removes the signal the suite exists to give. Check that the unaffected regression signal still works.
 
 <example>
-A `@pytest.mark.flaky(reruns=2)` on `test_sync` ships with ticket `QA-231` in the pull request and a note that the cause is still unknown.
+A `@pytest.mark.flaky(reruns=2)` on `test_sync` ships with ticket `QA-231` and a sentence in the pull request description that the cause is still unknown.
 </example>

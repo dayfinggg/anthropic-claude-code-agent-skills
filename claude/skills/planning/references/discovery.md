@@ -11,7 +11,7 @@ When a request names a broad solution, identify the event that creates the need,
 Extract the intended users, the observable result, the existing constraints, and the requested destination, tell an implementation request apart from a request for advice or a plan, and treat supplied deadlines and budgets as constraints and not as estimates of the work, because a deadline says when the user needs the result and nothing about how long it takes.
 
 <example>
-"Need this by Friday, can you plan the SSO rollout" is a plan request with a Friday constraint, and the plan states whether its stages fit before Friday instead of assuming they do.
+"Need this by Friday, can you plan the SSO rollout" is a plan request with a Friday constraint, and the plan states whether its increments fit before Friday instead of assuming they do.
 </example>
 
 Before asking a question, classify the gap. Investigate repository facts through the available files and tools, ask one focused question with the consequential trade-off when a product choice changes acceptance, and for a low-risk reversible detail choose the existing convention and state the assumption when it matters, because a question about something the code already shows costs the user a turn and a vague question gets a vague answer.
@@ -28,7 +28,7 @@ When language is vague, replace adjectives with observable behavior before decom
 "Make the import faster" becomes "importing the 50,000-row `customers.csv` finishes below the current 40 s median, and rejected rows still appear in the error report".
 </example>
 
-Assign each criterion a feasible check with its expected result, and use existing test names, commands, and thresholds only after inspecting them, because a check recalled from memory may not exist or may not observe the claimed result.
+When a criterion points to an existing test, command, or threshold, open it and confirm that it observes the claimed result before relying on it, because a check recalled from memory may not exist or may not observe the claimed result.
 
 <example>
 Criterion 3 points to `pytest tests/test_import.py::test_rejected_rows` only after the file is opened and the test is seen to assert the contents of the error report.
@@ -40,7 +40,7 @@ For performance claims, identify the operation, workload, baseline, measurement 
 "Search should be quick" prompts a question about the 95th percentile latency target for `GET /search?q=` on the 2 million product catalog, and the criterion stays unresolved until it is answered.
 </example>
 
-When requirements individually seem reasonable, check their combined effect for contradictory permissions, impossible ordering, incompatible limits, and undefined states, resolve contradictions before scheduling dependent work, and leave a criterion explicitly unresolved if the necessary product fact is unavailable, because stages built on contradictory requirements cannot all pass.
+When requirements individually seem reasonable, check their combined effect for contradictory permissions, impossible ordering, incompatible limits, and undefined states, resolve contradictions before scheduling dependent work, and leave a criterion explicitly unresolved if the necessary product fact is unavailable, because increments built on contradictory requirements cannot all pass.
 
 <example>
 "Admins can delete any invoice" conflicts with "invoices are kept for seven years for audit", so the plan asks which one wins before scheduling the delete endpoint.

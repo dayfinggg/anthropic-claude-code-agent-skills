@@ -53,7 +53,7 @@ A runbook says `scripts/dlq_replay.py` re-enqueues messages with their original 
 When producers can outrun consumers, bound in-flight work against downstream capacity, track backlog age as well as depth, and estimate recovery from spare processing capacity and not from total capacity already serving new work, because more consumers can worsen a slow dependency's overload. Use workload isolation when shared resources need fairness, accepting the extra queues or scheduling complexity it adds. Check a prolonged dependency slowdown and recovery with a backlog while new work continues, and verify bounded memory and concurrency.
 
 <example>
-A geocoding worker caps concurrency at 8 to match the provider's rate limit and alerts on oldest message age above 10 minutes, and a backlog of 6,000 messages at 10 messages per second capacity with 8 per second of new arrivals drains at 2 per second, which takes 50 minutes.
+A geocoding worker capped at 8 concurrent calls by the provider's rate limit has 10 messages per second of capacity and 8 per second of new arrivals, so a backlog of 6,000 messages drains at 2 per second and takes 50 minutes, and the alert watches oldest message age above 10 minutes.
 </example>
 
 Choose admission control, delayed delivery, prioritization, or stale-work expiry according to business semantics, because payments cannot be discarded like obsolete recomputable refreshes, and backpressure protects capacity but may reject valuable new work. Check the chosen fairness policy and that unaffected work still makes useful progress.

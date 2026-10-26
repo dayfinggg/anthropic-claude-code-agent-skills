@@ -1,5 +1,14 @@
 # Layout and hierarchy
 
+## Contents
+
+- Decide what leads
+- Group by meaning
+- Use a spacing scale with rhythm
+- Align deliberately
+- Match density to the task
+- Let content drive responsive structure
+
 ## Decide what leads
 
 Order content by the user's priorities and not by the order the data arrives in. Decide what the user sees first, what supports it, and what waits behind disclosure, put the most important item near the top and the leading edge, and let reading order match visual order, because keyboard and assistive technology users follow the document order.

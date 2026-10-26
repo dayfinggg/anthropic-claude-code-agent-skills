@@ -33,13 +33,13 @@ A `users` module that holds login, billing address edits, and marketing preferen
 When a proposed split crosses a business invariant, identify what must become true atomically and what may lag, and keep the required consistency boundary or obtain a changed requirement before splitting, because a split that turns an atomic rule into an eventually consistent one produces oversold stock, double charges, or orphaned records under concurrency. Take transaction boundaries from the stated rule and not from object navigation, UI screens, or entity relationships. Check concurrent and partial-completion scenarios against the invariant.
 
 <example>
-Splitting `inventory` from `checkout` is acceptable only if stock reservation stays atomic, and a test that sends two concurrent requests for the last unit of `sku-1042` confirms that only one succeeds.
+Splitting `inventory` from `checkout` is acceptable only if stock reservation stays atomic, for example through one conditional update, and a test that sends two concurrent requests for the last unit of `sku-1042` exposes a double sale when it does not.
 </example>
 
 When assigning ownership, distinguish conceptual modules, transactional aggregates, packages, and deployment units, identify the owner of the rule, its mutable state, and its supported interface, and avoid creating services or teams only to make these boundaries identical, because they answer different questions and forcing them to match adds operating cost without clarifying who is responsible. Check that an actual change has a clear maintainer and a clear compatibility owner.
 
 <example>
-When one shared platform core serves several client apps that each add their own modules and templates, a listing bug visible in every app traces to the core's `render_listing()`, so the fix belongs in the core because separate per-app patches would drift apart, while a bug in one app's checkout module stays in that app.
+`orders` and `inventory` stay two modules in one package and one database, `inventory` owns the stock aggregate, and no third service is created just so that module, aggregate, and deployment unit line up.
 </example>
 
 ## Dependency cycles and shared code

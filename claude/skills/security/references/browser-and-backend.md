@@ -19,15 +19,15 @@ When browsers automatically attach authentication credentials to state-changing 
 When configuring session cookies, use HTTPS, `Secure`, `HttpOnly`, and an explicit `SameSite` value that fits the sign-in flow, and prefer host-only scope when sibling hosts should not share authority, because a cookie path is not an isolation boundary between mutually untrusted applications on one origin, and `HttpOnly` stops script reads but not authenticated requests sent by an injected script. Check the response cookie attributes and the real sign-in redirect flow, verify that a script cannot read the session cookie, and confirm that old or expired sessions still fail server-side checks.
 
 <example>
-`app.use(session({ cookie: { secure: true, httpOnly: true, sameSite: 'lax' } }))` runs with no `domain` set, and `document.cookie` in the browser console does not list `connect.sid`.
+`app.use(session({ secret: process.env.SESSION_SECRET, cookie: { secure: true, httpOnly: true, sameSite: 'lax' } }))` runs with no `domain` set, and `document.cookie` in the browser console does not list `connect.sid`.
 </example>
 
 ## Do not confuse CORS with access control
 
-When an API intentionally exposes browser-readable data to another origin, allow the exact trusted origins and the required credential behavior, parse and compare origins instead of matching substrings, prefixes, or suffixes, and avoid reflecting arbitrary origins or trusting `null` for convenience, because CORS only governs whether a browser lets a page read a response, not whether a request is sent or a direct caller is authorized. Public unauthenticated data may intentionally use a broader policy, and protected data still needs its own authorization. Check an untrusted origin, a lookalike hostname, `null`, and a direct non-browser request.
+When an API intentionally exposes browser-readable data to another origin, allow the exact trusted origins and the required credential behavior, parse and compare origins instead of matching substrings, prefixes, or suffixes, and avoid reflecting arbitrary origins or trusting `null` for convenience, because CORS only tells a browser whether a page may read a cross-origin response, so simple cross-origin requests and direct callers reach the server regardless and still need their own authorization. Public unauthenticated data may intentionally use a broader policy, and protected data still needs its own authorization. Check an untrusted origin, a lookalike hostname, `null`, and a direct non-browser request.
 
 <example>
-The Go API echoes `Access-Control-Allow-Origin` only when the parsed `Origin` is in `{"https://app.tickets.example", "https://m.tickets.example"}`, so `https://app.tickets.example.evil.com` and `null` get no header, and `curl` without a session still gets 401 on private routes.
+The Go API echoes `Access-Control-Allow-Origin` only when the parsed `Origin` is in `{"https://app.tickets.example", "https://m.tickets.example"}` and sets `Vary: Origin` on every response, so `https://app.tickets.example.evil.test` and `null` get no header, and `curl` without a session still gets 401 on private routes.
 </example>
 
 ## Keep display data out of executable browser contexts

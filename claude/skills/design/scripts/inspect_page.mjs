@@ -30,7 +30,6 @@ function loadChromium() {
 async function checkFocus(page, limit) {
   const results = [];
   const seen = new Set();
-  await page.mouse.click(1, 1);
   for (let i = 0; i < limit; i++) {
     await page.keyboard.press("Tab");
     const info = await page.evaluate(focusJs);

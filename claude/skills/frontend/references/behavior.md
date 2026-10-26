@@ -1,5 +1,14 @@
 # State, forms, and asynchronous work
 
+## Contents
+
+- Define what each value means
+- Model states by user meaning
+- Keep form editing separate from submission
+- Make obsolete work unable to commit
+- Adapt to the installed framework
+- Check transitions, not only steady states
+
 ## Define what each value means
 
 Separate persisted records, editable drafts, selected identity, route state, and request status, identify each stored value's owner and reset condition, and calculate filtered lists, totals, and validity from current inputs, because a second copy kept in step by an Effect or watcher falls out of step with its source. An intentionally detached draft is different from redundant state.
@@ -63,7 +72,7 @@ An email field shows its error on blur, a `500` from the server appears in a for
 Preserve native labels, autocomplete, paste, and password-manager behavior, make non-submit buttons explicit inside forms, and leave Enter alone while an input method is composing text, because a button defaults to submit and Enter during composition confirms a character and not the form. Check composition in the supported browser and not through one keyboard event alone.
 
 <example>
-The "Add row" button is `type="button"`, and the Enter handler checks `event.isComposing` before submitting a Japanese search query.
+The "Add row" button is `type="button"`, and the Enter handler returns early when `event.isComposing || event.keyCode === 229`, so the Enter that confirms a Japanese IME candidate does not submit the search.
 </example>
 
 When submitting, capture the intended draft, prevent duplicate execution of that mutation, preserve the draft on failure, and keep unrelated fields and actions enabled, because a double click would create two records and a delayed validation or save response must not describe or overwrite a newer field value.
@@ -94,10 +103,10 @@ An aborted search shows no toast, a timed-out `POST /api/payments` asks the user
 
 ## Adapt to the installed framework
 
-In React, derive render data during rendering, put user actions in their event path, use Effects only to synchronize external systems with correct dependencies and cleanup, and fix a stale closure and not the dependency check, because an Effect that mirrors state adds a render and hides the data flow. Use the existing framework loader when one is available.
+In React, derive render data during rendering, put user actions in their event path, use Effects only to synchronize external systems with correct dependencies and cleanup, and fix a stale closure and not the dependency check, by moving the logic inside the Effect or, where the installed React version has `useEffectEvent`, by reading the latest values through an Effect Event, because an Effect that mirrors state adds a render and hides the data flow. Use the existing framework loader when one is available.
 
 <example>
-`fullName` is computed in render from `first` and `last`, and an `exhaustive-deps` warning on a subscription Effect is fixed by moving the handler inside the Effect and not silenced.
+`fullName` is computed in render from `first` and `last`, and an `exhaustive-deps` warning on a subscription Effect is fixed by moving the handler inside the Effect, or by wrapping it in `useEffectEvent` when the installed React has it, and not silenced.
 </example>
 
 In Vue, keep computed getters free of side effects, use watchers for effects, and register cleanup for stale work, because a computed with side effects runs at times the code does not control. `onWatcherCleanup` exists only in newer Vue versions and must be registered synchronously before an `await`, so check the installed version and otherwise use the cleanup callback the watcher already receives. Preserve composable reactivity and dispose resources with the owning scope.

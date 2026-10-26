@@ -28,10 +28,10 @@ Give each acquired resource one owner and one release path, preferably the langu
 `with open(path) as f:` in Python, `using var conn = ...` in C#, and a function that receives an already open file does not close it.
 </example>
 
-When cleanup itself can fail, keep the primary error and attach the cleanup error through the runtime's chaining or aggregation mechanism, because replacing the original error hides the real cause.
+When cleanup itself can fail, keep the primary error and attach the cleanup error to it through the runtime's suppressed-error, note, or aggregation mechanism, because replacing the original error hides the real cause.
 
 <example>
-In Python, a failing `close()` after a failed write is logged or chained, and the write error is still the one the caller sees.
+In Python 3.11 and later, a failing `close()` after a failed write is caught and added to the write error with `add_note()`, and the write error is the one the caller sees. Older versions log the close error.
 </example>
 
 ## Keep failures meaningful

@@ -16,13 +16,13 @@ A guest note on a Django hotel-booking site reaches `views.reserve`, a PostgreSQ
 Keep validation, authorization, and sink protection as three separate controls, and deny the operation when a security check is missing or fails instead of falling back to a privileged path, because each control answers a different question and a pass on one says nothing about the others.
 
 <example>
-A parameterized `SELECT * FROM invoices WHERE id = $1` in a Go handler is safe to run, yet the handler still checks that the signed-in accountant may view that invoice, and when the role lookup returns an error, the handler responds 403 and does not continue as an admin.
+A parameterized `SELECT * FROM invoices WHERE id = $1` in a Go handler is safe to run, yet the handler still checks that the signed-in accountant may view that invoice, and when the role lookup returns an error, the handler responds 503 and does not continue as an admin.
 </example>
 
-For a requested fix, repair the boundary where the defect lives and every confirmed instance of the same cause, and keep to that scope, because a sweep into unrelated infrastructure turns a small change into one nobody can review. Run a complete audit only when the user asks for one with bounded targets, because a sensitive filename such as `config.yaml` is not a request to review everything.
+For a requested fix, repair the boundary where the defect lives and the other places that share its root cause in code the change already touches, and report any further confirmed instance as a follow-up in the final answer, because a sweep into code the request did not name turns a small change into one nobody can review. Run a complete audit only when the user asks for one, with its targets and permitted effects settled first, because a sensitive filename such as `config.yaml` is not a request to review everything.
 
 <example>
-Fixing an unescaped `<%= raw product.name %>` in `show.html.erb` also fixes the same raw output in `compare.html.erb` once it is confirmed there, while the rest of the template layer stays as it is.
+Fixing an unescaped `<%= raw product.name %>` in `show.html.erb` also fixes the same raw output in the partial it renders, while the identical raw output in `compare.html.erb`, which the change does not touch, goes into the final answer as a follow-up.
 </example>
 
 Where tests exist, reproduce a known defect before fixing it, pair every negative check with a legitimate use of the same feature, and observe stored data, state, and outbound effects and not only the response wording, because a denied response can still hide a write that happened and a defense that blocks legitimate use is also a failure. Run the relevant existing checks and stop when the requested result passes.
@@ -37,9 +37,9 @@ Choose the references that apply before the first edit and read each one, becaus
 
 - For threat modeling, audit scope, diff review, variants, misuse-resistant APIs, or native code, read [assurance](references/assurance.md).
 - For authentication, sessions, tokens, objects, tenants, or jobs, read [identity and data](references/identity-and-data.md).
-- For CSRF, CORS, HTML, or browser origins, read [browser and backend](references/browser-and-backend.md).
+- For CSRF, CORS, cookies, HTML, or browser origins, read [browser and backend](references/browser-and-backend.md).
 - For SQL, processes, paths, SSRF, uploads, or parsers, read [sinks](references/sinks.md).
-- For secrets, cryptography, logging, caching, or private outputs, read [secrets and privacy](references/secrets-and-privacy.md).
+- For secrets, passwords, cryptography, logging, caching, or private outputs, read [secrets and privacy](references/secrets-and-privacy.md).
 - For packages, CI, build credentials, or artifacts, read [supply chain](references/supply-chain.md).
 - For prompts, retrieval, memory, tools, or MCP, read [LLM and agents](references/llm-and-agents.md).
 

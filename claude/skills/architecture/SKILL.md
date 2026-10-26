@@ -16,7 +16,7 @@ Before proposing to split `utils/`, run `git log --stat -- utils/` and grep the 
 When a structural choice matters, compare keeping the current design with the feasible alternatives, and name the requirement, the affected consumers, the principal cost, and the evidence that could overturn the recommendation, using measurements, representative change scenarios, or estimates labeled as such, because an invented score looks like evidence and hides the data that is missing.
 
 <example>
-For a request to move notifications out of the monolith, option one is the current design, the requirement is independent release of the mail code, and a replay of one week of real sends is the evidence that could overturn the split.
+For a request to move notifications out of the monolith, option one is the current design, the requirement is independent release of the mail code, and a replay of one week of recorded send requests against a capture mail server is the evidence that could overturn the split.
 </example>
 
 Choose styles and constraints such as layers, mandatory interfaces, services, or a directory tree only when each one earns a benefit in the current situation, because a constraint adopted for its label taxes every later change without a matching gain. Check that each constraint names the benefit it provides today.

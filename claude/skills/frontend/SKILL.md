@@ -1,11 +1,11 @@
 ---
 name: frontend
-description: Implements and fixes browser interfaces, including components, forms, state, routing, rendering, styling code, and accessibility. Use when changing frontend code or diagnosing browser behavior. Visual design decisions belong to the design skill.
+description: Implements and fixes browser interfaces, including components, forms, state, routing, rendering, styling code, and accessibility. Use when changing frontend code or diagnosing browser behavior. Visual design decisions belong to a design skill when one is installed.
 ---
 
 # Frontend
 
-These rules decide how browser interface code is scoped, built, and checked. Visual choices such as palette, type scale, spacing scale, and motion come from the design skill or the project's design system.
+These rules decide how browser interface code is scoped, built, and checked. Visual choices such as palette, type scale, spacing scale, and motion come from the project's design system or from a design skill when one is installed.
 
 Before editing, settle the outcome, acceptance conditions, affected flow, stack, rendering model, and supported browsers, read the project instructions, callers, affected files, and existing checks, and inspect the running interface when a browser is available, because a change aimed at the wrong flow or browser passes its own check and still fails the user.
 
@@ -44,7 +44,7 @@ Choose the references that apply before the first edit and read each one, becaus
 - For project setup, component boundaries, naming, or folders, read [architecture](references/architecture.md).
 - For state, forms, asynchronous work, or recovery, read [behavior](references/behavior.md).
 - For routing, deep links, server rendering, or hydration, read [routing and rendering](references/routing-and-rendering.md).
-- For controls, structure, keyboard behavior, focus, or overlays, read [accessibility](references/accessibility.md).
+- For controls, structure, names and labels, keyboard behavior, focus, overlays, announcements, contrast, zoom, or target size, read [accessibility](references/accessibility.md).
 - For CSS, tokens, responsive mechanics, fixed or sticky UI, or interaction states in code, read [styling implementation](references/visual-quality.md).
 - For slow loading, slow interactions, or large collections, read [performance](references/performance.md).
 - For untrusted content, credentials, storage, URLs, or embeds, read [browser security](references/browser-security.md).

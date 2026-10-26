@@ -1,5 +1,14 @@
 # Direction
 
+## Contents
+
+- Ground the work in the brief
+- Classify the change
+- Choose the surface mode
+- Follow the platform
+- Write the design plan
+- Extend an existing system
+
 ## Ground the work in the brief
 
 Name the concrete subject, the audience, the one job the surface must do, and the scene of use before choosing anything. Device, ambient light, frequency of use, time pressure, and the user's expertise change density, contrast, and tone. When the brief omits the subject, infer one from the project and state the assumption, and ask only when the answer would change the direction materially, because a question about a minor gap stalls work the user wanted done.
@@ -55,13 +64,13 @@ For native apps, start from the platform's components and conventions, because n
 A Windows tool built on the platform's native navigation view and title bar spends its design effort on one custom visualization.
 </example>
 
-On Apple platforms, use system components, semantic system colors, Dynamic Type, safe areas, and size classes rather than device type or orientation. Keep translucent system materials to the control and navigation layer and out of content, and do not hard-code documented system color values, because the system adapts its values to appearance settings and releases that a hard-coded value ignores.
+On Apple platforms, use system components, semantic system colors, Dynamic Type, safe areas, and size classes rather than device type or orientation. Keep Liquid Glass to the control and navigation layer and use the standard materials for structure in the content layer, and do not hard-code documented system color values, because the system adapts its values to appearance settings and releases that a hard-coded value ignores.
 
 <example>
 A SwiftUI list uses `.primary` and `.secondary` colors and the `.body` text style, so Dark Mode and larger text work without extra code.
 </example>
 
-On Android, map custom components to Material color roles and use the current Material motion system. Recent Material releases moved components to spring-based motion, so check the installed Material version before using the older easing and duration tokens, because those tokens may no longer be maintained.
+On Android, map custom components to Material color roles and take motion from the Material system as the motion reference describes, because role-mapped colors follow the user's theme and dark mode while a fixed hex value does not.
 
 <example>
 A custom card maps its fill to `surfaceContainer` and its text to `onSurface` instead of using fixed hex values.
@@ -88,16 +97,16 @@ A clinic booking plan names four color roles with hex values, one sans family at
 - One signature element where boldness is spent. Keep everything around it quiet.
 - Motion stance, either one authored moment or state feedback only.
 
-Review the plan against the brief and against the generic defaults list by imagining a similar prompt for a different product, because any part that would come out the same is a default and not a decision. Revise it and say what changed.
+Review the plan against the brief and against the generic defaults list by imagining a similar prompt for a different product, because any part that would come out the same is a default and not a decision. Revise it and report the resulting decisions in the final answer.
 
 <example>
-A plan whose palette would be identical for a legal-aid tool and a surf shop swaps its neutral ramp for one drawn from the subject, and the reply notes the swap.
+A plan whose palette would be identical for a legal-aid tool and a surf shop swaps its neutral ramp for one drawn from the subject, and the final answer lists the resulting palette roles.
 </example>
 
-Show the plan briefly to the user when the direction is open and the user is available. When the brief is already specific or the user cannot answer, continue without waiting and summarize the plan and its assumptions in the final report, because blocking on an answer that cannot arrive wastes the turn.
+Ask about the plan only when two plausible directions would lead to materially different work, and then as one question that names the recommended direction first. Otherwise build from the plan and list its assumptions in the final answer, because a stalled turn costs the user more than a palette they can change.
 
 <example>
-For an open request such as "a site for my yoga studio", share a five-line plan first, but for a fully specified brief build directly and list the assumptions at the end.
+For "a site for my yoga studio" with no brand material, build the recommended direction and list the assumptions at the end, while for "restyle the app" with two competing brand palettes in the repository, ask which palette leads.
 </example>
 
 ## Extend an existing system

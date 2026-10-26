@@ -22,10 +22,10 @@ Start action labels with a verb that says exactly what happens, and keep one nam
 `Save changes` replaces `Submit`, and a `Send invoice` button leads to an `Invoice sent` confirmation.
 </example>
 
-Pick one capitalization style for each element type and apply it everywhere. Sentence case reads as conversational and is the safer default, and the product's existing choice wins when it has one. Use possessive pronouns sparingly and keep one perspective instead of switching between "my" and "your", because mixed styles make one interface sound like several authors.
+Pick one capitalization style for each element type and apply it everywhere. Sentence case reads as conversational and is the safer default on the web, the product's existing choice wins when it has one, and a native app follows its platform's capitalization, such as title-style capitalization for button labels on Apple platforms. Use possessive pronouns sparingly and keep one perspective instead of switching between "my" and "your", because mixed styles make one interface sound like several authors.
 
 <example>
-Every button reads `Create new project` in sentence case, and none reads `Create New Project`.
+Every button of a web product reads `Create new project` in sentence case, and none reads `Create New Project`.
 </example>
 
 ## Make failure and emptiness useful

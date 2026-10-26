@@ -31,7 +31,7 @@ A new `features/invoices/` folder holds `InvoiceList.tsx`, `useInvoices.ts`, `in
 Before moving a file, inspect imports, route discovery, build aliases, test discovery, and server and client boundaries, and keep shared primitives from importing a feature's store or private components, because file-based routing and aliases break silently on a move and a primitive that imports a feature cannot be reused. Angular's feature-area and colocation advice is a model to adapt to other stacks, not a naming requirement.
 
 <example>
-Moving `pages/orders/[id].tsx` changes the URL under file-based routing, so grep for links to `/orders/` and check the rewrites in `next.config.js` first.
+Moving `pages/orders/[id].tsx` changes the URL under file-based routing, so search the repository for links to `/orders/` and check the rewrites in `next.config.js` first.
 </example>
 
 ## Make names explain the contract
@@ -59,7 +59,7 @@ A folder with `package.json` and `pnpm-lock.yaml` gets a new route in the existi
 For a genuinely new application, read the selected stack's official setup documentation for runtime prerequisites, package-manager syntax, generator options, and destination, select only the features the task needs, and run one generator into an empty target, because a hand-assembled manifest and toolchain drifts from the supported setup. A framework recommendation does not override an explicit stack choice, a static-site requirement, or an existing deployment constraint.
 
 <example>
-For "a small React app with TypeScript", read the Vite setup guide for the installed Node version and run its generator with the React TypeScript template into a new empty `my-app` directory.
+For "a small client-only React app with TypeScript on Vite", read the Vite setup guide for the installed Node version and run its generator with the React TypeScript template into a new empty `my-app` directory.
 </example>
 
 Inspect the generated files, preserve their entry points and scripts, and run the untouched baseline before implementing UI, continuing from its output when a standard setup workflow already ran, because a baseline that fails before your change cannot be told apart from a failure you caused.

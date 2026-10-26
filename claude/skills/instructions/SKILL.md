@@ -9,7 +9,7 @@ These rules make instruction text change what an agent actually does, and they r
 
 ## Write each rule so it can be followed
 
-Write instruction text, including its examples, in English, and set the reply language through a rule such as "the language of the user's latest message" instead of hardcoded phrases, because the same files serve every project and language, and mixed-language instructions leak into replies.
+Write instruction text, including its examples, in English unless the file already uses another language, and set the reply language through a rule such as "the language of the user's latest message" instead of hardcoded phrases, because the same files serve every project and language, and mixed-language instructions leak into replies.
 
 <example>
 "Write the final answer in the language of the user's latest message" instead of a rule that quotes a sample reply in one fixed language.
@@ -53,7 +53,7 @@ A deployment procedure lists its exact commands in order, while code review guid
 
 ## Keep the instruction set coherent
 
-Before adding a rule, search every file that loads in the same session, including CLAUDE.md and its imports, the output style, mod sections and reminders, skills, and the project's AGENTS.md, for rules on the same topic, then edit the existing rule or remove the duplicate, because two wordings of one rule drift apart and the model must reconcile them.
+Before adding a rule, search every file that loads in the same session, including CLAUDE.md and its imports, the output style, instruction files and reminders that plugins or hooks inject, skills, and the project's AGENTS.md, for rules on the same topic, then edit the existing rule or remove the duplicate, because two wordings of one rule drift apart and the model must reconcile them.
 
 <example>
 Before adding a rule about progress messages to a skill, Grep finds the same topic in the output style and a reminder, so the skill gets no copy and the reminder is aligned with the output style.
@@ -65,18 +65,30 @@ Put a rule that must hold every time into a hook, a setting, or a permission rul
 "Never edit files under `vendor/`" becomes a deny rule in settings, while "prefer small focused functions" stays in a skill.
 </example>
 
-Package a skill with a lowercase hyphenated `name` and a short third-person `description` that says what the skill does and when to use it in intent categories, keep SKILL.md well under 500 lines with details in reference files linked directly from it, and refer to bundled scripts from SKILL.md through the `CLAUDE_SKILL_DIR` substitution, written as a dollar sign followed by the name in braces, with forward slashes, because every description loads in every session, nested references get read partially, and relative script paths break when the working directory changes. Only SKILL.md gets that substitution, so a reference file names the skill's base directory in words instead.
+Give a skill a lowercase hyphenated `name` of at most 64 characters that leaves out the words "anthropic" and "claude", and a third-person `description` of at most 1,024 characters, without XML tags, that says what the skill does and when to use it, because every description loads in every session and these limits are what skill validation checks.
 
 <example>
-`description: Writes commit messages and shapes commits. Use whenever creating or describing commits.` instead of a description that lists twenty trigger words, with `references/pr-template.md` linked from SKILL.md rather than from another reference.
+`description: Writes commit messages and shapes commits. Use whenever creating or describing commits.` instead of a description that lists twenty trigger words.
+</example>
+
+Keep SKILL.md well under 500 lines, link each reference file directly from it, and refer to bundled scripts from SKILL.md through the `CLAUDE_SKILL_DIR` substitution, written as a dollar sign followed by the name in braces, with forward slashes, because nested references get read partially and relative script paths break when the working directory changes. Only SKILL.md gets that substitution, so a reference file names the skill's base directory in words instead.
+
+<example>
+SKILL.md links `references/pr-template.md` directly and starts its script path with the substitution followed by `/scripts/lint.py`, while the reference file says "the skill's base directory" in words.
 </example>
 
 ## Prove the change in fresh sessions
 
-Test a changed instruction in fresh sessions before calling it done, by running a few deliberately vague prompts that exercise it, for example with `claude -p` from a scratch folder, before and after the edit, and reading the output or transcript for each violation, because the author's session already knows the intent and asking a model whether it follows a rule is not a measurement. Delete the scratch folders afterwards.
+Test a changed rule that governs recurring behavior in fresh sessions before calling the change done, by running a few deliberately vague prompts with `claude -p` from a scratch folder, before and after the edit, and reading each transcript for violations, because the author's session already knows the intent and asking a model whether it follows a rule is not a measurement. A fresh session loads the user-level `~/.claude` folder and its working directory, so copy a project-level file under test into the scratch folder, and delete the scratch folders afterwards. Skip the runs for wording or formatting fixes that leave behavior unchanged.
 
 <example>
 `claude -p "Make the export faster"` run three times from an empty temp folder shows a status message after a Bash call in two runs before the change and in none after it.
+</example>
+
+Run the same prompts on each model tier that will load the file, such as the fastest tier used for subagents, because a rule that is clear to the largest model can need more detail for a smaller one.
+
+<example>
+A skill that search subagents load is run with the same three prompts on the fastest and on the most capable tier, and the fastest tier skips a step until the rule gains one more sentence of context.
 </example>
 
 When a violation persists, find which text the model actually received and when the violation appeared, such as right after a particular tool, reminder, or skill load, and fix the instruction at that trigger, because the cause often sits in another section or in harness text rather than in the rule being edited.
@@ -85,7 +97,7 @@ When a violation persists, find which text the model actually received and when 
 Most unwanted summaries appear right after long test runs, while the reminder fires only after file edits, so the reminder is extended to test runs instead of rewording the main rule again.
 </example>
 
-When the target is a Claude model and the text may carry patterns written for older models, run the claude-api skill's prompt audit as the review procedure, because it lists those dated patterns together with the content that must stay.
+When the target is a Claude model and the text may carry patterns written for older models, run the claude-api skill's prompt audit as the review procedure, because it lists those dated patterns together with the content that must stay. When the audit is not available, review the text by hand for capitalized pressure words, step-by-step prompts, and rules that restate model defaults, because those are the dated patterns the audit would flag.
 
 <example>
 An inherited system prompt full of "think step by step" and capitalized MUST lines is audited with `/claude-api prompt-audit` before any rewrite.

@@ -31,7 +31,7 @@ A response field named `timeout_ms: 1500` is documented with its unit, because a
 When a business rule means a local time in a place, keep the named zone and civil-time intent, and decide how nonexistent and repeated local times behave, because a UTC offset alone cannot express future daylight-saving changes. RFC 9557 adds zone information to fixed timestamps but does not define recurring-schedule semantics, so add its suffix format only when clients support it. Normalizing to UTC simplifies instant comparison but can discard scheduling intent, while preserving zones needs rule-version and ambiguity handling. Check a daylight-saving gap and overlap.
 
 <example>
-A Ruby appointment-reminder service stores "every day at 08:30" with `Europe/Berlin` and computes the next UTC instant when it schedules the send, so the reminder holds 08:30 across clock changes, and a nonexistent local time runs right after the gap by the documented rule.
+A Ruby nightly-report service stores "every day at 02:30" with `Europe/Berlin` and computes the next UTC instant when it schedules the run, so the report holds 02:30 across clock changes, and on the spring day when 02:30 does not exist it runs right after the gap by the documented rule.
 </example>
 
 ## Use the right clock for waiting and ordering

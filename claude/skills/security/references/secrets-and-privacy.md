@@ -5,7 +5,7 @@
 When adding integration credentials, obtain only the needed record from the user's authorized store or the project's runtime secret mechanism, and keep values out of source, command output, URLs, prompts, fixtures, browser bundles, source maps, and container layers, because browser code cannot keep a shared backend credential confidential, and a variable named secret or kept in a local environment file is not automatically protected from a frontend build. Check the produced client assets and failure output using a dummy marker, and verify that the browser receives only the public configuration the feature requires.
 
 <example>
-The mail API key stays in the Go server's environment and is read with `os.Getenv("MAIL_API_KEY")`, and after the frontend build `grep -r DUMMY_KEY_123 dist/` finds nothing.
+The mail API key stays in the Go server's environment and is read with `os.Getenv("MAIL_API_KEY")`, and after the frontend build a Grep search of `dist/` for `DUMMY_KEY_123` finds nothing.
 </example>
 
 When a runtime consumes secrets, scope credentials to the operation, service, and environment, prefer short-lived workload identity where supported, and validate required security configuration without substituting a shared default, because a secret manager controls access but does not make a secret safe after it enters logs or process arguments. Check missing credentials, a denied store read, and the wrong environment's identity, and confirm that the application fails the protected operation without printing the value or escalating to a more privileged credential.
@@ -25,7 +25,7 @@ A committed `appsettings.json` shows a live SMTP password, so the response lists
 When storing passwords, use the identity framework's adaptive salted password hashing and verification APIs with current supported parameters chosen for the deployment's performance and policy requirements, because encryption or a fast digest lets an attacker who copies the table test guesses quickly or recover the passwords. Existing hashes may call for compatibility with rehash-on-success and not a bulk replacement that locks users out. Check incorrect passwords, malformed stored hashes, supported long inputs, and a legitimate legacy login, and confirm that a rejected input is never silently truncated into another accepted credential.
 
 <example>
-Ruby code stores `BCrypt::Password.create(pw)` and verifies with `BCrypt::Password.new(hash) == pw`, and a row that still holds an `md5` value is verified once with the legacy check and replaced by the bcrypt hash in that same login.
+Python code stores `PasswordHasher().hash(pw)` from `argon2-cffi` and verifies with `verify(hash, pw)`, and after a successful login `check_needs_rehash(hash)` triggers a replacement hash, while a row that still holds an `md5` value is verified once with the legacy check and replaced in that same login.
 </example>
 
 When confidentiality and integrity require application encryption, use a maintained high-level authenticated-encryption API, let the library manage nonce handling where possible, satisfy the chosen construction's uniqueness and usage limits, keep key material separate from protected data, and plan recovery and rotation, because encoding is not encryption, ciphertext does not enforce object authorization, and authenticated encryption does not prevent replay by itself. Check modified and truncated ciphertext, a wrong key, and an authentication-tag failure, and confirm that no unauthenticated plaintext is returned or processed, including in error paths.

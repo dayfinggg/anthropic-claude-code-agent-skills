@@ -22,6 +22,12 @@ When streaming calls can be cancelled, connect cancellation to the producer and 
 A Spring MVC handler returning an `SseEmitter` registers an `onCompletion` callback that cancels its upstream stock-level subscription, and it leaves the shared database pool open.
 </example>
 
+On a stream that can sit idle, send a periodic heartbeat (an SSE comment line or a WebSocket Ping frame) and use it to detect a departed receiver, because proxies drop idle connections after a timeout and a servlet container reports a vanished client only when the next write fails, which leaves the upstream subscription and connection occupied. Check an idle stream across the proxy's idle timeout and a client that leaves while the stream is quiet.
+
+<example>
+An SSE endpoint writes the comment line `: keepalive` every 15 seconds, so a 60-second proxy idle timeout never fires and a closed tab shows up as a failed write within 15 seconds, which cancels the upstream stock-level subscription.
+</example>
+
 For duplex streams, maintain progress in both directions and prefer existing streaming primitives over a homemade pair of unbounded queues, because with manual flow control both peers writing without reading can deadlock. Check by filling both directions simultaneously and verify no deadlock remains.
 
 <example>

@@ -1,5 +1,12 @@
 # Retention, replication, and recovery
 
+## Contents
+
+- Retain and delete according to the actual policy
+- Match replica reads to the consistency contract
+- Preserve CDC correctness across replay and schema change
+- Verify a recovery path by restoring it
+
 ## Retain and delete according to the actual policy
 
 Before choosing a purge mechanism, establish the required retention boundary, deletion exceptions, archive needs, and restore behavior, and distinguish hiding a row from deleting it and from removing its copies, because caches, derived indexes, CDC sinks, replicas, and retained backups all hold copies that the lifecycle design must cover. Do not invent a retention period or infer deletion permission from a storage-cost question. Check the supplied policy with boundary records and downstream consumers.
@@ -11,7 +18,7 @@ A report that the `access_log` table has grown to 80 GB gets the question "which
 For a small purge, evaluate a bounded indexed delete, and for a very large time-based lifecycle evaluate partition retirement only if the partition boundaries match the policy, because dropping a partition avoids row-by-row deletion while its locks and dependencies still matter. Detaching preserves a separate table, so it is not erasure. Do not repartition solely to make a hypothetical cleanup easier. Check pruning, allowed boundary values, references, and remaining copies before any authorized removal.
 
 <example>
-Expired `sessions` are removed with `DELETE ... WHERE expires_at < NOW() LIMIT 5000` in a loop, while a monthly-partitioned `access_log` retires its oldest month with `DROP PARTITION` after the policy confirms that month.
+On MySQL, expired `sessions` are removed with `DELETE ... WHERE expires_at < NOW() LIMIT 5000` in a loop, while a monthly-partitioned `access_log` retires its oldest month with `ALTER TABLE ... DROP PARTITION` after the policy confirms that month.
 </example>
 
 After PostgreSQL deletes, distinguish reusable internal space from space returned to the operating system, because ordinary vacuum normally makes space reusable without shrinking the file, while a table rewrite or `VACUUM FULL` needs a restrictive lock and extra disk. Do not propose a rewrite just because the file did not shrink. Check dead rows, space pressure, long snapshots, and maintenance behavior first.
@@ -72,10 +79,10 @@ For an initial snapshot followed by streaming, verify the connector's snapshot a
 Before the reporting store goes live from the stream, 200 sampled `customer_id` values and the total count from `customers` are compared with it, and a test customer is deleted to confirm that the delete event arrives.
 </example>
 
-For PostgreSQL logical replication, coordinate compatible additive schema changes and verify subscriber readiness, because DDL and sequence state are not replicated like ordinary table rows. Before considering a subscriber for failover, verify sequences and other nonreplicated objects explicitly. Logical slots can redeliver recent changes after a crash and can retain WAL while consumers are absent, so check those conditions before relying on the stream for recovery or cache invalidation.
+For PostgreSQL logical replication, coordinate compatible additive schema changes and verify subscriber readiness, because DDL does not replicate like ordinary table rows and sequence values follow the rows only where the installed version offers sequence synchronization and it has been run. Before considering a subscriber for failover, verify sequences and other nonreplicated objects explicitly. Logical slots can redeliver recent changes after a crash and can retain WAL while consumers are absent, so check those conditions before relying on the stream for recovery or cache invalidation.
 
 <example>
-Adding `orders.coupon_code` runs on the subscriber first and then on the publisher, and before the subscriber is promoted, `orders_id_seq` is set past the highest `id`, since sequence values are not copied.
+Adding `orders.coupon_code` runs on the subscriber first and then on the publisher, and before the subscriber is promoted, `orders_id_seq` is set past the highest `id`, since sequence values do not follow the table rows unless the installed version's sequence synchronization is run.
 </example>
 
 ## Verify a recovery path by restoring it

@@ -1,5 +1,12 @@
 # Typography
 
+## Contents
+
+- Choose faces for the subject
+- Set a scale and roles
+- Keep text readable
+- Get the details right
+
 ## Choose faces for the subject
 
 Choose typography before color and decoration, and pick a face whose character fits the subject and audience and not the family used on the last project. Name the choice and its reason in the design plan, because typography carries most of a surface's personality.
@@ -48,7 +55,7 @@ For fluid sizes, combine a `rem` term with viewport units inside `clamp()` and k
 
 ## Keep text readable
 
-Use a body size of at least `16px` on the web for reading text, since Practical Typography recommends `15` to `25` pixels, avoid ultralight and thin weights at small sizes, and use larger sizes when a face is light, because thin strokes break up on screens.
+Use a body size of at least `16px` on the web for reading text, which is the browser default and sits inside the `15` to `25` pixel range Practical Typography recommends, avoid ultralight and thin weights at small sizes, and use larger sizes when a face is light, because thin strokes break up on screens.
 
 <example>
 A user manual's body text is `17px` in a regular weight and not `15px` in a light weight.
