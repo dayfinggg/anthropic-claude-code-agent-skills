@@ -18,6 +18,11 @@ Write each command in the syntax of the interpreter that runs it. A PowerShell c
 `ls -la | head -20` sent to PowerShell fails, and the fix is `Get-ChildItem -Force | Select-Object -First 20` in the same tool, not a retry in Bash.
 </example>
 
+On a Windows host, avoid the two PowerShell traps that report a failure for a command that actually ran. PowerShell ends the text it pipes to a native program with CRLF, so a script piped to `ssh host bash` runs and then fails on the final carriage return with `$'\r': command not found`. Use a single-quoted here-string so PowerShell does not expand `$` or backticks inside, pass a remote script to ssh that way, or pipe a script file through `tr -d '\r'` on the remote side. `-ErrorAction SilentlyContinue` suppresses error OUTPUT but the cmdlet failure still causes this tool to report exit 1. To make a cmdlet failure truly non-fatal, promote it to terminating and swallow it: `try { Cmdlet ... -ErrorAction Stop } catch {}` (without `-ErrorAction Stop`, non-terminating errors skip the `catch` and still exit 1).
+<example>
+`Get-Content -Raw check.sh | ssh web1 "tr -d '\r' | bash"` runs a local script on a Linux server without the carriage return failure, and `try { Get-Item $path -ErrorAction Stop } catch {}` checks for an optional file without reporting exit 1.
+</example>
+
 Batch only calls that do not depend on each other, and wait for a result before a call that needs it. An edit and the check of that edit go in separate messages. Never invent a tool or switch tools to get around a permission or a read-only mode.
 <example>
 Reading three unrelated files goes in one message. Editing a file and running its test goes in two.
