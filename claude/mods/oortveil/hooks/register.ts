@@ -20,11 +20,6 @@ const TOOL_REMINDERS: Record<string, string> = {
   mcp__ccd_turn__update_plan: 'plan',
 }
 
-type LanguageRules = { readonly reminder: string; readonly rewrite: string }
-
-const MIN_LETTERS = 40
-const SHORT_LINE = 200
-
 const read = ($: EngineInterface, path: string) => $.fs.read(path).then(text => text.trim(), () => undefined)
 
 const reminder = ($: EngineInterface, name: string) => read($, `${$.plugin.root}/reminders/${name}.md`)
@@ -34,36 +29,9 @@ const configuredLanguage = async ($: EngineInterface) => {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined
 }
 
-const withLanguage = async ($: EngineInterface, name: string, language: string) =>
-  (await reminder($, name))?.replaceAll('{language}', language)
-
-const languageRules = async ($: EngineInterface): Promise<LanguageRules | undefined> => {
+const withLanguage = async ($: EngineInterface, name: string) => {
   const language = await configuredLanguage($)
-  if (!language) return undefined
-  const [reminderText, rewrite] = await Promise.all([withLanguage($, 'language', language), withLanguage($, 'language_rewrite', language)])
-  return reminderText && rewrite ? { reminder: reminderText, rewrite } : undefined
-}
-
-const SHELL_TOOLS = new Set(['Bash', 'PowerShell'])
-const REMOTE = /\b(?:ssh|scp|sftp|rsync|docker|kubectl|wsl|git|gh|curl|wget)\b/i
-const LEADING_NOISE = /^\s*(?:(?:cd|Set-Location|pushd)\s+(?:"[^"]*"|'[^']*'|\S+)\s*(?:&&|;)\s*|[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*/i
-
-const SHELL_DUPLICATES = [
-  { pattern: /^(?:sed\s+-i|perl\s+-p?i|Set-Content|Add-Content|Out-File|tee)\b|^(?:echo|printf|cat)\b[^|]*>\s*\S/i, needs: 'Edit' },
-  { pattern: /^(?:cat|head|tail|less|more|type|Get-Content|gc|bat)\b|^sed\s+-n\b/i, needs: 'Read' },
-  { pattern: /^(?:grep|egrep|fgrep|rg|ag|ack|findstr|Select-String|sls)\b/i, needs: 'Grep' },
-  { pattern: /^(?:find\s|fd\s|tree\b|ls\s+-[a-z]*R|dir\s+\/s|Get-ChildItem\b.*-Recurse|gci\b.*-Recurse)/i, needs: 'Glob' },
-] as const
-
-const hasTool = async ($: EngineInterface, name: string) => (await $.tool.list()).some(tool => tool.name === name)
-
-const shellNudge = async ($: EngineInterface, tool: string, input: unknown) => {
-  if (!SHELL_TOOLS.has(tool) || typeof input !== 'object' || input === null || !('command' in input)) return undefined
-  const { command } = input
-  if (typeof command !== 'string' || REMOTE.test(command)) return undefined
-  const match = SHELL_DUPLICATES.find(({ pattern }) => pattern.test(command.replace(LEADING_NOISE, '')))
-  if (!match || !(await hasTool($, match.needs))) return undefined
-  return reminder($, 'shell_nudge')
+  return language ? (await reminder($, name))?.replaceAll('{language}', language) : undefined
 }
 
 const userText = async ($: EngineInterface) => {
@@ -78,19 +46,14 @@ const prose = (text: string) =>
     .replace(/https?:\/\/\S+/g, '')
     .replace(/(?:[A-Za-z]:)?[\\/][^\s]+/g, '')
 
-const latinShare = (text: string) => {
+const isMostlyLatin = (text: string) => {
   const letters = prose(text).match(/\p{L}/gu) ?? []
-  const latin = letters.filter(letter => /\p{Script=Latin}/u.test(letter)).length
-  return { letters: letters.length, share: letters.length ? latin / letters.length : 0 }
+  return letters.filter(letter => /\p{Script=Latin}/u.test(letter)).length * 2 > letters.length
 }
 
-const isWrongScript = (user: string, text: string, minLetters: number) => {
-  const target = latinShare(user)
-  const actual = latinShare(text)
-  return target.letters >= 3 && target.share < 0.5 && actual.letters >= minLetters && actual.share > 0.7
-}
+const isWrongScript = (user: string, text: string) => !isMostlyLatin(user) && isMostlyLatin(text)
 
-const STYLE_SLIP = /[–—;]|^[ \t]*(?:[-*•]|\d+[.)]|#{1,6})[ \t]+\S|^[ \t]*\*\*[^*\n]{1,60}\*\*[ \t]*[:.]/m
+const STYLE_SLIP = /[–—;]|^[ \t]*(?:[-*•]|\d+[.)]|#{1,6})[ \t]+\S|^[ \t]*\*\*[^*\n]+\*\*[ \t]*[:.]/m
 
 const hasStyleSlip = (answer: string) =>
   STYLE_SLIP.test(
@@ -100,13 +63,9 @@ const hasStyleSlip = (answer: string) =>
       .join('\n'),
   )
 
-const lastAnswer = async ($: EngineInterface) => {
-  const messages = await $.session.messages()
-  return [...messages].reverse().find(message => message.role === 'assistant' && message.text.trim())?.text
-}
-
 const styleSlipNote = async ($: EngineInterface) => {
-  const answer = await lastAnswer($)
+  const messages = await $.session.messages()
+  const answer = [...messages].reverse().find(message => message.role === 'assistant' && message.text.trim())?.text
   return answer && hasStyleSlip(answer) ? reminder($, 'style_slip') : undefined
 }
 
@@ -125,17 +84,6 @@ const promptOverrides = async ($: EngineInterface) => {
   )
 }
 
-const outputStyle = async ($: EngineInterface) => {
-  const name = await $.settings.read({ key: 'outputStyle' })
-  if (typeof name !== 'string') return undefined
-  const text = await read($, `${$.plugin.root}/../../output-styles/${name.toLowerCase()}.md`)
-  return text?.replace(/^---[\s\S]*?\n---\s*/, '')
-}
-
-const SKILL_ENTRY = /\n(?=- \S+(?::\s|\n|$))/
-
-const entryName = (entry: string) => (entry.slice(2).split(/:\s|\n/)[0] ?? '').trim()
-
 const skillsIn = (messages: readonly SessionMessage[]) =>
   new Set(
     messages.flatMap(message =>
@@ -143,26 +91,11 @@ const skillsIn = (messages: readonly SessionMessage[]) =>
     ),
   )
 
-const invokedSkills = async ($: EngineInterface) => skillsIn(await $.session.messages())
-
 const skillsBeforeCompaction = new Map<string, ReadonlySet<string>>()
-
-const skillListing = async ($: EngineInterface, text: string) => {
-  const [head = '', ...entries] = text.split(SKILL_ENTRY)
-  const invoked = await invokedSkills($)
-  const kept = entries.filter(entry => !invoked.has(entryName(entry)))
-  if (!kept.length) return entries.length ? null : text
-  return [head, ...kept].join('\n')
-}
 
 const passThrough = <E, R>(_: unknown, e: E, next: (e: E) => R) => next(e)
 
 export const register: Register = on => {
-  on('prompt.attachment', { type: 'skill_listing' }, async ($, e, next) => {
-    const text = await skillListing($, e.text)
-    return text === null ? { text: null } : next({ ...e, text })
-  }).catch(passThrough)
-
   on('prompt.attachment', async ($, e, next) => {
     const text = await reminder($, e.type)
     return text === undefined ? next(e) : { text: text || null }
@@ -170,14 +103,8 @@ export const register: Register = on => {
 
   on('prompt.submit', async ($, e, next) => {
     if (e.command || e.isMeta) return next(e)
-    const notes = (await Promise.all([reminder($, 'prompt'), styleSlipNote($)])).filter((note): note is string => !!note)
-    return notes.length ? next({ ...e, context: [...(e.context ?? []), ...notes] }) : next(e)
-  }).catch(passThrough)
-
-  on('classic.PostToolUse', async ($, e, next) => {
-    const [result, rules, nudge] = await Promise.all([next(e), languageRules($), shellNudge($, e.tool_name, e.tool_input)])
-    const extra = [nudge, rules?.reminder].filter(text => text !== undefined)
-    return extra.length ? { ...result, additionalContext: [...(result.additionalContext ?? []), ...extra] } : result
+    const note = await styleSlipNote($)
+    return note ? next({ ...e, context: [...(e.context ?? []), note] }) : next(e)
   }).catch(passThrough)
 
   on('session.compact', async ($, e, next) => {
@@ -196,21 +123,16 @@ export const register: Register = on => {
     return { ...result, additionalContext: [...(result.additionalContext ?? []), context] }
   }).catch(passThrough)
 
-  on('classic.PostToolUseFailure', async ($, e, next) => {
-    const [result, rules] = await Promise.all([next(e), languageRules($)])
-    return rules ? { ...result, additionalContext: [...(result.additionalContext ?? []), rules.reminder] } : result
-  }).catch(passThrough)
-
   on('classic.Stop', async ($, e, next) => {
     const answer = e.stop_hook_active ? undefined : e.last_assistant_message
-    const [rules, user] = answer ? await Promise.all([languageRules($), userText($)]) : []
-    if (answer && rules && user && isWrongScript(user, answer, MIN_LETTERS)) return { block: rules.rewrite }
-    return next(e)
+    const user = answer ? await userText($) : undefined
+    const rewrite = answer && user && isWrongScript(user, answer) ? await withLanguage($, 'language_rewrite') : undefined
+    return rewrite ? { block: rewrite } : next(e)
   }).catch(passThrough)
 
   on('turn.step', async function* ($, e, next) {
     const user = await userText($)
-    if (!user || latinShare(user).share >= 0.5) return yield* next(e)
+    if (!user || isMostlyLatin(user)) return yield* next(e)
     const stream = next(e)
     const held: TurnStepChunk[] = []
     let heldText = ''
@@ -227,21 +149,21 @@ export const register: Register = on => {
       }
       if (chunk.kind === 'tool') {
         const released = held.splice(0)
-        yield* isWrongScript(user, heldText, 8) ? released.filter(c => c.kind !== 'text') : released
+        yield* isWrongScript(user, heldText) ? released.filter(c => c.kind !== 'text') : released
         holding = false
         yield chunk
         continue
       }
       held.push(chunk)
       if (chunk.kind === 'text') heldText += chunk.text
-      if (chunk.kind === 'stop' || heldText.trim().includes('\n') || heldText.length > SHORT_LINE) {
+      if (chunk.kind === 'stop' || heldText.trim().includes('\n')) {
         yield* held.splice(0)
         holding = false
       }
     }
   })
 
-  on('tool.describe', { tool: ['Bash', 'PowerShell', 'Skill', 'mcp__ccd_turn__update_plan'] }, async ($, e, next) => {
+  on('tool.describe', { tool: Object.keys(TOOL_REMINDERS) }, async ($, e, next) => {
     const described = await next(e)
     const name = TOOL_REMINDERS[e.tool]
     const text = name && (await reminder($, name))
@@ -279,9 +201,8 @@ export const register: Register = on => {
 
   on('agent.spawn', async ($, e, next) => {
     if (e.subagentType === 'fork') return next(e)
-    const [style, overrides, language] = await Promise.all([outputStyle($), promptOverrides($), configuredLanguage($)])
-    const intro = language && (await withLanguage($, 'agent_rules', language))
-    const rules = [intro, style, ...overrides.values()].filter(Boolean)
+    const [intro, overrides] = await Promise.all([withLanguage($, 'agent_rules'), promptOverrides($)])
+    const rules = [intro, ...overrides.values()].filter(Boolean)
     if (!rules.length) return next(e)
     return next({ ...e, prompt: `${e.prompt}\n\n<standing_rules>\n${rules.join('\n\n')}\n</standing_rules>` })
   })
