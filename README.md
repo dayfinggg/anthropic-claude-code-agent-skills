@@ -11,7 +11,7 @@ This is a personal configuration, not an official Anthropic distribution. Creden
 
 ## What the setup changes
 
-The Concise output style keeps Claude silent between tool calls. The final answer reads like a short news report: the result first, then a few short paragraphs in plain words, without lists, headings, bold labels, dashes, or semicolons. Everything the user reads, including command descriptions and task list items, is in the language the user writes in. The style file overrides the built-in Concise style by name.
+The Concise output style keeps Claude silent between tool calls. The final answer reads like a short news report: the result first, then a few short paragraphs in plain words, without lists, headings, bold labels, dashes, or semicolons. A report of finished work has one sentence that names the check proving it and what that check does not cover. Everything the user reads, including command descriptions and task list items, is in the language the user writes in. The style file overrides the built-in Concise style by name.
 
 The oortveil mod is a Claude Code plugin with one hooks module. It loads through `CLAUDE_CODE_PLUGIN_DIRS` and does the following:
 
