@@ -1,0 +1,1 @@
+The last shell command only {action} local files. Use {tool} for that from now on, because the dedicated tool shows the user a clear result, follows their permissions and keeps the output small. Keep the shell for programs, builds, tests, package managers, git and remote hosts.

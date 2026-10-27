@@ -47,6 +47,26 @@ const languageRules = async ($: EngineInterface): Promise<LanguageRules | undefi
     : undefined
 }
 
+const SHELL_TOOLS = new Set(['Bash', 'PowerShell'])
+const REMOTE = /\b(?:ssh|scp|sftp|rsync|docker|kubectl|wsl|git|gh|curl|wget)\b/i
+const LEADING_NOISE = /^\s*(?:(?:cd|Set-Location|pushd)\s+(?:"[^"]*"|'[^']*'|\S+)\s*(?:&&|;)\s*|[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*/i
+
+const SHELL_DUPLICATES = [
+  { pattern: /^(?:sed\s+-i|perl\s+-p?i|Set-Content|Add-Content|Out-File|tee)\b|^(?:echo|printf|cat)\b[^|]*>\s*\S/i, action: 'edited or wrote', tool: 'Edit or Write' },
+  { pattern: /^(?:cat|head|tail|less|more|type|Get-Content|gc|bat)\b/i, action: 'read', tool: 'Read' },
+  { pattern: /^(?:grep|egrep|fgrep|rg|ag|ack|findstr|Select-String|sls)\b/i, action: 'searched', tool: 'Grep' },
+  { pattern: /^(?:find\s|fd\s|tree\b|ls\s+-[a-z]*R|dir\s+\/s|Get-ChildItem\b.*-Recurse|gci\b.*-Recurse)/i, action: 'listed', tool: 'Glob' },
+] as const
+
+const shellNudge = async ($: EngineInterface, tool: string, input: unknown) => {
+  if (!SHELL_TOOLS.has(tool) || typeof input !== 'object' || input === null || !('command' in input)) return undefined
+  const { command } = input
+  if (typeof command !== 'string' || REMOTE.test(command)) return undefined
+  const match = SHELL_DUPLICATES.find(({ pattern }) => pattern.test(command.replace(LEADING_NOISE, '')))
+  const text = match && (await reminder($, 'shell_nudge'))
+  return text ? text.replace('{action}', match.action).replace('{tool}', match.tool) : undefined
+}
+
 const userText = async ($: EngineInterface) => {
   const messages = await $.session.messages()
   return [...messages].reverse().find(message => message.role === 'user' && /\p{L}/u.test(message.text) && !message.text.trimStart().startsWith('<'))?.text
@@ -139,8 +159,9 @@ export const register: Register = on => {
   }).catch(passThrough)
 
   on('classic.PostToolUse', async ($, e, next) => {
-    const [result, rules] = await Promise.all([next(e), languageRules($)])
-    return rules ? { ...result, additionalContext: [...(result.additionalContext ?? []), rules.reminder] } : result
+    const [result, rules, nudge] = await Promise.all([next(e), languageRules($), shellNudge($, e.tool_name, e.tool_input)])
+    const extra = [nudge, rules?.reminder].filter(text => text !== undefined)
+    return extra.length ? { ...result, additionalContext: [...(result.additionalContext ?? []), ...extra] } : result
   }).catch(passThrough)
 
   on('classic.PostToolUseFailure', async ($, e, next) => {
