@@ -135,17 +135,33 @@ const pathScopedSkills = async ($: EngineInterface) => {
   return skills.filter(skill => skill !== undefined)
 }
 
-const withPathScopedSkills = async ($: EngineInterface, text: string) => {
-  const [, ...entries] = text.split(SKILL_ENTRY)
-  const listed = new Set(entries.map(entry => (entry.slice(2).split(/:\s|\n/)[0] ?? '').trim()))
-  const missing = (await pathScopedSkills($)).filter(({ name }) => !listed.has(name)).map(({ entry }) => entry)
-  return missing.length ? [text, ...missing].join('\n') : text
+const entryName = (entry: string) => (entry.slice(2).split(/:\s|\n/)[0] ?? '').trim()
+
+const invokedSkills = async ($: EngineInterface) => {
+  const messages = await $.session.messages()
+  const names = messages.flatMap(message =>
+    message.toolUses.flatMap(use => (use.tool === 'Skill' && typeof use.input.skill === 'string' ? [use.input.skill] : [])),
+  )
+  return new Set(names)
+}
+
+const skillListing = async ($: EngineInterface, text: string) => {
+  const [head = '', ...entries] = text.split(SKILL_ENTRY)
+  const listed = new Set(entries.map(entryName))
+  const [scoped, invoked] = await Promise.all([pathScopedSkills($), invokedSkills($)])
+  const missing = scoped.filter(({ name }) => !listed.has(name)).map(({ entry }) => entry)
+  const kept = [...entries, ...missing].filter(entry => !invoked.has(entryName(entry)))
+  if (!kept.length) return entries.length || missing.length ? null : text
+  return [head, ...kept].join('\n')
 }
 
 const passThrough = <E, R>(_: unknown, e: E, next: (e: E) => R) => next(e)
 
 export const register: Register = on => {
-  on('prompt.attachment', { type: 'skill_listing' }, async ($, e, next) => next({ ...e, text: await withPathScopedSkills($, e.text) }))
+  on('prompt.attachment', { type: 'skill_listing' }, async ($, e, next) => {
+    const text = await skillListing($, e.text)
+    return text === null ? { text: null } : next({ ...e, text })
+  }).catch(passThrough)
 
   on('prompt.attachment', async ($, e, next) => {
     const text = await reminder($, e.type)
