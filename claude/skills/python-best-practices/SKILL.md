@@ -1,7 +1,6 @@
 ---
 name: python-best-practices
 description: "Python best practices. Use when reading or editing any .py or .pyi file, pyproject.toml, or a requirements file."
-paths: ["**/*.py", "**/*.pyi", "**/pyproject.toml", "**/requirements*.txt"]
 ---
 
 # Python best practices

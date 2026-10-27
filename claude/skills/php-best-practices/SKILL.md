@@ -1,7 +1,6 @@
 ---
 name: php-best-practices
 description: "PHP best practices. Use when reading or editing any .php or .phtml file, or composer.json."
-paths: ["**/*.php", "**/*.phtml", "**/composer.json"]
 ---
 
 # PHP best practices

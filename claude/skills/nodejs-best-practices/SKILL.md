@@ -1,7 +1,6 @@
 ---
 name: nodejs-best-practices
 description: "Node.js best practices. Use when reading or editing JavaScript or TypeScript that runs on Node.js, such as servers, bots, workers, CLIs and scripts, or a package.json. Browser-only code needs typescript-best-practices alone."
-paths: ["**/*.js", "**/*.mjs", "**/*.cjs", "**/*.ts", "**/*.mts", "**/*.cts", "**/package.json"]
 ---
 
 # Node.js best practices
