@@ -17,11 +17,14 @@ The oortveil mod is a Claude Code plugin with one hooks module. It loads through
 
 - It defers ten rarely used built-in tools behind tool search, so their schemas leave the context until the model asks for them.
 - It replaces system prompt sections with the rule files in [`prompt/`](claude/mods/oortveil/prompt). An empty file removes a section, which is how the mod drops the default instruction to announce each step. The coding rules cover scope, design principles such as DRY, KISS, YAGNI, and SOLID, code without comments, security, grounding against hallucinated APIs and packages, and clarifying questions.
-- It adds short reminders from [`reminders/`](claude/mods/oortveil/reminders) at the moments they apply: before each reply, in the descriptions of the shell, skill, and task list tools, and before each request, where it asks the model to check every listed skill.
-- After each tool call it reminds the model of the language named in the `language` setting. When the user writes in a non-Latin script and the final answer is mostly Latin, it sends the answer back to be written again. It removes the short English note that Claude Opus 5.5 sometimes writes before a tool call: a one-line message in Latin script followed by a tool call is dropped from the stream, so neither the screen, the desktop app nor the transcript shows it.
-- When a build has no Glob and Grep tools, as the native Linux build does, the rules tell the model to search with `grep` and `find` in the shell, and the reminder after a shell search stays silent.
-- It adds the output style, the prompt rules, and the user's language to the brief of every subagent except forks, which already inherit the main prompt.
+- It adds short reminders from [`reminders/`](claude/mods/oortveil/reminders) at the moments they apply: before each reply and in the descriptions of the shell, skill, and task list tools. Every reminder and rule is a Markdown file, so you change the text without touching the code.
+- When the user writes in a non-Latin script and the final answer is mostly Latin, it sends the answer back once to be written again in the language named in the `language` setting.
+- It removes the short English note that Claude Opus 5.5 sometimes writes before a tool call. A one-line message in Latin script followed by a tool call is dropped from the stream, so neither the terminal, the desktop app, nor the transcript shows it. This also applies to subagents.
+- When the previous answer contained a dash, a semicolon, a list, a heading, or a bold label, it reminds the model of the output style together with the next request. It never blocks an answer for this.
+- When a build has no Glob and Grep tools, as the native Linux build does, the rules tell the model to search with `grep` and `find` in the shell.
+- It adds the prompt rules and the user's language to the brief of every subagent except forks, which already inherit the main prompt.
 - Around compaction it asks the summary to keep the user's own instructions word for word, and right after compaction it reminds the model of the rules and of the skills that were in use, so it can load them again.
+
 The portable settings also set `language`, keep built-in and claude.ai skills in the listing by name only through `skillOverrides`, hide commit and pull request attribution, block the claude.ai Gmail, Google Calendar, and Google Drive connectors, and turn off idle compaction, the silent turn reminder, away summary, remote recap, and auto memory.
 
 ## Install or replace an older setup
