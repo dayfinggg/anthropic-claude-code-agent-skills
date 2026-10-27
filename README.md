@@ -23,7 +23,7 @@ The oortveil mod is a Claude Code plugin with one hooks module. It loads through
 - Around compaction it asks the summary to keep the user's own instructions word for word, and right after compaction it reminds the model of the rules and of the skills that were in use, so it can load them again.
 - It lists skills that use `paths` in the skill listing from the start, so they also apply when work happens outside the working directory.
 
-The portable settings also set `language`, keep built-in and claude.ai skills in the listing by name only through `skillOverrides`, hide commit and pull request attribution, block the claude.ai Gmail, Google Calendar, and Google Drive connectors, and turn off the silent turn reminder, away summary, remote recap, and auto memory.
+The portable settings also set `language`, keep built-in and claude.ai skills in the listing by name only through `skillOverrides`, hide commit and pull request attribution, block the claude.ai Gmail, Google Calendar, and Google Drive connectors, and turn off idle compaction, the silent turn reminder, away summary, remote recap, and auto memory.
 
 ## Install or replace an older setup
 

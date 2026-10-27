@@ -1,6 +1,7 @@
 {
   "outputStyle": "Concise",
   "language": "russian",
+  "idleCompaction": false,
   "skillOverrides": {
     "dataviz": "name-only",
     "artifact-design": "name-only",
