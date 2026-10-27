@@ -53,7 +53,7 @@ const LEADING_NOISE = /^\s*(?:(?:cd|Set-Location|pushd)\s+(?:"[^"]*"|'[^']*'|\S+
 
 const SHELL_DUPLICATES = [
   { pattern: /^(?:sed\s+-i|perl\s+-p?i|Set-Content|Add-Content|Out-File|tee)\b|^(?:echo|printf|cat)\b[^|]*>\s*\S/i, action: 'edited or wrote', tool: 'Edit or Write', needs: 'Edit' },
-  { pattern: /^(?:cat|head|tail|less|more|type|Get-Content|gc|bat)\b/i, action: 'read', tool: 'Read', needs: 'Read' },
+  { pattern: /^(?:cat|head|tail|less|more|type|Get-Content|gc|bat)\b|^sed\s+-n\b/i, action: 'read', tool: 'Read', needs: 'Read' },
   { pattern: /^(?:grep|egrep|fgrep|rg|ag|ack|findstr|Select-String|sls)\b/i, action: 'searched', tool: 'Grep', needs: 'Grep' },
   { pattern: /^(?:find\s|fd\s|tree\b|ls\s+-[a-z]*R|dir\s+\/s|Get-ChildItem\b.*-Recurse|gci\b.*-Recurse)/i, action: 'listed', tool: 'Glob', needs: 'Glob' },
 ] as const
@@ -193,7 +193,7 @@ export const register: Register = on => {
   }).catch(passThrough)
 
   on('turn.step', async function* ($, e, next) {
-    const user = e.agentId === undefined ? await userText($) : undefined
+    const user = await userText($)
     if (!user || latinShare(user).share >= 0.5) return yield* next(e)
     const stream = next(e)
     const held: TurnStepChunk[] = []
@@ -264,7 +264,7 @@ export const register: Register = on => {
   on('agent.spawn', async ($, e, next) => {
     if (e.subagentType === 'fork') return next(e)
     const [style, overrides, language] = await Promise.all([outputStyle($), promptOverrides($), configuredLanguage($)])
-    const rules = [language && `The person writes in ${language}. Write every text the person may see in ${language}, including your report, command descriptions and task list items.`, style, ...overrides.values()].filter(Boolean)
+    const rules = [language && `The person writes in ${language}. Write every text the person may see in ${language}, including your report and command descriptions. You have no task list on screen, so do not call the task list tool.`, style, ...overrides.values()].filter(Boolean)
     if (!rules.length) return next(e)
     return next({ ...e, prompt: `${e.prompt}\n\n<standing_rules>\n${AGENT_RULES_INTRO}\n\n${rules.join('\n\n')}\n</standing_rules>` })
   })
