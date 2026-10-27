@@ -1,0 +1,1 @@
+Before any other tool call, go through the skill listing and decide for each skill whether its description covers this request. Call Skill for every skill that does, then do the work by those skills. A request that needs no skill, such as a short question or a reply in conversation, goes ahead without one.
