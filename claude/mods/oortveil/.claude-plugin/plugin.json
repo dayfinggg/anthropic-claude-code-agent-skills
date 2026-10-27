@@ -2,5 +2,6 @@
   "name": "oortveil",
   "version": "0.2.0",
   "author": { "name": "dayfing" },
+  "types": "./types/index.d.ts",
   "description": "Keeps Claude Code lean and on its rules: defers rarely used tools, rewrites system prompt sections, reminds the model of the language and style at the right moments, and carries the rules to subagents."
 }
