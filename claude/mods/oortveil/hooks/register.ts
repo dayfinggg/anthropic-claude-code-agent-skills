@@ -1,4 +1,4 @@
-import type { EngineInterface, Register } from 'claude-code'
+import type { EngineInterface, Register, SessionMessage } from 'claude-code'
 
 const DRIFT = [
   'Artifact',
@@ -137,13 +137,16 @@ const pathScopedSkills = async ($: EngineInterface) => {
 
 const entryName = (entry: string) => (entry.slice(2).split(/:\s|\n/)[0] ?? '').trim()
 
-const invokedSkills = async ($: EngineInterface) => {
-  const messages = await $.session.messages()
-  const names = messages.flatMap(message =>
-    message.toolUses.flatMap(use => (use.tool === 'Skill' && typeof use.input.skill === 'string' ? [use.input.skill] : [])),
+const skillsIn = (messages: readonly SessionMessage[]) =>
+  new Set(
+    messages.flatMap(message =>
+      message.toolUses.flatMap(use => (use.tool === 'Skill' && typeof use.input.skill === 'string' ? [use.input.skill] : [])),
+    ),
   )
-  return new Set(names)
-}
+
+const invokedSkills = async ($: EngineInterface) => skillsIn(await $.session.messages())
+
+const skillsBeforeCompaction = new Map<string, ReadonlySet<string>>()
 
 const skillListing = async ($: EngineInterface, text: string) => {
   const [head = '', ...entries] = text.split(SKILL_ENTRY)
@@ -178,6 +181,22 @@ export const register: Register = on => {
     const [result, rules, nudge] = await Promise.all([next(e), languageRules($), shellNudge($, e.tool_name, e.tool_input)])
     const extra = [nudge, rules?.reminder].filter(text => text !== undefined)
     return extra.length ? { ...result, additionalContext: [...(result.additionalContext ?? []), ...extra] } : result
+  }).catch(passThrough)
+
+  on('session.compact', async ($, e, next) => {
+    skillsBeforeCompaction.set(e.agentId ?? 'main', skillsIn(e.messages))
+    const focus = await reminder($, 'compact_focus')
+    return next(focus ? { ...e, instructions: [e.instructions, focus].filter(Boolean).join('\n\n') } : e)
+  }).catch(passThrough)
+
+  on('classic.SessionStart', async ($, e, next) => {
+    const result = await next(e)
+    if (e.source !== 'compact') return result
+    const skills = [...(skillsBeforeCompaction.get(e.agent_id ?? 'main') ?? [])]
+    const text = await reminder($, 'after_compact')
+    if (!text) return result
+    const context = text.replace('{skills}', skills.length ? skills.join(', ') : 'none')
+    return { ...result, additionalContext: [...(result.additionalContext ?? []), context] }
   }).catch(passThrough)
 
   on('classic.PostToolUseFailure', async ($, e, next) => {
