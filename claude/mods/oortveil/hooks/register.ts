@@ -1,4 +1,4 @@
-import type { EngineInterface, Register, SessionMessage } from 'claude-code'
+import type { EngineInterface, Register, SessionMessage, TurnStepChunk } from 'claude-code'
 
 const DRIFT = [
   'Artifact',
@@ -52,18 +52,21 @@ const REMOTE = /\b(?:ssh|scp|sftp|rsync|docker|kubectl|wsl|git|gh|curl|wget)\b/i
 const LEADING_NOISE = /^\s*(?:(?:cd|Set-Location|pushd)\s+(?:"[^"]*"|'[^']*'|\S+)\s*(?:&&|;)\s*|[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*/i
 
 const SHELL_DUPLICATES = [
-  { pattern: /^(?:sed\s+-i|perl\s+-p?i|Set-Content|Add-Content|Out-File|tee)\b|^(?:echo|printf|cat)\b[^|]*>\s*\S/i, action: 'edited or wrote', tool: 'Edit or Write' },
-  { pattern: /^(?:cat|head|tail|less|more|type|Get-Content|gc|bat)\b/i, action: 'read', tool: 'Read' },
-  { pattern: /^(?:grep|egrep|fgrep|rg|ag|ack|findstr|Select-String|sls)\b/i, action: 'searched', tool: 'Grep' },
-  { pattern: /^(?:find\s|fd\s|tree\b|ls\s+-[a-z]*R|dir\s+\/s|Get-ChildItem\b.*-Recurse|gci\b.*-Recurse)/i, action: 'listed', tool: 'Glob' },
+  { pattern: /^(?:sed\s+-i|perl\s+-p?i|Set-Content|Add-Content|Out-File|tee)\b|^(?:echo|printf|cat)\b[^|]*>\s*\S/i, action: 'edited or wrote', tool: 'Edit or Write', needs: 'Edit' },
+  { pattern: /^(?:cat|head|tail|less|more|type|Get-Content|gc|bat)\b/i, action: 'read', tool: 'Read', needs: 'Read' },
+  { pattern: /^(?:grep|egrep|fgrep|rg|ag|ack|findstr|Select-String|sls)\b/i, action: 'searched', tool: 'Grep', needs: 'Grep' },
+  { pattern: /^(?:find\s|fd\s|tree\b|ls\s+-[a-z]*R|dir\s+\/s|Get-ChildItem\b.*-Recurse|gci\b.*-Recurse)/i, action: 'listed', tool: 'Glob', needs: 'Glob' },
 ] as const
+
+const hasTool = async ($: EngineInterface, name: string) => (await $.tool.list()).some(tool => tool.name === name)
 
 const shellNudge = async ($: EngineInterface, tool: string, input: unknown) => {
   if (!SHELL_TOOLS.has(tool) || typeof input !== 'object' || input === null || !('command' in input)) return undefined
   const { command } = input
   if (typeof command !== 'string' || REMOTE.test(command)) return undefined
   const match = SHELL_DUPLICATES.find(({ pattern }) => pattern.test(command.replace(LEADING_NOISE, '')))
-  const text = match && (await reminder($, 'shell_nudge'))
+  if (!match || !(await hasTool($, match.needs))) return undefined
+  const text = await reminder($, 'shell_nudge')
   return text ? text.replace('{action}', match.action).replace('{tool}', match.tool) : undefined
 }
 
@@ -114,26 +117,6 @@ const outputStyle = async ($: EngineInterface) => {
 }
 
 const SKILL_ENTRY = /\n(?=- \S+(?::\s|\n|$))/
-const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/
-
-const frontmatterField = (block: string, key: string) => block.match(new RegExp(`^${key}:[ \\t]*(.+)$`, 'm'))?.[1]?.trim()
-
-const pathScopedSkills = async ($: EngineInterface) => {
-  const root = `${$.plugin.root}/../../skills`
-  const dirs = await $.fs.list(root).catch(() => [])
-  const skills = await Promise.all(
-    dirs
-      .filter(dir => dir.kind === 'dir')
-      .map(async dir => {
-        const block = (await read($, `${root}/${dir.name}/SKILL.md`))?.match(FRONTMATTER)?.[1] ?? ''
-        const description = frontmatterField(block, 'description')
-        if (!description || !frontmatterField(block, 'paths')) return undefined
-        const name = frontmatterField(block, 'name') ?? dir.name
-        return { name, entry: `- ${name}: ${description}` }
-      }),
-  )
-  return skills.filter(skill => skill !== undefined)
-}
 
 const entryName = (entry: string) => (entry.slice(2).split(/:\s|\n/)[0] ?? '').trim()
 
@@ -150,11 +133,9 @@ const skillsBeforeCompaction = new Map<string, ReadonlySet<string>>()
 
 const skillListing = async ($: EngineInterface, text: string) => {
   const [head = '', ...entries] = text.split(SKILL_ENTRY)
-  const listed = new Set(entries.map(entryName))
-  const [scoped, invoked] = await Promise.all([pathScopedSkills($), invokedSkills($)])
-  const missing = scoped.filter(({ name }) => !listed.has(name)).map(({ entry }) => entry)
-  const kept = [...entries, ...missing].filter(entry => !invoked.has(entryName(entry)))
-  if (!kept.length) return entries.length || missing.length ? null : text
+  const invoked = await invokedSkills($)
+  const kept = entries.filter(entry => !invoked.has(entryName(entry)))
+  if (!kept.length) return entries.length ? null : text
   return [head, ...kept].join('\n')
 }
 
@@ -211,11 +192,38 @@ export const register: Register = on => {
     return next(e)
   }).catch(passThrough)
 
-  on('classic.MessageDisplay', async ($, e, next) => {
-    const isWholeShortLine = e.index === 0 && e.final && !e.delta.trim().includes('\n') && e.delta.trim().length <= SHORT_LINE
-    const user = isWholeShortLine ? await userText($) : undefined
-    return user && isWrongScript(user, e.delta, 8) ? { displayContent: '' } : next(e)
-  }).catch(passThrough)
+  on('turn.step', async function* ($, e, next) {
+    const user = e.agentId === undefined ? await userText($) : undefined
+    if (!user || latinShare(user).share >= 0.5) return yield* next(e)
+    const stream = next(e)
+    const held: TurnStepChunk[] = []
+    let heldText = ''
+    let holding = true
+    for (let step = await stream.next(); ; step = await stream.next()) {
+      if (step.done) {
+        yield* held
+        return step.value
+      }
+      const chunk = step.value
+      if (!holding || (!held.length && chunk.kind !== 'text')) {
+        yield chunk
+        continue
+      }
+      if (chunk.kind === 'tool') {
+        const released = held.splice(0)
+        yield* isWrongScript(user, heldText, 8) ? released.filter(c => c.kind !== 'text') : released
+        holding = false
+        yield chunk
+        continue
+      }
+      held.push(chunk)
+      if (chunk.kind === 'text') heldText += chunk.text
+      if (chunk.kind === 'stop' || heldText.trim().includes('\n') || heldText.length > SHORT_LINE) {
+        yield* held.splice(0)
+        holding = false
+      }
+    }
+  })
 
   on('tool.describe', { tool: ['Bash', 'PowerShell', 'Skill', 'mcp__ccd_turn__update_plan'] }, async ($, e, next) => {
     const described = await next(e)
