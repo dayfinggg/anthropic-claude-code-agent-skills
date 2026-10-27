@@ -84,20 +84,19 @@ const promptOverrides = async ($: EngineInterface) => {
   )
 }
 
-const skillsIn = (messages: readonly SessionMessage[]) =>
-  new Set(
+const skillsIn = (messages: readonly SessionMessage[]) => [
+  ...new Set(
     messages.flatMap(message =>
       message.toolUses.flatMap(use => (use.tool === 'Skill' && typeof use.input.skill === 'string' ? [use.input.skill] : [])),
     ),
-  )
-
-const skillsBeforeCompaction = new Map<string, ReadonlySet<string>>()
+  ),
+]
 
 const passThrough = <E, R>(_: unknown, e: E, next: (e: E) => R) => next(e)
 
 export const register: Register = on => {
-  on('prompt.attachment', async ($, e, next) => {
-    const text = await reminder($, e.type)
+  on('prompt.attachment', { type: 'output_style' }, async ($, e, next) => {
+    const text = await reminder($, 'output_style')
     return text === undefined ? next(e) : { text: text || null }
   })
 
@@ -108,7 +107,7 @@ export const register: Register = on => {
   }).catch(passThrough)
 
   on('session.compact', async ($, e, next) => {
-    skillsBeforeCompaction.set(e.agentId ?? 'main', skillsIn(e.messages))
+    await $.state.set({ plugin: 'oortveil', key: 'skillsBeforeCompaction', id: e.agentId ?? 'main' }, skillsIn(e.messages))
     const focus = await reminder($, 'compact_focus')
     return next(focus ? { ...e, instructions: [e.instructions, focus].filter(Boolean).join('\n\n') } : e)
   }).catch(passThrough)
@@ -116,7 +115,7 @@ export const register: Register = on => {
   on('classic.SessionStart', async ($, e, next) => {
     const result = await next(e)
     if (e.source !== 'compact') return result
-    const skills = [...(skillsBeforeCompaction.get(e.agent_id ?? 'main') ?? [])]
+    const { value: skills = [] } = await $.state.get({ plugin: 'oortveil', key: 'skillsBeforeCompaction', id: e.agent_id ?? 'main' })
     const text = await reminder($, 'after_compact')
     if (!text) return result
     const context = text.replace('{skills}', skills.length ? skills.join(', ') : 'none')
@@ -163,7 +162,7 @@ export const register: Register = on => {
     }
   })
 
-  on('tool.describe', { tool: Object.keys(TOOL_REMINDERS) }, async ($, e, next) => {
+  on('tool.describe', { tool: ['Bash', 'PowerShell', 'Skill', 'mcp__ccd_turn__update_plan'] }, async ($, e, next) => {
     const described = await next(e)
     const name = TOOL_REMINDERS[e.tool]
     const text = name && (await reminder($, name))
