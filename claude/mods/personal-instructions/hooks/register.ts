@@ -29,7 +29,6 @@ export const register: Register = on => {
   on('prompt.section', { name: 'communication' }, () => ({ text: null }))
   on('prompt.section', { name: 'heron_brook' }, () => ({ text: null }))
   on('prompt.attachment', { type: 'language' }, () => ({ text: null }))
-  on('prompt.attachment', { type: 'output_style_instructions' }, () => ({ text: null }))
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
     const sections: PromptComposeSection[] = []
@@ -40,12 +39,9 @@ export const register: Register = on => {
         ? { ...section, text: await $.fs.read(`${$.plugin.root}/rules/${file}.md`), scope: 'session' }
         : section)
     }
-    const style = await $.fs.read(`${$.plugin.root}/../../output-styles/concise-personal.md`)
-    const styleText = style.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '').trim()
     return { ...result, sections: [
       ...sections.filter(s => s.scope === 'shared'),
-      ...sections.filter(s => s.scope === 'session'),
-      { id: 'response_style', text: styleText, scope: 'session' }
+      ...sections.filter(s => s.scope === 'session')
     ] }
   })
   on('tool.describe', async ($, e, next) => {

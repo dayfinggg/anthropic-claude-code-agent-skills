@@ -6,7 +6,7 @@ The payload contains 39 engineering skills, the Concise Personal output style, t
 
 The style asks for plain, natural answers in the user's language. It preserves concise complete sentences, useful lists and tables, and the user's punctuation requirements. Short answers do not reduce the completeness of research or implementation.
 
-The mod loads operating rules from Markdown files, removes competing tone and communication sections, and places the canonical output style in a session-scoped system prompt section. It removes the duplicate native style attachment. Seven tool descriptions receive targeted text patches while their technical contracts remain intact. Search citations appear beside supported claims. The mod does not block calls, filter answers, rewrite tool schemas, or add recurring reminders.
+Claude Code loads the output style selected in settings through its standard mechanism. The mod neither injects the style nor suppresses its native attachment. It loads operating rules from Markdown files and removes competing tone and communication sections. Seven tool descriptions receive targeted text patches while their technical contracts remain intact. Search citations appear beside supported claims. The mod does not block calls, filter answers, rewrite tool schemas, or add recurring reminders.
 
 ## Install
 

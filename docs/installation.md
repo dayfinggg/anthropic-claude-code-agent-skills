@@ -6,7 +6,7 @@ Run `scripts/install.ps1` in PowerShell or `sh scripts/install.sh` on macOS or L
 
 PowerShell `-Mode Merge` and shell `--merge` preserve unrelated entries and global `CLAUDE.md`. Bundled directories are still updated. Both modes preserve existing settings values, add missing defaults, select `Concise Personal`, and connect the installed mod. Replace mode replaces the configured mod directory list. Merge mode appends missing bundled mods. Existing settings can therefore retain intentional host-specific overrides.
 
-For the default destination, the installed mod location is `~/.claude/mods/personal-instructions`. A custom destination uses its resolved host-native path. The mod resolves Markdown rules and the canonical output style relative to its own installation directory. Keep the mod and the included output style together.
+For the default destination, the installed mod location is `~/.claude/mods/personal-instructions`. A custom destination uses its resolved host-native path. The mod resolves its Markdown rule files relative to its installation directory. Claude Code independently loads the output style selected in settings.
 
 The settings enable `bypassPermissions` and skip its confirmation prompts. Review the portable settings before installation. No custom subagent roles are declared. The empty agents marker keeps the installer directory available in Git archives.
 
