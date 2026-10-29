@@ -1,14 +1,17 @@
 ---
 name: research
-description: "Investigate a question against high-trust primary sources in a background agent and write the cited findings to a Markdown file. Use when a task depends on facts that need real reading beyond a quick lookup: an unfamiliar API or library, version-specific behavior, a specification, or a comparison of options."
+description: Research an engineering API, version, configuration, or integration question against primary sources and report findings in chat.
 ---
 
-Spin up a **background agent** with the Agent tool (`subagent_type: "general-purpose"`, `run_in_background: true`) to do the research, so you keep working while it reads.
+Read [local host integration](../.shared/host-integration.md) before applying this workflow.
 
-Its job:
+Investigate the engineering question directly using primary sources.
 
-1. Investigate the question against **primary sources** (official docs, source code, specs, first-party APIs), not a secondary write-up of them. Follow every claim back to the source that owns it.
-2. Write the findings to a single Markdown file, citing each claim's source.
-3. Save it where the repo already keeps such notes and match the existing convention. If the repo has none, save it in the session scratchpad, so research started on the agent's own judgment adds no files to the repo.
+1. Recover the exact question, installed dependency versions, relevant integration, and constraints from the current conversation and repository.
+2. Read the relevant official documentation, specification, source code, or first-party API. A search snippet or page title does not establish the governing behavior.
+3. Match sources to the installed or explicitly selected version. Trace disputed or consequential claims back to their owner and reconcile material disagreements.
+4. Compare documented behavior with the actual integration and identify which finding changes the implementation decision. Do not expand into unrelated recommendations.
+5. Preserve the distinction between verified facts, inference, and unavailable evidence. Continue independent research while a genuinely necessary clarification is pending.
+6. Return concise, sourced findings in chat. Create a Markdown research file only when the user explicitly requests that deliverable. Use a background or separate agent only when explicitly authorized.
 
-When it finishes, check its sources yourself before you relay anything. Answer the user in prose by the session's output style: the main findings first, then the file path.
+Finish when the question is answered to the precision required for the user's task. More sources are useful only when they resolve a material uncertainty.

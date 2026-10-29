@@ -1,7 +1,9 @@
 ---
 name: diagnosing-bugs
-description: "Diagnosis loop for hard bugs and performance regressions: a red-capable feedback loop first, then minimise, ranked falsifiable hypotheses, tagged instrumentation, a regression test and cleanup. Use when the user says 'diagnose' or 'debug this', or something is broken, throwing, failing or slow with no confirmed cause after a first look."
+description: Diagnose a difficult reproducible bug or performance regression through a feedback loop, competing hypotheses, and regression proof.
 ---
+
+Read [local host integration](../.shared/host-integration.md) before applying this imported workflow.
 
 # Diagnosing Bugs
 
@@ -32,7 +34,7 @@ Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give
 7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
 8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
 9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
-10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Copy it to the session scratchpad and replace its example `step` and `capture` calls with yours. `step` shows an instruction and waits for Enter, `capture VAR "question"` reads an answer, and the script prints every capture as `KEY=VALUE` at the end. It reads from the keyboard, so never run it through the Bash tool: start it in the user's Terminal panel with `run_in_terminal` when the app offers it, otherwise ask the user to run it, and read the printed captures back with `read_terminal` or from their reply. Leave signing in to the user as a `step`, never a `capture`.
+10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
 
 Build the right feedback loop, and the bug is 90% fixed.
 
@@ -56,7 +58,7 @@ Stop and say so explicitly. List what you tried. Ask the user for: (a) access to
 
 ### Completion criterion: a tight loop that goes red
 
-Phase 1 is done when the loop is **tight** and **red-capable**: you can name **one command** (a script path, a test invocation, a curl) that you have **already run at least once** (keep the invocation and its redacted output for the final answer), and that is:
+Phase 1 is done when the loop is **tight** and **red-capable**: you can name **one command** (a script path, a test invocation, a curl) that you have **already run at least once** (show the invocation and its output, redacted), and that is:
 
 - [ ] **Red-capable**: it drives the actual bug code path and asserts the **user's exact symptom**, so it can go red on this bug and green once fixed. Not "runs without erroring"; it must be able to _catch this specific bug_.
 - [ ] **Deterministic**: same verdict every run (flaky bugs: a pinned, high reproduction rate, per above).
@@ -87,7 +89,7 @@ Do not proceed until you have reproduced **and** minimised.
 
 ## Phase 3: Hypothesise
 
-Generate **3–5 ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea.
+Consider competing, falsifiable hypotheses before testing when the cause is genuinely uncertain. Choose as many as the evidence warrants rather than forcing a quota.
 
 Each hypothesis must be **falsifiable**: state the prediction it makes.
 
@@ -95,7 +97,7 @@ Each hypothesis must be **falsifiable**: state the prediction it makes.
 
 If you cannot state the prediction, the hypothesis is a vibe: discard or sharpen it.
 
-Do not stop to show the list. Test in your ranked order, and put the ranked list with each verdict in the final answer, so the user can see which hypotheses were ruled out and why.
+Rank hypotheses using available deployment history, logs, and prior conversation before testing. Report a hypothesis only when it materially explains the next diagnostic step. Do not require an intermediate user checkpoint.
 
 ## Phase 4: Instrument
 
@@ -134,5 +136,5 @@ Required before declaring done:
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or absence of seam is documented)
 - [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
-- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
-- [ ] The hypothesis that turned out correct is stated in the final answer, and in the commit or PR message when the task includes one, so the next debugger learns
+- [ ] Task-owned throwaway prototypes and fixtures removed once no process needs them
+- [ ] The established cause is reported in chat, or in a commit or PR description only when that operation is requested
