@@ -1,5 +1,5 @@
 {
-  "outputStyle": "Concise",
+  "outputStyle": "Concise Personal",
   "language": "russian",
   "idleCompaction": false,
   "skillOverrides": {
@@ -36,6 +36,8 @@
     "anthropic-skills:xlsx": "name-only"
   },
   "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/personal-instructions",
+    "CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT": "0",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "128000",
     "CLAUDE_CODE_SILENT_TURN_REMINDER": "0",
     "CLAUDE_CODE_THRIFTY_SONIC": "0",

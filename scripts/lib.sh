@@ -196,7 +196,11 @@ claude_sync_payload() {
   set --
   for csp_mod in "$csp_source/mods/"*/; do
     [ -d "$csp_mod" ] || continue
-    set -- "$@" "$(claude_native_path "$csp_platform" "$csp_destination/mods/$(basename "$csp_mod")")"
+    if [ "$csp_destination" = "$HOME/.claude" ]; then
+      set -- "$@" "~/.claude/mods/$(basename "$csp_mod")"
+    else
+      set -- "$@" "$(claude_native_path "$csp_platform" "$csp_destination/mods/$(basename "$csp_mod")")"
+    fi
   done
   cp "$csp_source/settings.json" "$csp_work/portable-settings.json"
   csp_settings=
@@ -216,6 +220,11 @@ claude_sync_payload() {
   done
 
   CLAUDE_SYNC_REMOVED=0
+  if [ "$csp_mode" = replace ] && [ -e "$csp_destination/CLAUDE.md" ]; then
+    claude_backup_path "$csp_destination" "$csp_backup" CLAUDE.md
+    rm -f -- "$csp_destination/CLAUDE.md"
+    CLAUDE_SYNC_REMOVED=$((CLAUDE_SYNC_REMOVED + 1))
+  fi
   for csp_directory in $claude_managed_directories; do
     for csp_entry in "$csp_destination/$csp_directory/"* "$csp_destination/$csp_directory/".[!.]* "$csp_destination/$csp_directory/"..?*; do
       [ -e "$csp_entry" ] || [ -L "$csp_entry" ] || continue

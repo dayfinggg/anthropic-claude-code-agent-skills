@@ -238,7 +238,14 @@ function Sync-ClaudePayload {
     $InstalledMods = Join-Path $Destination "mods"
     $PluginDirectories = @(Get-ChildItem -LiteralPath (Join-Path $Source "mods") -Directory |
         Sort-Object Name |
-        ForEach-Object { Join-Path $InstalledMods $_.Name })
+        ForEach-Object {
+            $DefaultDestination = Join-Path ([Environment]::GetFolderPath("UserProfile")) ".claude"
+            if ($Destination -eq $DefaultDestination) {
+                "~/.claude/mods/$($_.Name)"
+            } else {
+                Join-Path $InstalledMods $_.Name
+            }
+        })
     $SettingsPath = Join-Path $Destination "settings.json"
     $Merged = Merge-ClaudeSettings `
         -PortablePath (Join-Path $Source "settings.json") `
@@ -252,6 +259,14 @@ function Sync-ClaudePayload {
     }
 
     $Removed = 0
+    if ($Mode -eq "Replace") {
+        $LegacyInstructions = Join-Path $Destination "CLAUDE.md"
+        if (Test-Path -LiteralPath $LegacyInstructions) {
+            Copy-ClaudeBackupPath -Destination $Destination -BackupDirectory $BackupDirectory -RelativePath "CLAUDE.md"
+            Remove-Item -LiteralPath $LegacyInstructions -Force
+            $Removed++
+        }
+    }
     foreach ($Directory in $script:ManagedDirectories) {
         $DestinationDirectory = Join-Path $Destination $Directory
         if (Test-Path -LiteralPath $DestinationDirectory) {

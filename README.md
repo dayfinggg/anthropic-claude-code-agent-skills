@@ -1,101 +1,41 @@
-# Claude Code Agent Skills
+# Claude Code instructions and skills
 
-English · [Українська](README.uk.md) · [Русский](README.ru.md)
+A portable configuration for Claude Opus 5.5, Sonnet 5.5, Haiku 5.5, and Fable 5.1, synchronized with the current local setup.
 
-A portable copy of the author's Claude Code setup for Claude Opus 5.5. It installs 33 engineering skills, one subagent, the Concise output style, the oortveil mod, and the settings that tie them together.
+The payload contains 39 engineering skills, the Concise Personal output style, the personal-instructions mod written in TypeScript, and portable settings. No custom subagent definitions or global CLAUDE.md file are installed.
 
-This is a personal configuration, not an official Anthropic distribution. Credentials, account state, chat history, projects, sessions, plugins, synced claude.ai skills, caches, and machine paths are not included.
+The style asks for plain, natural answers in the user's language. It preserves concise complete sentences, useful lists and tables, and the user's punctuation requirements. Short answers do not reduce the completeness of research or implementation.
 
-> [!WARNING]
-> The portable settings turn off permission prompts. When your settings don't set them, the installer adds `"permissions": { "defaultMode": "bypassPermissions" }`, `"skipDangerousModePermissionPrompt": true`, and `env.CLAUDE_CODE_EVEN_MORE_DANGEROUSLY_SKIP_PERMISSIONS` set to `1`. Claude Code then runs every tool call without asking, skips the confirmation before it enters that mode, and also runs `rm` commands that Claude Code treats as dangerous without a prompt. The [permission modes documentation](https://code.claude.com/docs/en/permission-modes#skip-all-checks-with-bypasspermissions-mode) recommends bypass mode only for isolated environments, such as containers and virtual machines without internet access. Review [the settings](claude/settings.json) before you install, or set your own values first, because the installer keeps existing values.
+The mod loads operating rules from Markdown files, removes competing tone and communication sections, and places the canonical output style in a session-scoped system prompt section. It removes the duplicate native style attachment. Seven tool descriptions receive targeted text patches while their technical contracts remain intact. Search citations appear beside supported claims. The mod does not block calls, filter answers, rewrite tool schemas, or add recurring reminders.
 
-## What the setup changes
+## Install
 
-The Concise output style keeps Claude silent between tool calls. The final answer reads like a short news report: the result first, then a few short paragraphs in plain words, without lists, headings, bold labels, dashes, or semicolons. A report of finished work has one sentence that names the check proving it and what that check does not cover. Everything the user reads, including command descriptions and task list items, is in the language the user writes in. The style file overrides the built-in Concise style by name.
-
-The oortveil mod is a Claude Code plugin with one hooks module. It loads through `CLAUDE_CODE_PLUGIN_DIRS` and does the following:
-
-- It defers ten rarely used built-in tools behind tool search, so their schemas leave the context until the model asks for them.
-- It replaces system prompt sections with the rule files in [`prompt/`](claude/mods/oortveil/prompt). An empty file removes a section, which is how the mod drops the default instruction to announce each step. The coding rules cover scope, design principles such as DRY, KISS, YAGNI, and SOLID, code without comments, security, grounding against hallucinated APIs and packages, clarifying questions, verification that proves a change works, long runs that keep their plan in a file, and the use of subagents. They follow the guidance on [claude.dev](https://claude.dev/), Anthropic's developer blog, where it fits the author's preferences.
-- It adds short reminders from [`reminders/`](claude/mods/oortveil/reminders) at the moments they apply: before each reply and in the descriptions of the shell, skill, and task list tools. Every reminder and rule is a Markdown file, so you change the text without touching the code.
-- When the user writes in a non-Latin script and the final answer is mostly Latin, it sends the answer back once to be written again in the language named in the `language` setting.
-- It removes the short English note that Claude Opus 5.5 sometimes writes before a tool call. A one-line message in Latin script followed by a tool call is dropped from the stream, so neither the terminal, the desktop app, nor the transcript shows it. This also applies to subagents.
-- When the previous answer contained a dash, a semicolon, a list, a heading, or a bold label, it reminds the model of the output style together with the next request. It never blocks an answer for this.
-- When a build has no Glob and Grep tools, as the native Linux build does, the rules tell the model to search with `grep` and `find` in the shell.
-- It adds the prompt rules and the user's language to the brief of every subagent except forks, which already inherit the main prompt.
-- Around compaction it asks the summary to keep the user's own instructions word for word, and right after compaction it reminds the model of the rules and of the skills that were in use, so it can load them again.
-
-The portable settings also set `language`, keep built-in and claude.ai skills in the listing by name only through `skillOverrides`, hide commit and pull request attribution, block the claude.ai Gmail, Google Calendar, and Google Drive connectors, and turn off idle compaction, the silent turn reminder, away summary, remote recap, and auto memory.
-
-## Install or replace an older setup
-
-Download and extract the [ZIP archive](https://github.com/dayfinggg/anthropic-claude-code-agent-skills/archive/refs/heads/main.zip), or clone the repository:
-
-```sh
-git clone https://github.com/dayfinggg/anthropic-claude-code-agent-skills.git
-cd anthropic-claude-code-agent-skills
-```
-
-Run one installer from the extracted or cloned folder. It uses the included files and downloads nothing.
-
-### Windows
-
-Requires Windows PowerShell 5.1 or PowerShell 7.
+Requires a Claude Code build supporting mods and TypeScript hooks. The current payload was validated with Claude Code 2.1.312. Windows installers require PowerShell 5.1 or PowerShell 7. The macOS and Linux installer also requires Python 3 for settings processing.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
 
-### macOS and Linux
-
-Requires a POSIX shell, `python3` for the settings merge, and a SHA-256 utility, such as `sha256sum`, `shasum`, or `openssl`.
-
 ```sh
 sh scripts/install.sh
 ```
 
-Restart Claude Code after installation. The mod requires Claude Code v2.1.280 or later.
+Replace mode backs up and replaces custom skills, agents, output styles, and mods. It removes a legacy global CLAUDE.md file so old instructions do not compete. Credentials, sessions, projects, plugins, synced skills, and unrelated files remain in place. Existing settings are preserved, missing defaults are added, and the active style and mod location are updated.
 
-Replace is the default mode. The installer backs up and replaces all skills except `skills/synced`, all agents, the `output-styles` folder, and the `mods` folder. It keeps synced skills, credentials, sessions, projects, plugins, and unrelated files. Existing settings values stay and missing keys are added, except `outputStyle`, which becomes `Concise`, and `env.CLAUDE_CODE_PLUGIN_DIRS`, which lists the installed mod folder. The `language` setting is `russian` in the portable settings, so set your own language before you install, or change it afterwards.
+The portable settings enable `bypassPermissions` and skip its confirmation prompts. Review [settings.json](claude/settings.json) before installation. The default mod path uses `~/.claude/mods/personal-instructions` and the installer resolves custom destinations on the host.
+
+Start a new Claude Code session after installation. See [installation details](docs/installation.md) for merge mode and custom destinations.
 
 ## Update
 
-To download and install the latest GitHub revision without updating your checkout:
+Run `scripts/update.ps1` in PowerShell or `sh scripts/update.sh` on macOS or Linux. A Git checkout can instead use `git pull --ff-only` followed by the installer. Updates reuse the last installation mode.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\update.ps1
-```
+## Contents
 
-```sh
-sh scripts/update.sh
-```
-
-Updates require internet access, and the shell updater also needs `curl` and `tar`. The last install mode is reused. If you keep a Git clone instead, run `git pull --ff-only` and rerun the installer.
-
-## Contents and installation details
-
-- [33 skills and their references](claude/skills)
-- [poteto-agent subagent](claude/agents/poteto-agent.md)
-- [Concise output style](claude/output-styles/concise.md)
-- [oortveil mod](claude/mods/oortveil)
+- [Output style](claude/output-styles/concise-personal.md)
+- [TypeScript mod](claude/mods/personal-instructions)
+- [Operating rules](claude/mods/personal-instructions/rules)
+- [Engineering skills](claude/skills)
 - [Portable settings](claude/settings.json)
-- [Installation modes, backups, and custom locations](docs/installation.md)
-- [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-Most skills and the subagent are adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack) by Lauren Tan and [skills](https://github.com/mattpocock/skills) by Matt Pocock, both under the MIT License. [Third-party notices](THIRD_PARTY_NOTICES.md) lists which skill comes from where and keeps the original license texts.
-
-The settings copy leaves out `env.CLAUDE_CODE_PLUGIN_DIRS`, which the installer writes for each platform. The mod's `.claude-plugin/types` folder is left out because [Claude Code generates those type definitions](https://code.claude.com/docs/en/plugins/mods/create#get-the-types-for-your-build) for the version it runs.
-
-Claude Code keeps its configuration in `~/.claude`, or in the folder named by `CLAUDE_CONFIG_DIR`, as [Environment variables](https://code.claude.com/docs/en/env-vars) describes. Skills load from `skills/<skill-name>/SKILL.md` ([Extend Claude with skills](https://code.claude.com/docs/en/skills)), and output styles load from `output-styles` ([Output styles](https://code.claude.com/docs/en/output-styles)).
-
-## Verify the installers
-
-Requires Python 3.11 or newer:
-
-```sh
-python -m unittest discover -s tests -v
-```
-
-The tests use temporary directories, not your real Claude Code setup. They run every available Windows PowerShell, PowerShell 7, and POSIX shell and report the missing ones as skipped.
-
-The previous setup, with the nova output style and mod, is kept in the [`legacy` branch](https://github.com/dayfinggg/anthropic-claude-code-agent-skills/tree/legacy). Report problems through [GitHub issues](https://github.com/dayfinggg/anthropic-claude-code-agent-skills/issues). Repository instructions and scripts use the [MIT License](LICENSE).
+Account state, sessions, project data, caches, retired files, and cloud-synced skills are excluded. No Telegram notification workflow is included. This is an independent configuration, not an official Anthropic distribution. Prompt instructions guide behavior and do not guarantee compliance on every response.

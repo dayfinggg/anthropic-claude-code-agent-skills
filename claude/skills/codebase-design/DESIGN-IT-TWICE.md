@@ -1,6 +1,6 @@
 # Design It Twice
 
-When a chosen deepening candidate has several plausible interfaces, or the user wants to explore alternatives, use this parallel sub-agent pattern. Based on "Design It Twice" (Ousterhout): your first idea is unlikely to be the best.
+When the user wants to explore alternative interfaces for a chosen deepening candidate, use this comparative design procedure. Based on "Design It Twice" (Ousterhout): your first idea is unlikely to be the best.
 
 Uses the vocabulary in [SKILL.md](SKILL.md): **module**, **interface**, **seam**, **adapter**, **leverage**.
 
@@ -8,28 +8,28 @@ Uses the vocabulary in [SKILL.md](SKILL.md): **module**, **interface**, **seam**
 
 ### 1. Frame the problem space
 
-Before spawning sub-agents, write down the problem space for the chosen candidate:
+Establish the problem space for the chosen candidate from available code and requirements:
 
 - The constraints any new interface would need to satisfy
 - The dependencies it would rely on, and which category they fall into (see [DEEPENING.md](DEEPENING.md))
 - A rough illustrative code sketch to ground the constraints, not a proposal, just a way to make the constraints concrete
 
-Keep it for the final answer and proceed to Step 2 without stopping.
+Keep routine design notes internal. Surface a material unresolved requirement through the host's question tool, and continue independent work.
 
-### 2. Spawn sub-agents
+### 2. Develop independent alternatives
 
-Spawn 3+ sub-agents in parallel with the Agent tool (`subagent_type: "Explore"`, "do not edit files" in the brief, `model` and `effort` taken in turn from the entries of the `architect runners` row of the Models table in the **poteto-mode** skill). Each must produce a **radically different** interface for the deepened module.
+Develop materially different interfaces directly in the current agent. Compare only alternatives that address a real design uncertainty. Separate agents are optional when explicitly authorized.
 
-Prompt each sub-agent with a separate technical brief (file paths, coupling details, dependency category from [DEEPENING.md](DEEPENING.md), what sits behind the seam). The brief is independent of the user-facing problem-space explanation in Step 1. Give each agent a different design constraint:
+Give each alternative a separate technical brief (file paths, coupling details, dependency category from [DEEPENING.md](DEEPENING.md), what sits behind the seam). The brief is independent of the user-facing problem-space explanation in Step 1. Evaluate different design constraints:
 
-- Agent 1: "Minimize the interface: aim for 1–3 entry points max. Maximise leverage per entry point."
-- Agent 2: "Maximise flexibility: support many use cases and extension."
-- Agent 3: "Optimise for the most common caller: make the default case trivial."
-- Agent 4 (if applicable): "Design around ports & adapters for cross-seam dependencies."
+- Alternative 1 "Minimize the interface: aim for 1–3 entry points max. Maximise leverage per entry point."
+- Alternative 2 "Maximise flexibility: support many use cases and extension."
+- Alternative 3 "Optimise for the most common caller: make the default case trivial."
+- Alternative 4 when applicable "Design around ports & adapters for cross-seam dependencies."
 
-Include both [SKILL.md](SKILL.md) vocabulary and GLOSSARY.md vocabulary in the brief so each sub-agent names things consistently with the architecture language and the project's domain language.
+Include both [SKILL.md](SKILL.md) vocabulary and GLOSSARY.md vocabulary in the brief so each alternative names things consistently with the architecture language and the project's domain language.
 
-Each sub-agent outputs:
+Record for each alternative:
 
 1. Interface (types, methods, params, plus invariants, ordering, error modes)
 2. Usage example showing how callers use it
@@ -39,6 +39,6 @@ Each sub-agent outputs:
 
 ### 3. Present and compare
 
-Compare the designs in prose, one short paragraph per design, by **depth** (leverage at the interface), **locality** (where change concentrates), and **seam placement**. A table fits when several designs are compared across these attributes.
+Compare alternatives internally and present the selected design and material tradeoffs in the user's requested format. Show alternatives only when requested. Contrast by **depth** (leverage at the interface), **locality** (where change concentrates), and **seam placement**.
 
-Then give your own recommendation: which design is strongest and why. If elements from different designs combine well, propose a hybrid. Be opinionated: the user wants a strong read, not a menu. When this runs inside an autonomous task rather than on the user's request to compare designs, take the recommended design and continue, and put the comparison in the final answer.
+After comparing, give your own recommendation: which design you think is strongest and why. If elements from different designs would combine well, propose a hybrid. Be opinionated: the user wants a strong read, not a menu.
