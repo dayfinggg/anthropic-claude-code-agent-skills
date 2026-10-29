@@ -38,4 +38,4 @@ Run `scripts/update.ps1` in PowerShell or `sh scripts/update.sh` on macOS or Lin
 - [Engineering skills](claude/skills)
 - [Portable settings](claude/settings.json)
 
-Account state, sessions, project data, caches, retired files, and cloud-synced skills are excluded. No Telegram notification workflow is included. This is an independent configuration, not an official Anthropic distribution. Prompt instructions guide behavior and do not guarantee compliance on every response.
+Account state, sessions, project data, caches, retired files, and cloud-synced skills are excluded. Telegram notifications remain available for future repository updates. This is an independent configuration, not an official Anthropic distribution. Prompt instructions guide behavior and do not guarantee compliance on every response.
