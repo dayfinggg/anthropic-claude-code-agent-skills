@@ -178,6 +178,22 @@ class PayloadChecks:
 
         self.assertEqual(self.settings()["reviewedAt"], "2026-10-15T12:00:00+02:00")
 
+    def test_retired_skill_overrides_are_removed_and_backed_up(self):
+        for mode in ("merge", "replace"):
+            with self.subTest(mode=mode):
+                original = {"skillOverrides": {"docs": "name-only"}, "model": "personal-model"}
+                self.write(self.destination / "settings.json", json.dumps(original))
+                self.sync(mode=mode)
+                self.assertNotIn("skillOverrides", self.settings())
+                self.assertEqual(self.settings()["model"], "personal-model")
+                self.assertEqual(json.loads((self.backup / "settings.json").read_text()), original)
+
+    def test_payload_skill_overrides_remain_supported(self):
+        portable = dict(PORTABLE_SETTINGS, skillOverrides={"docs": "on"})
+        self.write(self.source / "settings.json", json.dumps(portable))
+        self.sync()
+        self.assertEqual(self.settings()["skillOverrides"], {"docs": "on"})
+
     def test_settings_switch_output_style_to_brief(self):
         self.write(self.destination / "settings.json", json.dumps({"outputStyle": "Explanatory"}))
 
