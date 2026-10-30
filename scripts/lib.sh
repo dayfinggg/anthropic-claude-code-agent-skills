@@ -117,6 +117,9 @@ def main(portable_path, settings_path, output_path, mode, platform, home, *bundl
     portable = read_settings(portable_path, "Payload claude/settings.json")
     settings = read_settings(settings_path, "Existing settings.json") if settings_path else {}
     changed = add_missing(settings, portable)
+    if "skillOverrides" not in portable and "skillOverrides" in settings:
+        del settings["skillOverrides"]
+        changed += 1
     if "outputStyle" in portable and settings["outputStyle"] != portable["outputStyle"]:
         settings["outputStyle"] = portable["outputStyle"]
         changed += 1

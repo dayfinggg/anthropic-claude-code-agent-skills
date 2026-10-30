@@ -176,6 +176,10 @@ function Merge-ClaudeSettings {
     }
 
     $Changed = Add-ClaudeMissingSettings -Settings $Settings -Portable $Portable
+    if ($null -eq $Portable.PSObject.Properties["skillOverrides"] -and $null -ne $Settings.PSObject.Properties["skillOverrides"]) {
+        $Settings.PSObject.Properties.Remove("skillOverrides")
+        $Changed++
+    }
     $OutputStyle = $Portable.PSObject.Properties["outputStyle"]
     if ($null -ne $OutputStyle -and $Settings.outputStyle -cne $OutputStyle.Value) {
         $Settings.outputStyle = $OutputStyle.Value

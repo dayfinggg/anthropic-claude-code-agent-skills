@@ -1,4 +1,5 @@
 import type { PromptComposeSection, Register } from 'claude-code'
+import { excludeAgentInstructions, excludeStyleInstructions } from './style-exclusions.ts'
 
 const sectionFiles: Readonly<Record<string, string>> = {
   intro: 'intro',
@@ -10,25 +11,58 @@ const sectionFiles: Readonly<Record<string, string>> = {
   context_management: 'context_management'
 }
 const removedSections = new Set(['tone', 'communication', 'heron_brook'])
-const patchedTools = new Set(['Agent', 'Bash', 'PowerShell', 'Grep', 'WebFetch', 'WebSearch', 'DesignSync'])
-
-export function patchDescription(description: string, specification: string): string {
-  let text = description.replace(/\r\n/g, '\n')
-  const patches = specification.replace(/\r\n/g, '\n')
-  if (patches.startsWith('remove-example-blocks: true\n')) {
-    text = text.replace(/<example>[\s\S]*?<\/example>\s*/g, '')
-  }
-  for (const match of patches.matchAll(/<find>\n([\s\S]*?)\n<\/find>\n<replace>\n([\s\S]*?)\n<\/replace>/g)) {
-    const [ , find, replacement ] = match
-    if (find && replacement !== undefined) text = text.split(find).join(replacement)
-  }
-  return text
-}
+const deferredTools = [
+  'Artifact',
+  'ScheduleWakeup',
+  'Workflow',
+  'ReportFindings',
+  'SearchPlugins',
+  'SuggestPluginInstall',
+  'SuggestSkills',
+  'ListAgents'
+]
+const claudeMcpServers = new Set([
+  'Claude_Browser',
+  'Claude_Preview',
+  'claude-in-chrome',
+  'computer-use',
+  'terminal',
+  'visualize',
+  'workspace',
+  'ide',
+  'claude_ai_Claude_Docs',
+  '1a59c906-04da-521d-bda7-7f71b9f9e01c'
+])
 
 export const register: Register = on => {
+  on('tool.describe', async ($, e, next) => {
+    const result = await next(e)
+    const server = /^mcp__(.+?)__/.exec(e.tool)?.[1]
+    const isClaudeMcp = server !== undefined && (
+      claudeMcpServers.has(server) || server.startsWith('ccd_')
+    )
+    return {
+      ...result,
+      description: excludeStyleInstructions(e.tool === 'Agent'
+        ? excludeAgentInstructions(result.description)
+        : result.description),
+      ...(deferredTools.includes(e.tool) || isClaudeMcp ? { isDeferred: true } : {})
+    }
+  })
+  on('session.start', async ($, e, next) => {
+    $.ui.invalidate('tool.describe')
+    $.ui.invalidate('prompt.section')
+    $.ui.invalidate('prompt.attachment')
+    return next(e)
+  })
   on('prompt.section', { name: 'communication' }, () => ({ text: null }))
+  on('prompt.section', { name: 'tone' }, () => ({ text: null }))
   on('prompt.section', { name: 'heron_brook' }, () => ({ text: null }))
   on('prompt.attachment', { type: 'language' }, () => ({ text: null }))
+  on('prompt.attachment', { type: 'mcp_instructions_delta' }, async ($, e, next) => {
+    const result = await next(e)
+    return { ...result, text: result.text === null ? null : excludeStyleInstructions(result.text) }
+  })
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
     const sections: PromptComposeSection[] = []
@@ -37,17 +71,11 @@ export const register: Register = on => {
       const file = sectionFiles[section.id]
       sections.push(file
         ? { ...section, text: await $.fs.read(`${$.plugin.root}/rules/${file}.md`), scope: 'session' }
-        : section)
+        : { ...section, text: excludeStyleInstructions(section.text) })
     }
     return { ...result, sections: [
       ...sections.filter(s => s.scope === 'shared'),
       ...sections.filter(s => s.scope === 'session')
     ] }
-  })
-  on('tool.describe', async ($, e, next) => {
-    const result = await next(e)
-    if (!patchedTools.has(e.tool) || e.provider.plugin !== 'engine') return result
-    const specification = await $.fs.read(`${$.plugin.root}/tool-patches/${e.tool}.md`)
-    return { ...result, description: patchDescription(result.description, specification) }
   })
 }
