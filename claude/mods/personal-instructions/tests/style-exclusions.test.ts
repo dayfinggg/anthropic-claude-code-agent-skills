@@ -1,4 +1,13 @@
 import { expect, test } from 'claude-code/testing'
+import { excludeStyleInstructions } from '../hooks/style-exclusions.ts'
+
+test('Fable style conflicts are removed while work and permission requirements remain', () => {
+  const text = '# Delivering work\nDo ordinary work as asked. Stop short of actions beyond the request.\n\n# Writing for the user\n- Lead with the answer or outcome. If something could not be verified, say so first. Keep it short by leaving things out, not by packing them in.\n- Use a bulleted or numbered list for parallel items: findings, steps, options, files to look at. One or two sentences per bullet, never a paragraph. Bold the first few words of a bullet or paragraph, never a whole sentence. A single point or a line of argument stays in prose.\n- No headers in a message under about 500 words. Above that, at most three. If the user asks for no formatting, use none.\nOffering follow-ups after the task is done is fine; asking permission before doing the work is not.\nBefore running a command that changes system state, check the evidence.'
+  const result = excludeStyleInstructions(text)
+  for (const phrase of ['say so first', 'Bold the first few', 'at most three', 'Offering follow-ups', 'leaving things out']) expect(result.includes(phrase)).toBe(false)
+  for (const phrase of ['Do ordinary work as asked.', 'Stop short of actions beyond the request.', 'Lead with the answer or outcome.', 'Before running a command that changes system state, check the evidence.']) expect(result.includes(phrase)).toBe(true)
+  expect(excludeStyleInstructions(result)).toBe(result)
+})
 
 test('Agent keeps its calling contract without proactive delegation or conflicting examples', async ($, on) => {
   on('tool.describe', ($, e) => ({ description: e.description, isDeferred: e.isDeferred }))
