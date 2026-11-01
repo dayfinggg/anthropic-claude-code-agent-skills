@@ -2,7 +2,7 @@
 
 A portable configuration for Claude Opus 5.5, Sonnet 5.5, Haiku 5.5, and Fable 5.1, synchronized with the current local setup.
 
-The payload contains 39 engineering skills, the Concise Personal output style, the personal-instructions mod written in TypeScript, and portable settings. No custom subagent definitions or global CLAUDE.md file are installed.
+The payload contains 41 engineering skills, the Concise Personal output style, the personal-instructions mod written in TypeScript, and portable settings. No custom subagent definitions or global CLAUDE.md file are installed.
 
 The style asks for plain, natural answers in the user's language. It preserves concise complete sentences, useful lists and tables, and the user's punctuation requirements. Short answers do not reduce the completeness of research or implementation.
 
