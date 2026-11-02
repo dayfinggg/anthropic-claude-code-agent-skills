@@ -1,6 +1,6 @@
 import type { PromptComposeSection, Register } from 'claude-code'
 import { excludeAgentInstructions, excludeStyleInstructions } from './style-exclusions.ts'
-import { finishToolTurn, readStyleReminderState, recordToolStep } from './style-reminder.ts'
+import { readStyleReminderState, recordToolBatch, styleReminderBatchThreshold } from './style-reminder.ts'
 
 const sectionFiles: Readonly<Record<string, string>> = {
   intro: 'intro',
@@ -78,83 +78,34 @@ export const register: Register = on => {
     const result = await next(e)
     return { ...result, text: result.text === null ? null : excludeStyleInstructions(result.text) }
   })
-  on('prompt.submit', async ($, e, next) => {
-    if (e.command || e.isMeta || e.turnId || !['composer', 'bridge', 'sdk'].includes(e.origin.kind)) return next(e)
-    let sessionId: string
-    try {
-      sessionId = await $.session.id()
-    } catch {
-      return next(e)
-    }
-    if (inFlightStyleReminders.has(sessionId)) return next(e)
+  on('classic.PostToolBatch', async ($, e, next) => {
+    const result = await next(e)
+    const batchId = e.tool_calls[0]?.tool_use_id
+    if (e.agent_id !== undefined || !e.prompt_id || !batchId || result.block !== undefined || result.preventContinuation) return result
+    const sessionId = e.session_id
+    if (inFlightStyleReminders.has(sessionId)) return result
     inFlightStyleReminders.add(sessionId)
-    let reminderState: ReturnType<typeof readStyleReminderState> | null = null
-    let reminder: string | null = null
     try {
+      if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
+      if (conciseStyleSessions.get(sessionId) !== true) return result
       const key = styleReminderKey(sessionId)
-      const state = readStyleReminderState(await $.store.get(key))
-      if (state.pending) {
-        if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
-        if (conciseStyleSessions.get(sessionId) === true) {
-          reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
-          reminderState = state
-        } else {
-          await $.store.delete(key)
-        }
+      const state = recordToolBatch(readStyleReminderState(await $.store.get(key)), e.prompt_id, batchId)
+      if (state.sent) return result
+      if (state.batchIds.length < styleReminderBatchThreshold) {
+        await $.store.set(key, state)
+        return result
       }
+      await $.prompt.compose()
+      if (conciseStyleSessions.get(sessionId) !== true) return result
+      const reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
+      if (!reminder.trim()) return result
+      await $.store.set(key, { ...state, sent: true })
+      return { ...result, additionalContext: [...(result.additionalContext ?? []), reminder] }
     } catch {
-      reminderState = null
-      reminder = null
-    }
-    if (reminderState === null || reminder === null) {
-      inFlightStyleReminders.delete(sessionId)
-      return next(e)
-    }
-    try {
-      await $.store.set(styleReminderKey(sessionId), { ...reminderState, pending: false })
-    } catch {
-      inFlightStyleReminders.delete(sessionId)
-      return next(e)
-    }
-    try {
-      return await next({ ...e, context: [...(e.context ?? []), reminder] })
-    } catch (error) {
-      try {
-        await $.store.set(styleReminderKey(sessionId), reminderState)
-      } catch {
-      }
-      throw error
+      return result
     } finally {
       inFlightStyleReminders.delete(sessionId)
     }
-  })
-  on('turn.step', async function* ($, e, next) {
-    const result = yield* next(e)
-    if (e.agentId === undefined && result.toolUses.length > 0) {
-      try {
-        const sessionId = await $.session.id()
-        const key = styleReminderKey(sessionId)
-        const state = readStyleReminderState(await $.store.get(key))
-        await $.store.set(key, recordToolStep(state, e.turnId, e.index))
-      } catch {
-      }
-    }
-    return result
-  })
-  on('turn.complete', async ($, e, next) => {
-    const result = await next(e)
-    if (e.agentId === undefined) {
-      try {
-        const sessionId = await $.session.id()
-        const key = styleReminderKey(sessionId)
-        const state = readStyleReminderState(await $.store.get(key))
-        const completed = finishToolTurn(state, e.turnId, e.reason === 'answer' && !e.isAborted && conciseStyleSessions.get(sessionId) === true)
-        if (completed.pending || completed.indexes.length > 0) await $.store.set(key, completed)
-        else await $.store.delete(key)
-      } catch {
-      }
-    }
-    return result
   })
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
