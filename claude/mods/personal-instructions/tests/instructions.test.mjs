@@ -11,6 +11,29 @@ register((event, ...args) => {
 })
 const api = { plugin: { root }, fs: { read: path => readFile(path, 'utf8') } }
 const compose = hooks.find(hook => hook.event === 'prompt.compose').handle
+const language = hooks.find(hook => hook.event === 'prompt.attachment' && hook.matcher.type === 'language').handle
+
+test('the language attachment follows the request without fixing a language or changing thinking', async () => {
+  for (const text of ['Always respond in russian.', 'Always respond in french.']) {
+    const event = Object.freeze({ type: 'language', text, origin: Object.freeze({ kind: 'engine' }) })
+    const result = await language(api, event, async () => ({ text }))
+    assert.equal(typeof result.text, 'string')
+    assert.ok(result.text.includes("language of the user's own request"))
+    assert.ok(result.text.includes('Thinking blocks may use any language'))
+    assert.ok(!result.text.includes(text))
+    assert.equal(event.text, text)
+  }
+})
+
+test('an unavailable language instruction leaves the attachment omitted', async () => {
+  const failing = { ...api, fs: { read: async () => { throw new Error('unavailable') } } }
+  assert.deepEqual(await language(failing, {}, async () => ({ text: 'fixed language' })), { text: null })
+})
+
+test('an empty language instruction leaves the attachment omitted', async () => {
+  const empty = { ...api, fs: { read: async () => ' \n' } }
+  assert.deepEqual(await language(empty, {}, async () => ({ text: 'fixed language' })), { text: null })
+})
 
 test('the mod adds context without blocking calls or filtering output', () => {
   assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'classic.PostToolBatch', 'tool.describe', 'session.start', 'session.end'].includes(hook.event)))
