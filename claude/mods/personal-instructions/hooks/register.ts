@@ -73,7 +73,14 @@ export const register: Register = on => {
   on('prompt.section', { name: 'communication' }, () => ({ text: null }))
   on('prompt.section', { name: 'tone' }, () => ({ text: null }))
   on('prompt.section', { name: 'heron_brook' }, () => ({ text: null }))
-  on('prompt.attachment', { type: 'language' }, () => ({ text: null }))
+  on('prompt.attachment', { type: 'language' }, async $ => {
+    try {
+      const text = await $.fs.read(`${$.plugin.root}/rules/language.md`)
+      return { text: text.trim() ? text : null }
+    } catch {
+      return { text: null }
+    }
+  })
   on('prompt.attachment', { type: 'mcp_instructions_delta' }, async ($, e, next) => {
     const result = await next(e)
     return { ...result, text: result.text === null ? null : excludeStyleInstructions(result.text) }
