@@ -8,11 +8,11 @@ The style asks for plain, natural answers in the user's language. It preserves c
 
 Claude Code loads the output style selected in settings through its standard mechanism. The mod preserves that mechanism, loads operating rules from Markdown files, and removes competing tone, communication, narration, and proactive delegation instructions. It puts selected built-in tools and Claude MCP tools behind ToolSearch without changing their input schemas or blocking calls. T3 and third-party MCP loading preferences are preserved. MCP server instructions are separate from deferred tool definitions and are not deferred by this setting.
 
-Intermediate messages are limited to requested status, material blockers or changes, findings that change the next step, and approaches the user needs to understand beforehand. Messages outside thinking blocks follow the language of the user's request. Internal reasoning and thinking blocks have no language requirement. The mod removes the separate fixed-language reminder and selected conflicting Claude Docs instructions. It does not filter generated answers or add recurring reminders.
+Intermediate messages are limited to requested status, material blockers or changes, findings that change the next step, and approaches the user needs to understand beforehand. Messages outside thinking blocks follow the language of the user's request. Internal reasoning and thinking blocks have no language requirement. The mod removes the separate fixed-language reminder and selected conflicting Claude Docs instructions. It does not filter generated answers. After a completed main turn with at least five distinct tool-using model steps, it adds one short contract reminder to the next idle user prompt while Concise Personal is active. Commands, meta prompts, mid-turn input, and subagents are excluded. The threshold is a heuristic, not a measured guarantee. The reminder covers user-facing intermediate text as well as the final answer, and session-keyed state survives resume. It does not revise an answer already sent.
 
 ## Install
 
-Requires a Claude Code build supporting mods and TypeScript hooks. The current mod was tested with Claude Code 2.1.314. Windows installers require PowerShell 5.1 or PowerShell 7. The macOS and Linux installer also requires Python 3 for settings processing.
+Requires a Claude Code build supporting mods and TypeScript hooks. The current mod was tested with Claude Code 2.1.316. Windows installers require PowerShell 5.1 or PowerShell 7. The macOS and Linux installer also requires Python 3 for settings processing.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1
