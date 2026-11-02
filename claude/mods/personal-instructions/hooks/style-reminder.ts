@@ -1,32 +1,29 @@
 export type StyleReminderState = {
-  turnId: string
-  indexes: number[]
-  pending: boolean
+  promptId: string
+  batchIds: string[]
+  sent: boolean
 }
 
-export const styleReminderToolThreshold = 5
+export const styleReminderBatchThreshold = 5
 
 export const readStyleReminderState = (value: unknown): StyleReminderState => {
-  if (value === null || typeof value !== 'object') return { turnId: '', indexes: [], pending: false }
-  const state = value as { turnId?: unknown; indexes?: unknown; pending?: unknown }
+  if (value === null || typeof value !== 'object') return { promptId: '', batchIds: [], sent: false }
+  const state = value as { promptId?: unknown; batchIds?: unknown; sent?: unknown }
   return {
-    turnId: typeof state.turnId === 'string' ? state.turnId : '',
-    indexes: Array.isArray(state.indexes) ? state.indexes.filter((index): index is number => Number.isSafeInteger(index)) : [],
-    pending: state.pending === true
+    promptId: typeof state.promptId === 'string' ? state.promptId : '',
+    batchIds: Array.isArray(state.batchIds)
+      ? [...new Set(state.batchIds.filter((id): id is string => typeof id === 'string' && id.length > 0))].slice(0, styleReminderBatchThreshold)
+      : [],
+    sent: state.sent === true
   }
 }
 
-export const recordToolStep = (state: StyleReminderState, turnId: string, index: number): StyleReminderState => {
-  const current = state.turnId === turnId ? state.indexes : []
+export const recordToolBatch = (state: StyleReminderState, promptId: string, batchId: string): StyleReminderState => {
+  const current = state.promptId === promptId ? state : { promptId, batchIds: [], sent: false }
   return {
-    turnId,
-    indexes: current.length >= styleReminderToolThreshold || current.includes(index) ? current : [...current, index],
-    pending: state.pending
+    ...current,
+    batchIds: current.sent || current.batchIds.length >= styleReminderBatchThreshold || current.batchIds.includes(batchId)
+      ? current.batchIds
+      : [...current.batchIds, batchId]
   }
 }
-
-export const finishToolTurn = (state: StyleReminderState, turnId: string, reminder: boolean): StyleReminderState => ({
-  turnId: '',
-  indexes: [],
-  pending: state.pending || (state.turnId === turnId && reminder && state.indexes.length >= styleReminderToolThreshold)
-})
