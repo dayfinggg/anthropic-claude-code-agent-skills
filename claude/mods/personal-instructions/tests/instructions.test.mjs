@@ -60,6 +60,25 @@ test('a typed prompt carries the style note as context and commands and meta pro
   assert.equal(seen.at(-1).context, undefined)
 })
 
+test('built-in tool descriptions carry the call note only under the concise style', async () => {
+  const describe = hooks.find(hook => hook.event === 'tool.describe').handle
+  const engine = {
+    ...api,
+    session: { id: async () => 'describe' },
+    store: { delete: async () => {} },
+    prompt: { compose: async () => compose(engine, { outputStyle: { name: engine.style } }, async () => ({ sections: [] })) },
+    style: 'Concise Personal'
+  }
+  const edit = await describe(engine, { tool: 'Edit' }, async () => ({ description: 'Edits a file.' }))
+  assert.ok(edit.description.startsWith('Edits a file.\n\nSend this call on its own.'))
+  const mcp = await describe(engine, { tool: 'mcp__github__get_issue' }, async () => ({ description: 'Gets an issue.' }))
+  assert.equal(mcp.description, 'Gets an issue.')
+  engine.style = 'Other'
+  await engine.prompt.compose()
+  const other = await describe(engine, { tool: 'Edit' }, async () => ({ description: 'Edits a file.' }))
+  assert.equal(other.description, 'Edits a file.')
+})
+
 test('the native output-style attachment remains enabled', () => {
   assert.ok(!hooks.some(hook => hook.event === 'prompt.attachment' && ['output_style', 'output_style_instructions'].includes(hook.matcher.type)))
 })
