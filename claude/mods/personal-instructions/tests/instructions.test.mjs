@@ -72,6 +72,9 @@ test('a typed prompt carries the style note as context and commands and meta pro
   const pass = async e => { seen.push(e); return { text: e.text } }
   await submit(engine, { text: 'Почини тесты.', context: ['existing'] }, pass)
   assert.deepEqual(seen.at(-1).context, ['existing', reminder])
+  const midturn = (await readFile(new URL('../rules/midturn_note.md', import.meta.url), 'utf8')).trim()
+  await submit(engine, { text: 'И ещё проверь логи.', turnId: 'turn-1' }, pass)
+  assert.deepEqual(seen.at(-1).context, [reminder, midturn])
   await submit(engine, { text: '/review', command: { name: 'review', args: '' } }, pass)
   assert.equal(seen.at(-1).context, undefined)
   await submit(engine, { text: '<task-notification>done</task-notification>', isMeta: true }, pass)
@@ -121,7 +124,7 @@ test('composition preserves unknown sections, cache order, and native style load
 })
 
 test('the rule files and the style contain no forbidden punctuation in their own prose', async () => {
-  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder', 'subagent_rules']
+  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder', 'subagent_rules', 'midturn_note']
   for (const name of files) {
     const text = await readFile(new URL(`../rules/${name}.md`, import.meta.url), 'utf8')
     assert.ok(!/[—–]/.test(text), `${name}.md contains a dash`)
