@@ -108,8 +108,13 @@ export const register: Register = on => {
       if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
       if (conciseStyleSessions.get(sessionId) !== true) return next(e)
       const reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
-      if (!reminder.trim()) return next(e)
-      return next({ ...e, context: [...(e.context ?? []), reminder.trim()] })
+      const context = [...(e.context ?? [])]
+      if (reminder.trim()) context.push(reminder.trim())
+      if (e.turnId) {
+        const midturn = await $.fs.read(`${$.plugin.root}/rules/midturn_note.md`)
+        if (midturn.trim()) context.push(midturn.trim())
+      }
+      return context.length === (e.context?.length ?? 0) ? next(e) : next({ ...e, context })
     } catch {
       return next(e)
     }
