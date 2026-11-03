@@ -33,7 +33,31 @@ test('an unavailable or empty rule file leaves the engine reminder unchanged', a
 })
 
 test('the mod adds context without blocking calls or filtering output', () => {
-  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'classic.PostToolBatch', 'tool.describe', 'session.start', 'session.end'].includes(hook.event)))
+  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.describe', 'session.start', 'session.end'].includes(hook.event)))
+})
+
+test('a typed prompt carries the style note as context and commands and meta prompts do not', async () => {
+  const submit = hooks.find(hook => hook.event === 'prompt.submit').handle
+  const reminder = (await readFile(new URL('../rules/style_reminder.md', import.meta.url), 'utf8')).trim()
+  const engine = {
+    ...api,
+    session: { id: async () => 'submit' },
+    store: { delete: async () => {} },
+    prompt: { compose: async () => compose(engine, { outputStyle: { name: engine.style } }, async () => ({ sections: [] })) },
+    style: 'Concise Personal'
+  }
+  const seen = []
+  const pass = async e => { seen.push(e); return { text: e.text } }
+  await submit(engine, { text: 'Почини тесты.', context: ['existing'] }, pass)
+  assert.deepEqual(seen.at(-1).context, ['existing', reminder])
+  await submit(engine, { text: '/review', command: { name: 'review', args: '' } }, pass)
+  assert.equal(seen.at(-1).context, undefined)
+  await submit(engine, { text: '<task-notification>done</task-notification>', isMeta: true }, pass)
+  assert.equal(seen.at(-1).context, undefined)
+  engine.style = 'Other'
+  await engine.prompt.compose()
+  await submit(engine, { text: 'Почини тесты.' }, pass)
+  assert.equal(seen.at(-1).context, undefined)
 })
 
 test('the native output-style attachment remains enabled', () => {
