@@ -87,6 +87,19 @@ export const register: Register = on => {
     const result = await next(e)
     return { ...result, text: result.text === null ? null : excludeStyleInstructions(result.text) }
   })
+  on('prompt.submit', async ($, e, next) => {
+    if (e.isMeta || e.command || !e.text.trim()) return next(e)
+    try {
+      const sessionId = await $.session.id()
+      if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
+      if (conciseStyleSessions.get(sessionId) !== true) return next(e)
+      const reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
+      if (!reminder.trim()) return next(e)
+      return next({ ...e, context: [...(e.context ?? []), reminder.trim()] })
+    } catch {
+      return next(e)
+    }
+  }).catch(($, e, next) => next(e))
   on('classic.PostToolBatch', async ($, e, next) => {
     const result = await next(e)
     const batchId = e.tool_calls[0]?.tool_use_id
