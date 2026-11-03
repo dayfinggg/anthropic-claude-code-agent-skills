@@ -1,22 +1,22 @@
 export type StyleReminderState = {
   promptId: string
-  batchIds: string[]
+  count: number
+  lastBatchId: string
   sentAt: number[]
 }
 
-export const styleReminderThresholds: readonly number[] = [5, 10, 15]
-const maxTrackedBatches = Math.max(...styleReminderThresholds)
+export const firstReminderAt = 5
+export const reminderInterval = 10
 
-const stringList = (value: unknown, limit: number): string[] => Array.isArray(value)
-  ? [...new Set(value.filter((id): id is string => typeof id === 'string' && id.length > 0))].slice(0, limit)
-  : []
+const empty = (promptId = ''): StyleReminderState => ({ promptId, count: 0, lastBatchId: '', sentAt: [] })
 
 export const readStyleReminderState = (value: unknown): StyleReminderState => {
-  if (value === null || typeof value !== 'object') return { promptId: '', batchIds: [], sentAt: [] }
-  const state = value as { promptId?: unknown; batchIds?: unknown; sentAt?: unknown }
+  if (value === null || typeof value !== 'object') return empty()
+  const state = value as { promptId?: unknown; count?: unknown; lastBatchId?: unknown; sentAt?: unknown }
   return {
     promptId: typeof state.promptId === 'string' ? state.promptId : '',
-    batchIds: stringList(state.batchIds, maxTrackedBatches),
+    count: typeof state.count === 'number' && Number.isInteger(state.count) && state.count >= 0 ? state.count : 0,
+    lastBatchId: typeof state.lastBatchId === 'string' ? state.lastBatchId : '',
     sentAt: Array.isArray(state.sentAt)
       ? [...new Set(state.sentAt.filter((n): n is number => typeof n === 'number' && Number.isInteger(n) && n > 0))]
       : []
@@ -24,21 +24,18 @@ export const readStyleReminderState = (value: unknown): StyleReminderState => {
 }
 
 export const recordToolBatch = (state: StyleReminderState, promptId: string, batchId: string): StyleReminderState => {
-  const current = state.promptId === promptId ? state : { promptId, batchIds: [], sentAt: [] }
-  return {
-    ...current,
-    batchIds: current.batchIds.length >= maxTrackedBatches || current.batchIds.includes(batchId)
-      ? current.batchIds
-      : [...current.batchIds, batchId]
-  }
+  const current = state.promptId === promptId ? state : empty(promptId)
+  if (current.lastBatchId === batchId) return current
+  return { ...current, count: current.count + 1, lastBatchId: batchId }
 }
 
 export const reminderDue = (state: StyleReminderState): number | undefined => {
-  const count = state.batchIds.length
-  return styleReminderThresholds.find(threshold => threshold === count && !state.sentAt.includes(threshold))
+  const { count } = state
+  const due = count === firstReminderAt || (count > firstReminderAt && (count - firstReminderAt) % reminderInterval === 0)
+  return due && !state.sentAt.includes(count) ? count : undefined
 }
 
-export const markReminderSent = (state: StyleReminderState, threshold: number): StyleReminderState => ({
+export const markReminderSent = (state: StyleReminderState, count: number): StyleReminderState => ({
   ...state,
-  sentAt: state.sentAt.includes(threshold) ? state.sentAt : [...state.sentAt, threshold]
+  sentAt: state.sentAt.includes(count) ? state.sentAt : [...state.sentAt, count]
 })

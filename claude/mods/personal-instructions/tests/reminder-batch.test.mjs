@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import { register } from '../hooks/register.ts'
-import { readStyleReminderState, recordToolBatch, reminderDue, styleReminderThresholds } from '../hooks/style-reminder.ts'
+import { firstReminderAt, readStyleReminderState, recordToolBatch, reminderDue, reminderInterval } from '../hooks/style-reminder.ts'
 
 const root = fileURLToPath(new URL('..', import.meta.url)).replaceAll('\\', '/')
 const text = (await readFile(new URL('../rules/style_reminder.md', import.meta.url), 'utf8'))
@@ -33,7 +33,9 @@ const makeEngine = (sessionId, stored = new Map()) => {
   engine.end = reason => hooks.get('session.end')(engine, { sessionId, reason }, async () => ({}))
   return engine
 }
-const [first, second, third] = styleReminderThresholds
+const first = firstReminderAt
+const second = first + reminderInterval
+const third = second + reminderInterval
 const runBatches = async (engine, from, to, options = {}) => {
   const delivered = []
   for (let index = from; index < to; index += 1) {
@@ -43,10 +45,10 @@ const runBatches = async (engine, from, to, options = {}) => {
   return delivered
 }
 
-test('a long turn receives the reminder at each threshold and never more than three times', async () => {
+test('a long turn receives the reminder at the first threshold and then at every interval', async () => {
   const engine = makeEngine('thresholds')
-  const delivered = await runBatches(engine, 1, 40)
-  assert.deepEqual(delivered, [first, second, third])
+  const delivered = await runBatches(engine, 1, third + reminderInterval + 1)
+  assert.deepEqual(delivered, [first, second, third, third + reminderInterval])
 })
 
 test('the reminder is appended to existing context without mutating the original result', async () => {
@@ -150,13 +152,13 @@ test('concurrent duplicate batches cannot inject twice', async () => {
   assert.deepEqual((await inFlight).additionalContext, [text])
 })
 
-test('legacy state is not misread and stored batch IDs stay bounded', () => {
+test('legacy state is not misread and the count stays a plain number', () => {
   let state = readStyleReminderState({ promptId: 'old', batchIds: ['a', 'b', 'c', 'd', 'e'], sent: true })
-  assert.deepEqual(state, { promptId: 'old', batchIds: ['a', 'b', 'c', 'd', 'e'], sentAt: [] })
+  assert.deepEqual(state, { promptId: 'old', count: 0, lastBatchId: '', sentAt: [] })
   state = readStyleReminderState({ turnId: 'old', indexes: [0, 1, 2, 3, 4], pending: true })
-  assert.deepEqual(state, { promptId: '', batchIds: [], sentAt: [] })
-  for (let index = 0; index < 100; index += 1) state = recordToolBatch(state, 'prompt', 'batch-' + index)
-  assert.equal(state.batchIds.length, third)
-  assert.equal(reminderDue(state), third)
-  assert.deepEqual(recordToolBatch(state, 'new', 'first'), { promptId: 'new', batchIds: ['first'], sentAt: [] })
+  assert.deepEqual(state, { promptId: '', count: 0, lastBatchId: '', sentAt: [] })
+  for (let index = 0; index < 105; index += 1) state = recordToolBatch(state, 'prompt', 'batch-' + index)
+  assert.equal(state.count, 105)
+  assert.equal(reminderDue(state), 105)
+  assert.deepEqual(recordToolBatch(state, 'new', 'first'), { promptId: 'new', count: 1, lastBatchId: 'first', sentAt: [] })
 })
