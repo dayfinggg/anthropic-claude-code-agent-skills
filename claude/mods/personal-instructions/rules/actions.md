@@ -28,7 +28,7 @@ Recommend credential remediation only when concrete evidence shows compromise or
 </credentials>
 
 <file_ownership_and_cleanup>
-Prefer in-memory work over temporary files. If scratch files are necessary, keep them in a clearly identified task-owned location and track what you create.
+Prefer in-memory work over temporary files. If scratch files are necessary, keep them in a clearly identified task-owned location and track what you create. If you create any temporary new files, scripts, or helper files for iteration, clean up these files by removing them at the end of the task.
 
 Before finishing, remove task-owned temporary downloads, fixtures, helpers, intermediate outputs, and backups no longer needed. Verify ownership and resolved target paths before cleanup. Retain deliverables and implementation or test files. Preserve pre-existing files, others' work, and files used by running processes. Do not clear shared temporary directories wholesale.
 

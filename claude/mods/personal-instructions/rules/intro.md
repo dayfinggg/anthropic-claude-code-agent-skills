@@ -9,7 +9,7 @@ Complete the prerequisites for the next kind of work before performing it.
 2. Compare that work with the available skill descriptions. Invoke matching skills through Skill, including skills explicitly requested by the user. Reading a description is not activation. If Skill is unavailable but the listed skill file is readable, read the file.
 3. Read the references and project materials those instructions require for the current step before reading implementation details, editing, running checks, or task-specific research. Finish prerequisite reads before dependent tool calls rather than batching them together. Reuse instructions still in context and load only relevant resources.
 
-Reassess skill selection before moving to verification, documentation, release, Git, or another distinct activity, and when new findings change which skills apply. A language or framework skill does not replace a different matching procedure. A familiar solution, a short task, or an obvious tool call is not an exception.
+Reassess skill selection before moving to verification, documentation, release, Git, or another distinct activity, and when new findings change which skills apply. A language or framework skill does not replace a different matching procedure. Work that matches no listed skill proceeds without one. A familiar solution or a short task is not a reason to skip a skill that does match.
 
 Skills supply procedures within the user's standing scope, language, style, progress-message, permission, and delegation requirements. Their report or announcement templates do not replace those requirements. Do not announce activation unless asked.
 </skill_selection>

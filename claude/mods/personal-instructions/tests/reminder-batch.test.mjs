@@ -3,13 +3,16 @@ import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import { register } from '../hooks/register.ts'
-import { readStyleReminderState, recordToolBatch } from '../hooks/style-reminder.ts'
+import { readStyleReminderState, recordToolBatch, reminderDue, styleReminderThresholds } from '../hooks/style-reminder.ts'
 
 const root = fileURLToPath(new URL('..', import.meta.url)).replaceAll('\\', '/')
-const text = await readFile(new URL('../rules/style_reminder.md', import.meta.url), 'utf8')
+const text = (await readFile(new URL('../rules/style_reminder.md', import.meta.url), 'utf8'))
 const makeEngine = (sessionId, stored = new Map()) => {
   const hooks = new Map()
-  register((event, ...args) => hooks.set(event, args.at(-1)))
+  register((event, ...args) => {
+    hooks.set(event, args.at(-1))
+    return { catch: () => {} }
+  })
   const engine = {
     style: 'Concise Personal', hooks, stored, plugin: { root },
     fs: { read: path => readFile(path, 'utf8') },
@@ -30,18 +33,28 @@ const makeEngine = (sessionId, stored = new Map()) => {
   engine.end = reason => hooks.get('session.end')(engine, { sessionId, reason }, async () => ({}))
   return engine
 }
-const prime = async engine => {
-  for (let index = 0; index < 4; index += 1) assert.equal((await engine.batch('batch-' + index)).additionalContext, undefined)
+const [first, second, third] = styleReminderThresholds
+const runBatches = async (engine, from, to, options = {}) => {
+  const delivered = []
+  for (let index = from; index < to; index += 1) {
+    const result = await engine.batch('batch-' + index, options)
+    if (result.additionalContext) delivered.push(index)
+  }
+  return delivered
 }
 
-test('the first long turn receives context before completion, once only', async () => {
-  const engine = makeEngine('same-turn')
-  await prime(engine)
+test('a long turn receives the reminder at each threshold and never more than three times', async () => {
+  const engine = makeEngine('thresholds')
+  const delivered = await runBatches(engine, 1, 40)
+  assert.deepEqual(delivered, [first, second, third])
+})
+
+test('the reminder is appended to existing context without mutating the original result', async () => {
+  const engine = makeEngine('append')
+  await runBatches(engine, 1, first)
   const original = { additionalContext: ['existing context'] }
-  assert.deepEqual((await engine.batch('batch-4', {}, original)).additionalContext, ['existing context', text])
+  assert.deepEqual((await engine.batch('batch-' + first, {}, original)).additionalContext, ['existing context', text])
   assert.deepEqual(original, { additionalContext: ['existing context'] })
-  for (let index = 5; index < 12; index += 1) assert.strictEqual(await engine.batch('batch-' + index, {}, original), original)
-  assert.equal(engine.hooks.has('prompt.submit'), false)
 })
 
 test('parallel tools count as one batch and duplicate delivery does not advance it', async () => {
@@ -49,28 +62,26 @@ test('parallel tools count as one batch and duplicate delivery does not advance 
   const tool_calls = Array.from({ length: 8 }, (_, i) => ({ tool_name: 'Read', tool_input: {}, tool_use_id: 'parallel-' + i, tool_response: 'result' }))
   assert.equal((await engine.batch('', { tool_calls })).additionalContext, undefined)
   assert.equal((await engine.batch('', { tool_calls })).additionalContext, undefined)
-  for (let index = 1; index < 4; index += 1) assert.equal((await engine.batch('batch-' + index)).additionalContext, undefined)
-  assert.deepEqual((await engine.batch('batch-4')).additionalContext, [text])
+  assert.deepEqual(await runBatches(engine, 2, first), [])
+  assert.deepEqual((await engine.batch('batch-' + first)).additionalContext, [text])
 })
 
 test('new prompts have independent thresholds', async () => {
   const engine = makeEngine('new-prompt')
-  await prime(engine)
-  assert.deepEqual((await engine.batch('batch-4')).additionalContext, [text])
-  for (let index = 0; index < 4; index += 1) assert.equal((await engine.batch('next-' + index, { prompt_id: 'prompt-2' })).additionalContext, undefined)
-  assert.deepEqual((await engine.batch('next-4', { prompt_id: 'prompt-2' })).additionalContext, [text])
+  assert.deepEqual(await runBatches(engine, 1, second + 1), [first, second])
+  assert.deepEqual(await runBatches(engine, 100, 100 + second + 1, { prompt_id: 'prompt-2' }), [100 + first - 1, 100 + second - 1])
 })
 
 test('subagents, empty batches, missing prompt IDs and other styles are excluded', async () => {
   const engine = makeEngine('excluded')
-  for (let index = 0; index < 7; index += 1) {
+  for (let index = 0; index < 20; index += 1) {
     for (const options of [{ agent_id: 'worker' }, { tool_calls: [] }, { prompt_id: undefined }]) {
       assert.equal((await engine.batch('batch-' + index, options)).additionalContext, undefined)
     }
   }
   assert.equal(engine.stored.size, 0)
   engine.style = 'Other'
-  for (let index = 0; index < 7; index += 1) assert.equal((await engine.batch('other-' + index)).additionalContext, undefined)
+  for (let index = 0; index < 20; index += 1) assert.equal((await engine.batch('other-' + index)).additionalContext, undefined)
   assert.equal(engine.stored.size, 0)
 })
 
@@ -85,62 +96,67 @@ test('downstream stop decisions and original event data are preserved', async ()
 })
 
 test('resume preserves progress and does not replay a delivered reminder', async () => {
-  const first = makeEngine('resume-batch')
-  await prime(first)
-  await first.end('resume')
-  const resumed = makeEngine('resume-batch', first.stored)
-  assert.deepEqual((await resumed.batch('batch-4')).additionalContext, [text])
+  const one = makeEngine('resume-batch')
+  await runBatches(one, 1, first)
+  await one.end('resume')
+  const resumed = makeEngine('resume-batch', one.stored)
+  assert.deepEqual((await resumed.batch('batch-' + first)).additionalContext, [text])
   await resumed.end('prompt_input_exit')
-  const again = makeEngine('resume-batch', first.stored)
-  assert.equal((await again.batch('batch-5')).additionalContext, undefined)
+  const again = makeEngine('resume-batch', one.stored)
+  assert.equal((await again.batch('batch-' + first)).additionalContext, undefined)
+  assert.equal((await again.batch('batch-' + (first + 1))).additionalContext, undefined)
   await again.end('clear')
-  assert.equal(first.stored.size, 0)
+  assert.equal(one.stored.size, 0)
 })
 
 test('changing styles clears tracking, including immediately before injection', async () => {
   const engine = makeEngine('changed-style')
-  await prime(engine)
+  await runBatches(engine, 1, first)
   engine.style = 'Other'
-  assert.equal((await engine.batch('batch-4')).additionalContext, undefined)
+  assert.equal((await engine.batch('batch-' + first)).additionalContext, undefined)
   assert.equal(engine.stored.size, 0)
   engine.style = 'Concise Personal'
   await engine.prompt.compose()
-  await prime(engine)
-  assert.deepEqual((await engine.batch('batch-4')).additionalContext, [text])
+  await runBatches(engine, 1, first)
+  assert.deepEqual((await engine.batch('batch-' + first)).additionalContext, [text])
 })
 
 test('missing reminder files and storage failures do not block work', async () => {
   const engine = makeEngine('fail-open')
-  await prime(engine)
+  await runBatches(engine, 1, first)
   const read = engine.fs.read
   engine.fs.read = async () => { throw new Error('unavailable') }
   const result = { additionalContext: ['existing'] }
-  assert.strictEqual(await engine.batch('batch-4', {}, result), result)
+  assert.strictEqual(await engine.batch('batch-' + first, {}, result), result)
   engine.fs.read = read
-  assert.deepEqual((await engine.batch('batch-5')).additionalContext, [text])
+  assert.deepEqual((await engine.batch('batch-' + (first + 1))).additionalContext, [text])
+  assert.deepEqual((await engine.batch('batch-' + (first + 2))).additionalContext, undefined)
   engine.store.get = async () => { throw new Error('unavailable') }
-  assert.strictEqual(await engine.batch('batch-6', {}, result), result)
+  assert.strictEqual(await engine.batch('batch-x', {}, result), result)
 })
 
 test('concurrent duplicate batches cannot inject twice', async () => {
   const engine = makeEngine('concurrent-batch')
-  await prime(engine)
+  await runBatches(engine, 1, first)
   let enter
   let release
   const entered = new Promise(resolve => { enter = resolve })
   const gate = new Promise(resolve => { release = resolve })
   engine.fs.read = async () => { enter(); await gate; return text }
-  const first = engine.batch('batch-4')
+  const inFlight = engine.batch('batch-' + first)
   await entered
-  assert.equal((await engine.batch('batch-4')).additionalContext, undefined)
+  assert.equal((await engine.batch('batch-' + first)).additionalContext, undefined)
   release()
-  assert.deepEqual((await first).additionalContext, [text])
+  assert.deepEqual((await inFlight).additionalContext, [text])
 })
 
 test('legacy state is not misread and stored batch IDs stay bounded', () => {
-  let state = readStyleReminderState({ turnId: 'old', indexes: [0, 1, 2, 3, 4], pending: true })
-  assert.deepEqual(state, { promptId: '', batchIds: [], sent: false })
+  let state = readStyleReminderState({ promptId: 'old', batchIds: ['a', 'b', 'c', 'd', 'e'], sent: true })
+  assert.deepEqual(state, { promptId: 'old', batchIds: ['a', 'b', 'c', 'd', 'e'], sentAt: [] })
+  state = readStyleReminderState({ turnId: 'old', indexes: [0, 1, 2, 3, 4], pending: true })
+  assert.deepEqual(state, { promptId: '', batchIds: [], sentAt: [] })
   for (let index = 0; index < 100; index += 1) state = recordToolBatch(state, 'prompt', 'batch-' + index)
-  assert.equal(state.batchIds.length, 5)
-  assert.deepEqual(recordToolBatch(state, 'new', 'first'), { promptId: 'new', batchIds: ['first'], sent: false })
+  assert.equal(state.batchIds.length, third)
+  assert.equal(reminderDue(state), third)
+  assert.deepEqual(recordToolBatch(state, 'new', 'first'), { promptId: 'new', batchIds: ['first'], sentAt: [] })
 })
