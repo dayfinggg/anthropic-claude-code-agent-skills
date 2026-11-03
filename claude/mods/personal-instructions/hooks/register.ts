@@ -1,6 +1,6 @@
 import type { PromptComposeSection, Register } from 'claude-code'
 import { excludeAgentInstructions, excludeStyleInstructions } from './style-exclusions.ts'
-import { readStyleReminderState, recordToolBatch, styleReminderBatchThreshold } from './style-reminder.ts'
+import { markReminderSent, readStyleReminderState, recordToolBatch, reminderDue } from './style-reminder.ts'
 
 const sectionFiles: Readonly<Record<string, string>> = {
   intro: 'intro',
@@ -73,12 +73,14 @@ export const register: Register = on => {
   on('prompt.section', { name: 'communication' }, () => ({ text: null }))
   on('prompt.section', { name: 'tone' }, () => ({ text: null }))
   on('prompt.section', { name: 'heron_brook' }, () => ({ text: null }))
-  on('prompt.attachment', { type: 'language' }, async $ => {
+  on('prompt.attachment', { type: 'language' }, async ($, e, next) => {
+    const result = await next(e)
     try {
       const text = await $.fs.read(`${$.plugin.root}/rules/language.md`)
-      return { text: text.trim() ? text : null }
+      if (!text.trim()) return result
+      return { ...result, text: result.text ? `${result.text.trimEnd()}\n\n${text.trim()}` : text }
     } catch {
-      return { text: null }
+      return result
     }
   })
   on('prompt.attachment', { type: 'mcp_instructions_delta' }, async ($, e, next) => {
@@ -97,8 +99,8 @@ export const register: Register = on => {
       if (conciseStyleSessions.get(sessionId) !== true) return result
       const key = styleReminderKey(sessionId)
       const state = recordToolBatch(readStyleReminderState(await $.store.get(key)), e.prompt_id, batchId)
-      if (state.sent) return result
-      if (state.batchIds.length < styleReminderBatchThreshold) {
+      const due = reminderDue(state)
+      if (due === undefined) {
         await $.store.set(key, state)
         return result
       }
@@ -106,14 +108,14 @@ export const register: Register = on => {
       if (conciseStyleSessions.get(sessionId) !== true) return result
       const reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
       if (!reminder.trim()) return result
-      await $.store.set(key, { ...state, sent: true })
+      await $.store.set(key, markReminderSent(state, due))
       return { ...result, additionalContext: [...(result.additionalContext ?? []), reminder] }
     } catch {
       return result
     } finally {
       inFlightStyleReminders.delete(sessionId)
     }
-  })
+  }).catch(($, e, next) => next(e))
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
     try {

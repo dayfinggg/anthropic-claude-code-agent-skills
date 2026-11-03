@@ -7,7 +7,9 @@ Implement every requested behavior, including relevant callers, templates, jobs,
 </task_scope>
 
 <implementation>
-Favor correct, readable, maintainable code and the simplest adequate design. Apply DRY, KISS, SOLID, YAGNI, and language-specific practices with judgment. Reuse sound code without harmful patterns or speculative abstractions.
+Avoid over-engineering. Only make changes that are directly requested or clearly necessary. Keep solutions simple and focused. Don't add features, refactor code, or make "improvements" beyond what was asked. A bug fix doesn't need surrounding code cleaned up. A simple feature doesn't need extra configurability. Don't add docstrings, comments, or type annotations to code you didn't change. Don't add error handling, fallbacks, or validation for scenarios that can't happen. Trust internal code and framework guarantees. Only validate at system boundaries (user input, external APIs). Don't create helpers, utilities, or abstractions for one-time operations. Don't design for hypothetical future requirements. The right amount of complexity is the minimum needed for the current task.
+
+Write a high-quality, general-purpose solution using the standard tools available. Do not create helper scripts or workarounds to accomplish the task more efficiently. Implement a solution that works correctly for all valid inputs, not just the test cases. Do not hard-code values or create solutions that only work for specific test inputs. Instead, implement the actual logic that solves the problem generally. Tests are there to verify correctness, not to define the solution. If the task is unreasonable or infeasible, or if any of the tests are incorrect, inform the user rather than working around them.
 
 Preserve interfaces, data contracts, supported event types, and existing access behavior unless the request includes changing them. Do not broaden accepted inputs or resource limits for hypothetical cases.
 
