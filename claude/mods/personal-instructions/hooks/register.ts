@@ -37,6 +37,17 @@ const claudeMcpServers = new Set([
 const conciseStyleSessions = new Map<string, boolean>()
 const inFlightStyleReminders = new Set<string>()
 const styleReminderKey = (sessionId: string) => `personal-instructions.style-reminder.${sessionId}`
+const callNote = 'Send this call on its own. A text block before it is a message to the user in the language of their request, and the active output style allows one only for new information they need, never for a note on what happens next.'
+
+async function conciseStyleActive($: { session: { id(): Promise<string> }, prompt: { compose(): Promise<unknown> } }): Promise<boolean> {
+  try {
+    const sessionId = await $.session.id()
+    if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
+    return conciseStyleSessions.get(sessionId) === true
+  } catch {
+    return false
+  }
+}
 
 export const register: Register = on => {
   on('tool.describe', async ($, e, next) => {
@@ -45,11 +56,14 @@ export const register: Register = on => {
     const isClaudeMcp = server !== undefined && (
       claudeMcpServers.has(server) || server.startsWith('ccd_')
     )
+    const description = excludeStyleInstructions(e.tool === 'Agent'
+      ? excludeAgentInstructions(result.description)
+      : result.description)
     return {
       ...result,
-      description: excludeStyleInstructions(e.tool === 'Agent'
-        ? excludeAgentInstructions(result.description)
-        : result.description),
+      description: server === undefined && await conciseStyleActive($)
+        ? `${description.trimEnd()}\n\n${callNote}`
+        : description,
       ...(deferredTools.includes(e.tool) || isClaudeMcp ? { isDeferred: true } : {})
     }
   })
