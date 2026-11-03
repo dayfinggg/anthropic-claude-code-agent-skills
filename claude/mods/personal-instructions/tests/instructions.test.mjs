@@ -33,7 +33,29 @@ test('an unavailable or empty rule file leaves the engine reminder unchanged', a
 })
 
 test('the mod adds context without blocking calls or filtering output', () => {
-  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.describe', 'session.start', 'session.end'].includes(hook.event)))
+  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.describe', 'agent.spawn', 'session.start', 'session.end'].includes(hook.event)))
+})
+
+test('a subagent task carries the standing rules unless it is a fork or another style is active', async () => {
+  const spawn = hooks.find(hook => hook.event === 'agent.spawn').handle
+  const rules = (await readFile(new URL('../rules/subagent_rules.md', import.meta.url), 'utf8')).trim()
+  const engine = {
+    ...api,
+    session: { id: async () => 'spawn' },
+    store: { delete: async () => {} },
+    prompt: { compose: async () => compose(engine, { outputStyle: { name: engine.style } }, async () => ({ sections: [] })) },
+    style: 'Concise Personal'
+  }
+  const seen = []
+  const pass = async e => { seen.push(e); return { model: 'x' } }
+  await spawn(engine, { prompt: 'Посчитай файлы.', fork: false }, pass)
+  assert.equal(seen.at(-1).prompt, `Посчитай файлы.\n\n${rules}`)
+  await spawn(engine, { prompt: 'Посчитай файлы.', fork: true }, pass)
+  assert.equal(seen.at(-1).prompt, 'Посчитай файлы.')
+  engine.style = 'Other'
+  await engine.prompt.compose()
+  await spawn(engine, { prompt: 'Посчитай файлы.', fork: false }, pass)
+  assert.equal(seen.at(-1).prompt, 'Посчитай файлы.')
 })
 
 test('a typed prompt carries the style note as context and commands and meta prompts do not', async () => {
@@ -99,7 +121,7 @@ test('composition preserves unknown sections, cache order, and native style load
 })
 
 test('the rule files and the style contain no forbidden punctuation in their own prose', async () => {
-  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder']
+  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder', 'subagent_rules']
   for (const name of files) {
     const text = await readFile(new URL(`../rules/${name}.md`, import.meta.url), 'utf8')
     assert.ok(!/[—–]/.test(text), `${name}.md contains a dash`)

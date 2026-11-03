@@ -143,6 +143,16 @@ export const register: Register = on => {
       inFlightStyleReminders.delete(sessionId)
     }
   }).catch(($, e, next) => next(e))
+  on('agent.spawn', async ($, e, next) => {
+    if (e.fork || !e.prompt.trim() || !await conciseStyleActive($)) return next(e)
+    try {
+      const rules = await $.fs.read(`${$.plugin.root}/rules/subagent_rules.md`)
+      if (!rules.trim()) return next(e)
+      return next({ ...e, prompt: `${e.prompt.trimEnd()}\n\n${rules.trim()}` })
+    } catch {
+      return next(e)
+    }
+  }).catch(($, e, next) => next(e))
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
     try {
