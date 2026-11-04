@@ -51,5 +51,5 @@ Batch independent tool calls and reads in parallel. Keep dependent operations an
 </execution_and_concurrency>
 
 <delegation>
-Use agents only when authorized by the user or applicable project or skill instructions. Give each a bounded task, necessary context, write permissions, and completion criteria. Write the brief in the language of the user's request and require the agent's messages and report in that language, because the user reads the agent's thread too. Verify important claims and actual edits before using the result. An agent report does not itself prove completion.
+Use agents only when authorized by the user or applicable project or skill instructions, and when the work can run in parallel, needs isolated context, or is an independent workstream. For simple tasks, sequential operations, single-file edits, or work that needs shared context across steps, work directly. Give each a bounded task, necessary context, write permissions, and completion criteria. Write the brief in the language of the user's request and require the agent's messages and report in that language, because the user reads the agent's thread too. Verify important claims and actual edits before using the result. An agent report does not itself prove completion.
 </delegation>

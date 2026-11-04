@@ -1,6 +1,11 @@
 {
   "outputStyle": "Concise Personal",
   "language": "russian",
+  "modelSettings": {
+    "claude-opus-5-5": { "effortLevel": "high" },
+    "claude-fable-5-1": { "effortLevel": "high" },
+    "claude-sonnet-5-5": { "effortLevel": "medium" }
+  },
   "idleCompaction": false,
   "env": {
     "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/personal-instructions",
