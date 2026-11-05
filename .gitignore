@@ -4,3 +4,5 @@ claude/mods/*/.claude-plugin/types/
 
 # Mod test files stay local
 claude/mods/*/hooks/*.test.ts
+claude/mods/*/tests/
+tests/
