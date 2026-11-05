@@ -19,10 +19,9 @@ test('Agent keeps its calling contract without proactive delegation or conflicti
   expect(result.description.includes('Example usage')).toBe(false)
   expect(result.description.includes('Specify subagent_type.')).toBe(true)
   expect(result.description.includes('Never fabricate results.')).toBe(true)
-  expect(result.description.endsWith('Apply the communication contract to every text block.')).toBe(true)
+  expect(result.description.endsWith('Never fabricate results.')).toBe(true)
   const other = await $.tool.describe({ tool: 'Other', description, provider: { plugin: 'engine', tier: 'core' } })
-  expect(other.description.startsWith(description)).toBe(true)
-  expect(other.description.includes('Use tool_use blocks for tool calls.')).toBe(true)
+  expect(other.description).toBe(description)
 })
 
 test('tone sections are omitted, the communication section carries the rules, and other sections are unchanged', async ($, on) => {
