@@ -1,5 +1,5 @@
 import type { PromptComposeSection, Register } from 'claude-code'
-import { excludeAgentInstructions, excludeStyleInstructions } from './style-exclusions.ts'
+import { excludeAgentInstructions, excludeSearchSourcesRequirement, excludeSourcesReminder, excludeStyleInstructions } from './style-exclusions.ts'
 import { markReminderSent, readStyleReminderState, recordToolBatch, reminderDue } from './style-reminder.ts'
 
 const sectionFiles: Readonly<Record<string, string>> = {
@@ -38,6 +38,14 @@ const claudeMcpServers = new Set([
 const inFlightStyleReminders = new Set<string>()
 const styleReminderKey = (sessionId: string) => `personal-instructions.style-reminder.${sessionId}`
 export const register: Register = on => {
+  on('tool.call', { tool: 'WebSearch' }, async ($, e, next) => {
+    const ran = await next(e)
+    if (ran.deny !== undefined || ran.isError || !ran.result || !Array.isArray(ran.result.results)) return ran
+    const results = excludeSourcesReminder(ran.result.results)
+    return results.length === ran.result.results.length && results.every((entry, index) => entry === ran.result.results[index])
+      ? ran
+      : { result: { ...ran.result, results } }
+  }).catch(($, e, next) => next(e))
   on('tool.describe', async ($, e, next) => {
     const result = await next(e)
     const server = /^mcp__(.+?)__/.exec(e.tool)?.[1]
@@ -46,7 +54,9 @@ export const register: Register = on => {
     )
     let description = excludeStyleInstructions(e.tool === 'Agent'
       ? excludeAgentInstructions(result.description)
-      : result.description)
+      : e.tool === 'WebSearch'
+        ? excludeSearchSourcesRequirement(result.description)
+        : result.description)
     if (e.tool === 'Bash' || e.tool === 'PowerShell') {
       try {
         const note = (await $.fs.read(`${$.plugin.root}/rules/command_note.md`)).trim()

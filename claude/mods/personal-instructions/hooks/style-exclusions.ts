@@ -35,6 +35,18 @@ export function excludeStyleInstructions(text: string): string {
   return result
 }
 
+export function excludeSearchSourcesRequirement(text: string): string {
+  return text.replace(/\n*CRITICAL REQUIREMENT - You MUST follow this:[\s\S]*?(?=\n\s*Usage notes:|$)/, '')
+}
+
+const sourcesReminder = /\s*REMINDER: You MUST include the sources[^\n]*/g
+
+export function excludeSourcesReminder<T>(results: readonly (T | string)[]): (T | string)[] {
+  return results
+    .map(entry => typeof entry === 'string' ? entry.replace(sourcesReminder, '').trimEnd() : entry)
+    .filter(entry => entry !== '')
+}
+
 export function excludeAgentInstructions(text: string): string {
   const examples = text.indexOf('Example usage:')
   const body = examples === -1 ? text : text.slice(0, examples)
