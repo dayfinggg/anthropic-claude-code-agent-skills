@@ -38,6 +38,16 @@ const claudeMcpServers = new Set([
 const inFlightStyleReminders = new Set<string>()
 const styleReminderKey = (sessionId: string) => `personal-instructions.style-reminder.${sessionId}`
 export const register: Register = on => {
+  on('tool.call', { tool: 'Bash' }, ($, e, next) =>
+    typeof e.timeout === 'number' && e.timeout > 0
+      ? next(e)
+      : { deny: `${$.plugin.name}: set timeout in milliseconds to the expected run time of this command, measure a directory tree, an archive, or a file of unknown size first, and run one heavy step per call.` }
+  ).catch(($, e, next) => next.called ? next(e) : { deny: `${$.plugin.name}: its timeout guard failed.` })
+  on('tool.call', { tool: 'PowerShell' }, ($, e, next) =>
+    typeof e.timeout === 'number' && e.timeout > 0
+      ? next(e)
+      : { deny: `${$.plugin.name}: set timeout in milliseconds to the expected run time of this command, measure a directory tree, an archive, or a file of unknown size first, and run one heavy step per call.` }
+  ).catch(($, e, next) => next.called ? next(e) : { deny: `${$.plugin.name}: its timeout guard failed.` })
   on('tool.describe', async ($, e, next) => {
     const result = await next(e)
     const server = /^mcp__(.+?)__/.exec(e.tool)?.[1]
