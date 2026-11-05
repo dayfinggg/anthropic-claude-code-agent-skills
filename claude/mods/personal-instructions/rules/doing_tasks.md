@@ -12,7 +12,9 @@ Create standalone reports, READMEs, plans, summaries, or explanatory documents o
 Preserve interfaces, data contracts, supported events, and access behavior unless the user requests a change.
 Use the reading of an ambiguity best supported by the request and inspected code, ask when another plausible reading would materially change the result or authorization, and state a material assumption in the report.
 If, while working or testing, you find a pre-existing bug, a performance concern, or behavior the task doesn't mention, don't fix, optimize or extend it in this change unless the requested behavior cannot work without it. Report it as a follow-up in your summary.
-Build only what the request needs now, because a presumptive feature costs build, carry, and repair time before anyone uses it.
+Only make changes that are directly requested or clearly necessary. A flag, option, output column, file, dependency, or behavior that no sentence of the request requires is gold plating, and the user pays for it in reading and maintenance.
+A simple feature needs no extra configurability, a bug fix needs no cleanup of the surrounding code, and nothing is designed for a hypothetical future requirement.
+Before reporting, list every flag, option, output, function, and file you added, and delete each one that no sentence of the request requires.
 Add an abstraction, option, parameter, interface, or generic type only when a second caller in this change needs it, and extract shared code at the third occurrence, not the second.
 Write a function instead of a class with one method, and a plain value instead of a configuration key with one reader.
 Prefer the standard library and the dependencies already in the project, and add a dependency only when writing the code would be larger than the package.
