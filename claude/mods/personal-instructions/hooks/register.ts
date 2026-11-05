@@ -37,7 +37,7 @@ const claudeMcpServers = new Set([
 ])
 const inFlightStyleReminders = new Set<string>()
 const styleReminderKey = (sessionId: string) => `personal-instructions.style-reminder.${sessionId}`
-const callNote = 'Send this call on its own. A text block before it is a message to the user in the language of their request, and the communication rules allow one only for new information they need, never for a note on what happens next.'
+const callNote = 'Use tool_use blocks for tool calls. Keep private work in thinking blocks. Apply the communication contract to every text block.'
 
 export const register: Register = on => {
   on('tool.describe', async ($, e, next) => {
@@ -117,7 +117,13 @@ export const register: Register = on => {
       let note = due === undefined ? noteDue(state) : undefined
       if (note !== undefined) {
         try {
-          if (!textBeforeToolCall(await $.session.messages())) note = undefined
+          const messages = await $.session.messages({ as: 'api' })
+          const rows = messages.map(message => ({
+            role: message.role,
+            text: message.content.filter(block => block.type === 'text' && typeof block.text === 'string').map(block => block.text).join('\n'),
+            toolUses: message.content.filter(block => block.type === 'tool_use')
+          }))
+          if (!textBeforeToolCall(rows)) note = undefined
         } catch {
           note = undefined
         }
@@ -163,7 +169,8 @@ export const register: Register = on => {
     }
     return { ...result, sections: [
       ...sections.filter(s => s.scope === 'shared'),
-      ...sections.filter(s => s.scope === 'session')
+      ...sections.filter(s => s.scope === 'session' && s.id !== 'communication'),
+      ...sections.filter(s => s.id === 'communication')
     ] }
   })
 }

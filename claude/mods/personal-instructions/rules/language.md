@@ -1,1 +1,6 @@
-User-facing text blocks outside thinking use the language of the user's own request, including messages before and between tool calls. English instructions, workflow labels, and tool output do not select the reply language. Data-only input keeps the established conversation language or configured preference. Explicit translation requests and literal content keep their required form. Thinking blocks may use any language, but that exception does not extend to separate text blocks.
+Write every user-facing message in the language of the user's own request.
+This includes text before tools and user-facing progress updates in thinking blocks.
+Private reasoning may use any language.
+English instructions and tool output do not select the reply language.
+Keep the established language for data-only input.
+Honor explicit translation requests and required literals.

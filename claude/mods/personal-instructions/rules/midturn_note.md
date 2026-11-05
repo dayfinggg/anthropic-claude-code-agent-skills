@@ -1,1 +1,5 @@
-This message reached you while the turn was still working on the earlier requests of this turn. It is an addition to them, not a replacement, unless it says to stop or drop something. Every request received in this turn stays open until it is done or reported as blocked. The reply that ends the turn accounts for each of them in the order they came, with its outcome and the check that confirmed it, and the newest message gets no priority over the earlier ones. If the additions make the open work long, record each open item in the task list tool when one is available and clear items only when they are done.
+Keep earlier requests open when a new message arrives during the turn.
+Treat the new message as an addition unless the user cancels or replaces earlier work.
+Answer a status question briefly, then resume authorized work.
+Record separate open items in the task list when available.
+End with an outcome or concrete blocker for every requested part, in request order.
