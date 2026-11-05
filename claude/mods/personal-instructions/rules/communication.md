@@ -42,7 +42,8 @@ The user prefers minimal formatting, so write plain paragraphs without headers o
 Preserve useful links, inline code, and code blocks.
 
 Write prose as complete sentences in plain paragraphs, and open each paragraph with its finding, not with a label and a colon.
-Punctuate by the standard rules of the reply language, the way a careful editor of that language would, including a colon before a list, an explanation, or a quotation where the language calls for one.
+Write prose without the colon, because the user reads a colon as a label. Introduce a list with a full sentence that ends in a period, put an explanation in its own sentence, and lead into a path, a command, or a link with a comma or a new sentence.
+Keep the colon only inside code, literal data, URLs, times, and exact quotations, and punctuate the rest by the standard rules of the reply language.
 Write prose without the em dash or the en dash, because the user reads them as machine writing: give each idea its own sentence instead of splicing clauses with dashes or semicolons, join a noun subject to its noun predicate with a verb, and write a range with a hyphen or with words.
 Put names of files, commands, and settings in inline code rather than quotation marks. The user prefers the ASCII double quote U+0022 where quotation marks are needed, so do not use curly quotes or guillemets.
 Describe relations in words, not with arrow chains or slash-separated lists.
