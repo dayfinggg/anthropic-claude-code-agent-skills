@@ -44,9 +44,15 @@ export const register: Register = on => {
     const isClaudeMcp = server !== undefined && (
       claudeMcpServers.has(server) || server.startsWith('ccd_')
     )
-    const description = excludeStyleInstructions(e.tool === 'Agent'
+    let description = excludeStyleInstructions(e.tool === 'Agent'
       ? excludeAgentInstructions(result.description)
       : result.description)
+    if (e.tool === 'Bash' || e.tool === 'PowerShell') {
+      try {
+        const note = (await $.fs.read(`${$.plugin.root}/rules/command_note.md`)).trim()
+        if (note) description = `${description.trimEnd()}\n\n${note}`
+      } catch {}
+    }
     return {
       ...result,
       description: server === undefined ? description.trimEnd() : description,
