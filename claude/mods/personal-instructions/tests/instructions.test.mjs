@@ -64,8 +64,13 @@ test('a typed prompt carries the rules note as context and commands and meta pro
   assert.equal(seen.at(-1).context, undefined)
 })
 
-test('built-in and MCP tool descriptions carry no added note', async () => {
+test('shell tool descriptions carry the command note and other tools carry none', async () => {
   const describe = hooks.find(hook => hook.event === 'tool.describe').handle
+  const note = (await rule('command_note')).trim()
+  for (const tool of ['Bash', 'PowerShell']) {
+    const shell = await describe(api, { tool }, async () => ({ description: 'Runs a command.\n' }))
+    assert.equal(shell.description, `Runs a command.\n\n${note}`)
+  }
   const edit = await describe(api, { tool: 'Edit' }, async () => ({ description: 'Edits a file.\n' }))
   assert.equal(edit.description, 'Edits a file.')
   const mcp = await describe(api, { tool: 'mcp__github__get_issue' }, async () => ({ description: 'Gets an issue.' }))
@@ -114,7 +119,7 @@ test('the communication section is sized for the system prompt and names the kno
 })
 
 test('the rule files contain no forbidden punctuation in their own prose', async () => {
-  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder', 'subagent_rules', 'midturn_note', 'communication']
+  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder', 'subagent_rules', 'midturn_note', 'command_note', 'communication']
   for (const name of files) {
     const text = await rule(name)
     assert.ok(!/[—–]/.test(text), `${name}.md contains a dash`)
