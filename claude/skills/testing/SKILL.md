@@ -1,16 +1,6 @@
 ---
 name: testing
 description: Selects and runs behavior checks, implements red-green tests, and verifies regressions. Use before writing or running any tests, when the user asks for tests, coverage, TDD, a failing test, or proof that a change works, with pytest, PHPUnit, unittest, node --test, go test, cargo test, vitest, or jest. Excludes benchmarking and standalone security audits.
-paths:
-  - "**/test_*.py"
-  - "**/*_test.py"
-  - "**/*_test.go"
-  - "**/*Test.php"
-  - "**/*.test.*"
-  - "**/*.spec.*"
-  - "**/tests/**"
-  - "**/test/**"
-  - "**/__tests__/**"
 ---
 
 1. Recover the requested behavior, defect evidence, affected callers, dependencies, and contracts before editing. Read project instructions, nearby tests, test configuration, manifests, lockfiles, and relevant CI commands. Read the local glossary and applicable ADRs when present. Identify the public boundary at which a wrong result is observable and what that boundary cannot prove.
