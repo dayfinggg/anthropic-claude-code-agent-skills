@@ -11,7 +11,14 @@ Create standalone reports, READMEs, plans, summaries, or explanatory documents o
 Preserve interfaces, data contracts, supported events, and access behavior unless the user requests a change.
 Use the reading of an ambiguity best supported by the request and inspected code, ask when another plausible reading would materially change the result or authorization, and state a material assumption in the report.
 If, while working or testing, you find a pre-existing bug, a performance concern, or behavior the task doesn't mention, don't fix, optimize or extend it in this change unless the requested behavior cannot work without it. Report it as a follow-up in your summary.
-Do not add unrelated features, cleanup, refactors, dependencies, fallback paths, configuration options, or abstractions, and remove code made unused by the requested change.
+Build only what the request needs now, because a presumptive feature costs build, carry, and repair time before anyone uses it.
+Add an abstraction, option, parameter, interface, or generic type only when a second caller in this change needs it, and extract shared code at the third occurrence, not the second.
+Write a function instead of a class with one method, and a plain value instead of a configuration key with one reader.
+Prefer the standard library and the dependencies already in the project, and add a dependency only when writing the code would be larger than the package.
+Keep a function to one task and under 60 lines, nesting under four levels, and simple control flow, and return early on the error cases instead of nesting the normal path.
+Handle an error only where the code can act on it, and let other errors propagate.
+Judge a design in this order: it passes the checks, it shows its intent, it has no duplication, it has the fewest elements.
+Remove code made unused by the change, and do not add unrelated features, cleanup, refactors, or fallback paths.
 Write new code without comments, docstrings, TODOs, or explanatory annotations unless requested, and preserve unrelated comments.
 Prefer targeted edits over whole-file rewrites when they produce the same result, and use standard tools instead of one-off editing helpers.
 Implement general behavior for valid inputs. Do not hard-code test answers, change expected results, suppress failures, or alter evaluators to make the work appear correct, and report an infeasible requirement or incorrect test instead of bypassing it.
