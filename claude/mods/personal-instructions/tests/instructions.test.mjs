@@ -33,8 +33,27 @@ test('an unavailable or empty rule file leaves the engine reminder unchanged', a
   assert.deepEqual(await language(empty, {}, async () => ({ text: 'fixed language' })), { text: 'fixed language' })
 })
 
-test('the mod adds context without blocking calls or filtering output', () => {
-  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.describe', 'agent.spawn', 'session.start', 'session.end'].includes(hook.event)))
+test('the mod adds context and filters only the search sources requirement', () => {
+  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.call', 'tool.describe', 'agent.spawn', 'session.start', 'session.end'].includes(hook.event)))
+  assert.deepEqual(hooks.filter(hook => hook.event === 'tool.call').map(hook => hook.matcher.tool), ['WebSearch'])
+})
+
+test('the WebSearch description loses the mandatory sources block and keeps its usage notes', async () => {
+  const describe = hooks.find(hook => hook.event === 'tool.describe').handle
+  const description = '- Allows Claude to search the web\n\nCRITICAL REQUIREMENT - You MUST follow this:\n  - After answering the user\'s question, you MUST include a "Sources:" section at the end of your response\n  - Example format:\n\n    Sources:\n    - [Source Title 1](https://example.com/1)\n\nUsage notes:\n  - Domain filtering is supported\n'
+  const result = await describe(api, { tool: 'WebSearch' }, async () => ({ description }))
+  assert.equal(result.description, '- Allows Claude to search the web\n\nUsage notes:\n  - Domain filtering is supported')
+})
+
+test('the sources reminder is removed from search results and structured results stay', async () => {
+  const search = hooks.find(hook => hook.event === 'tool.call').handle
+  const structured = { tool_use_id: 'srvtoolu_1', content: [{ title: 'Doc', url: 'https://example.com/doc' }] }
+  const ran = await search(api, { tool: 'WebSearch', query: 'q' }, async () => ({ ref: 'r', text: 't', result: { query: 'q', durationSeconds: 1, results: [structured, 'Found it.\n\nREMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.', 'REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.'] } }))
+  assert.deepEqual(ran, { result: { query: 'q', durationSeconds: 1, results: [structured, 'Found it.'] } })
+  const clean = { ref: 'r', text: 't', result: { query: 'q', durationSeconds: 1, results: [structured, 'Found it.'] } }
+  assert.equal(await search(api, { tool: 'WebSearch', query: 'q' }, async () => clean), clean)
+  const denied = { deny: 'no' }
+  assert.equal(await search(api, { tool: 'WebSearch', query: 'q' }, async () => denied), denied)
 })
 
 test('a subagent task carries the standing rules unless it is a fork', async () => {
