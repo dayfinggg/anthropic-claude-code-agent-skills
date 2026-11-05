@@ -1,6 +1,6 @@
 import type { PromptComposeSection, Register } from 'claude-code'
 import { excludeAgentInstructions, excludeStyleInstructions } from './style-exclusions.ts'
-import { markReminderSent, readStyleReminderState, recordToolBatch, reminderDue } from './style-reminder.ts'
+import { markNoteSent, markReminderSent, noteDue, readStyleReminderState, recordToolBatch, reminderDue, textBeforeToolCall } from './style-reminder.ts'
 
 const sectionFiles: Readonly<Record<string, string>> = {
   intro: 'intro',
@@ -9,9 +9,10 @@ const sectionFiles: Readonly<Record<string, string>> = {
   actions: 'actions',
   tools: 'tools',
   session_guidance: 'session_guidance',
-  context_management: 'context_management'
+  context_management: 'context_management',
+  communication: 'communication'
 }
-const removedSections = new Set(['tone', 'communication', 'heron_brook'])
+const removedSections = new Set(['tone', 'heron_brook'])
 const deferredTools = [
   'Artifact',
   'ScheduleWakeup',
@@ -34,20 +35,9 @@ const claudeMcpServers = new Set([
   'claude_ai_Claude_Docs',
   '1a59c906-04da-521d-bda7-7f71b9f9e01c'
 ])
-const conciseStyleSessions = new Map<string, boolean>()
 const inFlightStyleReminders = new Set<string>()
 const styleReminderKey = (sessionId: string) => `personal-instructions.style-reminder.${sessionId}`
-const callNote = 'Send this call on its own. A text block before it is a message to the user in the language of their request, and the active output style allows one only for new information they need, never for a note on what happens next.'
-
-async function conciseStyleActive($: { session: { id(): Promise<string> }, prompt: { compose(): Promise<unknown> } }): Promise<boolean> {
-  try {
-    const sessionId = await $.session.id()
-    if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
-    return conciseStyleSessions.get(sessionId) === true
-  } catch {
-    return false
-  }
-}
+const callNote = 'Send this call on its own. A text block before it is a message to the user in the language of their request, and the communication rules allow one only for new information they need, never for a note on what happens next.'
 
 export const register: Register = on => {
   on('tool.describe', async ($, e, next) => {
@@ -61,9 +51,7 @@ export const register: Register = on => {
       : result.description)
     return {
       ...result,
-      description: server === undefined && await conciseStyleActive($)
-        ? `${description.trimEnd()}\n\n${callNote}`
-        : description,
+      description: server === undefined ? `${description.trimEnd()}\n\n${callNote}` : description,
       ...(deferredTools.includes(e.tool) || isClaudeMcp ? { isDeferred: true } : {})
     }
   })
@@ -75,7 +63,6 @@ export const register: Register = on => {
   })
   on('session.end', async ($, e, next) => {
     const result = await next(e)
-    conciseStyleSessions.delete(e.sessionId)
     if (e.reason === 'clear' || e.reason === 'logout') {
       try {
         await $.store.delete(styleReminderKey(e.sessionId))
@@ -84,7 +71,7 @@ export const register: Register = on => {
     }
     return result
   })
-  on('prompt.section', { name: 'communication' }, () => ({ text: null }))
+  on('prompt.section', { name: 'communication' }, async $ => ({ text: await $.fs.read(`${$.plugin.root}/rules/communication.md`) }))
   on('prompt.section', { name: 'tone' }, () => ({ text: null }))
   on('prompt.section', { name: 'heron_brook' }, () => ({ text: null }))
   on('prompt.attachment', { type: 'language' }, async ($, e, next) => {
@@ -104,9 +91,6 @@ export const register: Register = on => {
   on('prompt.submit', async ($, e, next) => {
     if (e.isMeta || e.command || !e.text.trim()) return next(e)
     try {
-      const sessionId = await $.session.id()
-      if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
-      if (conciseStyleSessions.get(sessionId) !== true) return next(e)
       const reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
       const context = [...(e.context ?? [])]
       if (reminder.trim()) context.push(reminder.trim())
@@ -127,20 +111,24 @@ export const register: Register = on => {
     if (inFlightStyleReminders.has(sessionId)) return result
     inFlightStyleReminders.add(sessionId)
     try {
-      if (!conciseStyleSessions.has(sessionId)) await $.prompt.compose()
-      if (conciseStyleSessions.get(sessionId) !== true) return result
       const key = styleReminderKey(sessionId)
       const state = recordToolBatch(readStyleReminderState(await $.store.get(key)), e.prompt_id, batchId)
       const due = reminderDue(state)
-      if (due === undefined) {
+      let note = due === undefined ? noteDue(state) : undefined
+      if (note !== undefined) {
+        try {
+          if (!textBeforeToolCall(await $.session.messages())) note = undefined
+        } catch {
+          note = undefined
+        }
+      }
+      if (due === undefined && note === undefined) {
         await $.store.set(key, state)
         return result
       }
-      await $.prompt.compose()
-      if (conciseStyleSessions.get(sessionId) !== true) return result
-      const reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
+      const reminder = await $.fs.read(`${$.plugin.root}/rules/${due === undefined ? 'text_before_tool_note' : 'style_reminder'}.md`)
       if (!reminder.trim()) return result
-      await $.store.set(key, markReminderSent(state, due))
+      await $.store.set(key, due === undefined ? markNoteSent(state, note as number) : markReminderSent(state, due))
       return { ...result, additionalContext: [...(result.additionalContext ?? []), reminder] }
     } catch {
       return result
@@ -149,7 +137,7 @@ export const register: Register = on => {
     }
   }).catch(($, e, next) => next(e))
   on('agent.spawn', async ($, e, next) => {
-    if (e.fork || !e.prompt.trim() || !await conciseStyleActive($)) return next(e)
+    if (e.fork || !e.prompt.trim()) return next(e)
     try {
       const rules = await $.fs.read(`${$.plugin.root}/rules/subagent_rules.md`)
       if (!rules.trim()) return next(e)
@@ -160,19 +148,18 @@ export const register: Register = on => {
   }).catch(($, e, next) => next(e))
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
-    try {
-      const sessionId = await $.session.id()
-      conciseStyleSessions.set(sessionId, e.outputStyle?.name === 'Concise Personal')
-      if (e.outputStyle?.name !== 'Concise Personal') await $.store.delete(styleReminderKey(sessionId))
-    } catch {
-    }
     const sections: PromptComposeSection[] = []
+    let communication = false
     for (const section of result.sections) {
       if (removedSections.has(section.id)) continue
       const file = sectionFiles[section.id]
+      if (section.id === 'communication') communication = true
       sections.push(file
         ? { ...section, text: await $.fs.read(`${$.plugin.root}/rules/${file}.md`), scope: 'session' }
         : { ...section, text: excludeStyleInstructions(section.text) })
+    }
+    if (!communication) {
+      sections.push({ id: 'communication', text: await $.fs.read(`${$.plugin.root}/rules/communication.md`), scope: 'session' })
     }
     return { ...result, sections: [
       ...sections.filter(s => s.scope === 'shared'),
