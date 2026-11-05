@@ -11,6 +11,7 @@ $Destination = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Joi
 $Destination = [System.IO.Path]::GetFullPath($Destination)
 $Backup = Join-Path $Destination (".anthropic-claude-code-agent-skills-backups/" + [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssfffffffZ"))
 
+Write-Warning "This replaces the skills, agents, output-styles, and mods directories in $Destination with the ones from this repository. Your own files there stop loading. They are moved to $Backup first."
 $Result = Sync-ClaudePayload `
     -Source $Source `
     -Destination $Destination `
@@ -26,4 +27,4 @@ Write-Host "Claude Code setup installed in $Mode mode: updated=$($Result.Updated
 if (Test-Path -LiteralPath $Backup) {
     Write-Host "Previous files were backed up to $Backup"
 }
-Write-Host "Restart Claude Code to load the new skills, agents, output style, mods, and settings."
+Write-Host "Restart Claude Code to load the new skills, mods, and settings."

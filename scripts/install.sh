@@ -21,9 +21,10 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 backup="$dest/.anthropic-claude-code-agent-skills-backups/$(date -u +%Y%m%dT%H%M%SZ)-$(basename "$tmp")"
 install_mode="${mode#--}"
 
+printf 'WARNING: this replaces the skills, agents, output-styles, and mods directories in %s with the ones from this repository. Your own files there stop loading. They are moved to %s first.\n' "$dest" "$backup" >&2
 claude_sync_payload "$src" "$dest" "$backup" "$install_mode" "$tmp"
 printf '%s\n' "$install_mode" >"$dest/.anthropic-claude-code-agent-skills.install-mode"
 printf 'Claude Code setup installed in %s mode: updated=%s removed=%s settings_changed=%s.\n' \
   "$install_mode" "$CLAUDE_SYNC_UPDATED" "$CLAUDE_SYNC_REMOVED" "$CLAUDE_SETTINGS_CHANGED"
 [ ! -d "$backup" ] || printf 'Previous files were backed up to %s\n' "$backup"
-printf 'Restart Claude Code to load the new skills, agents, output style, mods, and settings.\n'
+printf 'Restart Claude Code to load the new skills, mods, and settings.\n'
