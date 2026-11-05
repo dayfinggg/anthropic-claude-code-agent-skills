@@ -1,9 +1,15 @@
 {
   "language": "russian",
   "modelSettings": {
-    "claude-opus-5-5": { "effortLevel": "high" },
-    "claude-fable-5-1": { "effortLevel": "high" },
-    "claude-sonnet-5-5": { "effortLevel": "medium" }
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "medium"
+    }
   },
   "idleCompaction": false,
   "env": {
@@ -40,5 +46,19 @@
   "autoDreamEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
-  "switchModelsOnFlag": false
+  "switchModelsOnFlag": false,
+  "skillOverrides": {
+    "anthropic-skills:pdf": "off",
+    "anthropic-skills:pptx": "off",
+    "anthropic-skills:google-workspace": "off",
+    "anthropic-skills:artifact-emulator": "off",
+    "anthropic-skills:docx": "off",
+    "artifact-diagramming": "off",
+    "artifact-capabilities": "off",
+    "keybindings-help": "off",
+    "fewer-permission-prompts": "off",
+    "schedule": "off",
+    "init": "off",
+    "security-review": "off"
+  }
 }

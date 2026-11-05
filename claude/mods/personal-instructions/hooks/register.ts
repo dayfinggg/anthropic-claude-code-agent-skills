@@ -1,6 +1,6 @@
 import type { PromptComposeSection, Register } from 'claude-code'
 import { excludeAgentInstructions, excludeStyleInstructions } from './style-exclusions.ts'
-import { markNoteSent, markReminderSent, noteDue, readStyleReminderState, recordToolBatch, reminderDue, textBeforeToolCall } from './style-reminder.ts'
+import { markReminderSent, readStyleReminderState, recordToolBatch, reminderDue } from './style-reminder.ts'
 
 const sectionFiles: Readonly<Record<string, string>> = {
   intro: 'intro',
@@ -37,8 +37,6 @@ const claudeMcpServers = new Set([
 ])
 const inFlightStyleReminders = new Set<string>()
 const styleReminderKey = (sessionId: string) => `personal-instructions.style-reminder.${sessionId}`
-const callNote = 'Use tool_use blocks for tool calls. Keep private work in thinking blocks. Apply the communication contract to every text block.'
-
 export const register: Register = on => {
   on('tool.describe', async ($, e, next) => {
     const result = await next(e)
@@ -51,7 +49,7 @@ export const register: Register = on => {
       : result.description)
     return {
       ...result,
-      description: server === undefined ? `${description.trimEnd()}\n\n${callNote}` : description,
+      description: server === undefined ? description.trimEnd() : description,
       ...(deferredTools.includes(e.tool) || isClaudeMcp ? { isDeferred: true } : {})
     }
   })
@@ -114,27 +112,13 @@ export const register: Register = on => {
       const key = styleReminderKey(sessionId)
       const state = recordToolBatch(readStyleReminderState(await $.store.get(key)), e.prompt_id, batchId)
       const due = reminderDue(state)
-      let note = due === undefined ? noteDue(state) : undefined
-      if (note !== undefined) {
-        try {
-          const messages = await $.session.messages({ as: 'api' })
-          const rows = messages.map(message => ({
-            role: message.role,
-            text: message.content.filter(block => block.type === 'text' && typeof block.text === 'string').map(block => block.text).join('\n'),
-            toolUses: message.content.filter(block => block.type === 'tool_use')
-          }))
-          if (!textBeforeToolCall(rows)) note = undefined
-        } catch {
-          note = undefined
-        }
-      }
-      if (due === undefined && note === undefined) {
+      if (due === undefined) {
         await $.store.set(key, state)
         return result
       }
-      const reminder = await $.fs.read(`${$.plugin.root}/rules/${due === undefined ? 'text_before_tool_note' : 'style_reminder'}.md`)
+      const reminder = await $.fs.read(`${$.plugin.root}/rules/style_reminder.md`)
       if (!reminder.trim()) return result
-      await $.store.set(key, due === undefined ? markNoteSent(state, note as number) : markReminderSent(state, due))
+      await $.store.set(key, markReminderSent(state, due))
       return { ...result, additionalContext: [...(result.additionalContext ?? []), reminder] }
     } catch {
       return result
@@ -143,7 +127,7 @@ export const register: Register = on => {
     }
   }).catch(($, e, next) => next(e))
   on('agent.spawn', async ($, e, next) => {
-    if (e.fork || !e.prompt.trim()) return next(e)
+    if (e.fork || e.resume || e.workflow || !e.prompt.trim()) return next(e)
     try {
       const rules = await $.fs.read(`${$.plugin.root}/rules/subagent_rules.md`)
       if (!rules.trim()) return next(e)

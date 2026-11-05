@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-const note = '\n\nUse tool_use blocks for tool calls. Keep private work in thinking blocks. Apply the communication contract to every text block.'
+const note = ''
 
 test('infrequently used tools stay searchable and preserve their descriptions', async ($, on) => {
   on('tool.describe', ($, e) => ({ description: e.description, isDeferred: e.isDeferred }))

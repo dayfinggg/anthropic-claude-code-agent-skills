@@ -21,7 +21,7 @@ test('the language attachment keeps the engine reminder and adds the request-lan
     const result = await language(api, event, async () => ({ text }))
     assert.ok(result.text.startsWith(text))
     assert.ok(result.text.includes("language of the user's own request"))
-    assert.ok(result.text.includes('Private reasoning may use any language'))
+    assert.ok(result.text.includes('text before a tool call'))
     assert.equal(event.text, text)
   }
 })
@@ -64,11 +64,10 @@ test('a typed prompt carries the rules note as context and commands and meta pro
   assert.equal(seen.at(-1).context, undefined)
 })
 
-test('built-in tool descriptions carry the call note and MCP tools do not', async () => {
+test('built-in and MCP tool descriptions carry no added note', async () => {
   const describe = hooks.find(hook => hook.event === 'tool.describe').handle
-  const edit = await describe(api, { tool: 'Edit' }, async () => ({ description: 'Edits a file.' }))
-  assert.ok(edit.description.startsWith('Edits a file.\n\nUse tool_use blocks for tool calls.'))
-  assert.ok(edit.description.includes('communication contract'))
+  const edit = await describe(api, { tool: 'Edit' }, async () => ({ description: 'Edits a file.\n' }))
+  assert.equal(edit.description, 'Edits a file.')
   const mcp = await describe(api, { tool: 'mcp__github__get_issue' }, async () => ({ description: 'Gets an issue.' }))
   assert.equal(mcp.description, 'Gets an issue.')
 })
@@ -109,13 +108,13 @@ test('a prompt without a native communication section still receives the rules',
 test('the communication section is sized for the system prompt and names the known slips', async () => {
   const communication = await rule('communication')
   assert.ok(communication.length < 6000, `communication.md is ${communication.length} characters`)
-  for (const phrase of ['150 words', '80 words', 'U+003A', 'U+003B', 'U+2014', 'U+2013', 'U+0022', 'guillemets', 'language of the user\'s own request', 'whitespace', 'progress updates']) {
+  for (const phrase of ['150 words', '80 words', 'U+0022', 'guillemets', 'semicolon', 'dash', 'label and a colon', 'language of the user\'s own request', 'whitespace', 'progress updates']) {
     assert.ok(communication.includes(phrase), `missing: ${phrase}`)
   }
 })
 
 test('the rule files contain no forbidden punctuation in their own prose', async () => {
-  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder', 'subagent_rules', 'midturn_note', 'text_before_tool_note', 'communication']
+  const files = ['intro', 'system', 'doing_tasks', 'actions', 'tools', 'session_guidance', 'context_management', 'language', 'style_reminder', 'subagent_rules', 'midturn_note', 'communication']
   for (const name of files) {
     const text = await rule(name)
     assert.ok(!/[—–]/.test(text), `${name}.md contains a dash`)
