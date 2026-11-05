@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import { register } from '../hooks/register.ts'
+import { checkAnswer } from '../hooks/style-check.ts'
 
 const root = fileURLToPath(new URL('..', import.meta.url)).replaceAll('\\', '/')
 const hooks = []
@@ -33,9 +34,37 @@ test('an unavailable or empty rule file leaves the engine reminder unchanged', a
   assert.deepEqual(await language(empty, {}, async () => ({ text: 'fixed language' })), { text: 'fixed language' })
 })
 
-test('the mod adds context and guards only shell calls', () => {
-  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.call', 'tool.describe', 'agent.spawn', 'session.start', 'session.end'].includes(hook.event)))
+test('the mod adds context, guards shell calls, and checks the final answer once', () => {
+  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'classic.Stop', 'tool.call', 'tool.describe', 'agent.spawn', 'session.start', 'session.end'].includes(hook.event)))
   assert.deepEqual(hooks.filter(hook => hook.event === 'tool.call').map(hook => hook.matcher.tool).sort(), ['Bash', 'PowerShell'])
+})
+
+test('the answer check flags the mechanical style rules and leaves code, links, paths, and times alone', () => {
+  assert.deepEqual(checkAnswer('Утилита готова. Запуск выглядит так.\n\n```\npython a.py C:\\x\n```\n\nФайл лежит в `C:\\Users\\a\\b.py`, ссылка <t3-thread://v2/a:b> и время 12:30 не считаются.'), [])
+  assert.equal(checkAnswer('Утилита: [a.py](C:\\a.py)').length, 1)
+  assert.ok(checkAnswer('Файл `x.py` — скрипт.')[0].includes('dash'))
+  assert.ok(checkAnswer('Причина; следствие.')[0].includes('semicolon'))
+  assert.ok(checkAnswer('Он сказал «да».')[0].includes('quotes'))
+  assert.ok(checkAnswer('## Итог\nГотово.')[0].includes('heading'))
+  assert.ok(checkAnswer('**Итог.** Готово.')[0].includes('Bold'))
+  const five = 'Раз готово. Два готово. Три готово. Четыре готово. Пять готово.'
+  assert.ok(checkAnswer(five)[0].includes('5 sentences'))
+  assert.deepEqual(checkAnswer('- Раз.\n- Два.\n- Три.\n- Четыре.\n- Пять.'), [])
+  const long = 'Это предложение ' + 'слово '.repeat(20) + 'конец.'
+  assert.ok(checkAnswer(long)[0].includes('words'))
+  assert.deepEqual(checkAnswer('Версия 3.11 и размер 5.4 ГБ в одном предложении.'), [])
+})
+
+test('the final answer is sent back once with the findings and passes when clean', async () => {
+  const stop = hooks.find(hook => hook.event === 'classic.Stop').handle
+  const flagged = await stop(api, { hook_event_name: 'Stop', stop_hook_active: false, last_assistant_message: 'Итог: готово.' }, async () => ({}))
+  assert.ok(flagged.block.includes('colon'))
+  const retried = await stop(api, { hook_event_name: 'Stop', stop_hook_active: true, last_assistant_message: 'Итог: готово.' }, async () => ({}))
+  assert.equal(retried.block, undefined)
+  const clean = await stop(api, { hook_event_name: 'Stop', stop_hook_active: false, last_assistant_message: 'Готово.' }, async () => ({ additionalContext: ['x'] }))
+  assert.deepEqual(clean, { additionalContext: ['x'] })
+  const missing = await stop(api, { hook_event_name: 'Stop', stop_hook_active: false }, async () => ({}))
+  assert.deepEqual(missing, {})
 })
 
 test('a shell command without a timeout is refused and one with a timeout runs unchanged', async () => {
