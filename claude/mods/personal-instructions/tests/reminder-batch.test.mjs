@@ -3,10 +3,13 @@ import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 import { register } from '../hooks/register.ts'
-import { firstReminderAt, readStyleReminderState, recordToolBatch, reminderDue, reminderInterval } from '../hooks/style-reminder.ts'
+import { firstReminderAt, noteGap, noteLimit, readStyleReminderState, recordToolBatch, reminderDue, reminderInterval, textBeforeToolCall } from '../hooks/style-reminder.ts'
 
 const root = fileURLToPath(new URL('..', import.meta.url)).replaceAll('\\', '/')
 const text = (await readFile(new URL('../rules/style_reminder.md', import.meta.url), 'utf8'))
+const note = (await readFile(new URL('../rules/text_before_tool_note.md', import.meta.url), 'utf8'))
+const quiet = [{ role: 'user', text: 'Почини тесты.', toolUses: [] }, { role: 'assistant', text: '', toolUses: [{ name: 'Read' }] }, { role: 'user', text: '', toolUses: [], toolResults: [{ text: 'ok' }] }]
+const announced = [quiet[0], { role: 'assistant', text: 'Now the tests.', toolUses: [{ name: 'Edit' }] }, quiet[2]]
 const makeEngine = (sessionId, stored = new Map()) => {
   const hooks = new Map()
   register((event, ...args) => {
@@ -14,15 +17,14 @@ const makeEngine = (sessionId, stored = new Map()) => {
     return { catch: () => {} }
   })
   const engine = {
-    style: 'Concise Personal', hooks, stored, plugin: { root },
+    hooks, stored, plugin: { root }, rows: quiet,
     fs: { read: path => readFile(path, 'utf8') },
-    session: { id: async () => sessionId },
+    session: { id: async () => sessionId, messages: async () => engine.rows },
     store: {
       get: async key => stored.has(key) ? structuredClone(stored.get(key)) : undefined,
       set: async (key, value) => stored.set(key, structuredClone(value)),
       delete: async key => stored.delete(key)
-    },
-    prompt: { compose: async () => hooks.get('prompt.compose')(engine, { outputStyle: { name: engine.style } }, async () => ({ sections: [] })) }
+    }
   }
   engine.batch = (id, options = {}, result = {}) => hooks.get('classic.PostToolBatch')(engine, {
     session_id: sessionId, transcript_path: '/test/transcript.jsonl', cwd: '/test',
@@ -74,16 +76,13 @@ test('new prompts have independent thresholds', async () => {
   assert.deepEqual(await runBatches(engine, 100, 100 + second + 1, { prompt_id: 'prompt-2' }), [100 + first - 1, 100 + second - 1])
 })
 
-test('subagents, empty batches, missing prompt IDs and other styles are excluded', async () => {
+test('subagents, empty batches and missing prompt IDs are excluded', async () => {
   const engine = makeEngine('excluded')
   for (let index = 0; index < 20; index += 1) {
     for (const options of [{ agent_id: 'worker' }, { tool_calls: [] }, { prompt_id: undefined }]) {
       assert.equal((await engine.batch('batch-' + index, options)).additionalContext, undefined)
     }
   }
-  assert.equal(engine.stored.size, 0)
-  engine.style = 'Other'
-  for (let index = 0; index < 20; index += 1) assert.equal((await engine.batch('other-' + index)).additionalContext, undefined)
   assert.equal(engine.stored.size, 0)
 })
 
@@ -109,18 +108,6 @@ test('resume preserves progress and does not replay a delivered reminder', async
   assert.equal((await again.batch('batch-' + (first + 1))).additionalContext, undefined)
   await again.end('clear')
   assert.equal(one.stored.size, 0)
-})
-
-test('changing styles clears tracking, including immediately before injection', async () => {
-  const engine = makeEngine('changed-style')
-  await runBatches(engine, 1, first)
-  engine.style = 'Other'
-  assert.equal((await engine.batch('batch-' + first)).additionalContext, undefined)
-  assert.equal(engine.stored.size, 0)
-  engine.style = 'Concise Personal'
-  await engine.prompt.compose()
-  await runBatches(engine, 1, first)
-  assert.deepEqual((await engine.batch('batch-' + first)).additionalContext, [text])
 })
 
 test('missing reminder files and storage failures do not block work', async () => {
@@ -152,13 +139,53 @@ test('concurrent duplicate batches cannot inject twice', async () => {
   assert.deepEqual((await inFlight).additionalContext, [text])
 })
 
+test('a text block before a tool call draws the note, at most twice per prompt and spaced apart', async () => {
+  const engine = makeEngine('note')
+  engine.rows = announced
+  const delivered = []
+  for (let index = 1; index < first; index += 1) {
+    const result = await engine.batch('batch-' + index)
+    if (result.additionalContext) delivered.push([index, result.additionalContext[0] === note ? 'note' : 'reminder'])
+  }
+  assert.deepEqual(delivered, [[1, 'note'], [1 + noteGap, 'note']])
+  assert.equal(noteLimit, 2)
+  assert.deepEqual((await engine.batch('batch-' + first)).additionalContext, [text])
+  assert.deepEqual(await runBatches(engine, first + 1, second), [])
+  assert.deepEqual(await runBatches(engine, 1, 1 + noteGap + 1, { prompt_id: 'prompt-2' }), [1, 1 + noteGap])
+})
+
+test('the note is not sent for a quiet response, a final answer, or on the batch of the periodic reminder', async () => {
+  const engine = makeEngine('note-quiet')
+  assert.deepEqual(await runBatches(engine, 1, first - 1), [])
+  engine.rows = [quiet[0], { role: 'assistant', text: 'Готово.', toolUses: [] }]
+  assert.equal((await engine.batch('batch-' + (first - 1))).additionalContext, undefined)
+  engine.rows = announced
+  assert.deepEqual((await engine.batch('batch-' + first)).additionalContext, [text])
+  assert.deepEqual(readStyleReminderState(engine.stored.values().next().value).noteAt, [])
+})
+
+test('a response stored as one row per block is still recognized', () => {
+  assert.equal(textBeforeToolCall([quiet[0], { role: 'assistant', text: 'Now the tests.', toolUses: [] }, { role: 'assistant', text: '', toolUses: [{ name: 'Edit' }] }, quiet[2]]), true)
+  assert.equal(textBeforeToolCall([quiet[0], { role: 'assistant', text: 'Now the tests.', toolUses: [] }, { role: 'user', text: '', toolUses: [] }, { role: 'assistant', text: '', toolUses: [{ name: 'Edit' }] }, quiet[2]]), false)
+  assert.equal(textBeforeToolCall(quiet), false)
+  assert.equal(textBeforeToolCall([]), false)
+})
+
+test('an unavailable transcript leaves the periodic reminder working', async () => {
+  const engine = makeEngine('note-unavailable')
+  engine.session.messages = async () => { throw new Error('unavailable') }
+  assert.deepEqual(await runBatches(engine, 1, first), [])
+  assert.deepEqual((await engine.batch('batch-' + first)).additionalContext, [text])
+})
+
 test('legacy state is not misread and the count stays a plain number', () => {
   let state = readStyleReminderState({ promptId: 'old', batchIds: ['a', 'b', 'c', 'd', 'e'], sent: true })
-  assert.deepEqual(state, { promptId: 'old', count: 0, lastBatchId: '', sentAt: [] })
+  assert.deepEqual(state, { promptId: 'old', count: 0, lastBatchId: '', sentAt: [], noteAt: [] })
   state = readStyleReminderState({ turnId: 'old', indexes: [0, 1, 2, 3, 4], pending: true })
-  assert.deepEqual(state, { promptId: '', count: 0, lastBatchId: '', sentAt: [] })
+  assert.deepEqual(state, { promptId: '', count: 0, lastBatchId: '', sentAt: [], noteAt: [] })
+  assert.deepEqual(readStyleReminderState({ promptId: 'p', count: 7, lastBatchId: 'b', sentAt: [5] }).noteAt, [])
   for (let index = 0; index < 105; index += 1) state = recordToolBatch(state, 'prompt', 'batch-' + index)
   assert.equal(state.count, 105)
   assert.equal(reminderDue(state), 105)
-  assert.deepEqual(recordToolBatch(state, 'new', 'first'), { promptId: 'new', count: 1, lastBatchId: 'first', sentAt: [] })
+  assert.deepEqual(recordToolBatch(state, 'new', 'first'), { promptId: 'new', count: 1, lastBatchId: 'first', sentAt: [], noteAt: [] })
 })

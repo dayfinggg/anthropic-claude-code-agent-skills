@@ -185,6 +185,10 @@ function Merge-ClaudeSettings {
         $Settings.outputStyle = $OutputStyle.Value
         $Changed++
     }
+    elseif ($null -eq $OutputStyle -and $null -ne $Settings.PSObject.Properties["outputStyle"]) {
+        $Settings.PSObject.Properties.Remove("outputStyle")
+        $Changed++
+    }
 
     if ($null -eq $Settings.PSObject.Properties["env"]) {
         $Settings | Add-Member -NotePropertyName "env" -NotePropertyValue ([pscustomobject]@{})

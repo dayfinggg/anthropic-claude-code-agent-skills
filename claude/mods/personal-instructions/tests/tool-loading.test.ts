@@ -1,11 +1,13 @@
 import { expect, test } from 'claude-code/testing'
 
+const note = '\n\nSend this call on its own. A text block before it is a message to the user in the language of their request, and the communication rules allow one only for new information they need, never for a note on what happens next.'
+
 test('infrequently used tools stay searchable and preserve their descriptions', async ($, on) => {
   on('tool.describe', ($, e) => ({ description: e.description, isDeferred: e.isDeferred }))
   for (const tool of ['Artifact', 'ScheduleWakeup', 'Workflow', 'ReportFindings', 'SearchPlugins', 'SuggestPluginInstall', 'SuggestSkills', 'ListAgents']) {
     for (const isDeferred of [undefined, true] as const) {
       const result = await $.tool.describe({ tool, description: `${tool} original description`, provider: { plugin: 'engine', tier: 'core' }, ...(isDeferred === undefined ? {} : { isDeferred }) })
-      expect(result.description).toBe(`${tool} original description`)
+      expect(result.description).toBe(`${tool} original description${note}`)
       expect(result.isDeferred).toBe(true)
     }
   }
@@ -16,7 +18,7 @@ test('core tools and existing deferred tools retain their placement', async ($, 
   for (const tool of ['ToolSearch', 'Bash', 'PowerShell', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'Skill', 'Agent', 'AskUserQuestion', 'WebSearch', 'mcp__example__read']) {
     for (const isDeferred of [undefined, true] as const) {
       const result = await $.tool.describe({ tool, description: tool, provider: { plugin: 'engine', tier: 'core' }, isDeferred })
-      expect(result.description).toBe(tool)
+      expect(result.description).toBe(tool.startsWith('mcp__') ? tool : tool + note)
       expect(result.isDeferred).toBe(isDeferred ?? false)
     }
   }
@@ -45,7 +47,7 @@ test('Claude MCP tools defer without changing external MCP tools or ToolSearch',
     for (const isDeferred of [undefined, true] as const) {
       const result = await $.tool.describe({ tool, description: 'Unrelated tool.', provider: { plugin: 'engine', tier: 'core' }, isDeferred })
       expect(result.isDeferred).toBe(isDeferred ?? false)
-      expect(result.description).toBe('Unrelated tool.')
+      expect(result.description).toBe(tool === 'ToolSearch' ? 'Unrelated tool.' + note : 'Unrelated tool.')
     }
   }
 })

@@ -1,5 +1,4 @@
 {
-  "outputStyle": "Concise Personal",
   "language": "russian",
   "modelSettings": {
     "claude-opus-5-5": { "effortLevel": "high" },
