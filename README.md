@@ -2,13 +2,13 @@
 
 A portable configuration for Claude Opus 5.5, Sonnet 5.5, Haiku 5.5, and Fable 5.1, synchronized with the current local setup.
 
-The payload contains 41 engineering skills, the Concise Personal output style, the personal-instructions mod written in TypeScript, and portable settings. No custom subagent definitions or global CLAUDE.md file are installed.
+The payload contains 41 engineering skills, the personal-instructions mod written in TypeScript, and portable settings. No output style, custom subagent definitions, or global CLAUDE.md file are installed. The former Concise Personal output style was retired on 2026-11-05 and its requirements now live in the system prompt as the Communication section, loaded by the mod from [communication.md](claude/mods/personal-instructions/rules/communication.md).
 
-The style asks for plain, natural answers in the user's language. It preserves concise complete sentences, useful lists and tables, and the user's punctuation requirements. Short answers do not reduce the completeness of research or implementation.
+The Communication section asks for plain, natural answers in the user's language. It limits text before and between tool calls to requested status, material blockers or changes, findings that change the next step, and approaches the user must understand beforehand, and it names the step announcements that belong in thinking instead. It sets the size of completion reports, the paragraph format, the punctuation requirements, the evidence standard, and the closing paragraphs for unfinished work, with three complete examples. Thinking blocks have no language requirement. Short answers do not reduce the completeness of research or implementation.
 
-Claude Code loads the output style selected in settings through its standard mechanism. The mod preserves that mechanism, loads operating rules from Markdown files, and removes competing tone, communication, narration, and proactive delegation instructions. It puts selected built-in tools and Claude MCP tools behind ToolSearch without changing their input schemas or blocking calls. T3 and third-party MCP loading preferences are preserved. MCP server instructions are separate from deferred tool definitions and are not deferred by this setting.
+The mod replaces the native communication section with that file, loads the other operating rules from Markdown files, and removes competing tone, narration, and proactive delegation instructions. It puts selected built-in tools and Claude MCP tools behind ToolSearch without changing their input schemas or blocking calls. T3 and third-party MCP loading preferences are preserved. MCP server instructions are separate from deferred tool definitions and are not deferred by this setting. The mod replaces the native fixed-language attachment, when present, with a request-language instruction and removes selected conflicting Claude Docs instructions. It does not filter generated answers.
 
-Intermediate messages are limited to requested status, material blockers or changes, findings that change the next step, and approaches the user needs to understand beforehand. Messages outside thinking blocks follow the language of the user's request. Internal reasoning and thinking blocks have no language requirement. The mod replaces the native fixed-language attachment, when present, with a request-language instruction and removes selected conflicting Claude Docs instructions. It does not filter generated answers. During a main-agent request, the mod adds one short contract reminder after the fifth nonempty tool batch through PostToolBatch, before the next model request. It applies only while Concise Personal is active and requires the host's prompt ID. Parallel tools count as one batch, duplicate batches do not advance the count, and subagents and downstream stop decisions are excluded. The reminder is sent at most once per prompt; it does not wait for another user message. Session-keyed tracking survives resume and is cleared when the session is cleared or the style changes. Five batches is a heuristic, not a measured guarantee. The reminder does not request extra work or status narration and does not revise an answer already sent.
+Two reminders support long sessions, both delivered through PostToolBatch before the next model request and only for the main agent. The periodic reminder arrives after the fifth nonempty tool batch of a prompt and then every tenth batch. The targeted note arrives once after a response that put a text block before a tool call, at most twice per prompt and at least three batches apart, and it is decided from the shape of the response alone, without language detection. Parallel tools count as one batch, duplicate batches do not advance the count, and subagents and downstream stop decisions are excluded. Session-keyed tracking survives resume and is cleared when the session is cleared. The thresholds are heuristics, not measured guarantees. Neither reminder requests extra work or status narration, and neither revises an answer already sent.
 
 ## Install
 
@@ -22,7 +22,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1
 sh scripts/install.sh
 ```
 
-Replace mode backs up and replaces custom skills, agents, output styles, and mods. It removes a legacy global CLAUDE.md file so old instructions do not compete. Credentials, sessions, projects, plugins, synced skills, and unrelated files remain in place. Existing settings are preserved, missing defaults are added, and the active style and mod location are updated. Both installation modes remove the retired skillOverrides setting after backing it up.
+Replace mode backs up and replaces custom skills, agents, output styles, and mods. It removes a legacy global CLAUDE.md file so old instructions do not compete. Credentials, sessions, projects, plugins, synced skills, and unrelated files remain in place. Existing settings are preserved, missing defaults are added, and the mod location is updated. Both installation modes remove the retired skillOverrides and outputStyle settings after backing them up, so the retired Concise Personal style is no longer selected.
 
 The portable settings enable `bypassPermissions` and skip its confirmation prompts. Review [settings.json](claude/settings.json) before installation. The default mod path uses `~/.claude/mods/personal-instructions` and the installer resolves custom destinations on the host.
 
@@ -34,7 +34,7 @@ Run `scripts/update.ps1` in PowerShell or `sh scripts/update.sh` on macOS or Lin
 
 ## Contents
 
-- [Output style](claude/output-styles/concise-personal.md)
+- [Communication rules](claude/mods/personal-instructions/rules/communication.md)
 - [TypeScript mod](claude/mods/personal-instructions)
 - [Operating rules](claude/mods/personal-instructions/rules)
 - [Engineering skills](claude/skills)

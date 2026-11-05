@@ -123,6 +123,9 @@ def main(portable_path, settings_path, output_path, mode, platform, home, *bundl
     if "outputStyle" in portable and settings["outputStyle"] != portable["outputStyle"]:
         settings["outputStyle"] = portable["outputStyle"]
         changed += 1
+    elif "outputStyle" not in portable and "outputStyle" in settings:
+        del settings["outputStyle"]
+        changed += 1
     environment = settings.setdefault("env", {})
     if not isinstance(environment, dict):
         fail("Existing settings.json must contain a JSON object in env.")

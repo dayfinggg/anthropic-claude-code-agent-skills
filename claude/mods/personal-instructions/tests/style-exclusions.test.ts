@@ -19,15 +19,19 @@ test('Agent keeps its calling contract without proactive delegation or conflicti
   expect(result.description.includes('Example usage')).toBe(false)
   expect(result.description.includes('Specify subagent_type.')).toBe(true)
   expect(result.description.includes('Never fabricate results.')).toBe(true)
+  expect(result.description.endsWith('never for a note on what happens next.')).toBe(true)
   const other = await $.tool.describe({ tool: 'Other', description, provider: { plugin: 'engine', tier: 'core' } })
-  expect(other.description).toBe(description)
+  expect(other.description.startsWith(description)).toBe(true)
+  expect(other.description.includes('Send this call on its own.')).toBe(true)
 })
 
-test('tone sections are omitted without changing other system sections', async ($, on) => {
+test('tone sections are omitted, the communication section carries the rules, and other sections are unchanged', async ($, on) => {
   on('prompt.section', ($, e) => ({ text: e.text }))
-  for (const name of ['tone', 'communication', 'heron_brook']) {
+  on('fs.read', ($, e) => ({ value: e.path.replaceAll('\\', '/').endsWith('/rules/communication.md') ? '# Communication\nRules.' : 'other' }))
+  for (const name of ['tone', 'heron_brook']) {
     expect((await $.prompt.section({ name, text: 'Conflicting style' })).text).toBe(null)
   }
+  expect((await $.prompt.section({ name: 'communication', text: 'Native communication' })).text).toBe('# Communication\nRules.')
   expect((await $.prompt.section({ name: 'provider_policy', text: 'Preserve access policy.' })).text).toBe('Preserve access policy.')
 })
 
@@ -36,8 +40,11 @@ test('desktop composition removes narration and wrap-up while preserving operati
     { id: 'host', scope: 'session' as const, text: 'Before\n- Right before each session\'s tool call, in the same message, write a bold title line and one sentence on what it will do; it has started only once the tool result says so. Two or more at once: call `mcp__ccd_session__mark_chapter` first with a short batch title.\nNever push those branches.\n# Task list and wrap-up (this app)\nMandatory recap.\n<browsers>\nPreserve browser permissions.\n</browsers>' }
   ]
   on('prompt.compose', () => ({ sections }))
+  on('fs.read', () => ({ value: '# Communication\nRules.' }))
   const result = await $.prompt.compose({ model: 'claude-opus-5-5', promptModel: 'claude-opus-5-5', surfaces: ['desktop'], tools: [], outputStyle: null, traits: ['sdk-preset'] })
   expect(result.sections[0]?.text).toBe('Before\n\nNever push those branches.\n<browsers>\nPreserve browser permissions.\n</browsers>')
+  expect(result.sections.at(-1)?.id).toBe('communication')
+  expect(result.sections.at(-1)?.text).toBe('# Communication\nRules.')
 })
 
 test('tool descriptions lose the preamble without changing tool placement', async ($, on) => {

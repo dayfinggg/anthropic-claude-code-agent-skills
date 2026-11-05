@@ -201,6 +201,16 @@ class PayloadChecks:
 
         self.assertEqual(self.settings()["outputStyle"], "Brief")
 
+    def test_output_style_is_removed_when_the_payload_has_none(self):
+        portable = {key: value for key, value in PORTABLE_SETTINGS.items() if key != "outputStyle"}
+        self.write(self.source / "settings.json", json.dumps(portable))
+        for mode in ("merge", "replace"):
+            with self.subTest(mode=mode):
+                self.write(self.destination / "settings.json", json.dumps({"outputStyle": "Explanatory", "model": "personal-model"}))
+                self.sync(mode=mode)
+                self.assertNotIn("outputStyle", self.settings())
+                self.assertEqual(self.settings()["model"], "personal-model")
+
     def test_replace_lists_exactly_the_bundled_mod_directories(self):
         self.write(self.destination / "settings.json", json.dumps(
             {"env": {PLUGIN_DIRECTORIES: str(self.root / "other mods" / "custom")}}))
