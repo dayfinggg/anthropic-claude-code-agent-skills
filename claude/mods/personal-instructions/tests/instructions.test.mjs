@@ -10,7 +10,7 @@ register((event, ...args) => {
   hooks.push({ event, matcher: args.length === 2 ? args[0] : {}, handle: args.at(-1) })
   return { catch: () => {} }
 })
-const api = { plugin: { root }, fs: { read: path => readFile(path, 'utf8') } }
+const api = { plugin: { root, name: 'personal-instructions' }, fs: { read: path => readFile(path, 'utf8') } }
 const compose = hooks.find(hook => hook.event === 'prompt.compose').handle
 const language = hooks.find(hook => hook.event === 'prompt.attachment' && hook.matcher.type === 'language').handle
 const rule = name => readFile(new URL(`../rules/${name}.md`, import.meta.url), 'utf8')
@@ -33,8 +33,20 @@ test('an unavailable or empty rule file leaves the engine reminder unchanged', a
   assert.deepEqual(await language(empty, {}, async () => ({ text: 'fixed language' })), { text: 'fixed language' })
 })
 
-test('the mod adds context without blocking calls or filtering output', () => {
-  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.describe', 'agent.spawn', 'session.start', 'session.end'].includes(hook.event)))
+test('the mod adds context and guards only shell calls', () => {
+  assert.ok(hooks.every(hook => ['prompt.section', 'prompt.attachment', 'prompt.compose', 'prompt.submit', 'classic.PostToolBatch', 'tool.call', 'tool.describe', 'agent.spawn', 'session.start', 'session.end'].includes(hook.event)))
+  assert.deepEqual(hooks.filter(hook => hook.event === 'tool.call').map(hook => hook.matcher.tool).sort(), ['Bash', 'PowerShell'])
+})
+
+test('a shell command without a timeout is refused and one with a timeout runs unchanged', async () => {
+  for (const guard of hooks.filter(hook => hook.event === 'tool.call')) {
+    const refused = await guard.handle(api, { tool: guard.matcher.tool, command: 'ls' }, async () => ({ result: 'ran' }))
+    assert.ok(typeof refused.deny === 'string' && refused.deny.includes('timeout'))
+    const zero = await guard.handle(api, { tool: guard.matcher.tool, command: 'ls', timeout: 0 }, async () => ({ result: 'ran' }))
+    assert.ok(typeof zero.deny === 'string')
+    const ran = await guard.handle(api, { tool: guard.matcher.tool, command: 'ls', timeout: 30000 }, async e => ({ result: e.command }))
+    assert.deepEqual(ran, { result: 'ls' })
+  }
 })
 
 test('a subagent task carries the standing rules unless it is a fork', async () => {
