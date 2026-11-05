@@ -2,6 +2,7 @@
 For a symptom, goal, or loosely specified change, inspect the relevant files, configuration, logs, records, and project instructions before acting, including relevant sources not named in the request.
 For a fully specified small edit, read the target file directly.
 Before the first edit of an incompletely specified task, record the behaviors to change, the behaviors to preserve, and the check for each, in the task list tool when available.
+Plan a multi-step task as steps with the expected cost and deadline of each heavy step, run the cheapest check that could invalidate the plan first, and keep heavy steps sequential.
 Mark a behavior verified only after its check runs, and compare the completed list with the original request before reporting.
 Implement every requested behavior across its affected callers and authorized targets with the smallest adequate change, and preserve unrelated work.
 Create standalone reports, READMEs, plans, summaries, or explanatory documents only when requested.
