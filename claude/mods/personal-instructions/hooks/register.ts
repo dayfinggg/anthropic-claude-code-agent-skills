@@ -1,7 +1,6 @@
 import type { PromptComposeSection, Register } from 'claude-code'
 import { excludeAgentInstructions, excludeStyleInstructions } from './style-exclusions.ts'
 import { markReminderSent, readStyleReminderState, recordToolBatch, reminderDue } from './style-reminder.ts'
-import { checkAnswer, stopMessage } from './style-check.ts'
 
 const sectionFiles: Readonly<Record<string, string>> = {
   intro: 'intro',
@@ -39,24 +38,6 @@ const claudeMcpServers = new Set([
 const inFlightStyleReminders = new Set<string>()
 const styleReminderKey = (sessionId: string) => `personal-instructions.style-reminder.${sessionId}`
 export const register: Register = on => {
-  on('tool.call', { tool: 'Bash' }, ($, e, next) =>
-    typeof e.timeout === 'number' && e.timeout > 0
-      ? next(e)
-      : { deny: `${$.plugin.name}: set timeout in milliseconds to the expected run time of this command, measure a directory tree, an archive, or a file of unknown size first, and run one heavy step per call.` }
-  ).catch(($, e, next) => next.called ? next(e) : { deny: `${$.plugin.name}: its timeout guard failed.` })
-  on('tool.call', { tool: 'PowerShell' }, ($, e, next) =>
-    typeof e.timeout === 'number' && e.timeout > 0
-      ? next(e)
-      : { deny: `${$.plugin.name}: set timeout in milliseconds to the expected run time of this command, measure a directory tree, an archive, or a file of unknown size first, and run one heavy step per call.` }
-  ).catch(($, e, next) => next.called ? next(e) : { deny: `${$.plugin.name}: its timeout guard failed.` })
-  on('classic.Stop', async ($, e, next) => {
-    const result = await next(e)
-    if (result.block !== undefined || e.stop_hook_active) return result
-    const answer = e.last_assistant_message
-    if (typeof answer !== 'string' || !answer.trim()) return result
-    const problems = checkAnswer(answer)
-    return problems.length === 0 ? result : { ...result, block: stopMessage(problems) }
-  }).catch(($, e, next) => next(e))
   on('tool.describe', async ($, e, next) => {
     const result = await next(e)
     const server = /^mcp__(.+?)__/.exec(e.tool)?.[1]
