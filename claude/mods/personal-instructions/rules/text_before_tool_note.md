@@ -1,1 +1,6 @@
-The previous response put a text block before a tool call. The user reads that block as a message addressed to them. Under the Communication rules of the system prompt such a block exists only when the user asked for a status, a material change or blocker appeared, a verified finding changes the next step, or an approach must be understood before it runs, and then it is written in the language of the user's own request. Any other text in a response that also contains a tool call, whatever it announces, restates, confirms, or corrects, is a working note. It stays in thinking, whatever language the thinking uses, and the tool call goes out with no text block. This note needs no reply and asks for no new work.
+A text block accompanied the previous tool call.
+Before the next call, keep text only for requested status, a material change or blocker, a finding that changes the agreed approach or result, or a non-obvious approach the user must understand first.
+Otherwise send the call without text.
+Use the user's language for any permitted message.
+An edit retry or a step announcement does not meet these conditions.
+Do not acknowledge this reminder.
