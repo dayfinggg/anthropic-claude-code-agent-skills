@@ -108,7 +108,7 @@ test('a prompt without a native communication section still receives the rules',
 test('the communication section is sized for the system prompt and names the known slips', async () => {
   const communication = await rule('communication')
   assert.ok(communication.length < 6000, `communication.md is ${communication.length} characters`)
-  for (const phrase of ['one or two short paragraphs', 'one to three sentences', 'U+0022', 'guillemets', 'semicolon', 'dash', 'label and a colon', 'language of the user\'s own request', 'progress updates']) {
+  for (const phrase of ['first sentence', 'at most 20 words', 'at most four sentences', 'at most two supporting sentences', 'U+0022', 'guillemets', 'semicolon', 'dash', 'label and a colon', 'language of the user\'s own request', 'progress updates']) {
     assert.ok(communication.includes(phrase), `missing: ${phrase}`)
   }
 })
