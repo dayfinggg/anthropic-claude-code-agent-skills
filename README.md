@@ -1,4 +1,4 @@
-This repository distributes the Concise plugin for Claude Code. It includes 21 engineering skills, the Concise output style, and coding instructions.
+This repository distributes the Concise plugin for Claude Code. It includes 22 engineering skills, the Concise output style, and coding instructions.
 
 Install the plugin with Claude Code's plugin manager.
 
