@@ -94,9 +94,15 @@ export const register: Register = on => {
     const result = await next(e)
     if (e.traits.includes('bare')) return result
 
-    const added = e.traits.includes('skills')
-      ? [{ id: `${$.plugin.name}:skills`, text: (await $.fs.read(pluginFile($, 'skill.md'))).trim(), scope: 'session' as const }]
-      : []
+    const section = async (name: string, file: string) => ({
+      id: `${$.plugin.name}:${name}`,
+      text: (await $.fs.read(pluginFile($, file))).trim(),
+      scope: 'session' as const,
+    })
+    const added = [
+      ...(e.tools.includes('Read') && e.tools.includes('Edit') ? [await section('tools', 'tools.md')] : []),
+      ...(e.traits.includes('skills') ? [await section('skills', 'skill.md')] : []),
+    ]
     if (!e.outputStyle?.isKeepingCodingInstructions) return { sections: [...result.sections, ...added] }
 
     const coding = await $.fs.read(pluginFile($, 'coding.md'))
