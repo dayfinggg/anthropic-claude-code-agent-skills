@@ -4,7 +4,7 @@ const STYLE = 'Concise output style is active.'
 const GENERIC_REMINDER = 'Remember to follow the specific guidelines for this style.'
 const CODING_SECTION = 'doing_tasks'
 const REMOVED_SECTIONS = ['communication', 'tone']
-const SHELL_OVER_TOOLS = 'instead of the dedicated Read, Edit, or Write tools'
+const SHELL_OVER_TOOLS = /the dedicated Read, Edit,? (or|and) Write tools/
 const DEFERRED_TOOLS = [
   'Artifact',
   'Workflow',
@@ -45,7 +45,11 @@ export const register: Register = on => {
 
   on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
 
-  on('prompt.attachment', { type: 'auto_mode' }, ($, e, next) => (e.text.includes(SHELL_OVER_TOOLS) ? { text: null } : next(e)))
+  on('prompt.attachment', { type: 'auto_mode' }, ($, e, next) => {
+    if (!SHELL_OVER_TOOLS.test(e.text)) return next(e)
+    const kept = e.text.split(/\n\s*\n/).filter(paragraph => !SHELL_OVER_TOOLS.test(paragraph))
+    return kept.every(paragraph => paragraph.trim().endsWith(':')) ? { text: null } : next({ ...e, text: kept.join('\n\n') })
+  })
 
   on('tool.describe', { tool: DEFERRED_TOOLS }, async ($, e, next) => ({ ...(await next(e)), isDeferred: true }))
 
