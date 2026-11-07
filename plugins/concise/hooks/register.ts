@@ -36,6 +36,17 @@ const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result
 
 const pluginFile = ($: EngineInterface, name: string) => `${$.plugin.root}/instructions/${name}`
 
+const withoutFrontmatter = (text: string) => text.replace(/^---[\s\S]*?\n---\s*/, '').trim()
+
+const subagentBrief = async ($: EngineInterface, task: string) => {
+  const [preface, style, coding] = await Promise.all([
+    $.fs.read(pluginFile($, 'subagent.md')),
+    $.fs.read(`${$.plugin.root}/output-styles/concise.md`),
+    $.fs.read(pluginFile($, 'coding.md')),
+  ])
+  return `<main_session_instructions>\n${preface.trim()}\n\n<output_style>\n${withoutFrontmatter(style)}\n</output_style>\n\n<coding_instructions>\n${coding.trim()}\n</coding_instructions>\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
+}
+
 export const register: Register = on => {
   on('prompt.attachment', { type: 'output_style' }, async ($, e, next) => {
     if (!e.text.includes(STYLE)) return next(e)
@@ -79,6 +90,10 @@ export const register: Register = on => {
         })
       : next(e),
   )
+
+  on('agent.spawn', async ($, e, next) =>
+    e.subagentType === 'fork' ? next(e) : next({ ...e, prompt: await subagentBrief($, e.prompt) }),
+  ).catch(($, e, next) => next(e))
 
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
