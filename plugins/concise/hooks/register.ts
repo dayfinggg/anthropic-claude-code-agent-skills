@@ -58,11 +58,6 @@ export const register: Register = on => {
     return { ...result, description: `${result.description}\n\n${rule.trim()}` }
   })
 
-  on('tool.describe', { tool: 'Skill' }, async ($, e, next) => {
-    const [result, rule] = await Promise.all([next(e), $.fs.read(pluginFile($, 'skill.md'))])
-    return { ...result, description: `${result.description}\n\n${rule.trim()}` }
-  })
-
   on('tool.describe', { tool: 'WebSearch' }, async ($, e, next) => {
     const result = await next(e)
     return { ...result, description: removeSourceListRules(result.description) }
@@ -86,13 +81,19 @@ export const register: Register = on => {
 
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
-    if (!e.outputStyle?.isKeepingCodingInstructions || e.traits.includes('bare')) return result
+    if (e.traits.includes('bare')) return result
+
+    const added = e.traits.includes('skills')
+      ? [{ id: `${$.plugin.name}:skills`, text: (await $.fs.read(pluginFile($, 'skill.md'))).trim(), scope: 'session' as const }]
+      : []
+    if (!e.outputStyle?.isKeepingCodingInstructions) return { sections: [...result.sections, ...added] }
 
     const coding = await $.fs.read(pluginFile($, 'coding.md'))
     const sections = result.sections
       .filter(section => !REMOVED_SECTIONS.includes(section.id))
       .map(section => (section.id === CODING_SECTION ? { ...section, text: coding } : section))
     const hasCoding = sections.some(section => section.id === CODING_SECTION)
-    return { sections: hasCoding ? sections : [...sections, { id: `${$.plugin.name}:coding`, text: coding, scope: 'session' as const }] }
+    const codingSection = hasCoding ? [] : [{ id: `${$.plugin.name}:coding`, text: coding, scope: 'session' as const }]
+    return { sections: [...sections, ...codingSection, ...added] }
   })
 }
