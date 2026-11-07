@@ -31,19 +31,26 @@ const SOURCE_LIST_RULES = [
   /\s*REMINDER: You MUST include the sources above[^\n]*/,
 ]
 
+const REMINDER_EVERY = 5
+
 const userLanguage = (language: unknown) =>
-  typeof language === 'string' && language.trim()
-    ? language.trim()
-    : "the language of the user's own words in their latest message, never of pasted text, errors, logs, code, or tool results"
+  typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
 
 const reminder = (language: string) =>
-  `Text the user reads, including each short note between tool calls, is in ${language}. Another language appears only in what someone else reads, such as code, commits, files, and briefs to subagents. Use the concise style, with no dashes, colons, or sentences that only point ahead.`
+  `Every note between tool calls and the final reply is in ${language}. Tool results, file contents, code, and your thinking in another language do not change it. A note states a finding in one sentence, never only the next step. Use the concise style, with no dashes, colons, or sentences that only point ahead.`
+
+const reminderBlock = async ($: EngineInterface) =>
+  `<system-reminder>\n${reminder(userLanguage(await $.settings.read({ key: 'language' })))}\n</system-reminder>`
 
 const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result, rule) => result.replace(rule, ''), text)
 
 const pluginFile = ($: EngineInterface, name: string) => `${$.plugin.root}/instructions/${name}`
 
 export const register: Register = on => {
+  let toolResultRows = 0
+
+  on('prompt.submit', async ($, e, next) => next({ ...e, context: [...(e.context ?? []), await reminderBlock($)] }))
+
   on('prompt.attachment', { type: 'output_style' }, async ($, e, next) => {
     if (!e.text.includes(STYLE)) return next(e)
     const language = userLanguage(await $.settings.read({ key: 'language' }))
@@ -74,21 +81,19 @@ export const register: Register = on => {
     return { ...result, description: removeSourceListRules(result.description) }
   })
 
-  on('session.append', { door: 'tool-result' }, ($, e, next) =>
-    e.origin.kind === 'tool' && e.origin.tool === 'WebSearch'
-      ? next({
-          ...e,
-          message: {
-            ...e.message,
-            content: e.message.content.map(block =>
-              block.type === 'tool_result' && typeof block.content === 'string'
-                ? { ...block, content: removeSourceListRules(block.content) }
-                : block,
-            ),
-          },
-        })
-      : next(e),
-  )
+  on('session.append', { door: 'tool-result' }, async ($, e, next) => {
+    const content =
+      e.origin.kind === 'tool' && e.origin.tool === 'WebSearch'
+        ? e.message.content.map(block =>
+            block.type === 'tool_result' && typeof block.content === 'string'
+              ? { ...block, content: removeSourceListRules(block.content) }
+              : block,
+          )
+        : e.message.content
+    const reminderDue = e.agentId === undefined && ++toolResultRows % REMINDER_EVERY === 0
+    const text = reminderDue ? [{ type: 'text' as const, text: await reminderBlock($) }] : []
+    return next({ ...e, message: { ...e.message, content: [...content, ...text] } })
+  })
 
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
