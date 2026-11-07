@@ -3,7 +3,14 @@ import type { EngineInterface, Register } from 'claude-code'
 const STYLE = 'Concise output style is active.'
 const GENERIC_REMINDER = 'Remember to follow the specific guidelines for this style.'
 const CODING_SECTION = 'doing_tasks'
-const REMOVED_SECTIONS = ['communication', 'tone']
+const REMOVED_SECTIONS = ['communication', 'tone', 'willow_tern']
+const SECTION_REWRITES: Record<string, [string, string]> = {
+  autonomy_append: [
+    "Offering follow-ups after the task is done is fine; asking permission before doing the work is not.",
+    'Ask no permission before doing the work.',
+  ],
+}
+const SILENT_TURN_REMINDER = 'silent_turn_reminder'
 const SHELL_OVER_TOOLS = /the dedicated Read, Edit,? (or|and) Write tools/
 const DEFERRED_TOOLS = [
   'Artifact',
@@ -43,7 +50,11 @@ export const register: Register = on => {
     return next({ ...e, text: e.text.replace(GENERIC_REMINDER, reminder(language)) })
   })
 
-  on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
+  on('prompt.attachment', { type: SILENT_TURN_REMINDER }, () => ({ text: null }))
+
+  on('session.append', { door: 'attachment' }, ($, e, next) =>
+    e.message.name === SILENT_TURN_REMINDER ? next({ ...e, message: { ...e.message, content: [] } }) : next(e),
+  )
 
   on('prompt.attachment', { type: 'auto_mode' }, ($, e, next) => {
     if (!SHELL_OVER_TOOLS.test(e.text)) return next(e)
@@ -91,7 +102,11 @@ export const register: Register = on => {
     const coding = await $.fs.read(pluginFile($, 'coding.md'))
     const sections = result.sections
       .filter(section => !REMOVED_SECTIONS.includes(section.id))
-      .map(section => (section.id === CODING_SECTION ? { ...section, text: coding } : section))
+      .map(section => {
+        if (section.id === CODING_SECTION) return { ...section, text: coding }
+        const rewrite = SECTION_REWRITES[section.id]
+        return rewrite ? { ...section, text: section.text.replace(...rewrite) } : section
+      })
     const hasCoding = sections.some(section => section.id === CODING_SECTION)
     const codingSection = hasCoding ? [] : [{ id: `${$.plugin.name}:coding`, text: coding, scope: 'session' as const }]
     return { sections: [...sections, ...codingSection, ...added] }
