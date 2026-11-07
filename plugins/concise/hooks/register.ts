@@ -32,6 +32,8 @@ const SOURCE_LIST_RULES = [
 ]
 
 const REMINDER_EVERY = 5
+const SEARCH_RESULT_NOTE =
+  '<system-reminder>\nThe summary in this result is search output, not a source. Open each page you rely on with WebFetch and read its text before you state a fact from it.\n</system-reminder>'
 
 const userLanguage = (language: unknown) =>
   typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
@@ -77,8 +79,8 @@ export const register: Register = on => {
   })
 
   on('tool.describe', { tool: 'WebSearch' }, async ($, e, next) => {
-    const result = await next(e)
-    return { ...result, description: removeSourceListRules(result.description) }
+    const [result, rule] = await Promise.all([next(e), $.fs.read(pluginFile($, 'websearch.md'))])
+    return { ...result, description: `${removeSourceListRules(result.description)}\n\n${rule.trim()}` }
   })
 
   on('session.append', { door: 'tool-result' }, async ($, e, next) => {
@@ -86,7 +88,7 @@ export const register: Register = on => {
       e.origin.kind === 'tool' && e.origin.tool === 'WebSearch'
         ? e.message.content.map(block =>
             block.type === 'tool_result' && typeof block.content === 'string'
-              ? { ...block, content: removeSourceListRules(block.content) }
+              ? { ...block, content: `${removeSourceListRules(block.content)}\n\n${SEARCH_RESULT_NOTE}` }
               : block,
           )
         : e.message.content
