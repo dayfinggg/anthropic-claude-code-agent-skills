@@ -8,4 +8,4 @@ claude plugin install concise --marketplace dayfinggg/anthropic-claude-code-agen
 
 Restart Claude Code after installation. The plugin uses your configured response language, or the language of your latest message when none is configured.
 
-Each skill stores source attribution and redistribution terms in `references/credits.md`. This plugin is not an official Anthropic distribution.
+The distribution `LICENSE` holds source attribution and redistribution terms. This plugin is not an official Anthropic distribution.
