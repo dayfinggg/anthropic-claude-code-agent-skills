@@ -6,7 +6,7 @@ description: Guides the writing of documents that agents read, so each run takes
 <overview>
 This skill is a reference for writing any document an agent consumes. That covers a skill, an `AGENTS.md` or `CLAUDE.md`, and a doc reached by a pointer. The packaging differs, but the writing does not. The same levers make each one predictable. The agent then takes the same process every run, though its output may differ.
 
-When the document is a Claude Code skill, read [SKILL-MECHANICS.md](SKILL-MECHANICS.md). It covers frontmatter, the invocation choice, the skill listing, and router skills. For another harness, check its own skill documentation before applying invocation fields or context budgets.
+When the document is a Claude Code skill, read [SKILL-MECHANICS.md](references/SKILL-MECHANICS.md). It covers frontmatter, the invocation choice, the skill listing, and router skills. For another harness, check its own skill documentation before applying invocation fields or context budgets.
 </overview>
 
 <context_pointers>
@@ -64,7 +64,7 @@ The strongest criteria are both checkable and exhaustive.
 <when_to_split>
 Splitting one document into two spends one of the two loads, so split only when the cut earns it.
 - Split by sequence where the post-completion steps tempt the agent to rush the current one. Keeping them out of view drives more legwork on the current task. The reverse also holds. Merging sequences exposes each step to the steps after it and invites premature completion.
-- Split by invocation, which applies only to skills and is described in [SKILL-MECHANICS.md](SKILL-MECHANICS.md).
+- Split by invocation, which applies only to skills and is described in [SKILL-MECHANICS.md](references/SKILL-MECHANICS.md).
 </when_to_split>
 
 <leading_words>
@@ -94,3 +94,7 @@ Four habits keep a document lean.
 <emphasis>
 Current models follow instructions closely, so emphasis overcorrects. Capitals, "CRITICAL", "MUST", and pressure such as "be thorough, do not be lazy" make a model over-trigger and act rigidly. A hedge such as "try to" on a real requirement reads as permission to skip it. State each rule once at normal volume, with its reason beside it. A word too weak to beat the default is a no-op, so delete it. An example is "be thorough" for an agent that is already thorough. Choose a stronger word, such as "relentless", only when a run shows the default falls short. Trigger text in a description is the one place where calibrated urgency can help, because skills tend to under-trigger.
 </emphasis>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

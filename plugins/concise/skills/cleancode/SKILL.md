@@ -9,10 +9,10 @@ This skill routes code quality work to four book rule sets. Each reference file 
 
 <books>
 Each reference file covers one book.
-- [code-complete.mini.md](code-complete.mini.md) holds the construction rules of Code Complete by Steve McConnell. Read it when you write new code or change behavior. It covers names, data types, control flow, error handling, and performance tuning.
-- [refactoring.mini.md](refactoring.mini.md) holds the rules of Refactoring by Martin Fowler. Read it when the task is a refactor or cleanup. Also read it when the requested change needs a preparatory refactor.
-- [working-effectively-with-legacy-code.mini.md](working-effectively-with-legacy-code.mini.md) holds the rules of Working Effectively with Legacy Code by Michael Feathers. Read it when you change code without trustworthy tests, or when a hidden dependency blocks a test.
-- [release-it.mini.md](release-it.mini.md) holds the rules of Release It by Michael T. Nygard. Read it when code makes outbound calls or touches queues, pools, caches, or jobs. Startup, health checks, migrations, and deployment also qualify.
+- [code-complete.mini.md](references/code-complete.mini.md) holds the construction rules of Code Complete by Steve McConnell. Read it when you write new code or change behavior. It covers names, data types, control flow, error handling, and performance tuning.
+- [refactoring.mini.md](references/refactoring.mini.md) holds the rules of Refactoring by Martin Fowler. Read it when the task is a refactor or cleanup. Also read it when the requested change needs a preparatory refactor.
+- [working-effectively-with-legacy-code.mini.md](references/working-effectively-with-legacy-code.mini.md) holds the rules of Working Effectively with Legacy Code by Michael Feathers. Read it when you change code without trustworthy tests, or when a hidden dependency blocks a test.
+- [release-it.mini.md](references/release-it.mini.md) holds the rules of Release It by Michael T. Nygard. Read it when code makes outbound calls or touches queues, pools, caches, or jobs. Startup, health checks, migrations, and deployment also qualify.
 </books>
 
 <precedence>
@@ -23,3 +23,7 @@ The coding instructions win where a book disagrees with them. The `code_rules` b
 
 The `design` skill owns module interfaces, depth, and seam placement.
 </precedence>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>
