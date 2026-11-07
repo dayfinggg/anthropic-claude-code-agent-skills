@@ -32,8 +32,12 @@ const SOURCE_LIST_RULES = [
 ]
 
 const REMINDER_EVERY = 5
-const SEARCH_RESULT_NOTE =
-  '<system-reminder>\nThe summary in this result is search output, not a source. Open each page you rely on with WebFetch and read its text before you state a fact from it.\n</system-reminder>'
+const RESULT_NOTES: Record<string, string> = {
+  WebSearch:
+    '<system-reminder>\nThe summary in this result is search output, not a source. Open each page you rely on with WebFetch and read its text before you state a fact from it.\n</system-reminder>',
+  WebFetch:
+    '<system-reminder>\nIf this page failed or gave a summary in place of its text, take the same facts from another page or a new query. A fact that no page you read confirms stays out of the answer.\n</system-reminder>',
+}
 
 const userLanguage = (language: unknown) =>
   typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
@@ -84,14 +88,16 @@ export const register: Register = on => {
   })
 
   on('session.append', { door: 'tool-result' }, async ($, e, next) => {
+    const tool = e.origin.kind === 'tool' ? e.origin.tool : undefined
+    const note = tool === undefined ? undefined : RESULT_NOTES[tool]
     const content =
-      e.origin.kind === 'tool' && e.origin.tool === 'WebSearch'
-        ? e.message.content.map(block =>
+      note === undefined
+        ? e.message.content
+        : e.message.content.map(block =>
             block.type === 'tool_result' && typeof block.content === 'string'
-              ? { ...block, content: `${removeSourceListRules(block.content)}\n\n${SEARCH_RESULT_NOTE}` }
+              ? { ...block, content: `${tool === 'WebSearch' ? removeSourceListRules(block.content) : block.content}\n\n${note}` }
               : block,
           )
-        : e.message.content
     const reminderDue = e.agentId === undefined && ++toolResultRows % REMINDER_EVERY === 0
     const text = reminderDue ? [{ type: 'text' as const, text: await reminderBlock($) }] : []
     return next({ ...e, message: { ...e.message, content: [...content, ...text] } })
