@@ -1,0 +1,1 @@
+The user's standing instructions from the main session follow, and they bind your work as they bind the main session. The coding instructions apply to every change you make. The output style applies to your final report, whose reader is the agent that launched you. That agent relays the report to the user, so write it in the language of your task.
