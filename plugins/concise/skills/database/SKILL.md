@@ -17,11 +17,12 @@ These steps apply to every destructive change.
 4. Tell the user what the command destroys, which database it targets, the row count, and where the backup is. Then wait for confirmation.
 5. Run the change in a transaction where the engine allows it. Compare the affected row count with step 3 before `COMMIT`.
 
-These commands back up one table to a file, first with PostgreSQL and then with MySQL.
+Store backups in a private directory outside the repository and shared folders. Restrict access to the owner and use encrypted storage for sensitive production data. Keep backups out of logs, chat, and commits. Set `BACKUP_FILE` to the approved destination before these commands. Use the database's existing secure credential mechanism rather than putting passwords in command arguments.
 
 ```
-pg_dump --format=custom --table=public.orders --file=orders.dump "$DATABASE_URL"
-mysqldump --single-transaction mydb orders > orders.sql
+umask 077
+pg_dump --format=custom --table=public.orders --file="$BACKUP_FILE"
+mysqldump --single-transaction mydb orders > "$BACKUP_FILE"
 ```
 
 A copy inside the same database is enough for a small data fix. It does not survive a lost server, so prefer a dump for large changes.
@@ -162,13 +163,17 @@ A query inside a loop over rows is an N+1 pattern. Load the related rows in one 
 
 <references>
 Each reference file covers one engine area, so read only the one the task needs.
-- [postgres-schema.md](postgres-schema.md) covers data types, primary keys, foreign key indexes, idempotent constraints, identifiers, and partial and JSONB indexes. Read it when you design or change PostgreSQL tables.
-- [postgres-queries.md](postgres-queries.md) covers N+1 batching, keyset pagination, upserts, transactions, deadlocks, queues, `EXPLAIN`, statistics, and bulk loads. Read it when you write PostgreSQL queries or diagnose a slow one.
-- [postgres-operations.md](postgres-operations.md) covers connection pooling, prepared statements, timeouts, privileges, and row level security. Read it when you configure connections or access control.
-- [mysql-online-ddl.md](mysql-online-ddl.md) covers DDL algorithms, lock levels, and online schema change tools. Read it before any MySQL `ALTER TABLE` on a large table.
-- [mysql-transactions.md](mysql-transactions.md) covers isolation levels, InnoDB row locks, deadlocks, and connection limits. Read it when you write MySQL transactions or debug locking and connection errors.
+- [postgres-schema.md](references/postgres-schema.md) covers data types, primary keys, foreign key indexes, idempotent constraints, identifiers, and partial and JSONB indexes. Read it when you design or change PostgreSQL tables.
+- [postgres-queries.md](references/postgres-queries.md) covers N+1 batching, keyset pagination, upserts, transactions, deadlocks, queues, `EXPLAIN`, statistics, and bulk loads. Read it when you write PostgreSQL queries or diagnose a slow one.
+- [postgres-operations.md](references/postgres-operations.md) covers connection pooling, prepared statements, timeouts, privileges, and row level security. Read it when you configure connections or access control.
+- [mysql-online-ddl.md](references/mysql-online-ddl.md) covers DDL algorithms, lock levels, and online schema change tools. Read it before any MySQL `ALTER TABLE` on a large table.
+- [mysql-transactions.md](references/mysql-transactions.md) covers isolation levels, InnoDB row locks, deadlocks, and connection limits. Read it when you write MySQL transactions or debug locking and connection errors.
 </references>
 
 <report>
 End every migration task with a migration safety report in the reply. Give one sentence per risky statement that names the statement, its risk, and your change. An example is "`CREATE INDEX` on `orders` blocked writes, so it now runs `CONCURRENTLY` alone." Then say whether a lock timeout is set. Name the expand and contract steps left for later deploys, or say that none remain. If you could not make a statement safe, say so in the first sentence of the report.
 </report>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

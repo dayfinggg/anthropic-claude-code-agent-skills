@@ -38,14 +38,14 @@ The reference files rank rules by their effect on load time and responsiveness. 
 
 | Category | Impact | Reference file |
 |---|---|---|
-| Request waterfalls | Critical | [react-async-and-bundle.md](react-async-and-bundle.md) |
-| Bundle size | Critical | [react-async-and-bundle.md](react-async-and-bundle.md) |
-| Server rendering and Server Components | High | [react-server.md](react-server.md) |
-| Script loading, resource hints, long lists | High | [js-performance.md](js-performance.md) |
-| Re-renders and rendering | Medium | [react-rendering.md](react-rendering.md) |
-| DOM, storage, and JavaScript hot paths | Low to medium | [js-performance.md](js-performance.md) |
+| Request waterfalls | Critical | [react-async-and-bundle.md](references/react-async-and-bundle.md) |
+| Bundle size | Critical | [react-async-and-bundle.md](references/react-async-and-bundle.md) |
+| Server rendering and Server Components | High | [react-server.md](references/react-server.md) |
+| Script loading, resource hints, long lists | High | [js-performance.md](references/js-performance.md) |
+| Re-renders and rendering | Medium | [react-rendering.md](references/react-rendering.md) |
+| DOM, storage, and JavaScript hot paths | Low to medium | [js-performance.md](references/js-performance.md) |
 
-Read [react-async-and-bundle.md](react-async-and-bundle.md) when code awaits several independent operations or when a page loads too much JavaScript. Read [react-server.md](react-server.md) when you write Server Components, Server Actions, server-side caches, or props that cross the server and client boundary. Read [react-rendering.md](react-rendering.md) when you write hooks, effects, state updates, or components that render too often or mismatch on hydration. Read [js-performance.md](js-performance.md) when you add scripts or preloads, render long lists, or touch the DOM, storage, or a hot loop.
+Read [react-async-and-bundle.md](references/react-async-and-bundle.md) when code awaits several independent operations or when a page loads too much JavaScript. Read [react-server.md](references/react-server.md) when you write Server Components, Server Actions, server-side caches, or props that cross the server and client boundary. Read [react-rendering.md](references/react-rendering.md) when you write hooks, effects, state updates, or components that render too often or mismatch on hydration. Read [js-performance.md](references/js-performance.md) when you add scripts or preloads, render long lists, or touch the DOM, storage, or a hot loop.
 </priorities>
 
 <ecmascript>
@@ -72,3 +72,7 @@ These features are in ES2026.
 - A `JSON.parse` reviver gets a third `context` argument with the raw `source` text. `JSON.rawJSON` makes `JSON.stringify` emit raw JSON text.
 - `Map` and `WeakMap` have `getOrInsert(key, value)` and `getOrInsertComputed(key, callback)`, and the callback runs only for a missing key.
 </ecmascript>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

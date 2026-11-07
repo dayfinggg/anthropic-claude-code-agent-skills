@@ -112,12 +112,12 @@ interface ExporterInterface
 ```php
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
-#[AsTaggedItem('csv')]
-final class CsvExporter implements ExporterInterface
+#[AsTaggedItem('json')]
+final class JsonExporter implements ExporterInterface
 {
     public function export(array $rows): string
     {
-        return implode("\n", array_map(fn (array $row): string => implode(',', $row), $rows));
+        return json_encode($rows, JSON_THROW_ON_ERROR);
     }
 }
 ```
