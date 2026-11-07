@@ -102,7 +102,7 @@ def create_archive(repository, before, after, target):
         item
         for item in files
         if any(
-            item[side + '_path'].startswith(('claude/', 'scripts/')) for side in ('before', 'after')
+            item[side + '_path'].startswith(('.claude-plugin/', 'plugins/')) for side in ('before', 'after')
         )
     ]
     blobs = sorted(
@@ -131,7 +131,7 @@ def create_archive(repository, before, after, target):
     revision = old if after == ZERO_SHA else new
     roots = [
         root
-        for root in ('claude', 'scripts')
+        for root in ('.claude-plugin', 'plugins')
         if git('cat-file', '-e', revision + ':' + root, required=False) is not None
     ]
     if roots:
@@ -249,7 +249,7 @@ def notification(repository, branch, before, after, files, commit_text='', icons
             }
         )
     else:
-        blocks.append(paragraph('В папках claude и scripts изменений нет.'))
+        blocks.append(paragraph('В файлах плагина изменений нет.'))
     buttons = [{'text': 'Открыть репозиторий', 'url': url}]
     return {
         'rich_message': {'blocks': blocks, 'skip_entity_detection': True},

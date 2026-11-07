@@ -5,8 +5,8 @@ on:
     branches:
       - '**'
     paths:
-      - 'claude/**'
-      - 'scripts/**'
+      - '.claude-plugin/**'
+      - 'plugins/**'
   workflow_dispatch:
     inputs:
       before:
