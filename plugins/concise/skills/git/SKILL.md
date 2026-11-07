@@ -180,7 +180,7 @@ Agent starts work
     └── Feature complete → All commits form a clean history
 ```
 
-With this pattern, you never lose more than one increment of work. If a change goes off the rails, restore only the files you changed since the last commit. This command restores one path in the index and the working tree from `HEAD`.
+Before restoring a path, inspect both staged and unstaged changes. Restore it only when all changes belong to this task and the user authorized discarding them. Preserve user edits and other tasks' changes. This command discards both staged and unstaged changes in the named path.
 
 ```bash
 git restore --source=HEAD --staged --worktree <path>
@@ -296,7 +296,7 @@ Write the entry under Unreleased in the same change that makes the change, while
 </release_and_versioning>
 
 <pull_requests>
-For a pull request body, follow [pull-requests.md](pull-requests.md).
+For a pull request body, follow [pull-requests.md](references/pull-requests.md).
 </pull_requests>
 
 <red_flags>
@@ -330,3 +330,7 @@ Every release of anything with consumers passes three checks.
 - [ ] The release is tagged, and the version comes from the tag instead of a hand edit.
 - [ ] The changelog has a curated, human-readable entry for this version, grouped by impact.
 </verification>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

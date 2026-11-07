@@ -57,7 +57,7 @@ Check whether the code agrees when the user states how something works. Surface 
 </cross_reference_with_code>
 
 <update_the_glossary_inline>
-Update `GLOSSARY.md` right when a term is resolved. Capture terms as they happen instead of in batches. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md), and read it before the first glossary edit.
+Update `GLOSSARY.md` right when a term is resolved. Capture terms as they happen instead of in batches. Use the format in [GLOSSARY-FORMAT.md](references/GLOSSARY-FORMAT.md), and read it before the first glossary edit.
 
 `GLOSSARY.md` holds no implementation details. It is not a spec, a scratch pad, or a store for implementation decisions. It is a glossary and nothing else.
 </update_the_glossary_inline>
@@ -68,6 +68,10 @@ Offer to create an ADR only when three conditions all hold.
 2. It is surprising without context, so a future reader will wonder "why did they do it this way?"
 3. It is the result of a real trade-off, with genuine alternatives and specific reasons for the pick.
 
-If any of the three is missing, skip the ADR. Read [ADR-FORMAT.md](./ADR-FORMAT.md) before you write one, for its template, numbering, and the kinds of decisions that qualify.
+If any of the three is missing, skip the ADR. Read [ADR-FORMAT.md](references/ADR-FORMAT.md) before you write one, for its template, numbering, and the kinds of decisions that qualify.
 </offer_adrs_sparingly>
 </during_the_session>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

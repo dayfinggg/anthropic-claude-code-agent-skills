@@ -6,7 +6,7 @@ description: Generates an interactive bash wizard that walks a human through ste
 <overview>
 A wizard is a bash script that walks a human step by step through a manual procedure. Such a procedure is tedious to do by hand and tedious to re-explain to an AI every time. The wizard opens each URL and says exactly what to click and copy. It captures the values and writes them where they belong, such as `.env` or GitHub secrets. It confirms at every stage and shows how many stages are left. It might configure third-party services, run a one-off migration, or move the project from one state to another.
 
-[template.sh](template.sh) already solves the user experience. It provides stage-by-stage progress, confirmation gates, and URL opening across platforms, WSL included. It also provides hidden secret entry, idempotent `.env` upserts, `gh secret` and `gh variable` writes, and a closing summary. Your job is only to scope the procedure and author its stages. The library functions above `run_wizard` are identical in every wizard, and that consistency is the point. So edit only the body of `run_wizard`.
+[template.sh](scripts/template.sh) already solves the user experience. It provides stage-by-stage progress, confirmation gates, and URL opening across platforms, WSL included. It also provides hidden secret entry, idempotent `.env` upserts, `gh secret` and `gh variable` writes, and a closing summary. Your job is only to scope the procedure and author its stages. The library functions above `run_wizard` are identical in every wizard, and that consistency is the point. So edit only the body of `run_wizard`.
 
 A wizard is ephemeral by default. It is built for one run and saved to the session's scratchpad or a temporary directory. Delete it when the job is done. Save it to `scripts/` in the repository only when the user wants a repeatable setup path there.
 </overview>
@@ -32,7 +32,7 @@ This step is done when every stage traces to concrete instructions a stranger co
 </map_each_stage>
 
 <author_the_wizard>
-Copy `template.sh` to the target path. Replace the example stage inside `run_wizard` with one `stage` per step, in dependency order. Use the library helpers `stage`, `say`, `step`, `note`, `warn`, `open_url`, `ask`, `ask_secret`, `write_env`, `set_secret`, `set_var`, `pause`, and `confirm`. Start with `banner` and end with `finish`, as the example does. Set `TOTAL_STAGES` to the number of stages you wrote.
+Copy `scripts/template.sh` to the target path. Replace the example stage inside `run_wizard` with one `stage` per step, in dependency order. Use the library helpers `stage`, `say`, `step`, `note`, `warn`, `open_url`, `ask`, `ask_secret`, `write_env`, `set_secret`, `set_var`, `pause`, and `confirm`. Start with `banner` and end with `finish`, as the example does. Set `TOTAL_STAGES` to the number of stages you wrote.
 
 Hold the bar the template sets.
 - Open the URL before you ask for its value.
@@ -52,3 +52,7 @@ Verify the script statically, because a real run opens browsers and blocks on hu
 4. Tell the user the command that runs it. Change a README only when requested, as `code_rules` requires.
 </verify_and_hand_off>
 </process>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

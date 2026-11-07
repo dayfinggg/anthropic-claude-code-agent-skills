@@ -12,7 +12,7 @@ When you explore the codebase, read `GLOSSARY.md` if it exists. Test names and i
 <good_test>
 Tests verify behavior through public interfaces, not implementation details. The code can change entirely, and the tests should not change with it. A good test reads like a specification. "user can checkout with valid cart" tells you exactly what capability exists. Such a test survives refactors, because it does not care about internal structure.
 
-[tests.md](tests.md) has examples, and [mocking.md](mocking.md) has the mocking guidelines.
+[tests.md](references/tests.md) has examples, and [mocking.md](references/mocking.md) has the mocking guidelines.
 </good_test>
 
 <seams>
@@ -36,3 +36,7 @@ The loop has three rules.
 - Work one slice at a time, with one seam, one test, and one minimal implementation per cycle.
 - Refactoring is not part of the loop. It follows the review stage, where the `review` skill reports the smells, not the red-green cycle.
 </rules_of_the_loop>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

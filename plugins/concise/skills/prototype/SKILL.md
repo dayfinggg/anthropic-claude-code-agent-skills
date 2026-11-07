@@ -9,8 +9,8 @@ A prototype is throwaway code that answers a question. The question decides the 
 
 <pick_a_branch>
 Identify which question the prototype answers, from the user's prompt or the surrounding code. Ask if the user is present and the prompt does not settle it.
-- "Does this logic or state model feel right?" leads to [LOGIC.md](LOGIC.md). It builds a single shareable HTML file with free-play buttons and tabbed guided walkthroughs. That file pushes the state model through cases that are hard to judge on paper. A non-developer can drive it.
-- "What should this look like?" leads to [UI.md](UI.md). It generates several radically different UI variations on a single route. A URL search param and a floating bottom bar switch between them.
+- "Does this logic or state model feel right?" leads to [LOGIC.md](references/LOGIC.md). It builds a single shareable HTML file with free-play buttons and tabbed guided walkthroughs. That file pushes the state model through cases that are hard to judge on paper. A non-developer can drive it.
+- "What should this look like?" leads to [UI.md](references/UI.md). It generates several radically different UI variations on a single route. A URL search param and a floating bottom bar switch between them.
 
 Read the matching file before you build. The two branches produce very different artifacts, so the wrong pick wastes the whole prototype. If the question stays ambiguous and the user is away, pick the branch that matches the surrounding code. A backend module points to logic, and a page or component points to UI. State that assumption at the top of the prototype.
 </pick_a_branch>
@@ -24,3 +24,7 @@ Six rules apply to both branches.
 5. It surfaces the state. After every action (logic) or variant switch (UI), render the full relevant state. The user then sees what changed.
 6. It ends with a captured answer. Report the verdict and the question it settled. Fold the validated decision into the real code when the user wants that. Then remove the prototype files from the main code. Keep them only where the user asks, such as a throwaway branch.
 </rules_for_both>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>

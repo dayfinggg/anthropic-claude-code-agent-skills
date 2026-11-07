@@ -15,4 +15,6 @@ claude plugin update concise@concise
 
 The plugin lives in `plugins/concise`. Installation does not replace your personal skills, global instructions, permissions, or language settings.
 
-Each bundled skill keeps its upstream license and attribution. This is not an official Anthropic distribution. Instructions guide behavior but do not guarantee compliance on every response.
+Each skill keeps its entry point in `SKILL.md`, guidance in `references`, runnable helpers in `scripts`, and reusable examples in `assets`.
+
+Each skill's `references/credits.md` preserves its source attribution and redistribution terms. This is not an official Anthropic distribution. Instructions guide behavior but do not guarantee compliance on every response.

@@ -35,7 +35,7 @@ These five facts matter most when a project moves to TypeScript 6 or 7.
 - TypeScript 7.0 has no programmatic API. Tools that import `typescript`, such as typescript-eslint, still need the `@typescript/typescript6` package.
 - An omitted `types` list no longer loads every `@types` package. List global packages such as `node` explicitly.
 
-Read [typescript-6-7.md](typescript-6-7.md) before you edit a `tsconfig.json`, upgrade TypeScript, or fix errors that appeared after an upgrade.
+Read [typescript-6-7.md](references/typescript-6-7.md) before you edit a `tsconfig.json`, upgrade TypeScript, or fix errors that appeared after an upgrade.
 </upgrade_facts>
 
 <quick_examples>
@@ -95,31 +95,35 @@ async function fetchUser(): Promise<User> {
 Each rule file explains one technique with examples. Read a file when the task needs that technique.
 
 <core_patterns>
-- [rules/as-const-typeof.md](rules/as-const-typeof.md) derives types from runtime values with `as const` and `typeof`. Read it when one object should define both values and types.
-- [rules/array-index-access.md](rules/array-index-access.md) gets element types with `[number]`. Read it when you need a union of the items in an array or tuple.
-- [rules/utility-types.md](rules/utility-types.md) covers `Parameters`, `ReturnType`, `Awaited`, `Omit`, `Partial`, `Record`, and related types. Read it when you wrap a function or derive a type from another type.
+- [rules/as-const-typeof.md](references/as-const-typeof.md) derives types from runtime values with `as const` and `typeof`. Read it when one object should define both values and types.
+- [rules/array-index-access.md](references/array-index-access.md) gets element types with `[number]`. Read it when you need a union of the items in an array or tuple.
+- [rules/utility-types.md](references/utility-types.md) covers `Parameters`, `ReturnType`, `Awaited`, `Omit`, `Partial`, `Record`, and related types. Read it when you wrap a function or derive a type from another type.
 </core_patterns>
 
 <advanced_generics>
-- [rules/generics-basics.md](rules/generics-basics.md) covers type parameters, constraints, defaults, and inference. Read it when a generic loses information or infers `unknown`.
-- [rules/builder-pattern.md](rules/builder-pattern.md) tracks state in the type of a chainable builder. Read it when a fluent API must remember earlier calls.
-- [rules/deep-inference.md](rules/deep-inference.md) keeps literal types in nested arguments with `const` type parameters. Read it when a config object widens to `string` or `string[]`.
+- [rules/generics-basics.md](references/generics-basics.md) covers type parameters, constraints, defaults, and inference. Read it when a generic loses information or infers `unknown`.
+- [rules/builder-pattern.md](references/builder-pattern.md) tracks state in the type of a chainable builder. Read it when a fluent API must remember earlier calls.
+- [rules/deep-inference.md](references/deep-inference.md) keeps literal types in nested arguments with `const` type parameters. Read it when a config object widens to `string` or `string[]`.
 </advanced_generics>
 
 <type_level_programming>
-- [rules/conditional-types.md](rules/conditional-types.md) covers `extends ? :` logic and distribution over unions. Read it when a type depends on another type.
-- [rules/infer-keyword.md](rules/infer-keyword.md) extracts parts of a type with `infer`. Read it when you need the element, argument, or return type of something.
-- [rules/template-literal-types.md](rules/template-literal-types.md) builds and parses string types. Read it for typed routes, event names, or key renames.
-- [rules/mapped-types.md](rules/mapped-types.md) transforms each property of a type, with key remapping and modifiers. Read it when a new type follows the shape of another type.
+- [rules/conditional-types.md](references/conditional-types.md) covers `extends ? :` logic and distribution over unions. Read it when a type depends on another type.
+- [rules/infer-keyword.md](references/infer-keyword.md) extracts parts of a type with `infer`. Read it when you need the element, argument, or return type of something.
+- [rules/template-literal-types.md](references/template-literal-types.md) builds and parses string types. Read it for typed routes, event names, or key renames.
+- [rules/mapped-types.md](references/mapped-types.md) transforms each property of a type, with key remapping and modifiers. Read it when a new type follows the shape of another type.
 </type_level_programming>
 
 <type_safety_patterns>
-- [rules/opaque-types.md](rules/opaque-types.md) brands primitives so different IDs or validated strings cannot mix. Read it when values share a primitive type but mean different things.
-- [rules/type-narrowing.md](rules/type-narrowing.md) covers control-flow narrowing, type predicates, assertion functions, and exhaustive checks. Read it when a union or `unknown` value needs a specific type.
-- [rules/function-overloads.md](rules/function-overloads.md) gives one function several call signatures. Read it when the return type depends on the argument type.
+- [rules/opaque-types.md](references/opaque-types.md) brands primitives so different IDs or validated strings cannot mix. Read it when values share a primitive type but mean different things.
+- [rules/type-narrowing.md](references/type-narrowing.md) covers control-flow narrowing, type predicates, assertion functions, and exhaustive checks. Read it when a union or `unknown` value needs a specific type.
+- [rules/function-overloads.md](references/function-overloads.md) gives one function several call signatures. Read it when the return type depends on the argument type.
 </type_safety_patterns>
 
 <debugging>
-- [rules/error-diagnosis.md](rules/error-diagnosis.md) explains how to read long compiler errors and isolate their cause. Read it when an error message is long or unclear.
+- [rules/error-diagnosis.md](references/error-diagnosis.md) explains how to read long compiler errors and isolate their cause. Read it when an error message is long or unclear.
 </debugging>
 </rules>
+
+<attribution>
+Read [credits](references/credits.md) when checking source attribution or redistribution terms.
+</attribution>
