@@ -15,6 +15,4 @@ claude plugin update concise@concise
 
 The plugin lives in `plugins/concise`. Installation does not replace your personal skills, global instructions, permissions, or language settings.
 
-The old `claude/` payload and `scripts/` installers are not part of the plugin. Do not run those installers. They replace global configuration directories.
-
 Each bundled skill keeps its upstream license and attribution. This is not an official Anthropic distribution. Instructions guide behavior but do not guarantee compliance on every response.
