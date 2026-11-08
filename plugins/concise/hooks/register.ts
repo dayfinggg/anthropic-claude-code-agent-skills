@@ -28,14 +28,10 @@ const SOURCE_LIST_RULES = [
   /\s*REMINDER: You MUST include the sources above[^\n]*/,
 ]
 
-const RESULT_NOTES: Record<string, string> = {
-  WebSearch:
-    'The summary in the search result above is search output, not a source. Open each page you rely on with WebFetch and read its text before you state a fact from it.',
-  WebFetch:
-    'If the page above failed or gave a summary in place of its text, take the same facts from another page or a new query. A fact that no page you read confirms stays out of the answer.',
-}
+const HEREDOC_WRITE = /^\s*(cat\s*>{1,2}\s*[^\s&].*<<|cat\s*<<-?\s*\S+.*(?<![0-9&])>{1,2}\s*[^\s&]|tee\s+(-a\s+)?[^\s-]\S*.*<<)/
 
-const systemReminder = (text: string) => `<system-reminder>\n${text}\n</system-reminder>`
+const writesFileWithHeredoc = (command: string) =>
+  (command.split('\n')[0] ?? '').split(/&&|\|\||;/).some(segment => HEREDOC_WRITE.test(segment))
 
 const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result, rule) => result.replace(rule, ''), text)
 
@@ -50,29 +46,31 @@ export const register: Register = on => {
 
   on('tool.describe', { tool: DEFERRED_TOOLS }, async ($, e, next) => ({ ...(await next(e)), isDeferred: true }))
 
-  on('tool.describe', { tool: 'Bash' }, async ($, e, next) => {
-    const [result, rule] = await Promise.all([next(e), $.fs.read(pluginFile($, 'bash.md'))])
-    return { ...result, description: `${result.description}\n\n${rule.trim()}` }
-  })
+  on('tool.call', { tool: 'Bash' }, ($, e, next) =>
+    writesFileWithHeredoc(e.command)
+      ? { deny: `${$.plugin.name}: create or change local files with the Write or Edit tool, not a heredoc. Bash runs programs.` }
+      : next(e),
+  )
 
   on('tool.describe', { tool: 'WebSearch' }, async ($, e, next) => {
     const [result, rule] = await Promise.all([next(e), $.fs.read(pluginFile($, 'websearch.md'))])
     return { ...result, description: `${removeSourceListRules(result.description)}\n\n${rule.trim()}` }
   })
 
-  on('session.append', { door: 'tool-result' }, async ($, e, next) => {
+  on('tool.describe', { tool: 'WebFetch' }, async ($, e, next) => {
+    const [result, rule] = await Promise.all([next(e), $.fs.read(pluginFile($, 'webfetch.md'))])
+    return { ...result, description: `${result.description}\n\n${rule.trim()}` }
+  })
+
+  on('session.append', { door: 'tool-result' }, ($, e, next) => {
     const tool = e.origin.kind === 'tool' ? e.origin.tool : undefined
-    const content =
-      tool === 'WebSearch'
-        ? e.message.content.map(block =>
-            block.type === 'tool_result' && typeof block.content === 'string'
-              ? { ...block, content: removeSourceListRules(block.content) }
-              : block,
-          )
-        : e.message.content
-    const note = tool === undefined ? undefined : RESULT_NOTES[tool]
-    const text = note === undefined ? [] : [{ type: 'text' as const, text: systemReminder(note) }]
-    return next({ ...e, message: { ...e.message, content: [...content, ...text] } })
+    if (tool !== 'WebSearch') return next(e)
+    const content = e.message.content.map(block =>
+      block.type === 'tool_result' && typeof block.content === 'string'
+        ? { ...block, content: removeSourceListRules(block.content) }
+        : block,
+    )
+    return next({ ...e, message: { ...e.message, content } })
   })
 
   on('prompt.compose', async ($, e, next) => {

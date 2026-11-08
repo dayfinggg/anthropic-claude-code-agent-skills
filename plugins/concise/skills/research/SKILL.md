@@ -56,6 +56,8 @@ After you fetch a page, extract the key patterns and note each deprecation warni
 Word each query so the top results come from the owner of the fact. Add the library name and the major version, and quote an exact error message. Restrict a search to the official domain or repository when you know it. Search the changelog, release notes, or issue tracker for changes, deprecations, and known bugs.
 
 Check each deciding claim in a second, independent source, such as the API reference plus the source code. Two pages that copy one source count as one source. Check the date of each page and the version it covers. When sources still disagree, say which one you followed and why.
+
+For a broad question, such as news, a comparison, or an overview, read independent sources of several kinds, such as official bodies, agencies, and major outlets, so the gaps or bias of one source do not shape the answer. Vary the words, the language, and the date terms across queries. A failed page never ends the search, so open another result, the original source, or a new query for the same facts. The search is done when each fact you state stands on a page you read, each deciding fact stands on two independent pages, and new queries bring no new facts.
 </queries_and_cross_checks>
 
 <untrusted_content>
