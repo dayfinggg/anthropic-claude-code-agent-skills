@@ -36,7 +36,7 @@ The agent sees only the brief, so give the whole task once and precisely. Write 
 1. Goal and finish line. State what is wrong or wanted. Say what done looks like, such as "the suite passes 30 runs in a row".
 2. Context. Give exact paths, the relevant facts you already know, and what you ruled out. Pass long material as file paths, not pasted text.
 3. Scope. Name the files or modules the agent owns, and what it must not touch.
-4. Rules. Point to the user's standing rules, because a native subagent does not inherit the output style or the coding instructions. Name the coding instructions at `../../instructions/coding.md` and the output style at `../../output-styles/concise.md`, relative to this skill. Give both as absolute paths. Name the skills that fit the task.
+4. Rules. Point to the user's standing rules, because a native subagent does not inherit them. Name the coding instructions at `../../instructions/coding.md`, the communication rules at `../../instructions/communication.md`, and the output style at `../../output-styles/concise.md`, relative to this skill. Give each as an absolute path. Name the skills that fit the task.
 5. Proof. Say which check proves the work, such as a command, a test, or a screenshot. Ask the agent to report any check it could not run.
 6. Stop conditions. The agent asks only when it cannot continue, or before a destructive or external action. It reports a blocker instead of working around it.
 7. Return contract. Ask for a short report that opens with the outcome. It gives evidence with file and line, and it marks unverified claims.
