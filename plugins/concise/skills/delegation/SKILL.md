@@ -1,6 +1,6 @@
 ---
 name: delegation
-description: Decides when to hand work to another agent, picks the provider, model, and effort from what the runtime offers, and writes a complete brief. Use before spawning any subagent, child task, or parallel agent, before delegating to a model of another provider, and when the user asks to delegate, parallelize, or run agents. Covers native subagents and child tasks in T3 Code, an app that runs agents from several providers.
+description: Decides when to hand work to another agent, picks the provider, model, and effort from what the runtime offers, and writes a complete brief. Use before spawning any subagent, child task, or parallel agent, before delegating to a model of another provider, and when the user asks to delegate, parallelize, or run agents.
 ---
 
 <when_to_delegate>
