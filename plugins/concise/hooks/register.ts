@@ -9,6 +9,7 @@ import {
   SECTION_REWRITES,
   SHELL_OVER_TOOLS,
   SOURCE_LIST_RULES,
+  SUBAGENT_PREFACE,
   TOOL_RULES,
 } from './config'
 
@@ -20,6 +21,17 @@ const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result
 const readInstruction = async ($: EngineInterface, name: string) =>
   (await $.fs.read(`${$.plugin.root}/instructions/${name}`)).trim()
 
+const readStyle = async ($: EngineInterface) =>
+  (await $.fs.read(`${$.plugin.root}/output-styles/concise.md`)).replace(/^---[\s\S]*?\n---\s*/, '').trim()
+
+const subagentTask = async ($: EngineInterface, task: string) => {
+  const [style, ...rules] = await Promise.all([
+    readStyle($),
+    ...['coding.md', 'tools.md', 'skill.md'].map(name => readInstruction($, name)),
+  ])
+  return `<main_session_instructions>\n${SUBAGENT_PREFACE}\n\n${style}\n\n${rules.join('\n\n')}\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
+}
+
 export const register: Register = on => {
   on('prompt.submit', ($, e, next) => next({ ...e, context: [...(e.context ?? []), REPLY_REMINDER] }))
 
@@ -28,6 +40,10 @@ export const register: Register = on => {
     const kept = e.text.split(/\n\s*\n/).filter(paragraph => !SHELL_OVER_TOOLS.test(paragraph))
     return kept.every(paragraph => paragraph.trim().endsWith(':')) ? { text: null } : next({ ...e, text: kept.join('\n\n') })
   })
+
+  on('agent.spawn', async ($, e, next) =>
+    e.subagentType === 'fork' ? next(e) : next({ ...e, prompt: await subagentTask($, e.prompt) }),
+  ).catch(($, e, next) => next(e))
 
   on('tool.describe', { tool: DEFERRED_TOOLS }, async ($, e, next) => ({ ...(await next(e)), isDeferred: true }))
 
