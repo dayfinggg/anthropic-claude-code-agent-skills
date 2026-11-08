@@ -46,6 +46,15 @@ export const TOOL_REMINDER_EVERY = 5
 export const TOOL_REMINDER =
   'Style check for the next text you write. A note only names a finding or a change of direction, in plain sentences with no colons, semicolons, dashes, or angle quotes, and each term explained.'
 
+export const REPLY_CHECKS: [string, RegExp][] = [
+  ['a markdown heading', /^#{1,6} /m],
+  ['bold text', /\*\*/],
+  ['an em or en dash', /[—–]/],
+  ['a semicolon', /;/],
+  ['a colon in prose', /[\p{L}\p{N})"] ?:(\s|$)/u],
+  ['angle or curly quotes', /[«»“”„]/],
+]
+
 export const SUBAGENT_PREFACE =
   "The user's standing instructions from the main session follow and bind your work as they bind the main session. The output style applies to your final report, which the agent that launched you relays to the user, so write it in the language of your task."
 

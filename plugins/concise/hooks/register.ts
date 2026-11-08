@@ -5,6 +5,7 @@ import {
   HEREDOC_DENIAL,
   HEREDOC_WRITE,
   REMOVED_SECTIONS,
+  REPLY_CHECKS,
   REPLY_REMINDER,
   SECTION_REWRITES,
   SHELL_OVER_TOOLS,
@@ -19,6 +20,18 @@ const writesFileWithHeredoc = (command: string) =>
   (command.split('\n')[0] ?? '').split(/&&|\|\||;/).some(segment => HEREDOC_WRITE.test(segment))
 
 const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result, rule) => result.replace(rule, ''), text)
+
+const replyProblems = (reply: string) => {
+  const prose = reply
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`\n]*`/g, '')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, 'link')
+    .replace(/https?:\/\/\S+/g, 'link')
+    .split('\n')
+    .filter(line => !line.trimStart().startsWith('|'))
+    .join('\n')
+  return REPLY_CHECKS.filter(([, pattern]) => pattern.test(prose)).map(([name]) => name)
+}
 
 const readInstruction = async ($: EngineInterface, name: string) =>
   (await $.fs.read(`${$.plugin.root}/instructions/${name}`)).trim()
@@ -36,6 +49,15 @@ const subagentTask = async ($: EngineInterface, task: string) => {
 
 export const register: Register = on => {
   on('prompt.submit', ($, e, next) => next({ ...e, context: [...(e.context ?? []), REPLY_REMINDER] }))
+
+  on('classic.Stop', ($, e, next) => {
+    if (e.stop_hook_active || !e.last_assistant_message) return next(e)
+    const problems = replyProblems(e.last_assistant_message)
+    if (problems.length === 0) return next(e)
+    return {
+      block: `Your last reply has ${problems.join(', ')}, which the output style rules out. Send it again with the same content, rewritten to the style. If the user asked for this format, send it unchanged.`,
+    }
+  }).catch(($, e, next) => next(e))
 
   on('prompt.attachment', { type: 'auto_mode' }, ($, e, next) => {
     if (!SHELL_OVER_TOOLS.test(e.text)) return next(e)
