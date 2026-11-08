@@ -8,10 +8,9 @@ import {
   REPLY_REMINDER,
   SECTION_REWRITES,
   SHELL_OVER_TOOLS,
+  SILENT_TURN_REMINDER,
   SOURCE_LIST_RULES,
   SUBAGENT_PREFACE,
-  TOOL_REMINDER,
-  TOOL_REMINDER_EVERY,
   TOOL_RULES,
 } from './config'
 
@@ -43,6 +42,8 @@ export const register: Register = on => {
     return kept.every(paragraph => paragraph.trim().endsWith(':')) ? { text: null } : next({ ...e, text: kept.join('\n\n') })
   })
 
+  on('prompt.attachment', { type: 'silent_turn_reminder' }, ($, e, next) => next({ ...e, text: SILENT_TURN_REMINDER }))
+
   on('agent.spawn', async ($, e, next) =>
     e.subagentType === 'fork' ? next(e) : next({ ...e, prompt: await subagentTask($, e.prompt) }),
   ).catch(($, e, next) => next(e))
@@ -58,20 +59,14 @@ export const register: Register = on => {
     writesFileWithHeredoc(e.command) ? { deny: `${$.plugin.name}: ${HEREDOC_DENIAL}` } : next(e),
   ).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the heredoc guard failed.` }))
 
-  let toolResults = 0
   on('session.append', { door: 'tool-result' }, ($, e, next) => {
-    const isSearch = e.origin.kind === 'tool' && e.origin.tool === 'WebSearch'
+    if (e.origin.kind !== 'tool' || e.origin.tool !== 'WebSearch') return next(e)
     const content = e.message.content.map(block =>
-      isSearch && block.type === 'tool_result' && typeof block.content === 'string'
+      block.type === 'tool_result' && typeof block.content === 'string'
         ? { ...block, content: removeSourceListRules(block.content) }
         : block,
     )
-    toolResults += 1
-    const reminder =
-      toolResults % TOOL_REMINDER_EVERY === 0
-        ? [{ type: 'text' as const, text: `<system-reminder>\n${TOOL_REMINDER}\n</system-reminder>` }]
-        : []
-    return next({ ...e, message: { ...e.message, content: [...content, ...reminder] } })
+    return next({ ...e, message: { ...e.message, content } })
   })
 
   on('prompt.compose', async ($, e, next) => {
