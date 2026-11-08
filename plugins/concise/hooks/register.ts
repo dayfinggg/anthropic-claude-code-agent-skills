@@ -10,6 +10,8 @@ import {
   SHELL_OVER_TOOLS,
   SOURCE_LIST_RULES,
   SUBAGENT_PREFACE,
+  TOOL_REMINDER,
+  TOOL_REMINDER_EVERY,
   TOOL_RULES,
 } from './config'
 
@@ -56,14 +58,20 @@ export const register: Register = on => {
     writesFileWithHeredoc(e.command) ? { deny: `${$.plugin.name}: ${HEREDOC_DENIAL}` } : next(e),
   ).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the heredoc guard failed.` }))
 
+  let toolResults = 0
   on('session.append', { door: 'tool-result' }, ($, e, next) => {
-    if (e.origin.kind !== 'tool' || e.origin.tool !== 'WebSearch') return next(e)
+    const isSearch = e.origin.kind === 'tool' && e.origin.tool === 'WebSearch'
     const content = e.message.content.map(block =>
-      block.type === 'tool_result' && typeof block.content === 'string'
+      isSearch && block.type === 'tool_result' && typeof block.content === 'string'
         ? { ...block, content: removeSourceListRules(block.content) }
         : block,
     )
-    return next({ ...e, message: { ...e.message, content } })
+    toolResults += 1
+    const reminder =
+      toolResults % TOOL_REMINDER_EVERY === 0
+        ? [{ type: 'text' as const, text: `<system-reminder>\n${TOOL_REMINDER}\n</system-reminder>` }]
+        : []
+    return next({ ...e, message: { ...e.message, content: [...content, ...reminder] } })
   })
 
   on('prompt.compose', async ($, e, next) => {

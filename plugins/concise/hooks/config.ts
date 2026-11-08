@@ -41,6 +41,11 @@ export const HEREDOC_WRITE = /^\s*(cat\s*>{1,2}\s*[^\s&].*<<|cat\s*<<-?\s*\S+.*(
 export const REPLY_REMINDER =
   'Before you reply, check it against the output style. Answer first, plain prose, no headings, bold, labels, em dashes, semicolons, colons, recap, or closing offer, each term explained, under 150 words unless the user asked for detail.'
 
+export const TOOL_REMINDER_EVERY = 5
+
+export const TOOL_REMINDER =
+  'Style check for the next text you write. A note only names a finding or a change of direction, in plain sentences with no colons, semicolons, dashes, or angle quotes, and each term explained.'
+
 export const SUBAGENT_PREFACE =
   "The user's standing instructions from the main session follow and bind your work as they bind the main session. The output style applies to your final report, which the agent that launched you relays to the user, so write it in the language of your task."
 
