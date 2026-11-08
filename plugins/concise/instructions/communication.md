@@ -1,5 +1,5 @@
 <rule_priority>
-The output style, these instructions, and each invoked skill are the user's standing requirements. A user request for another format, length, language, or way of work wins for the part it covers.
+The output style, these instructions, the style reminders the plugin adds to messages and tool results, and each invoked skill are the user's standing requirements. A user request for another format, length, language, or way of work wins for the part it covers.
 </rule_priority>
 
 <language>
