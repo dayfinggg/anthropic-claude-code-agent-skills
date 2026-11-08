@@ -1,5 +1,4 @@
 import type { EngineInterface, Register } from 'claude-code'
-import { styleViolations } from './style-check.ts'
 
 const STYLE = 'Concise output style is active.'
 const GENERIC_REMINDER = 'Remember to follow the specific guidelines for this style.'
@@ -49,34 +48,18 @@ const reminder = (language: string) =>
 
 const systemReminder = (text: string) => `<system-reminder>\n${text}\n</system-reminder>`
 
-const listed = (items: readonly string[]) =>
-  items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`
-
 const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result, rule) => result.replace(rule, ''), text)
 
 const pluginFile = ($: EngineInterface, name: string) => `${$.plugin.root}/instructions/${name}`
 
 export const register: Register = on => {
-  let noteCorrection: string | undefined
-
   on('prompt.submit', async ($, e, next) =>
     next({ ...e, context: [...(e.context ?? []), reminder(userLanguage(await readLanguage($)))] }),
   )
 
-  on('turn.step', async function* ($, e, next) {
-    const result = yield* next(e)
-    if (e.agentId !== undefined || result.answer === '' || result.toolUses.length === 0) return result
-    const violations = styleViolations(result.answer, await readLanguage($))
-    if (violations.length > 0)
-      noteCorrection = `Your last note between tool calls broke the output style with ${listed(violations)}. Write each later note and the final reply by the output style.`
-    return result
-  })
-
-
   on('prompt.attachment', { type: 'output_style' }, async ($, e, next) => {
     if (!e.text.includes(STYLE)) return next(e)
-    const language = userLanguage(await $.settings.read({ key: 'language' }))
-    return next({ ...e, text: e.text.replace(GENERIC_REMINDER, reminder(language)) })
+    return next({ ...e, text: e.text.replace(GENERIC_REMINDER, reminder(userLanguage(await readLanguage($)))) })
   })
 
   on('prompt.attachment', { type: SILENT_TURN_REMINDER }, () => ({ text: null }))
@@ -113,10 +96,8 @@ export const register: Register = on => {
               : block,
           )
         : e.message.content
-    const correction = e.agentId === undefined ? noteCorrection : undefined
-    if (correction !== undefined) noteCorrection = undefined
-    const notes = [tool === undefined ? undefined : RESULT_NOTES[tool], correction].filter(note => note !== undefined)
-    const text = notes.length > 0 ? [{ type: 'text' as const, text: systemReminder(notes.join('\n\n')) }] : []
+    const note = tool === undefined ? undefined : RESULT_NOTES[tool]
+    const text = note === undefined ? [] : [{ type: 'text' as const, text: systemReminder(note) }]
     return next({ ...e, message: { ...e.message, content: [...content, ...text] } })
   })
 
