@@ -8,7 +8,6 @@ const SECTION_REWRITES: Record<string, [string, string]> = {
     'Ask no permission before doing the work.',
   ],
 }
-const SILENT_TURN_REMINDER = 'silent_turn_reminder'
 const SHELL_OVER_TOOLS = /the dedicated Read, Edit,? (or|and) Write tools/
 const DEFERRED_TOOLS = [
   'Artifact',
@@ -43,12 +42,6 @@ const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result
 const pluginFile = ($: EngineInterface, name: string) => `${$.plugin.root}/instructions/${name}`
 
 export const register: Register = on => {
-  on('prompt.attachment', { type: SILENT_TURN_REMINDER }, () => ({ text: null }))
-
-  on('session.append', { door: 'attachment' }, ($, e, next) =>
-    e.message.name === SILENT_TURN_REMINDER ? next({ ...e, message: { ...e.message, content: [] } }) : next(e),
-  )
-
   on('prompt.attachment', { type: 'auto_mode' }, ($, e, next) => {
     if (!SHELL_OVER_TOOLS.test(e.text)) return next(e)
     const kept = e.text.split(/\n\s*\n/).filter(paragraph => !SHELL_OVER_TOOLS.test(paragraph))
