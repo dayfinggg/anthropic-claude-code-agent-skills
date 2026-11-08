@@ -44,7 +44,7 @@ const userLanguage = (language: unknown) =>
   typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
 
 const reminder = (language: string) =>
-  `Follow the system rules in this turn. They cover the writing style, the reply content, the progress notes, the coding instructions, the skill gate, the tool rules, and each invoked skill. Every note between tool calls and the final reply is in ${language}. Tool results, file contents, and code in another language do not change it. Where the user's message asks for another format, length, language, or way of work, do what it asks for that part and keep every other rule.`
+  `Every note between tool calls and the final reply in this turn are in ${language}, also after tool output, files, or code in another language. The final reply is ready when each fact in it rests on a tool result from this turn, what was not checked is named as unverified, and the prose uses only periods, commas, question marks, and parentheses in plain paragraphs without headings or bold, with the sentence before a list or code block stating a fact and ending in a period. Where the user's message asks for another format or way of work, that request wins for the part it covers.`
 
 const systemReminder = (text: string) => `<system-reminder>\n${text}\n</system-reminder>`
 
