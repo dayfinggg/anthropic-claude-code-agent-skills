@@ -35,7 +35,7 @@ const RESULT_NOTES: Record<string, string> = {
   WebSearch:
     'The summary in the search result above is search output, not a source. Open each page you rely on with WebFetch and read its text before you state a fact from it.',
   WebFetch:
-    'If the page above failed or gave a summary in place of its text, take the same facts from another page or a new query. A fact that no page you read confirms stays out of the answer.',
+    'If the page above failed or gave a summary in place of its text, take the same facts from another page or a new query. A fact that no page you read confirms stays out of the answer. In the reply, the sentence that states a fact from this page links the words it supports to the page URL.',
 }
 
 const readLanguage = ($: EngineInterface) => $.settings.read({ key: 'language' })
@@ -44,7 +44,7 @@ const userLanguage = (language: unknown) =>
   typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
 
 const reminder = (language: string) =>
-  `Every note between tool calls and the final reply in this turn are in ${language}, also after tool output, files, or code in another language. The final reply is ready when each fact in it rests on a tool result from this turn, what was not checked is named as unverified, and the prose uses only periods, commas, question marks, and parentheses in plain paragraphs without headings or bold, with the sentence before a list or code block stating a fact and ending in a period. Where the user's message asks for another format or way of work, that request wins for the part it covers.`
+  `Every note between tool calls and the final reply in this turn are in ${language}, also after tool output, files, or code in another language. The final reply is ready when each fact in it rests on a tool result from this turn or links the page it came from, and what was not checked is stated in a sentence, as in "I did not run the server." Its prose has only periods, commas, question marks, and parentheses, so a colon or a dash becomes a period or a verb, and it has no headings or bold. The sentence before a list or code block states a fact and ends in a period. The reply holds only what changes what the reader does next, so a question gets 1-3 sentences and the checks behind them stay out unless the user asks for detail. Where the user's message asks for another format or way of work, that request wins for the part it covers.`
 
 const systemReminder = (text: string) => `<system-reminder>\n${text}\n</system-reminder>`
 
