@@ -3,6 +3,6 @@
   "owner": { "name": "dayfinggg" },
   "metadata": { "description": "Engineering skills and concise output for Claude Code" },
   "plugins": [
-    { "name": "concise", "source": "./plugins/concise", "description": "21 engineering skills, concise output, and coding instructions" }
+    { "name": "concise", "source": "./plugins/concise", "description": "22 engineering skills, concise output, and coding instructions" }
   ]
 }
