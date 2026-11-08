@@ -1,1 +1,1 @@
-The text that comes with the links is a summary that another model wrote from search snippets, so it can be wrong, outdated, or about another version. Use it to choose which pages to open, and state a fact only from a page you opened with WebFetch and read.
+The text beside the links is another model's summary and may be wrong, so use it only to pick pages, and state facts only from pages you read with WebFetch.

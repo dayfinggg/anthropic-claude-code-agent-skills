@@ -5,6 +5,7 @@ import {
   HEREDOC_DENIAL,
   HEREDOC_WRITE,
   REMOVED_SECTIONS,
+  REPLY_REMINDER,
   SECTION_REWRITES,
   SHELL_OVER_TOOLS,
   SOURCE_LIST_RULES,
@@ -20,6 +21,8 @@ const readInstruction = async ($: EngineInterface, name: string) =>
   (await $.fs.read(`${$.plugin.root}/instructions/${name}`)).trim()
 
 export const register: Register = on => {
+  on('prompt.submit', ($, e, next) => next({ ...e, context: [...(e.context ?? []), REPLY_REMINDER] }))
+
   on('prompt.attachment', { type: 'auto_mode' }, ($, e, next) => {
     if (!SHELL_OVER_TOOLS.test(e.text)) return next(e)
     const kept = e.text.split(/\n\s*\n/).filter(paragraph => !SHELL_OVER_TOOLS.test(paragraph))
