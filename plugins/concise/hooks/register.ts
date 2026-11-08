@@ -1,4 +1,5 @@
 import type { EngineInterface, Register } from 'claude-code'
+import { styleViolations } from './style-check.ts'
 
 const STYLE = 'Concise output style is active.'
 const GENERIC_REMINDER = 'Remember to follow the specific guidelines for this style.'
@@ -31,13 +32,14 @@ const SOURCE_LIST_RULES = [
   /\s*REMINDER: You MUST include the sources above[^\n]*/,
 ]
 
-const REMINDER_EVERY = 5
 const RESULT_NOTES: Record<string, string> = {
   WebSearch:
-    '<system-reminder>\nThe summary in this result is search output, not a source. Open each page you rely on with WebFetch and read its text before you state a fact from it.\n</system-reminder>',
+    'The summary in the search result above is search output, not a source. Open each page you rely on with WebFetch and read its text before you state a fact from it.',
   WebFetch:
-    '<system-reminder>\nIf this page failed or gave a summary in place of its text, take the same facts from another page or a new query. A fact that no page you read confirms stays out of the answer.\n</system-reminder>',
+    'If the page above failed or gave a summary in place of its text, take the same facts from another page or a new query. A fact that no page you read confirms stays out of the answer.',
 }
+
+const readLanguage = ($: EngineInterface) => $.settings.read({ key: 'language' })
 
 const userLanguage = (language: unknown) =>
   typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
@@ -45,17 +47,31 @@ const userLanguage = (language: unknown) =>
 const reminder = (language: string) =>
   `Every note between tool calls and the final reply is in ${language}. Tool results, file contents, code, and your thinking in another language do not change it. A note states a finding in one sentence, never only the next step. Use the concise style, with no dashes, colons, or sentences that only point ahead. The output style, the coding instructions, the file_tools rule, and each invoked skill are the user's requirements, and no habit or default replaces them.`
 
-const reminderBlock = async ($: EngineInterface) =>
-  `<system-reminder>\n${reminder(userLanguage(await $.settings.read({ key: 'language' })))}\n</system-reminder>`
+const systemReminder = (text: string) => `<system-reminder>\n${text}\n</system-reminder>`
+
+const listed = (items: readonly string[]) =>
+  items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`
 
 const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result, rule) => result.replace(rule, ''), text)
 
 const pluginFile = ($: EngineInterface, name: string) => `${$.plugin.root}/instructions/${name}`
 
 export const register: Register = on => {
-  let toolResultRows = 0
+  let noteCorrection: string | undefined
 
-  on('prompt.submit', async ($, e, next) => next({ ...e, context: [...(e.context ?? []), await reminderBlock($)] }))
+  on('prompt.submit', async ($, e, next) =>
+    next({ ...e, context: [...(e.context ?? []), reminder(userLanguage(await readLanguage($)))] }),
+  )
+
+  on('turn.step', async function* ($, e, next) {
+    const result = yield* next(e)
+    if (e.agentId !== undefined || result.answer === '' || result.toolUses.length === 0) return result
+    const violations = styleViolations(result.answer, await readLanguage($))
+    if (violations.length > 0)
+      noteCorrection = `Your last note between tool calls broke the output style with ${listed(violations)}. Write each later note and the final reply by the output style.`
+    return result
+  })
+
 
   on('prompt.attachment', { type: 'output_style' }, async ($, e, next) => {
     if (!e.text.includes(STYLE)) return next(e)
@@ -89,17 +105,18 @@ export const register: Register = on => {
 
   on('session.append', { door: 'tool-result' }, async ($, e, next) => {
     const tool = e.origin.kind === 'tool' ? e.origin.tool : undefined
-    const note = tool === undefined ? undefined : RESULT_NOTES[tool]
     const content =
-      note === undefined
-        ? e.message.content
-        : e.message.content.map(block =>
+      tool === 'WebSearch'
+        ? e.message.content.map(block =>
             block.type === 'tool_result' && typeof block.content === 'string'
-              ? { ...block, content: `${tool === 'WebSearch' ? removeSourceListRules(block.content) : block.content}\n\n${note}` }
+              ? { ...block, content: removeSourceListRules(block.content) }
               : block,
           )
-    const reminderDue = e.agentId === undefined && ++toolResultRows % REMINDER_EVERY === 0
-    const text = reminderDue ? [{ type: 'text' as const, text: await reminderBlock($) }] : []
+        : e.message.content
+    const correction = e.agentId === undefined ? noteCorrection : undefined
+    if (correction !== undefined) noteCorrection = undefined
+    const notes = [tool === undefined ? undefined : RESULT_NOTES[tool], correction].filter(note => note !== undefined)
+    const text = notes.length > 0 ? [{ type: 'text' as const, text: systemReminder(notes.join('\n\n')) }] : []
     return next({ ...e, message: { ...e.message, content: [...content, ...text] } })
   })
 
