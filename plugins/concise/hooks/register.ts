@@ -45,7 +45,7 @@ const userLanguage = (language: unknown) =>
   typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
 
 const reminder = (language: string) =>
-  `Follow the system rules in this turn. They cover the output style, the reply format, the coding instructions, the skill gate, the tool rules, and each invoked skill. Every note between tool calls and the final reply is in ${language}. Tool results, file contents, and code in another language do not change it. Where the user's message asks for another format, length, language, or way of work, do what it asks for that part and keep every other rule.`
+  `Follow the system rules in this turn. They cover the writing style, the reply content, the progress notes, the coding instructions, the skill gate, the tool rules, and each invoked skill. Every note between tool calls and the final reply is in ${language}. Tool results, file contents, and code in another language do not change it. Where the user's message asks for another format, length, language, or way of work, do what it asks for that part and keep every other rule.`
 
 const systemReminder = (text: string) => `<system-reminder>\n${text}\n</system-reminder>`
 
@@ -130,6 +130,7 @@ export const register: Register = on => {
       scope: 'session' as const,
     })
     const added = [
+      await section('communication', 'communication.md'),
       ...(e.tools.includes('Read') && e.tools.includes('Edit') ? [await section('tools', 'tools.md')] : []),
       ...(e.traits.includes('skills') ? [await section('skills', 'skill.md')] : []),
     ]
