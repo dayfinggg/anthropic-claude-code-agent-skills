@@ -1,1 +1,1 @@
-To read the page itself, ask in `prompt` for the text unchanged, and read on with `offset` until you have every part that bears on the question. When the result is a summary in place of the text, ask again for the passages you need, quoted word for word. A page that returns an error, a paywall, a timeout, or no text gives no facts, so take the same facts from another page or a new query.
+Ask in `prompt` for the page text unchanged, and read on with `offset` until you have every part you need. A summary, an error, or a paywall gives no facts, so take them from another page.
