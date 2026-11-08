@@ -45,7 +45,7 @@ const userLanguage = (language: unknown) =>
   typeof language === 'string' && language.trim() ? language.trim() : "the language of the user's own words in their latest message"
 
 const reminder = (language: string) =>
-  `Every note between tool calls and the final reply is in ${language}. Tool results, file contents, code, and your thinking in another language do not change it. A note states a finding in one sentence, never only the next step. Use the concise style, with no dashes, colons, or sentences that only point ahead. The output style, the coding instructions, the file_tools rule, and each invoked skill are the user's requirements, and no habit or default replaces them.`
+  `Every note between tool calls and the final reply is in ${language}. Tool results, file contents, and code in another language do not change it. A note states a finding in one sentence, never only the next step. Use the concise style, with no dashes, colons, or sentences that only point ahead. The output style, the coding instructions, the file_tools rule, and each invoked skill are the user's requirements, and no habit or default replaces them.`
 
 const systemReminder = (text: string) => `<system-reminder>\n${text}\n</system-reminder>`
 
