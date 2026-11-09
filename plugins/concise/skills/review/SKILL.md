@@ -1,6 +1,6 @@
 ---
 name: review
-description: "Reviews a branch, a PR, or work-in-progress changes since a fixed point (commit, branch, tag, or merge-base) along three axes. Correctness looks for bugs and security problems. Standards checks the repo's documented coding standards. Spec checks what the originating issue or spec asked for. Each axis runs in a fresh sub-agent, and a verifier confirms bug findings before the report. Use when asked to review changes, or before opening a pull request for a multi-file change."
+description: "Reviews a branch, a PR, or work-in-progress changes since a fixed point (commit, branch, tag, or merge-base) along three axes. Correctness looks for bugs and security problems. Standards checks the repo's documented coding standards. Spec checks what the originating issue or spec asked for. Each axis runs in a fresh sub-agent, and a verifier confirms bug findings before the report. Use before you report a change to several files, or a change installed on another machine, as done, before opening a pull request, and when asked to review changes."
 ---
 
 <overview>
@@ -18,7 +18,7 @@ The fixed point is whatever the user named, such as a commit SHA, branch name, t
 
 Capture the diff command once as `git diff <fixed-point>...HEAD`. The three dots compare against the merge-base. Also note the list of commits from `git log <fixed-point>..HEAD --oneline`. That command leaves out uncommitted changes. To review uncommitted work, use `git diff HEAD`, and list untracked files with `git status --short`.
 
-Before you go further, confirm the fixed point with `git rev-parse <fixed-point>`. Also confirm that the diff is not empty. A bad ref or an empty diff should fail here, not inside parallel sub-agents.
+Before you go further, confirm the fixed point with `git rev-parse <fixed-point>`. Also confirm that the diff is not empty. A bad ref or an empty diff should fail here, not inside parallel sub-agents. When the change lives outside git, such as files installed on another machine, keep the before and after copies and give the sub-agents a diff of those copies, so each axis still reads the whole change.
 </step_1_pin_the_fixed_point>
 
 <step_2_identify_the_spec_source>

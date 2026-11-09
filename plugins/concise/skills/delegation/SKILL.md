@@ -38,7 +38,7 @@ The agent sees only the brief, so give the whole task once and precisely. Write 
 3. Scope. Name the files or modules the agent owns, and what it must not touch.
 4. Rules. A native subagent receives the output style and the coding, file tool, and skill rules through the plugin's hook. For an agent of another provider, name the working rules at `../../instructions/work.md` and the writing rules at `../../instructions/style.md`, relative to this skill. Give each as an absolute path. Name the skills that fit the task.
 5. Proof. Say which check proves the work, such as a command, a test, or a screenshot. Ask the agent to report any check it could not run.
-6. Stop conditions. The agent asks only when it cannot continue, or before a destructive or external action. It reports a blocker instead of working around it.
+6. Stop conditions and caps. The agent asks only when it cannot continue, or before a destructive or external action. It reports a blocker instead of working around it. Give it a cap on turns or spend where the runtime offers one, and name who approves the result.
 7. Return contract. Ask for a short report that opens with the outcome. It gives evidence with file and line, and it marks unverified claims.
 
 Keep the brief at the level of goals and checks. Overly specific steps or "stop for review" lines make current models end early or over-ask.
