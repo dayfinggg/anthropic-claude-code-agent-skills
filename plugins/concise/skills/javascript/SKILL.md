@@ -45,7 +45,7 @@ The reference files rank rules by their effect on load time and responsiveness. 
 | Re-renders and rendering | Medium | [react-rendering.md](references/react-rendering.md) |
 | DOM, storage, and JavaScript hot paths | Low to medium | [js-performance.md](references/js-performance.md) |
 
-Read [react-async-and-bundle.md](references/react-async-and-bundle.md) when code awaits several independent operations or when a page loads too much JavaScript. Read [react-server.md](references/react-server.md) when you write Server Components, Server Actions, server-side caches, or props that cross the server and client boundary. Read [react-rendering.md](references/react-rendering.md) when you write hooks, effects, state updates, or components that render too often or mismatch on hydration. Read [js-performance.md](references/js-performance.md) when you add scripts or preloads, render long lists, or touch the DOM, storage, or a hot loop.
+Read each file whole before you change code on its topic. Read [react-async-and-bundle.md](references/react-async-and-bundle.md) when code awaits several independent operations or when a page loads too much JavaScript. Read [react-server.md](references/react-server.md) when you write Server Components, Server Actions, server-side caches, or props that cross the server and client boundary. Read [react-rendering.md](references/react-rendering.md) when you write hooks, effects, state updates, or components that render too often or mismatch on hydration. Read [js-performance.md](references/js-performance.md) when you add scripts or preloads, render long lists, or touch the DOM, storage, or a hot loop.
 </priorities>
 
 <ecmascript>
