@@ -163,7 +163,7 @@ A query inside a loop over rows is an N+1 pattern. Load the related rows in one 
 
 <references>
 Each reference file covers one engine area, so read only the one the task needs.
-- [postgres-schema.md](references/postgres-schema.md) covers data types, primary keys, foreign key indexes, idempotent constraints, identifiers, and partial and JSONB indexes. Read it when you design or change PostgreSQL tables.
+- [postgres-schema.md](references/postgres-schema.md) covers data types, primary keys, foreign key indexes, idempotent constraints, identifiers, and partial and JSONB indexes. Read it whole before you write a PostgreSQL migration or change a PostgreSQL table.
 - [postgres-queries.md](references/postgres-queries.md) covers N+1 batching, keyset pagination, upserts, transactions, deadlocks, queues, `EXPLAIN`, statistics, and bulk loads. Read it when you write PostgreSQL queries or diagnose a slow one.
 - [postgres-operations.md](references/postgres-operations.md) covers connection pooling, prepared statements, timeouts, privileges, and row level security. Read it when you configure connections or access control.
 - [mysql-online-ddl.md](references/mysql-online-ddl.md) covers DDL algorithms, lock levels, and online schema change tools. Read it before any MySQL `ALTER TABLE` on a large table.
