@@ -1,6 +1,8 @@
 import type { EngineInterface, Register, ToolCallInput } from 'claude-code'
 import {
+  CHANGE_TOOLS,
   CODING_SECTION,
+  COMPACT_INSTRUCTIONS,
   DEFERRED_TOOLS,
   FILE_TOOLS,
   HEREDOC_DENIAL,
@@ -32,6 +34,7 @@ import {
 } from './config'
 
 const loadedSkills = new Set<string>()
+const changedFilesThisTurn = new Set<string>()
 let toolCallsThisTurn = 0
 let remindersThisTurn = 0
 
@@ -66,7 +69,8 @@ const triggerTarget = (e: ToolCallInput): { tool: string; file: string; command:
   return { tool: e.tool, file: '', command: '' }
 }
 
-const triggerMatches = (trigger: SkillTrigger, target: { tool: string; file: string; command: string }) => {
+const triggerMatches = (trigger: SkillTrigger, target: { tool: string; file: string; command: string }, changed: ReadonlySet<string>) => {
+  if (trigger.changedFiles !== undefined && changed.size >= trigger.changedFiles) return true
   const fileTools = trigger.tools ?? FILE_TOOLS
   if (target.file && trigger.files && fileTools.includes(target.tool)) return trigger.files.test(target.file)
   if (target.command && trigger.commands) return trigger.commands.test(target.command)
@@ -127,6 +131,7 @@ export const register: Register = on => {
     if (!e.agentId) {
       toolCallsThisTurn = 0
       remindersThisTurn = 0
+      changedFilesThisTurn.clear()
     }
     return next(e)
   })
@@ -138,7 +143,7 @@ export const register: Register = on => {
 
   on('session.compact', ($, e, next) => {
     resetSkills()
-    return next(e)
+    return next({ ...e, instructions: [e.instructions, COMPACT_INSTRUCTIONS].filter(Boolean).join('\n\n') })
   })
 
   on('tool.call', async ($, e, next) => {
@@ -149,8 +154,9 @@ export const register: Register = on => {
     if (e.agentId || 'deny' in result) return result
     const additions: string[] = []
     const target = triggerTarget(e)
+    if (target.file && CHANGE_TOOLS.includes(target.tool)) changedFilesThisTurn.add(target.file)
     for (const trigger of SKILL_TRIGGERS) {
-      if (loadedSkills.has(trigger.skill) || !triggerMatches(trigger, target)) continue
+      if (loadedSkills.has(trigger.skill) || !triggerMatches(trigger, target, changedFilesThisTurn)) continue
       loadedSkills.add(trigger.skill)
       additions.push(await skillContext($, trigger))
     }

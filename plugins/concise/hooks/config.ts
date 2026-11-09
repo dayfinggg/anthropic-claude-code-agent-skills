@@ -90,12 +90,20 @@ export const FILE_TOOLS = ['Read', 'Edit', 'Write']
 
 export const CHANGE_TOOLS = ['Edit', 'Write']
 
+export const CODE_FILES = /\.(php|py|ts|tsx|js|jsx|mjs|cjs|go|rs|java|kt|cs|rb|swift)$/i
+
+export const REMOTE_INSTALL = /\b(scp|rsync)\b|\bssh\b[\s\S]*\b(mv|cp|tee|install|systemctl|service)\b/
+
+export const COMPACT_INSTRUCTIONS =
+  "Keep in the summary, stated exactly, everything the user asked for, decided, ruled out, or set as a preference, constraint, or boundary. Keep every difficulty that came up and how it was handled, every approach that was tried or set aside and why, exactly where the work stands, everything still open or promised, and the details that would be hard to reconstruct, such as names, numbers, dates, paths, commands, exact wording, and links. Keep what the user said close to their own words, and condense the assistant's own reasoning to what it concluded or produced. Also list the skills that were loaded and the checks that were run with their results."
+
 export type SkillTrigger = {
   skill: string
   kind: string
   files?: RegExp
   commands?: RegExp
   tools?: readonly string[]
+  changedFiles?: number
 }
 
 export const SKILL_TRIGGERS: readonly SkillTrigger[] = [
@@ -109,5 +117,7 @@ export const SKILL_TRIGGERS: readonly SkillTrigger[] = [
   { skill: 'testing', kind: 'test runs', commands: /\b(pytest|phpunit|pest|vitest|jest|mocha|playwright|go\s+test|cargo\s+test|(npm|pnpm|yarn|bun)\s+(run\s+)?test)\b/ },
   { skill: 'tdd', kind: 'test code', files: /(^|[\\/])(tests?|spec|__tests__)[\\/].*\.(php|py|ts|tsx|js|jsx|go|rs)$|\.(test|spec)\.(ts|tsx|js|jsx|py)$|Test\.php$|_test\.(py|go)$/i },
   { skill: 'agentdocs', kind: 'agent instruction files', files: /(^|[\\/])(CLAUDE|AGENTS|SKILL)\.md$|[\\/]\.claude[\\/]rules[\\/].*\.md$|[\\/]output-styles[\\/].*\.md$/i },
-  { skill: 'cleancode', kind: 'production code changes', files: /\.(php|py|ts|tsx|js|jsx|mjs|cjs|go|rs|java|kt|cs|rb|swift)$/i, tools: CHANGE_TOOLS },
+  { skill: 'cleancode', kind: 'production code changes', files: CODE_FILES, tools: CHANGE_TOOLS },
+  { skill: 'testing', kind: 'a code change that needs a check', files: CODE_FILES, tools: CHANGE_TOOLS },
+  { skill: 'review', kind: 'a change to several files or a file installed on another machine', changedFiles: 3, commands: REMOTE_INSTALL },
 ]
