@@ -53,22 +53,22 @@ For large CSV or ETL inputs, `createReadStream(input)` and `await pipeline(...)`
 </streams_and_caching>
 
 <references>
-Read a rule file when the task touches its topic.
+Each file below holds the rules for one topic. Read the whole file before you write or change code on its topic, and apply every rule in it that fits the case.
 
-- [references/async-patterns.md](references/async-patterns.md) for async/await, parallel work, concurrency limits, and cancellation
-- [references/error-handling.md](references/error-handling.md) for error codes, causes, and async errors
-- [references/streams.md](references/streams.md) for pipelines, transforms, backpressure, and stream consumers
-- [references/modules.md](references/modules.md) for ESM, CommonJS, `require(esm)`, and import paths
-- [references/testing.md](references/testing.md) for `node:test`, mocks, snapshots, and hooks
-- [references/flaky-tests.md](references/flaky-tests.md) for tests that fail at random
-- [references/stuck-processes-and-tests.md](references/stuck-processes-and-tests.md) for processes and test runs that never exit
-- [references/node-modules-exploration.md](references/node-modules-exploration.md) for installed versions, dependency trees, and package internals
-- [references/performance.md](references/performance.md) for event loop blocking, worker threads, pools, and leaks
-- [references/caching.md](references/caching.md) for choosing and invalidating caches
-- [references/profiling.md](references/profiling.md) for flame graphs, benchmarks, and diagnostic reports
-- [references/logging.md](references/logging.md) for pino, redaction, and debug output
-- [references/environment.md](references/environment.md) for env files, config validation, and secrets
-- [references/graceful-shutdown.md](references/graceful-shutdown.md) for signals, server shutdown, and health checks
-- [references/typescript.md](references/typescript.md) for type stripping, its tsconfig, and publishing TypeScript packages
-- [node-lts.md](references/node-lts.md) when the Node.js version matters, such as for an upgrade or a new API
+- [references/async-patterns.md](references/async-patterns.md) before you write async/await code, run work in parallel, limit concurrency, or cancel work.
+- [references/error-handling.md](references/error-handling.md) before you throw, catch, classify, or log an error, including async errors.
+- [references/streams.md](references/streams.md) before you build a pipeline, a transform, or a stream consumer, or handle backpressure.
+- [references/modules.md](references/modules.md) before you choose between ESM and CommonJS, use `require(esm)`, or change import paths.
+- [references/testing.md](references/testing.md) before you write or change tests with `node:test`, mocks, snapshots, or hooks.
+- [references/flaky-tests.md](references/flaky-tests.md) when a test passes and fails without a code change.
+- [references/stuck-processes-and-tests.md](references/stuck-processes-and-tests.md) when a process or test run never exits.
+- [references/node-modules-exploration.md](references/node-modules-exploration.md) before you look up installed versions, dependency trees, or package internals.
+- [references/performance.md](references/performance.md) when the event loop blocks, or before you add worker threads, pools, or hunt a leak.
+- [references/caching.md](references/caching.md) before you add a cache or change how one is invalidated.
+- [references/profiling.md](references/profiling.md) before you profile, benchmark, or take a diagnostic report.
+- [references/logging.md](references/logging.md) before you add or change logging, redaction, or debug output.
+- [references/environment.md](references/environment.md) before you read env files, validate config, or handle secrets.
+- [references/graceful-shutdown.md](references/graceful-shutdown.md) before you handle signals, shut a server down, or add a health check.
+- [references/typescript.md](references/typescript.md) before you run TypeScript in Node.js, write its tsconfig, or publish a TypeScript package.
+- [node-lts.md](references/node-lts.md) before you rely on a Node.js API that depends on the version, or upgrade Node.js.
 </references>

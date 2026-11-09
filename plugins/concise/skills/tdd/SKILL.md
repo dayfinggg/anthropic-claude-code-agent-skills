@@ -12,7 +12,7 @@ When you explore the codebase, read `GLOSSARY.md` if it exists. Test names and i
 <good_test>
 Tests verify behavior through public interfaces, not implementation details. The code can change entirely, and the tests should not change with it. A good test reads like a specification. "user can checkout with valid cart" tells you exactly what capability exists. Such a test survives refactors, because it does not care about internal structure.
 
-[tests.md](references/tests.md) has examples, and [mocking.md](references/mocking.md) has the mocking guidelines.
+Read [tests.md](references/tests.md) whole before you write the first test of a task, because it shows the shape a good test takes, and read [mocking.md](references/mocking.md) whole before you add a mock, a stub, or a fake.
 </good_test>
 
 <seams>

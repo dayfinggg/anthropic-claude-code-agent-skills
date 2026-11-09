@@ -94,6 +94,6 @@ This skill rejects three common framings.
 </rejected_framings>
 
 <going_deeper>
-- [DEEPENING.md](references/DEEPENING.md) covers how to deepen a cluster of modules given its dependencies. Read it for dependency categories, seam discipline, and the test strategy of replacing old tests.
+- [DEEPENING.md](references/DEEPENING.md) covers how to deepen a cluster of modules given its dependencies, with dependency categories, seam discipline, and the test strategy of replacing old tests. Read it whole before you merge modules or move a seam.
 - [DESIGN-IT-TWICE.md](references/DESIGN-IT-TWICE.md) runs parallel sub-agents that design an interface in radically different ways. Read it when the user wants to compare alternative interfaces on depth, locality, and seam placement.
 </going_deeper>
