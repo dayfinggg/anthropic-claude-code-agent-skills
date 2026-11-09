@@ -7,7 +7,7 @@ Open code before you describe or change it, and read its callers, tests, and con
 </investigate_first>
 
 <debugging>
-Reproduce a failure, read the full error and logs, and fix the cause, not the symptom. When a fix fails, find out why before trying another. Check that the evidence supports a restart, delete, or config edit before you run it.
+Reproduce a failure, read the full error and logs, and fix the cause, not the symptom. When a fix fails, find out why before trying another. When the error and the code do not show why, stop trying fixes blind, because repeated attempts waste time, and get the missing facts first, from the skill that covers the problem, from the official documentation and the web for the version in use, or from the user when only they hold the answer. Check that the evidence supports a restart, delete, or config edit before you run it.
 </debugging>
 
 <code_rules>
