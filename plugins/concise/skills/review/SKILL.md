@@ -83,7 +83,7 @@ A false bug report costs the author a fix round, so confirm each Correctness fin
 <step_6_aggregate>
 Open the report with the number of findings per axis. When no axis found anything to fix, say so plainly in that first sentence.
 
-Then present each axis separately, Correctness first, Standards second, and Spec third, in the format the output style sets. Do not merge or rerank findings across axes, because the axes are deliberately separate. Within an axis, tag each finding as important, nit, or pre-existing, and list them in that order. A pre-existing finding was already in the code before this change, so it does not count against the author. Keep nits few, unless `REVIEW.md` asks for more.
+Then present each axis separately, Correctness first, Standards second, and Spec third, as the `writing_style` rules require. Do not merge or rerank findings across axes, because the axes are deliberately separate. Within an axis, tag each finding as important, nit, or pre-existing, and list them in that order. A pre-existing finding was already in the code before this change, so it does not count against the author. Keep nits few, unless `REVIEW.md` asks for more.
 
 Name the worst issue within each axis, if any. Do not pick a single winner across axes, because that is the reranking the separation exists to prevent.
 </step_6_aggregate>
