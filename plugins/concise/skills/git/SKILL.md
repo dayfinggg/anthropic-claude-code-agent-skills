@@ -190,7 +190,7 @@ A command that discards other work, such as `git reset --hard`, needs the user's
 </save_points>
 
 <change_summaries>
-Report what changed in the format the output style sets.
+Report what changed as the `writing_style` rules require.
 </change_summaries>
 
 <pre_commit_hygiene>

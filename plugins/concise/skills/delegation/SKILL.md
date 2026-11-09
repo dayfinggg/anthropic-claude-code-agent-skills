@@ -36,7 +36,7 @@ The agent sees only the brief, so give the whole task once and precisely. Write 
 1. Goal and finish line. State what is wrong or wanted. Say what done looks like, such as "the suite passes 30 runs in a row".
 2. Context. Give exact paths, the relevant facts you already know, and what you ruled out. Pass long material as file paths, not pasted text.
 3. Scope. Name the files or modules the agent owns, and what it must not touch.
-4. Rules. A native subagent receives the output style and the coding, file tool, and skill rules through the plugin's hook. For an agent of another provider, name the working rules at `../../instructions/work.md` and the writing rules at `../../instructions/style.md`, relative to this skill. Give each as an absolute path. Name the skills that fit the task.
+4. Rules. A native subagent receives the writing rules and the coding, file tool, and skill rules through the plugin's hook. For an agent of another provider, name the working rules at `../../instructions/work.md` and the writing rules at `../../instructions/style.md`, relative to this skill. Give each as an absolute path. Name the skills that fit the task.
 5. Proof. Say which check proves the work, such as a command, a test, or a screenshot. Ask the agent to report any check it could not run.
 6. Stop conditions and caps. The agent asks only when it cannot continue, or before a destructive or external action. It reports a blocker instead of working around it. Give it a cap on turns or spend where the runtime offers one, and name who approves the result.
 7. Return contract. Ask for a short report that opens with the outcome. It gives evidence with file and line, and it marks unverified claims.
@@ -53,5 +53,5 @@ Do not poll an agent, sleep, or re-brief it while it runs. Keep working on what 
 </waiting>
 
 <results>
-Check each report's evidence before you accept it, such as the command, its output, and the cited lines. Do not redo the agent's work or re-derive its findings when the evidence holds. When several agents changed code, check for conflicts. Then run the project's checks on the combined result, as the `verification` block of the coding instructions requires. Relay findings to the user in the output style, and name each agent or thread as the runtime shows it.
+Check each report's evidence before you accept it, such as the command, its output, and the cited lines. Do not redo the agent's work or re-derive its findings when the evidence holds. When several agents changed code, check for conflicts. Then run the project's checks on the combined result, as the `verification` block of the coding instructions requires. Relay findings to the user as the `writing_style` rules require, and name each agent or thread as the runtime shows it.
 </results>
