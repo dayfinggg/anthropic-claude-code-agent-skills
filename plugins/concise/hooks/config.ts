@@ -72,7 +72,7 @@ export const REPLY_REMINDER =
   'This reply and each note before it follow the writing_style rules of the system prompt and are written {language}, so check the text against them before you send it. Before the first tool call, decide for each listed skill whether it fits this task, as the skills rule says.'
 
 export const TOOL_RESULT_REMINDER =
-  'The next text the user reads, a note or the final reply, follows the writing_style rules of the system prompt and is written {language}.'
+  'The next text the user reads, a note or the final reply, follows the writing_style rules of the system prompt and is written {language}. If the work has reached a new kind since your last Skill call, decide again for each listed skill, as the skills rule says.'
 
 export const TOOL_REMINDER_EVERY = 10
 

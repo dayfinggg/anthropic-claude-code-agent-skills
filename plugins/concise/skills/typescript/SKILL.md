@@ -1,6 +1,6 @@
 ---
 name: typescript
-description: Writes and fixes TypeScript types and compiler settings. Use it when a task adds or changes types, generics, type guards, branded types, or utility types, and when tsc reports a type error. Use it to replace `any` with a strict type. Use it when editing tsconfig.json, choosing module, target, or resolution settings, or upgrading to TypeScript 6 or 7 with the Go-based native compiler.
+description: Writes and fixes TypeScript types and compiler settings. Use it whenever a task adds or changes types, generics, type guards, branded types, or utility types, and when tsc reports a type error. Use it to replace `any` with a strict type. Use it when editing tsconfig.json, choosing module, target, or resolution settings, or upgrading to TypeScript 6 or 7 with the Go-based native compiler.
 ---
 
 <project_first>
