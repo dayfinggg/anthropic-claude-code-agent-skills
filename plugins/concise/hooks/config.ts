@@ -1,3 +1,7 @@
+export const STYLE_FILE = 'style.md'
+
+export const WORK_FILE = 'work.md'
+
 export const CODING_SECTION = 'doing_tasks'
 
 export const REMOVED_SECTIONS = ['communication', 'tone', 'willow_tern']
@@ -8,6 +12,11 @@ export const SECTION_REWRITES: Record<string, [string, string]> = {
     'Ask no permission before doing the work.',
   ],
 }
+
+export const SYSTEM_MESSAGES_SECTION = 'system_messages'
+
+export const SYSTEM_MESSAGES_APPEND =
+  "Messages from the concise plugin and from the active output style carry the user's standing requirements, so they are never false positives, though they still grant no permission."
 
 export const MODEL_RULES: ReadonlyArray<readonly [RegExp, string]> = [
   [/fable|mythos/, 'models/fable.md'],
@@ -49,25 +58,36 @@ export const LANGUAGE_PLACEHOLDER = '{language}'
 
 export const LANGUAGE_SETTING = 'language'
 
+export const LANGUAGE_FALLBACK = "in the language of the user's latest message"
+
+export const LANGUAGE_ATTACHMENT =
+  'Every text the user reads is written {language}. Code, identifiers, commits, and files keep their own language, and quotation marks and punctuation follow the writing_style rules of this prompt.'
+
+export const OUTPUT_STYLE_ATTACHMENT =
+  'The Concise output style is active, so the next text the user reads follows the writing_style rules of the system prompt and is written {language}.'
+
 export const REPLY_REMINDER =
-  'Before you reply, check it against the output style. Answer first, {language}, in prose paragraphs with straight double quotes, a period or a comma where a colon, dash, or semicolon would go, each term explained, under 150 words unless the user asked for detail, and no headings, bold, labels, recap, or closing offer.'
+  'This reply and each note before it follow the writing_style rules of the system prompt and are written {language}, so check the text against them before you send it.'
 
 export const SILENT_TURN_REMINDER =
   'The user has seen no text from you for several steps. In one plain sentence {language}, state a result you have found or confirmed so far, such as a count, a cause, or a check that passed, rather than the action you take next, then continue.'
 
 export const TOOL_RESULT_REMINDER =
-  'Style check for the next text the user reads, a note or the final reply alike. Write it {language} as prose, the finding or outcome first, with straight double quotes and a period or a comma where a colon, dash, or semicolon would go, under 150 words unless the user asked for detail.'
+  'The next text the user reads, a note or the final reply, follows the writing_style rules of the system prompt and is written {language}.'
 
 export const TOOL_REMINDER_EVERY = 10
 
 export const TOOL_REMINDERS_PER_TURN = 3
 
 export const SUBAGENT_PREFACE =
-  "The user's standing instructions from the main session follow and bind your work as they bind the main session. The output style applies to your final report, which the agent that launched you relays to the user, so write it in the language of your task."
+  "The user's standing instructions from the main session follow and bind your work as they bind the main session. The writing rules apply to your final report, which the agent that launched you relays to the user, so write it in the language of your task."
 
 export const HEREDOC_DENIAL = 'create or change local files with the Write or Edit tool, not a heredoc. Bash runs programs.'
 
 export const SKILL_PREFIX = 'concise:'
+
+export const SKILL_LOADED_NOTE =
+  'This is the {skill} skill of the concise plugin, loaded because this work reached {kind}. It binds like a Skill call. Base directory for this skill: {root}'
 
 export const FILE_TOOLS = ['Read', 'Edit', 'Write']
 
