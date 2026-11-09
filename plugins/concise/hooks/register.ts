@@ -15,7 +15,6 @@ import {
   REPLY_REMINDER,
   SECTION_REWRITES,
   SHELL_OVER_TOOLS,
-  SILENT_TURN_REMINDER,
   SKILL_LOADED_NOTE,
   SKILL_PREFIX,
   SKILL_TRIGGERS,
@@ -94,9 +93,7 @@ export const register: Register = on => {
     return kept.every(paragraph => paragraph.trim().endsWith(':')) ? { text: null } : next({ ...e, text: kept.join('\n\n') })
   })
 
-  on('prompt.attachment', { type: 'silent_turn_reminder' }, async ($, e, next) =>
-    next({ ...e, text: await withLanguage($, SILENT_TURN_REMINDER) }),
-  ).catch(($, e, next) => next(e))
+  on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
 
   on('prompt.attachment', { type: 'language' }, async ($, e, next) =>
     next({ ...e, text: await withLanguage($, LANGUAGE_ATTACHMENT) }),
