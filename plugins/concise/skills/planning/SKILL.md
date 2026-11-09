@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Breaks work into ordered, verifiable tasks before implementation. Use when a spec or requirements need to become tasks, when the user asks for a plan, or when work spans several sessions or agents. Use when a task feels too large or vague to start, when scope needs an estimate, or when parallel work is possible.
+description: Breaks work into ordered, verifiable tasks before implementation. Use it whenever the user asks for a plan, a roadmap, or an estimate, when requirements or a spec must become tasks, when the work spans several modules, sessions, or agents, or when a task feels too large or vague to start.
 ---
 
 <overview>

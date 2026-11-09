@@ -1,6 +1,6 @@
 ---
 name: delegation
-description: Decides when to hand work to another agent, picks the provider, model, and effort from what the runtime offers, and writes a complete brief. Use before spawning any subagent, child task, or parallel agent, before delegating to a model of another provider, and when the user asks to delegate, parallelize, or run agents.
+description: Picks the provider, model, and effort for another agent and writes its complete brief. Use it before the first subagent, child task, or parallel agent of a task, whenever the user asks to delegate, parallelize, or run agents, and before handing work to a model of another provider.
 ---
 
 <when_to_delegate>

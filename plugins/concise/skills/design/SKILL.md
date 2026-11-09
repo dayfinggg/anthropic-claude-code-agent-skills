@@ -1,6 +1,6 @@
 ---
 name: design
-description: Vocabulary and method for designing deep modules, which hide a lot of behavior behind a small interface at a clean seam. Use when designing or changing a module's interface, deciding where a seam goes, or making code more testable. Also use when merging shallow modules into a deeper one or comparing alternative interface designs.
+description: Vocabulary and method for designing deep modules, which hide a lot of behavior behind a small interface at a clean seam. Use it whenever you add a module, service, or class, change an interface or a boundary between parts, decide where a seam goes, make code testable, merge shallow modules, or compare interface designs.
 ---
 
 <overview>
