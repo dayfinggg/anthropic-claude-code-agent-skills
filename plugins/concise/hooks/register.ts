@@ -5,22 +5,30 @@ import {
   FILE_TOOLS,
   HEREDOC_DENIAL,
   HEREDOC_WRITE,
+  LANGUAGE_ATTACHMENT,
+  LANGUAGE_FALLBACK,
   LANGUAGE_PLACEHOLDER,
   LANGUAGE_SETTING,
   MODEL_RULES,
+  OUTPUT_STYLE_ATTACHMENT,
   REMOVED_SECTIONS,
   REPLY_REMINDER,
   SECTION_REWRITES,
   SHELL_OVER_TOOLS,
   SILENT_TURN_REMINDER,
+  SKILL_LOADED_NOTE,
   SKILL_PREFIX,
   SKILL_TRIGGERS,
   SOURCE_LIST_RULES,
+  STYLE_FILE,
   SUBAGENT_PREFACE,
+  SYSTEM_MESSAGES_APPEND,
+  SYSTEM_MESSAGES_SECTION,
   TOOL_REMINDERS_PER_TURN,
   TOOL_REMINDER_EVERY,
   TOOL_RESULT_REMINDER,
   TOOL_RULES,
+  WORK_FILE,
   type SkillTrigger,
 } from './config'
 
@@ -38,22 +46,19 @@ const stripFrontmatter = (text: string) => text.replace(/^---[\s\S]*?\n---\s*/, 
 const readInstruction = async ($: EngineInterface, name: string) =>
   (await $.fs.read(`${$.plugin.root}/instructions/${name}`)).trim()
 
-const readStyle = async ($: EngineInterface) => stripFrontmatter(await $.fs.read(`${$.plugin.root}/output-styles/concise.md`))
-
 const languagePhrase = async ($: EngineInterface) => {
   const value = await $.settings.read({ key: LANGUAGE_SETTING })
   const language = typeof value === 'string' ? value.trim() : ''
-  return language ? `in ${language.charAt(0).toUpperCase()}${language.slice(1)}` : "in the user's language"
+  return language ? `in ${language.charAt(0).toUpperCase()}${language.slice(1)}` : LANGUAGE_FALLBACK
 }
 
-const withLanguage = async ($: EngineInterface, text: string) => text.replace(LANGUAGE_PLACEHOLDER, await languagePhrase($))
+const withLanguage = async ($: EngineInterface, text: string) => text.replaceAll(LANGUAGE_PLACEHOLDER, await languagePhrase($))
+
+const readStyle = async ($: EngineInterface) => withLanguage($, await readInstruction($, STYLE_FILE))
 
 const subagentTask = async ($: EngineInterface, task: string) => {
-  const [style, ...rules] = await Promise.all([
-    readStyle($),
-    ...['coding.md', 'tools.md', 'skill.md'].map(name => readInstruction($, name)),
-  ])
-  return `<main_session_instructions>\n${SUBAGENT_PREFACE}\n\n${style}\n\n${rules.join('\n\n')}\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
+  const [style, work] = await Promise.all([readStyle($), readInstruction($, WORK_FILE)])
+  return `<main_session_instructions>\n${SUBAGENT_PREFACE}\n\n${style}\n\n${work}\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
 }
 
 const triggerTarget = (e: ToolCallInput): { tool: string; file: string; command: string } => {
@@ -72,8 +77,11 @@ const triggerMatches = (trigger: SkillTrigger, target: { tool: string; file: str
 const skillContext = async ($: EngineInterface, trigger: SkillTrigger) => {
   const root = `${$.plugin.root}/skills/${trigger.skill}`
   const body = stripFrontmatter(await $.fs.read(`${root}/SKILL.md`))
-  return `The plugin loaded the skill ${SKILL_PREFIX}${trigger.skill} because this work reached ${trigger.kind}. It binds as a Skill call does.\nBase directory for this skill: ${root}\n\n${body}`
+  const note = SKILL_LOADED_NOTE.replace('{skill}', `${SKILL_PREFIX}${trigger.skill}`).replace('{kind}', trigger.kind).replace('{root}', root)
+  return `${note}\n\n${body}`
 }
+
+const resetSkills = () => loadedSkills.clear()
 
 export const register: Register = on => {
   on('prompt.submit', async ($, e, next) =>
@@ -89,6 +97,19 @@ export const register: Register = on => {
   on('prompt.attachment', { type: 'silent_turn_reminder' }, async ($, e, next) =>
     next({ ...e, text: await withLanguage($, SILENT_TURN_REMINDER) }),
   ).catch(($, e, next) => next(e))
+
+  on('prompt.attachment', { type: 'language' }, async ($, e, next) =>
+    next({ ...e, text: await withLanguage($, LANGUAGE_ATTACHMENT) }),
+  ).catch(($, e, next) => next(e))
+
+  on('prompt.attachment', { type: 'output_style' }, async ($, e, next) =>
+    next({ ...e, text: await withLanguage($, OUTPUT_STYLE_ATTACHMENT) }),
+  ).catch(($, e, next) => next(e))
+
+  on('prompt.section', { name: SYSTEM_MESSAGES_SECTION }, async ($, e, next) => {
+    const result = await next(e)
+    return result.text ? { text: `${result.text.trimEnd()}\n\n${SYSTEM_MESSAGES_APPEND}` } : result
+  }).catch(($, e, next) => next(e))
 
   on('agent.spawn', async ($, e, next) =>
     e.subagentType === 'fork' ? next(e) : next({ ...e, prompt: await subagentTask($, e.prompt) }),
@@ -113,8 +134,13 @@ export const register: Register = on => {
     return next(e)
   })
 
+  on('session.start', ($, e, next) => {
+    resetSkills()
+    return next(e)
+  })
+
   on('session.compact', ($, e, next) => {
-    loadedSkills.clear()
+    resetSkills()
     return next(e)
   })
 
@@ -137,7 +163,7 @@ export const register: Register = on => {
       additions.push(await withLanguage($, TOOL_RESULT_REMINDER))
     }
     return additions.length === 0 ? result : { ...result, context: [...(result.context ?? []), ...additions] }
-  }).catch(($, e, next) => (next.called ? next(e) : next(e)))
+  }).catch(($, e, next) => next(e))
 
   on('session.append', { door: 'tool-result' }, ($, e, next) => {
     if (e.origin.kind !== 'tool' || e.origin.tool !== 'WebSearch') return next(e)
@@ -153,30 +179,23 @@ export const register: Register = on => {
     const result = await next(e)
     if (e.traits.includes('bare')) return result
 
-    const section = async (name: string, file: string) => ({
-      id: `${$.plugin.name}:${name}`,
-      text: await readInstruction($, file),
-      scope: 'session' as const,
-    })
+    const section = (name: string, text: string) => ({ id: `${$.plugin.name}:${name}`, text, scope: 'session' as const })
+    const work = await readInstruction($, WORK_FILE)
     const modelRule = MODEL_RULES.find(([pattern]) => pattern.test(e.model || e.promptModel))
-    const added = [
-      await section('communication', 'communication.md'),
-      ...(e.tools.includes('Read') && e.tools.includes('Edit') ? [await section('tools', 'tools.md')] : []),
-      ...(e.traits.includes('skills') ? [await section('skills', 'skill.md')] : []),
-      ...(modelRule ? [await section('model', modelRule[1])] : []),
+    const tail = [
+      ...(modelRule ? [section('model', await readInstruction($, modelRule[1]))] : []),
+      section('style', await readStyle($)),
     ]
-    if (!e.outputStyle?.isKeepingCodingInstructions) return { sections: [...result.sections, ...added] }
+    if (!e.outputStyle?.isKeepingCodingInstructions) return { sections: [...result.sections, section('work', work), ...tail] }
 
-    const coding = await readInstruction($, 'coding.md')
     const sections = result.sections
       .filter(section => !REMOVED_SECTIONS.some(id => section.id.startsWith(id)))
       .map(section => {
-        if (section.id === CODING_SECTION) return { ...section, text: coding }
+        if (section.id === CODING_SECTION) return { ...section, text: work }
         const rewrite = SECTION_REWRITES[section.id]
         return rewrite ? { ...section, text: section.text.replace(...rewrite) } : section
       })
-    const hasCoding = sections.some(section => section.id === CODING_SECTION)
-    const codingSection = hasCoding ? [] : [{ id: `${$.plugin.name}:coding`, text: coding, scope: 'session' as const }]
-    return { sections: [...sections, ...codingSection, ...added] }
+    const hasWork = sections.some(section => section.id === CODING_SECTION)
+    return { sections: [...sections, ...(hasWork ? [] : [section('work', work)]), ...tail] }
   })
 }
