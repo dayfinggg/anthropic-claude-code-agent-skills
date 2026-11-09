@@ -1,0 +1,38 @@
+{
+  "env": {
+    "CLAUDE_CODE_ENABLE_AWAY_SUMMARY": "0"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "skillOverrides": {
+    "anthropic-skills:artifact-emulator": "off",
+    "anthropic-skills:google-workspace": "off",
+    "anthropic-skills:pdf": "off",
+    "anthropic-skills:pptx": "off"
+  },
+  "enabledPlugins": {
+    "concise@concise": true
+  },
+  "extraKnownMarketplaces": {
+    "concise": {
+      "source": {
+        "source": "github",
+        "repo": "dayfinggg/anthropic-claude-code-agent-skills"
+      }
+    }
+  },
+  "feedbackSurveyRate": 0,
+  "feedbackDrafts": "off",
+  "spinnerTipsEnabled": false,
+  "effortLevel": "high",
+  "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
+  "autoMemoryEnabled": false,
+  "autoDreamEnabled": false,
+  "showTurnDuration": false,
+  "remoteControlAtStartup": false,
+  "agentPushNotifEnabled": true
+}

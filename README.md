@@ -13,6 +13,8 @@ claude plugin marketplace update concise
 claude plugin update concise@concise
 ```
 
+The file `settings.example.json` holds the author's optional Claude Code settings, such as high effort and memory, recaps, tips, and surveys turned off. Copy the keys you want into `~/.claude/settings.json`, and add `language` to set the reply language. The example leaves permission settings out, so your own permission mode stays in force.
+
 The plugin lives in `plugins/concise`. Installation does not replace your personal skills, global instructions, permissions, or language settings.
 
 Each skill keeps its entry point in `SKILL.md`, guidance in `references`, runnable helpers in `scripts`, and reusable examples in `assets`.
