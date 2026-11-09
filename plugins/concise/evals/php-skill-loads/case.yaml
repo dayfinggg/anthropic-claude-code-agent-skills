@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: php-skill-loads
+description: Reading a PHP file must load the php skill into the tool result before the model answers
+tags: [skills]
+context:
+  scaffold_script: fixture.sh
