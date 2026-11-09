@@ -1,3 +1,0 @@
-<skills>
-Before the first tool call of a task, call the Skill tool for each skill whose description names the task's kind of work, and check the list again when the work reaches another language, a database, a server or deploy step, documentation, a test, a commit, or a pull request. The plugin also loads a skill into a tool result the first time a file type or command of its kind appears in the session. A skill loaded either way binds as the user's requirements, so follow its rules and steps, open the reference files it points to for your case, and meet its checklist before you report. The output style and these instructions win where a skill conflicts with them. After compaction, call again each skill you still use.
-</skills>
