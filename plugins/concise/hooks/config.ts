@@ -69,9 +69,6 @@ export const OUTPUT_STYLE_ATTACHMENT =
 export const REPLY_REMINDER =
   'This reply and each note before it follow the writing_style rules of the system prompt and are written {language}, so check the text against them before you send it.'
 
-export const SILENT_TURN_REMINDER =
-  'The user has seen no text from you for several steps. In one plain sentence {language}, state a result you have found or confirmed so far, such as a count, a cause, or a check that passed, rather than the action you take next, then continue.'
-
 export const TOOL_RESULT_REMINDER =
   'The next text the user reads, a note or the final reply, follows the writing_style rules of the system prompt and is written {language}.'
 
