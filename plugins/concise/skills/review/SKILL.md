@@ -74,6 +74,8 @@ The Spec sub-agent prompt includes these items.
 - This brief. "Report the requirements that the spec asked for and the diff misses or only partly covers. Report the behaviour in the diff that nobody asked for, which is scope creep. Report the requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Report each finding once, in one short entry, with no preamble or recap."
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
+
+When no tool for starting a sub-agent is available, run the axes yourself, one after another. Reread the diff once for each axis against that axis's brief and items above, confirm or reject each Correctness finding against the code a second time in place of step 5, and say in the report that no fresh reviewer ran, because a self-review misses what a fresh reader would catch.
 </step_4_spawn_the_sub_agents>
 
 <step_5_verify_bug_findings>
