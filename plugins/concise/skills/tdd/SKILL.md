@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Test-driven development and test quality. Use when writing or changing tests for a feature or bug fix, when the user asks for test-first work, TDD, or red-green-refactor, or when deciding where tests go and what to mock.
+description: Test-driven development and test quality. Use it whenever you are about to create or change a test file for a feature or bug fix, including a regression test, before the first edit of that file, when the user asks for test-first work, TDD, or red-green-refactor, and when you decide where tests go and what to mock.
 ---
 
 <overview>

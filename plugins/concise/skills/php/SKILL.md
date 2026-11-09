@@ -1,6 +1,6 @@
 ---
 name: php
-description: Modern PHP practice current for November 2026, with Laravel and Symfony references. Use it when writing, reviewing, upgrading, or setting up PHP code, including Composer packages, PHPStan or Rector configuration, and PHPUnit or Pest tests. Use it for every Laravel or Symfony change, because it routes to framework references for Eloquent, validation, queues, testing, Doctrine, Messenger, forms, and voters.
+description: Modern PHP practice current for November 2026, with Laravel and Symfony references. Use it whenever you write, review, upgrade, or set up PHP code, including Composer packages, PHPStan or Rector configuration, and PHPUnit or Pest tests. Use it for every Laravel or Symfony change, because it routes to framework references for Eloquent, validation, queues, testing, Doctrine, Messenger, forms, and voters.
 license: MIT. See the distribution LICENSE for each source and its license.
 ---
 

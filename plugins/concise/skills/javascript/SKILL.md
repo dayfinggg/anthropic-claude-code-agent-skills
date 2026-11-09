@@ -1,6 +1,6 @@
 ---
 name: javascript
-description: Applies current JavaScript, browser, and React practice, with performance rules ranked by impact. Use it when writing, reviewing, or refactoring JavaScript or JSX, React components, hooks, or Server Components, or a Next.js app. Use it when fixing slow pages, request waterfalls, large bundles, extra re-renders, layout thrashing, or hydration mismatches. Use it when choosing a recent ECMAScript feature for the project's target runtimes.
+description: Applies current JavaScript, browser, and React practice, with performance rules ranked by impact. Use it whenever you write, review, or refactor JavaScript or JSX, React components, hooks, or Server Components, or a Next.js app. Use it when fixing slow pages, request waterfalls, large bundles, extra re-renders, layout thrashing, or hydration mismatches. Use it when choosing a recent ECMAScript feature for the project's target runtimes.
 ---
 
 <project_first>

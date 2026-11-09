@@ -1,6 +1,6 @@
 ---
 name: node
-description: Gives current Node.js runtime practice. Use it when writing, reviewing, or debugging Node.js servers, CLIs, workers, or scripts. Use it for streams, async code, errors, logging, caching, environment config, and graceful shutdown. Use it for flaky or hanging tests with node:test, for profiling, and for running TypeScript directly in Node. Use it when choosing Node APIs for the installed version or upgrading Node.
+description: Gives current Node.js runtime practice. Use it whenever you write, review, or debug Node.js servers, CLIs, workers, or scripts. Use it for streams, async code, errors, logging, caching, environment config, and graceful shutdown. Use it for flaky or hanging tests with node:test, for profiling, and for running TypeScript directly in Node. Use it when choosing Node APIs for the installed version or upgrading Node.
 ---
 
 <project_first>
