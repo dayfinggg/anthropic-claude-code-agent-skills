@@ -1,6 +1,6 @@
 {
   "name": "concise",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "Concise output style in any language, with plain-language writing rules, coding instructions, per-model notes, and skills that load by file type",
   "author": { "name": "dayfinggg" },
   "homepage": "https://github.com/dayfinggg/anthropic-claude-code-agent-skills",
