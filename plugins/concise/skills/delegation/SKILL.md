@@ -22,10 +22,10 @@ Find out what the runtime offers before you choose a model. Never pick from memo
 
 <model_and_effort>
 Match the model tier and effort to the task, and set the model explicitly. An omitted model inherits the parent's, which is usually the most expensive one. Set effort where the runtime offers it, by each tool's own rules.
-- Lookups, search, and summaries go to the fastest, cheapest tier. A misread search result sends the parent after the wrong file, so ask for exact paths and quotes.
-- Work with a clear spec and a check that proves it goes to the middle tier. Use medium or high effort there.
-- Judgement-heavy, long-horizon, or ambiguous work goes to the strongest tier at high effort or above.
-- Raise effort when edge cases matter. Switch to a stronger model when the same approach fails twice, because effort does not fix a wrong approach.
+- Lookups, search, log reading, and summaries go to the fastest, cheapest tier at its default effort, because a mistake there is cheap to spot. A misread search result still sends the parent after the wrong file, so ask for exact paths and quotes, and keep code edits and judgement calls off this tier.
+- Work with a clear spec and a check that proves it goes to the middle tier, and so does a well-defined task you run often, such as a review. Use medium or high effort there.
+- Judgement-heavy, long-horizon, or ambiguous work goes to the strongest tier, starting at medium effort and rising to high.
+- When a result falls short, first make sure the agent has a check it can run, then raise effort one level, then move up one tier and start there at a lower effort than the smaller model used. Past high effort the next tier up can cost no more than another effort level, and effort does not fix a wrong approach.
 - Use the user's named model and settings when the user gives them.
 
 Before you brief a model family for the first time in a session, read its current prompting guidance. For Claude models, invoke the `claude-api` skill, or read the prompting best practices at https://platform.claude.com/docs when it is unavailable. For GPT models, read OpenAI's current prompt guidance at https://developers.openai.com. For other providers, read their official prompting docs. Apply what you read to the brief.
