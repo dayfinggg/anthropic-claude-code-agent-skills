@@ -1,6 +1,6 @@
 ---
 name: debugging
-description: Diagnosis loop for hard bugs and performance regressions. Use when something is broken, throwing, failing, flaky, giving wrong output, or slow, and the cause is not clear from the error and the code it points to. Use it before changing code to fix such a bug.
+description: Diagnosis loop for anything reported broken, throwing, failing, flaky, slow, or giving wrong output, including a user's report that a feature or page stopped working. Use it whenever such a report arrives and the cause is not yet proven by the error and the code it points to, before you change code to fix it, even when the first explanation looks obvious.
 ---
 
 <overview>

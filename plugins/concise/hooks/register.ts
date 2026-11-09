@@ -25,7 +25,6 @@ import {
   SUBAGENT_PREFACE,
   SYSTEM_MESSAGES_APPEND,
   SYSTEM_MESSAGES_SECTION,
-  TOOL_REMINDERS_PER_TURN,
   TOOL_REMINDER_EVERY,
   TOOL_RESULT_REMINDER,
   TOOL_RULES,
@@ -33,10 +32,18 @@ import {
   type SkillTrigger,
 } from './config'
 
-const loadedSkills = new Set<string>()
+type Target = { tool: string; file: string; command: string }
+
+const loadedSkills = new Map<string, Set<string>>()
 const changedFilesThisTurn = new Set<string>()
 let toolCallsThisTurn = 0
-let remindersThisTurn = 0
+
+const skillsOf = (agentId?: string) => {
+  const key = agentId ?? 'main'
+  const loaded = loadedSkills.get(key) ?? new Set<string>()
+  loadedSkills.set(key, loaded)
+  return loaded
+}
 
 const writesFileWithHeredoc = (command: string) =>
   (command.split('\n')[0] ?? '').split(/&&|\|\||;/).some(segment => HEREDOC_WRITE.test(segment))
@@ -63,14 +70,15 @@ const subagentTask = async ($: EngineInterface, task: string) => {
   return `<main_session_instructions>\n${SUBAGENT_PREFACE}\n\n${style}\n\n${work}\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
 }
 
-const triggerTarget = (e: ToolCallInput): { tool: string; file: string; command: string } => {
+const triggerTarget = (e: ToolCallInput): Target => {
   if (e.tool === 'Bash') return { tool: e.tool, file: '', command: e.command }
   if (e.tool === 'Read' || e.tool === 'Edit' || e.tool === 'Write') return { tool: e.tool, file: e.file_path, command: '' }
   return { tool: e.tool, file: '', command: '' }
 }
 
-const triggerMatches = (trigger: SkillTrigger, target: { tool: string; file: string; command: string }, changed: ReadonlySet<string>) => {
+const triggerMatches = (trigger: SkillTrigger, target: Target, changed: ReadonlySet<string>) => {
   if (trigger.changedFiles !== undefined && changed.size >= trigger.changedFiles) return true
+  if (trigger.toolNames?.includes(target.tool)) return true
   const fileTools = trigger.tools ?? FILE_TOOLS
   if (target.file && trigger.files && fileTools.includes(target.tool)) return trigger.files.test(target.file)
   if (target.command && trigger.commands) return trigger.commands.test(target.command)
@@ -130,7 +138,6 @@ export const register: Register = on => {
   on('turn.start', ($, e, next) => {
     if (!e.agentId) {
       toolCallsThisTurn = 0
-      remindersThisTurn = 0
       changedFilesThisTurn.clear()
     }
     return next(e)
@@ -147,23 +154,24 @@ export const register: Register = on => {
   })
 
   on('tool.call', async ($, e, next) => {
+    const loaded = skillsOf(e.agentId)
     if (e.tool === 'Skill' && typeof e.skill === 'string' && e.skill.startsWith(SKILL_PREFIX)) {
-      loadedSkills.add(e.skill.slice(SKILL_PREFIX.length))
+      loaded.add(e.skill.slice(SKILL_PREFIX.length))
     }
     const result = await next(e)
-    if (e.agentId || 'deny' in result) return result
+    if ('deny' in result) return result
     const additions: string[] = []
     const target = triggerTarget(e)
-    if (target.file && CHANGE_TOOLS.includes(target.tool)) changedFilesThisTurn.add(target.file)
+    const changed = e.agentId ? new Set<string>() : changedFilesThisTurn
+    if (target.file && CHANGE_TOOLS.includes(target.tool)) changed.add(target.file)
     for (const trigger of SKILL_TRIGGERS) {
-      if (loadedSkills.has(trigger.skill) || !triggerMatches(trigger, target, changedFilesThisTurn)) continue
-      loadedSkills.add(trigger.skill)
+      if (loaded.has(trigger.skill) || !triggerMatches(trigger, target, changed)) continue
+      loaded.add(trigger.skill)
       additions.push(await skillContext($, trigger))
     }
-    toolCallsThisTurn += 1
-    if (toolCallsThisTurn % TOOL_REMINDER_EVERY === 0 && remindersThisTurn < TOOL_REMINDERS_PER_TURN) {
-      remindersThisTurn += 1
-      additions.push(await withLanguage($, TOOL_RESULT_REMINDER))
+    if (!e.agentId) {
+      toolCallsThisTurn += 1
+      if (toolCallsThisTurn % TOOL_REMINDER_EVERY === 0) additions.push(await withLanguage($, TOOL_RESULT_REMINDER))
     }
     return additions.length === 0 ? result : { ...result, context: [...(result.context ?? []), ...additions] }
   }).catch(($, e, next) => next(e))

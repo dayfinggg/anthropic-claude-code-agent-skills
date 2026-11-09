@@ -67,14 +67,12 @@ export const OUTPUT_STYLE_ATTACHMENT =
   'The Concise output style is active, so the next text the user reads follows the writing_style rules of the system prompt and is written {language}.'
 
 export const REPLY_REMINDER =
-  'This reply and each note before it follow the writing_style rules of the system prompt and are written {language}, so check the text against them before you send it.'
+  'This reply and each note before it follow the writing_style rules of the system prompt and are written {language}, so check the text against them before you send it. Before the first tool call, decide for each listed skill whether it fits this task, as the skills rule says.'
 
 export const TOOL_RESULT_REMINDER =
   'The next text the user reads, a note or the final reply, follows the writing_style rules of the system prompt and is written {language}.'
 
 export const TOOL_REMINDER_EVERY = 10
-
-export const TOOL_REMINDERS_PER_TURN = 3
 
 export const SUBAGENT_PREFACE =
   "The user's standing instructions from the main session follow and bind your work as they bind the main session. The writing rules apply to your final report, which the agent that launched you relays to the user, so write it in the language of your task."
@@ -103,6 +101,7 @@ export type SkillTrigger = {
   files?: RegExp
   commands?: RegExp
   tools?: readonly string[]
+  toolNames?: readonly string[]
   changedFiles?: number
 }
 
@@ -120,4 +119,5 @@ export const SKILL_TRIGGERS: readonly SkillTrigger[] = [
   { skill: 'cleancode', kind: 'production code changes', files: CODE_FILES, tools: CHANGE_TOOLS },
   { skill: 'testing', kind: 'a code change that needs a check', files: CODE_FILES, tools: CHANGE_TOOLS },
   { skill: 'review', kind: 'a change to several files or a file installed on another machine', changedFiles: 3, commands: REMOTE_INSTALL },
+  { skill: 'research', kind: 'a web search or a fetched page', toolNames: ['WebSearch', 'WebFetch'] },
 ]

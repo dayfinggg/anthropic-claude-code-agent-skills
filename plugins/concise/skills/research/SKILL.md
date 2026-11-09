@@ -1,6 +1,6 @@
 ---
 name: research
-description: Finds and verifies facts in official docs, source code, and on the web, and cites each claim with a deep link. Use before writing code that depends on a framework, library, or API version, when an answer needs current docs or web sources, when comparing tools or options, and when the user asks for research or a written report. Long reading goes to a subagent.
+description: Finds and verifies current facts in official docs, source code, and the web, and cites each claim with a deep link. Use it whenever an answer depends on a framework, library, API, service, price, or rule that changes over time, before writing framework-specific code from memory, when comparing tools or options, and when the user asks for research, a comparison, or a written report. Long reading goes to a subagent.
 ---
 
 <overview>
