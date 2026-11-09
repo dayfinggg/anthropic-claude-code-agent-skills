@@ -112,7 +112,7 @@ Use the test runner that the project already has. PHPUnit 13 needs PHP 8.4 and P
 
 <framework_references>
 Read the framework reference before you change code in a framework project. Composer's `require` section shows the framework.
-- A project that requires `laravel/framework` starts with [references/laravel.md](references/laravel.md). It covers versions, structure, Artisan, and Pint, and it links to the topic files `laravel-database.md`, `laravel-http.md`, `laravel-async.md`, `laravel-app.md`, and `laravel-testing.md`.
+- A project that requires `laravel/framework` starts with [references/laravel.md](references/laravel.md). It covers versions, structure, Artisan, and Pint, and it links to the topic files `laravel-database.md`, `laravel-http.md`, `laravel-async.md`, `laravel-app.md`, `laravel-testing.md`, and `laravel-testing-data.md` (factories, fakes, time, and suite speed), all in `references/`.
 - A project that requires `symfony/framework-bundle` starts with [references/symfony.md](references/symfony.md). It targets Symfony 7.4 LTS and 8.x. It covers services and autowiring, Messenger, forms and validation, voters, DTOs, and quality checks.
 - A project that uses Doctrine ORM also reads [references/symfony-doctrine.md](references/symfony-doctrine.md) for relations, fetch modes, batch processing, and transactions with ORM 3.
 </framework_references>

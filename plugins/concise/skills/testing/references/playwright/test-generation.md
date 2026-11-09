@@ -9,6 +9,14 @@ The sections work on their own.
 
 All three rely on one mechanic. Run `npx playwright test --debug=cli` in the background, then run `playwright-cli attach tw-XXXX` to drive the paused page. [playwright-tests.md](playwright-tests.md) explains the debug and attach steps.
 </overview>
+<contents>
+This file has these sections, in order.
+- how generation works
+- plan
+- generate
+- heal
+</contents>
+
 
 <how_generation_works>
 Every action you perform with `playwright-cli` prints the matching Playwright TypeScript code. You can copy it directly into test files. In this session, the snapshot shows `e1` as the Email textbox and `e2` as the Password textbox. `e3` is the Sign In button.
