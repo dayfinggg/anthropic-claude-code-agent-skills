@@ -3,6 +3,7 @@ import {
   CODING_SECTION,
   COMPACT_INSTRUCTIONS,
   DEFERRED_TOOLS,
+  DELEGATION_TOOLS,
   HEREDOC_DENIAL,
   HEREDOC_WRITE,
   LANGUAGE_ATTACHMENT,
@@ -17,9 +18,8 @@ import {
   SHELL_OVER_TOOLS,
   SOURCE_LIST_RULES,
   STYLE_FILE,
+  SUBAGENT_LANGUAGE_FALLBACK,
   SUBAGENT_PREFACE,
-  SYSTEM_MESSAGES_APPEND,
-  SYSTEM_MESSAGES_SECTION,
   TOOL_REMINDER_EVERY,
   TOOL_RESULT_REMINDER,
   TOOL_RULES,
@@ -36,19 +36,25 @@ const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result
 const readInstruction = async ($: EngineInterface, name: string) =>
   (await $.fs.read(`${$.plugin.root}/instructions/${name}`)).trim()
 
-const languagePhrase = async ($: EngineInterface) => {
+const languagePhrase = async ($: EngineInterface, fallback: string) => {
   const value = await $.settings.read({ key: LANGUAGE_SETTING })
   const language = typeof value === 'string' ? value.trim() : ''
-  return language ? `in ${language.charAt(0).toUpperCase()}${language.slice(1)}` : LANGUAGE_FALLBACK
+  return language ? `in ${language.charAt(0).toUpperCase()}${language.slice(1)}` : fallback
 }
 
-const withLanguage = async ($: EngineInterface, text: string) => text.replaceAll(LANGUAGE_PLACEHOLDER, await languagePhrase($))
+const withLanguage = async ($: EngineInterface, text: string, fallback = LANGUAGE_FALLBACK) =>
+  text.replaceAll(LANGUAGE_PLACEHOLDER, await languagePhrase($, fallback))
 
-const readStyle = async ($: EngineInterface) => withLanguage($, await readInstruction($, STYLE_FILE))
+const readStyle = async ($: EngineInterface, fallback?: string) =>
+  withLanguage($, await readInstruction($, STYLE_FILE), fallback)
 
 const subagentTask = async ($: EngineInterface, task: string) => {
-  const [style, work] = await Promise.all([readStyle($), readInstruction($, WORK_FILE)])
-  return `<main_session_instructions>\n${SUBAGENT_PREFACE}\n\n${style}\n\n${work}\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
+  const [preface, style, work] = await Promise.all([
+    withLanguage($, SUBAGENT_PREFACE, SUBAGENT_LANGUAGE_FALLBACK),
+    readStyle($, SUBAGENT_LANGUAGE_FALLBACK),
+    readInstruction($, WORK_FILE),
+  ])
+  return `<main_session_instructions>\n${preface}\n\n${style}\n\n${work}\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
 }
 
 export const register: Register = on => {
@@ -71,11 +77,6 @@ export const register: Register = on => {
   on('prompt.attachment', { type: 'output_style' }, async ($, e, next) =>
     next({ ...e, text: await withLanguage($, OUTPUT_STYLE_ATTACHMENT) }),
   ).catch(($, e, next) => next(e))
-
-  on('prompt.section', { name: SYSTEM_MESSAGES_SECTION }, async ($, e, next) => {
-    const result = await next(e)
-    return result.text ? { text: `${result.text.trimEnd()}\n\n${SYSTEM_MESSAGES_APPEND}` } : result
-  }).catch(($, e, next) => next(e))
 
   on('agent.spawn', async ($, e, next) =>
     e.subagentType === 'fork' ? next(e) : next({ ...e, prompt: await subagentTask($, e.prompt) }),
@@ -105,7 +106,7 @@ export const register: Register = on => {
     const result = await next(e)
     if (e.agentId || 'deny' in result) return result
     toolCallsThisTurn += 1
-    if (toolCallsThisTurn % TOOL_REMINDER_EVERY !== 0) return result
+    if (toolCallsThisTurn % TOOL_REMINDER_EVERY !== 0 && !DELEGATION_TOOLS.includes(e.tool)) return result
     return { ...result, context: [...(result.context ?? []), await withLanguage($, TOOL_RESULT_REMINDER)] }
   }).catch(($, e, next) => next(e))
 
