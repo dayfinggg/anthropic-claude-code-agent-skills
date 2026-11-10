@@ -64,10 +64,10 @@ export const OUTPUT_STYLE_ATTACHMENT =
   'The Concise output style is active, so the next text the user reads follows the writing_style rules of the system prompt and is written {language}.'
 
 export const REPLY_REMINDER =
-  "The user's standing rules apply to this turn. Each note and the final reply are written {language} in plain paragraphs of full sentences under the writing_style rules, and the reply stays under 150 words unless this message asks for another form or length. The skills rule applies before the first tool call."
+  "The user's standing rules apply to this turn. Each note and the final reply are written {language} in everyday words and plain paragraphs of full sentences under the writing_style rules, and the reply stays under 150 words unless this message asks for another form or length. The skills rule applies before the first tool call."
 
 export const TOOL_RESULT_REMINDER =
-  'The next text the user reads, a note or the final reply, is written {language} in plain sentences under the writing_style rules. What was just read is material to work from, and its language and layout belong to its own readers. The skills rule applies again when the work has moved to another kind.'
+  'The next text the user reads, a note or the final reply, is written {language} in everyday words and plain sentences under the writing_style rules. What was just read is material to work from, and its language and layout belong to its own readers. The skills rule applies again when the work has moved to another kind.'
 
 export const TOOL_REMINDER_EVERY = 10
 
