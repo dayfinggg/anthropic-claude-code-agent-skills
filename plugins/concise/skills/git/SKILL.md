@@ -1,6 +1,6 @@
 ---
 name: git
-description: Structures git workflow practices and pull request bodies. Use it when committing, branching, pushing, or resolving conflicts. Use it when splitting uncommitted work into clean atomic commits, or when organizing parallel streams of work. Use it when opening or writing a pull request (PR). Use it when cutting a release, choosing a semantic version bump, tagging, or writing a changelog. Use it for a commit message, a PR description, or a changelog entry. This holds even when the diff is pasted inline and the message looks easy to write.
+description: Structures git workflow and pull request bodies. Use it when committing, branching, pushing, resolving conflicts, splitting uncommitted work into atomic commits, opening a pull request (PR), or cutting a release with a version bump, a tag, or a changelog. Use it for a commit message, a PR description, or a changelog entry, even when the diff is pasted inline and the message looks easy to write.
 ---
 
 <overview>
