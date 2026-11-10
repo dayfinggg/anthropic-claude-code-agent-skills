@@ -1,6 +1,6 @@
 ---
 name: agentdocs
-description: Guides the writing of documents that agents read, so each run takes the same process. Use when creating or editing a skill, its description, or its reference files. Use when writing or modifying AGENTS.md, CLAUDE.md, a rule file, or a doc that an agent reaches through a pointer.
+description: Guides the writing and audit of documents that agents read. Use when creating, editing, or reviewing a skill, its description, or its reference files, and when writing or modifying AGENTS.md, CLAUDE.md, a rule file, or a doc that an agent reaches through a pointer.
 ---
 
 <overview>
@@ -15,7 +15,7 @@ A context pointer is a reference in the agent's context that names out-of-contex
 A pointer does two jobs. It states what the material is, and it lists the branches that should trigger reaching it. A branch is a distinct case the document handles, so different runs take different paths through it. Every word of an always-loaded pointer costs on every turn, so prune it even harder than the body.
 - Front-load the leading word, because the pointer is where it does its triggering work.
 - Write one trigger per branch. Synonyms that rename one branch are that branch written twice. Collapse them and keep only distinct branches.
-- Cut identity that the body already carries.
+- Keep what the material does and when to reach it, and cut everything else, because the body carries the rest.
 </context_pointers>
 
 <the_two_loads>
@@ -23,7 +23,7 @@ Every document and pointer you add spends one of two budgets.
 - Context load is the cost of always-loaded material on the agent's window. It covers an `AGENTS.md` line, a skill description, and anything else in context every turn. It spends tokens and attention whether or not it fires.
 - Cognitive load is the cost on the human, who must know which documents exist and when to reach for each. The human is the index. This cost is the price of human agency, not a cost to minimize. Spend it where human judgment matters, and remove it where it does not.
 
-Material reached only through a pointer escapes context load, at the price of the pointer's own line. Material with no pointer at all rides entirely on cognitive load.
+Material reached only through a pointer stays out of context until the pointer fires, at the price of the pointer's own line. Material with no pointer at all rides entirely on cognitive load.
 </the_two_loads>
 
 <information_hierarchy>
@@ -79,9 +79,17 @@ Hunt for chances to refactor with leading words. Typical candidates are a triad 
 You win twice, with fewer tokens and a sharper hook for the agent's thinking. Assume every document carries restatements that leading words could retire, and go find them.
 
 <negation>
-Negation is the failure mode beside this lever. Steering by prohibition drags the forbidden behavior into context and makes it more available, not less. Tell someone not to think of an elephant, and the elephant is all there is. The negation is a weak modifier that the strongly activated concept overruns. So the ban half-reads as an instruction to do the thing. Prompt the positive instead. State the target behavior, as in "write one-line comments," so the banned one is never spoken. A prohibition earns its place only as a hard guardrail you cannot phrase positively. Even then, pair it with the positive target and give its reason, so attention lands on what to do.
+A prohibition alone leaves the agent without a target. State the behavior you want first, as in "write one-line comments," and add a prohibition where a guardrail needs one. Give the prohibition its scope and its reason, so the agent applies it where it belongs and not everywhere. Current models follow a ban closely, so a ban without a scope spreads to cases it was never meant for.
 </negation>
 </leading_words>
+
+<conflicts_and_exceptions>
+Two rules that pull against each other cost more than a missing rule, because the agent must weigh them on every run and one of them loses. Before you add a rule, search the documents the agent loads for a rule that pulls the other way, and reconcile the two in one place.
+- Write an exception inside the rule it limits. A separate line that grants the exception changes little.
+- Give a rule that orders work a condition tied to the size or risk of the task. An unconditional order runs on every task, however small.
+- Write the document in the style you want back, because the layout of a prompt carries into the output.
+- Word a reminder that a hook adds as a statement of fact. Text framed as a command from outside the conversation can be read as an injection.
+</conflicts_and_exceptions>
 
 <pruning>
 Five habits keep a document lean.
