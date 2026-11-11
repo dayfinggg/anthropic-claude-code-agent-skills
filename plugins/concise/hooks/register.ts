@@ -13,6 +13,7 @@ import {
   OUTPUT_STYLE_ATTACHMENT,
   REMOVED_SECTIONS,
   REPLY_REMINDER,
+  REPORT_FILE,
   SECTION_REWRITES,
   SHELL_OVER_TOOLS,
   SOURCE_LIST_RULES,
@@ -40,16 +41,14 @@ const languagePhrase = async ($: EngineInterface, fallback: string) => {
 const withLanguage = async ($: EngineInterface, text: string, fallback = LANGUAGE_FALLBACK) =>
   text.replaceAll(LANGUAGE_PLACEHOLDER, await languagePhrase($, fallback))
 
-const readStyle = async ($: EngineInterface, fallback?: string) =>
-  withLanguage($, await readInstruction($, STYLE_FILE), fallback)
+const readStyle = async ($: EngineInterface) => withLanguage($, await readInstruction($, STYLE_FILE))
 
 const subagentTask = async ($: EngineInterface, task: string) => {
-  const [preface, style, work] = await Promise.all([
-    withLanguage($, SUBAGENT_PREFACE, SUBAGENT_LANGUAGE_FALLBACK),
-    readStyle($, SUBAGENT_LANGUAGE_FALLBACK),
+  const [work, report] = await Promise.all([
     readInstruction($, WORK_FILE),
+    readInstruction($, REPORT_FILE).then(text => withLanguage($, text, SUBAGENT_LANGUAGE_FALLBACK)),
   ])
-  return `<main_session_instructions>\n${preface}\n\n${style}\n\n${work}\n</main_session_instructions>\n\n<task>\n${task}\n</task>`
+  return `<main_session_instructions>\n${SUBAGENT_PREFACE}\n\n${work}\n</main_session_instructions>\n\n<task>\n${task}\n</task>\n\n${report}`
 }
 
 export const register: Register = on => {

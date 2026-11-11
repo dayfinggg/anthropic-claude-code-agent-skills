@@ -34,12 +34,12 @@ The brief rules below follow current Claude guidance, so a brief to a Claude sub
 <brief>
 The agent sees only the brief, so give the whole task once and precisely. Write it in English unless the task needs another language. Every brief covers these parts.
 1. Goal and finish line. State what is wrong or wanted. Say what done looks like, such as "the suite passes 30 runs in a row".
-2. Context. Give exact paths, the relevant facts you already know, and what you ruled out. Pass long material as file paths, not pasted text.
+2. Context. Give exact paths, the relevant facts you already know, and what you ruled out. Pass long material as file paths, not pasted text. Quote the user's request once, in its own words and without a translation.
 3. Scope. Name the files or modules the agent owns, and what it must not touch.
-4. Rules. A native subagent receives the working rules, the writing rules, and the report contract through the plugin's hook. For an agent of another provider, name the working rules at `../../instructions/work.md` and the writing rules at `../../instructions/style.md`, relative to this skill. Give each as an absolute path. Name the skills that fit the task.
+4. Rules. A native subagent receives the working rules and the report contract through the plugin's hook, so the brief does not repeat them. When the agent will write a document or a message for people, name the writing rules at `../../instructions/style.md`, relative to this skill, as an absolute path. For an agent of another provider, name that file, the working rules at `../../instructions/work.md`, and the report contract at `../../instructions/report.md` the same way. Name the skills that fit the task.
 5. Proof. Say which check proves the work, such as a command, a test, or a screenshot. Ask the agent to report any check it could not run.
 6. Stop conditions and caps. The agent asks only when it cannot continue, or before a destructive or external action. It works through ordinary obstacles such as errors and timeouts, and it reports a deliberate barrier, such as denied access, instead of working around it. Give it a cap on turns or spend where the runtime offers one, and name who approves the result.
-7. Return contract. Ask for a short report in plain paragraphs that opens with the outcome, gives evidence with file and line, and marks unverified claims. Name the length you need, and the language when it should differ from the user's. Ask for long material as a file path, not as report text.
+7. Return contract. The report contract already asks for a plain report in the user's language that opens with the outcome, gives evidence with file and line, and marks unverified claims. Say only what the report must contain and the length you need, and name another language only when the report itself must be in it. Ask for long material as a file path, not as report text.
 
 Keep the brief at the level of goals and checks. Overly specific steps or "stop for review" lines make current models end early or over-ask.
 </brief>
