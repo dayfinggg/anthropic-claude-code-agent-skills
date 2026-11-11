@@ -13,6 +13,8 @@ The framework reference files hold rules that this file does not repeat. The dep
 - In a Django project, read [django.md](references/django.md). It covers Django 5.2 LTS, 6.0, and 6.1 facts and access control for views, Django REST framework, and the admin.
 - For a Django performance review, or work on slow views and querysets, read [django-performance.md](references/django-performance.md). It finds N+1 queries, unbounded querysets, and missing indexes, and it validates each finding before it reports.
 - In a FastAPI project, read [fastapi.md](references/fastapi.md). It covers the FastAPI releases up to 0.162, dependencies, lifespan, request and response models, streaming, security, and testing.
+
+Every other rule of this file holds for any Python code. A project on another framework follows that code's existing patterns and the framework's documentation for the installed version.
 </framework_references>
 
 <python_versions>
