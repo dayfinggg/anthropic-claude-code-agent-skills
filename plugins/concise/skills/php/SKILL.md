@@ -23,7 +23,7 @@ Every other rule of this file holds for any PHP code. A project on another frame
 </framework_references>
 
 <php_versions>
-PHP 8.5 is the current stable release. PHP 8.6 is at RC5 and its general availability is planned for November 19, 2026. Each branch gets 2 years of active support and 2 more years of security fixes, as [php.net](https://www.php.net/supported-versions.php) lists.
+On November 11, 2026, PHP 8.5 was the newest stable branch and PHP 8.6 was at RC5, with general availability planned for November 19, 2026. Each branch gets 2 years of active support and 2 more years of security fixes, as [php.net](https://www.php.net/supported-versions.php) lists.
 
 | Branch | Released | Active support until | Security fixes until |
 | --- | --- | --- | --- |
@@ -63,7 +63,7 @@ PHP 8.5 deprecates the backtick operator, the casts `(boolean)`, `(integer)`, `(
 </php_8_5>
 
 <php_8_6>
-PHP 8.6 is not released yet, so use its features only in a project that already requires 8.6. Its [UPGRADING](https://github.com/php/php-src/blob/PHP-8.6/UPGRADING) file lists these changes.
+Use PHP 8.6 features only in a project that already requires 8.6. Its [UPGRADING](https://github.com/php/php-src/blob/PHP-8.6/UPGRADING) file lists these changes.
 - Partial function application creates a closure with `?` for one missing argument and `...` for the rest.
 - `clamp()` limits a value to a range.
 - Readonly properties can declare default values.
@@ -85,7 +85,7 @@ The shared format is [PER Coding Style 3.1](https://www.php-fig.org/per/coding-s
 </code_style>
 
 <composer>
-Composer manages dependencies and autoloading. The current release is 2.11.
+Composer manages dependencies and autoloading. The current release in November 2026 is 2.11.
 - Add a package with `composer require vendor/package`, and a dev tool with `composer require --dev vendor/package`. Never edit `composer.lock` by hand.
 - Install from the lockfile with `composer install`, and in CI or production add `--no-dev --optimize-autoloader` where the project deploys that way.
 - Update one package with `composer update vendor/package --with-dependencies`. Add `--minimal-changes` to keep the other locked versions.

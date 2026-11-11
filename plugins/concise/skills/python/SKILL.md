@@ -25,7 +25,7 @@ Python 3.15 adds these features, as [What's New in 3.15](https://docs.python.org
 - UTF-8 is the default encoding when no `encoding` argument is given (PEP 686). `PYTHONUTF8=0` or `-X utf8=0` restores the locale encoding.
 - `frozendict` is a built-in immutable mapping (PEP 814), and `sentinel` creates unique sentinel values (PEP 661).
 - Comprehensions accept unpacking, as in `[*xs for xs in lists]` (PEP 798).
-- The `profiling` package adds the `profiling.sampling` profiler and `profiling.tracing`, which replaces `cProfile` (PEP 799).
+- The `profiling` package adds the `profiling.sampling` profiler and `profiling.tracing`, the new home of `cProfile`, which stays as an alias (PEP 799). The `profile` module is deprecated.
 - Typing adds `TypedDict` with `extra_items` and `closed` (PEP 728), `TypeForm` (PEP 747), and disjoint bases (PEP 800).
 
 Python 3.14 adds these features, as [What's New in 3.14](https://docs.python.org/3/whatsnew/3.14.html) lists.
@@ -49,7 +49,7 @@ Modern Python code uses these defaults where the project has no other convention
 </modern_code>
 
 <uv>
-uv is the package and project manager from Astral. It replaces pip, pip-tools, pipx, pyenv, virtualenv, and Poetry. The current release is 0.13. Use uv when the project has `uv.lock` or a `[tool.uv]` table. A uv header in `requirements*.txt` files also shows it. Do not use uv in a project that Poetry or PDM manages, which `poetry.lock` or `pdm.lock` shows. Use that tool instead.
+uv is the package and project manager from Astral. It replaces pip, pip-tools, pipx, pyenv, virtualenv, and Poetry. The current release in November 2026 is 0.13. Use uv when the project has `uv.lock` or a `[tool.uv]` table. A uv header in `requirements*.txt` files also shows it. Do not use uv in a project that Poetry or PDM manages, which `poetry.lock` or `pdm.lock` shows. Use that tool instead.
 
 A project has `pyproject.toml` or `uv.lock`, and these commands manage it.
 - `uv init` creates a new project. By default it uses a `src` layout and the `uv_build` build backend.
@@ -101,7 +101,7 @@ The [uv documentation index](https://docs.astral.sh/uv/llms.txt) links to a page
 </uv>
 
 <ruff>
-Ruff is Astral's linter and formatter. It replaces Flake8, isort, Black, pyupgrade, and autoflake. The current release is 0.17. Use it when the project has a `[tool.ruff]` table, a `ruff.toml`, or a `.ruff.toml` file. Run `uv run ruff` when ruff is a project dependency, so that the pinned version runs. Run `uvx ruff` when it is not a dependency.
+Ruff is Astral's linter and formatter. It replaces Flake8, isort, Black, pyupgrade, and autoflake. The current release in November 2026 is 0.17. Use it when the project has a `[tool.ruff]` table, a `ruff.toml`, or a `.ruff.toml` file. Run `uv run ruff` when ruff is a project dependency, so that the pinned version runs. Run `uvx ruff` when it is not a dependency.
 
 Keep ruff's changes inside the task. If `ruff format --diff` changes a whole file, the project does not format with ruff. Leave that file unformatted. `ruff check --diff` shows the fixes for the code you change. Apply fixes only to the files you modify, unless the user asks for more.
 
@@ -155,7 +155,7 @@ ty fails on warnings by default, and `error-on-warning = false` under `[tool.ty.
 </type_checking>
 
 <pytest>
-pytest is the default test runner, and its current release is 9.2. It needs Python 3.10 or later. Run one test with `uv run pytest tests/test_users.py::test_create -q`. The `tdd` and `testing` skills cover test design.
+pytest is the default test runner, and its current release in November 2026 is 9.2. It needs Python 3.10 or later. Run one test with `uv run pytest tests/test_users.py::test_create -q`. The `tdd` and `testing` skills cover test design.
 
 pytest 9 changed these behaviors, as the [changelog](https://docs.pytest.org/en/stable/changelog.html) shows.
 - Configuration can use native TOML in a `[tool.pytest]` table, or in a `[pytest]` table in `pytest.toml`. The older `[tool.pytest.ini_options]` table still works, but a project cannot use both.

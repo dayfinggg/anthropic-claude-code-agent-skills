@@ -144,19 +144,19 @@ const cache = createCache({
 Manual invalidation works per entry, per function, or for the whole cache. The three calls below do each in that order.
 
 ```typescript
-await cache.invalidate('getUser', '123');
+await cache.clear('getUser', '123');
 
 await cache.clear('getUser');
 
 await cache.clear();
 ```
 
-Reference-based invalidation tags entries with references and then clears every entry that carries a reference. Here `invalidateAll` clears both cached functions for user 123.
+Reference-based invalidation tags entries with references and then clears every entry that carries a reference. It is off by default, so the storage options turn it on. Here `invalidateAll` clears both cached functions for user 123.
 
 ```typescript
 const cache = createCache({
   ttl: 60,
-  storage: { type: 'memory' },
+  storage: { type: 'memory', options: { invalidation: true } },
 });
 
 cache.define('getUser', {
