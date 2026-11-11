@@ -81,7 +81,7 @@ Skill database.
 <credits>
 This skill merges three MIT-licensed sources. Each text was edited to match the plugin's style. Outdated facts were corrected against the official PostgreSQL and MySQL documentation.
 
-The core of `../SKILL.md` comes from the `safe-migrations` skill by nuttakulsv at [github.com/nuttakulsv/safe-migrations](https://github.com/nuttakulsv/safe-migrations). It supplies the dangerous operations, safe rewrites, lock timeouts, expand and contract, and batched backfills. It also supplies the ORM traps, the commands never to run, and the migration report. Its `credits.md` file is copied unchanged as `credits.md` in this folder.
+The core of `../SKILL.md` comes from the `safe-migrations` skill by nuttakulsv at [github.com/nuttakulsv/safe-migrations](https://github.com/nuttakulsv/safe-migrations). It supplies the dangerous operations, safe rewrites, lock timeouts, expand and contract, and batched backfills. It also supplies the ORM traps, the commands never to run, and the migration report. Its license text is copied unchanged below.
 
 The files `postgres-schema.md`, `postgres-queries.md`, and `postgres-operations.md` come from the `supabase-postgres-best-practices` skill by Supabase at [github.com/supabase/agent-skills](https://github.com/supabase/agent-skills). Supabase-specific notes were removed, and several rule files were merged or left out.
 
@@ -143,7 +143,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-The safe-migrations source carries the same MIT text with the line "Copyright (c) 2026 nuttakulsv", in `credits.md`.
+The safe-migrations source carries the same MIT text with the line "Copyright (c) 2026 nuttakulsv", copied below.
 </licenses>
 
 Upstream redistribution terms follow.
@@ -258,7 +258,7 @@ SOFTWARE.
 
 Skill git.
 
-`../SKILL.md` is adapted from the [`git-workflow-and-versioning`](https://github.com/addyosmani/agent-skills/tree/main/skills/git-workflow-and-versioning) skill by Addy Osmani. It is under the MIT License, Copyright (c) 2025 Addy Osmani, in the `credits.md` file of this folder. The commit, message, pre-commit, and release rules come from that skill. The sections on trunk-based development, change size, branch names, worktrees, and git commands for history search were removed, because they restate common practice or set a convention where the project's own applies. The rules on the project's convention, commands that discard work, conflicts, and staging without an interactive prompt are original to this plugin.
+`../SKILL.md` is adapted from the [`git-workflow-and-versioning`](https://github.com/addyosmani/agent-skills/tree/main/skills/git-workflow-and-versioning) skill by Addy Osmani. It is under the MIT License, Copyright (c) 2025 Addy Osmani, with the full text below. The commit, message, pre-commit, and release rules come from that skill. The sections on trunk-based development, change size, branch names, worktrees, and git commands for history search were removed, because they restate common practice or set a convention where the project's own applies. The rules on the project's convention, commands that discard work, conflicts, and staging without an interactive prompt are original to this plugin.
 
 `pull-requests.md` is adapted from the [`pr`](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) skill by Matt Pocock. It is under the MIT License, Copyright (c) 2026 Matt Pocock, with the full text below.
 
@@ -401,7 +401,7 @@ Skill javascript.
 <sources>
 The four reference files and the impact ranking in `../SKILL.md` come from the `react-best-practices` skill in [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices) by Vercel. This skill merges its `../SKILL.md` and a selection of its `rules/` files, restyled for this plugin. Rules about Next.js or Vercel platform features were left out. The Next.js package now ships its own version-matched docs.
 
-The repository has no LICENSE file. Its `README.md` names the license in lines 214-216, where the section `## License` holds the single word `MIT`. The frontmatter of the skill's `../SKILL.md` also says `license: MIT`. The `credits.md` file in this folder therefore holds the standard MIT text, copied with Vercel as the copyright holder.
+The repository has no LICENSE file. Its `README.md` names the license in lines 214-216, where the section `## License` holds the single word `MIT`. The frontmatter of the skill's `../SKILL.md` also says `license: MIT`. This section therefore holds the standard MIT text below, copied with Vercel as the copyright holder.
 
 The `project_first`, `boundary`, `nextjs`, `react`, and `ecmascript` sections of `../SKILL.md` are original text from this plugin. The plugin is licensed under MIT.
 </sources>
@@ -437,7 +437,7 @@ Skill node.
 <sources>
 This skill merges two sources.
 
-The skill body, the rule files in `rules/`, and the scripts in `rules/assets/` come from the `node` skill in [mcollina/skills](https://github.com/mcollina/skills). Matteo Collina holds the copyright under the MIT license in [LICENSE](credits.md). The text was restyled for this plugin, and outdated facts were corrected against the official Node.js and package docs. The rule files on async patterns, performance, `node_modules` exploration, and flaky tests were removed, and so were the sections of the other files that restate common practice, because current models already apply them. The module rules moved into `node-lts.md`, and the `node:test` options for flaky runs moved into `testing.md`.
+The skill body, the rule files in `rules/`, and the scripts in `rules/assets/` come from the `node` skill in [mcollina/skills](https://github.com/mcollina/skills). Matteo Collina holds the copyright under the MIT license, with the full text below. The text was restyled for this plugin, and outdated facts were corrected against the official Node.js and package docs. The rule files on async patterns, performance, `node_modules` exploration, and flaky tests were removed, and so were the sections of the other files that restate common practice, because current models already apply them. The module rules moved into `node-lts.md`, and the `node:test` options for flaky runs moved into `testing.md`.
 
 The facts in `node-lts.md` were selected from the `nodejs-knowledge-patch` in [nevaberry/nevaberry-plugins](https://github.com/nevaberry/nevaberry-plugins). Nevaberry holds the copyright under the MIT license below. An LLM extracted that patch, so every kept fact was checked against nodejs.org or the Node.js release repository. Facts that could not be confirmed were left out.
 </sources>
@@ -499,9 +499,9 @@ SOFTWARE.
 Skill php.
 
 <sources>
-The Laravel reference files come from [laravel/boost](https://github.com/laravel/boost) by Taylor Otwell, under the MIT license in `credits.md`. The files `laravel.md`, `laravel-database.md`, `laravel-http.md`, `laravel-async.md`, and `laravel-app.md` adapt the `laravel-best-practices` skill and its 20 rule files. The files `laravel-testing.md` and `laravel-testing-data.md` adapt the `testing-best-practices` skill and its 9 rule files. Parts of `.ai/laravel/core.blade.php`, `.ai/laravel/12/core.blade.php`, `.ai/laravel/11/core.blade.php`, `.ai/pint/core.blade.php`, `.ai/pest/core.blade.php`, and `.ai/phpunit/core.blade.php` are also included.
+The Laravel reference files come from [laravel/boost](https://github.com/laravel/boost) by Taylor Otwell, under the MIT license, with the full text below. The files `laravel.md`, `laravel-database.md`, `laravel-http.md`, `laravel-async.md`, and `laravel-app.md` adapt the `laravel-best-practices` skill and its 20 rule files. The files `laravel-testing.md` and `laravel-testing-data.md` adapt the `testing-best-practices` skill and its 9 rule files. Parts of `.ai/laravel/core.blade.php`, `.ai/laravel/12/core.blade.php`, `.ai/laravel/11/core.blade.php`, `.ai/pint/core.blade.php`, `.ai/pest/core.blade.php`, and `.ai/phpunit/core.blade.php` are also included.
 
-The Symfony reference files come from [makfly/superpowers-symfony](https://github.com/makfly/superpowers-symfony), under the MIT license in `credits.md`. That license names no copyright holder beyond the year 2024. The file `symfony.md` merges the skills interfaces-and-autowiring, symfony-messenger, form-types-validation, symfony-voters, value-objects-and-dtos, and quality-checks, with short parts of messenger-retry-failures and controller-cleanup. The file `symfony-doctrine.md` merges doctrine-relations and doctrine-fetch-modes, with short parts of doctrine-batch-processing and doctrine-transactions.
+The Symfony reference files come from [makfly/superpowers-symfony](https://github.com/makfly/superpowers-symfony), under the MIT license, with the full text below. That license names no copyright holder beyond the year 2024. The file `symfony.md` merges the skills interfaces-and-autowiring, symfony-messenger, form-types-validation, symfony-voters, value-objects-and-dtos, and quality-checks, with short parts of messenger-retry-failures and controller-cleanup. The file `symfony-doctrine.md` merges doctrine-relations and doctrine-fetch-modes, with short parts of doctrine-batch-processing and doctrine-transactions.
 
 The PHP language facts in `../SKILL.md` start from `.ai/php/core.blade.php`, `.ai/php/8.4/core.blade.php`, and `.ai/php/8.5/core.blade.php` in laravel/boost. The rest of `../SKILL.md` is new text, checked against php.net, php-fig.org, phpunit.de, phpstan.org, getrector.com, and the Composer releases.
 </sources>
@@ -621,11 +621,11 @@ SOFTWARE.
 Skill python.
 
 <sources>
-The uv, ruff, and ty sections of `../SKILL.md` come from three skills by Astral Software Inc. They are `uv`, `ruff`, and `ty` in [astral-sh/claude-code-plugins](https://github.com/astral-sh/claude-code-plugins). That repository is licensed MIT or Apache-2.0, and this skill uses it under the MIT license in `credits.md`.
+The uv, ruff, and ty sections of `../SKILL.md` come from three skills by Astral Software Inc. They are `uv`, `ruff`, and `ty` in [astral-sh/claude-code-plugins](https://github.com/astral-sh/claude-code-plugins). That repository is licensed MIT or Apache-2.0, and this skill uses it under the MIT license, with the full text below.
 
-The file `django-performance.md` comes from the `django-perf-review` skill in [getsentry/skills](https://github.com/getsentry/skills) by Functional Software, Inc. (Sentry). It is licensed under Apache-2.0, with the full text in `credits.md`. The source has no NOTICE file.
+The file `django-performance.md` comes from the `django-perf-review` skill in [getsentry/skills](https://github.com/getsentry/skills) by Functional Software, Inc. (Sentry). It is licensed under Apache-2.0, with the full text below. The source has no NOTICE file.
 
-Candidate facts came from the knowledge patches in [nevaberry/nevaberry-plugins](https://github.com/nevaberry/nevaberry-plugins) by Nevaberry. They are under the MIT license in `credits.md`. They fed `django.md`, `fastapi.md`, and the Python and pytest version parts of `../SKILL.md`. Those patches are extracted by a language model. Every kept fact was checked against docs.python.org, docs.djangoproject.com, django-rest-framework.org, fastapi.tiangolo.com, or docs.pytest.org, and the text is new.
+Candidate facts came from the knowledge patches in [nevaberry/nevaberry-plugins](https://github.com/nevaberry/nevaberry-plugins) by Nevaberry. They are under the MIT license, with the full text below. They fed `django.md`, `fastapi.md`, and the Python and pytest version parts of `../SKILL.md`. Those patches are extracted by a language model. Every kept fact was checked against docs.python.org, docs.djangoproject.com, django-rest-framework.org, fastapi.tiangolo.com, or docs.pytest.org, and the text is new.
 
 The access control section of `django.md` is new text based on the Django and Django REST framework documentation.
 </sources>
@@ -885,7 +885,7 @@ Apache License
 
 Skill research.
 
-This skill merges three sources. Each one is under the MIT License, and `credits.md` holds the license text with all three copyright lines.
+This skill merges three sources. Each one is under the MIT License, and the license text below carries all three copyright lines.
 
 The base is the [`source-driven-development`](https://github.com/addyosmani/agent-skills/tree/main/skills/source-driven-development) skill by Addy Osmani, at revision `301b02b12bff98e4688e6984af6556802322bbde`. It gives the version detection, the docs fetching, the source ranking, the untrusted content rules, and the citation rules. The rationalizations table, the verification checklist, the list of situations, the table of dependency files, the red flags, and the link to `security-and-hardening` were removed. The advice to cite sources in code comments was removed too. The text was rewritten to the plugin's style.
 
@@ -981,7 +981,7 @@ SOFTWARE.
 
 Skill testing.
 
-This skill merges several sources. The MIT sources share the license text in `credits.md`, which lists each copyright line. The Apache-2.0 sources keep their own license files in `credits.md` and `credits.md`.
+This skill merges several sources. The MIT sources share the license text below, which lists each copyright line. The Apache-2.0 sources keep their own license texts after it.
 
 `good-tests.md` is adapted from [`writing-good-tests.md`](https://github.com/obra/superpowers/blob/main/skills/test-driven-development/writing-good-tests.md) in obra/superpowers by Jesse Vincent, under MIT, at revision `22f0b463e7a5e579904dd6211a520321035526f7`. The link to `writing-skills` and the "your human partner" lines were removed. The quick reference table and the section on shipping tests with each change were removed too. The mirror assertion example was removed, because the `tdd` skill already covers tautological tests. Three warning signs come from `references/testing-patterns.md` in addyosmani/agent-skills.
 
@@ -1445,7 +1445,7 @@ Skill typescript.
 
 This skill merges two MIT-licensed sources.
 
-The workflow in `../SKILL.md` comes from the `typescript-magician` skill in [mcollina/skills](https://github.com/mcollina/skills) by Matteo Collina. Its license is in the `credits.md` file of this folder. The text was restyled for this plugin. The 14 technique files of that skill and its two quick examples were removed, because they explain language features that current models already know.
+The workflow in `../SKILL.md` comes from the `typescript-magician` skill in [mcollina/skills](https://github.com/mcollina/skills) by Matteo Collina. Its license text is below. The text was restyled for this plugin. The 14 technique files of that skill and its two quick examples were removed, because they explain language features that current models already know.
 
 The facts in `typescript-6-7.md` come from the `typescript-knowledge-patch` in [nevaberry/nevaberry-plugins](https://github.com/nevaberry/nevaberry-plugins) by Nevaberry. That patch was extracted by a language model. Each kept fact was checked against the TypeScript release notes on typescriptlang.org, the TypeScript blog, or the microsoft/typescript-go repository. Facts that could not be confirmed were left out. The license of that source follows.
 
