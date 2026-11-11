@@ -2,6 +2,8 @@ export const STYLE_FILE = 'style.md'
 
 export const WORK_FILE = 'work.md'
 
+export const REPORT_FILE = 'report.md'
+
 export const CODING_SECTION = 'doing_tasks'
 
 export const REMOVED_SECTIONS = ['communication', 'tone', 'willow_tern']
@@ -70,7 +72,7 @@ export const REPLY_REMINDER =
 export const SUBAGENT_LANGUAGE_FALLBACK = 'in the language of your task'
 
 export const SUBAGENT_PREFACE =
-  "The user's standing instructions follow and bind your work as they bind the main session. Your final report goes to the agent that launched you, and that agent writes the reply to the user. Your task counts as the user's request for that report, so a form, length, or language it names wins over the writing rules below. Where it names none, write the report {language} under those rules."
+  "The user's standing working rules follow and bind your work as they bind the main session. Your task comes after them, and the contract for your report comes last."
 
 export const COMPACT_INSTRUCTIONS =
   "Keep in the summary, stated exactly, everything the user asked for, decided, ruled out, or set as a preference, constraint, or boundary. Keep every difficulty that came up and how it was handled, every approach that was tried or set aside and why, exactly where the work stands, everything still open or promised, and the details that would be hard to reconstruct, such as names, numbers, dates, paths, commands, exact wording, and links. Keep what the user said close to their own words, and keep from the assistant's own turns only what it concluded or produced. Also list the skills that were loaded and the checks that were run with their results, and state the language of the replies."
