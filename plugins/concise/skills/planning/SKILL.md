@@ -15,7 +15,7 @@ Before you write any code, work in read-only mode.
 - Map the dependencies between components.
 - Note risks and unknowns.
 
-Write no code during planning. The output is a plan document and a task list in the task list target, not implementation. The `output_files` block describes both.
+Write no code during planning. The output is a plan document and a task list in the task list target, not implementation. The `output_files` block describes both. When the user asked for the work itself and not only for a plan, start the first task as soon as the plan is written, because the plan is a step of that work and needs no approval of its own.
 </read_only_first>
 
 <vertical_slices>
