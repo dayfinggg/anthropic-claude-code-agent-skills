@@ -3,7 +3,6 @@ import {
   CODING_SECTION,
   COMPACT_INSTRUCTIONS,
   DEFERRED_TOOLS,
-  DELEGATION_TOOLS,
   HEREDOC_DENIAL,
   HEREDOC_WRITE,
   LANGUAGE_ATTACHMENT,
@@ -20,13 +19,9 @@ import {
   STYLE_FILE,
   SUBAGENT_LANGUAGE_FALLBACK,
   SUBAGENT_PREFACE,
-  TOOL_REMINDER_EVERY,
-  TOOL_RESULT_REMINDER,
   TOOL_RULES,
   WORK_FILE,
 } from './config'
-
-let toolCallsThisTurn = 0
 
 const writesFileWithHeredoc = (command: string) =>
   (command.split('\n')[0] ?? '').split(/&&|\|\||;/).some(segment => HEREDOC_WRITE.test(segment))
@@ -93,22 +88,9 @@ export const register: Register = on => {
     writesFileWithHeredoc(e.command) ? { deny: `${$.plugin.name}: ${HEREDOC_DENIAL}` } : next(e),
   ).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the heredoc guard failed.` }))
 
-  on('turn.start', ($, e, next) => {
-    if (!e.agentId) toolCallsThisTurn = 0
-    return next(e)
-  })
-
   on('session.compact', ($, e, next) =>
     next({ ...e, instructions: [e.instructions, COMPACT_INSTRUCTIONS].filter(Boolean).join('\n\n') }),
   )
-
-  on('tool.call', async ($, e, next) => {
-    const result = await next(e)
-    if (e.agentId || 'deny' in result) return result
-    toolCallsThisTurn += 1
-    if (toolCallsThisTurn % TOOL_REMINDER_EVERY !== 0 && !DELEGATION_TOOLS.includes(e.tool)) return result
-    return { ...result, context: [...(result.context ?? []), await withLanguage($, TOOL_RESULT_REMINDER)] }
-  }).catch(($, e, next) => next(e))
 
   on('session.append', { door: 'tool-result' }, ($, e, next) => {
     if (e.origin.kind !== 'tool' || e.origin.tool !== 'WebSearch') return next(e)
