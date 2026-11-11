@@ -258,7 +258,7 @@ SOFTWARE.
 
 Skill git.
 
-`../SKILL.md` is adapted from the [`git-workflow-and-versioning`](https://github.com/addyosmani/agent-skills/tree/main/skills/git-workflow-and-versioning) skill by Addy Osmani. It is under the MIT License, Copyright (c) 2025 Addy Osmani, in the `credits.md` file of this folder.
+`../SKILL.md` is adapted from the [`git-workflow-and-versioning`](https://github.com/addyosmani/agent-skills/tree/main/skills/git-workflow-and-versioning) skill by Addy Osmani. It is under the MIT License, Copyright (c) 2025 Addy Osmani, in the `credits.md` file of this folder. The commit, message, pre-commit, and release rules come from that skill. The sections on trunk-based development, change size, branch names, worktrees, and git commands for history search were removed, because they restate common practice or set a convention where the project's own applies. The rules on the project's convention, commands that discard work, conflicts, and staging without an interactive prompt are original to this plugin.
 
 `pull-requests.md` is adapted from the [`pr`](https://github.com/mattpocock/skills/tree/main/skills/engineering/pr) skill by Matt Pocock. It is under the MIT License, Copyright (c) 2026 Matt Pocock, with the full text below.
 
@@ -437,7 +437,7 @@ Skill node.
 <sources>
 This skill merges two sources.
 
-The skill body, the rule files in `rules/`, and the scripts in `rules/assets/` come from the `node` skill in [mcollina/skills](https://github.com/mcollina/skills). Matteo Collina holds the copyright under the MIT license in [LICENSE](credits.md). The text was restyled for this plugin, and outdated facts were corrected against the official Node.js and package docs.
+The skill body, the rule files in `rules/`, and the scripts in `rules/assets/` come from the `node` skill in [mcollina/skills](https://github.com/mcollina/skills). Matteo Collina holds the copyright under the MIT license in [LICENSE](credits.md). The text was restyled for this plugin, and outdated facts were corrected against the official Node.js and package docs. The rule files on async patterns, performance, `node_modules` exploration, and flaky tests were removed, and so were the sections of the other files that restate common practice, because current models already apply them. The module rules moved into `node-lts.md`, and the `node:test` options for flaky runs moved into `testing.md`.
 
 The facts in `node-lts.md` were selected from the `nodejs-knowledge-patch` in [nevaberry/nevaberry-plugins](https://github.com/nevaberry/nevaberry-plugins). Nevaberry holds the copyright under the MIT license below. An LLM extracted that patch, so every kept fact was checked against nodejs.org or the Node.js release repository. Facts that could not be confirmed were left out.
 </sources>
@@ -631,7 +631,7 @@ The access control section of `django.md` is new text based on the Django and Dj
 </sources>
 
 <changes>
-The astral skills were merged into one `../SKILL.md`. Code comments became prose, and the migration arrows became tables. The rule to use ty, ruff, and uv everywhere now yields to the project's existing tools. The ty example uses current rule names and defaults, and version numbers were updated to November 2026.
+The astral skills were merged into one `../SKILL.md`. Code comments became prose, the replacement arrows became a table, and the list of pyenv, pipx, and pip equivalents became one sentence. The rule to use ty, ruff, and uv everywhere now yields to the project's existing tools. The ty example uses current rule names and defaults, and version numbers were updated to November 2026.
 
 The Sentry file was changed in these ways. Its frontmatter, including `allowed-tools`, was removed. Headings, bold text, ALL-CAPS severity labels, and checkbox lists became XML sections, prose, and plain lists. Code comments moved into the prose, and the template part of the N+1 example moved into its own block. The Markdown report template was rewritten as prose that fits the plugin's output style. A `ForeignKey` example gained the required `on_delete` argument. One sentence on the Django 6.1 `fetch_mode()` API was added, and fetch modes joined the search for existing optimizations.
 </changes>
@@ -887,9 +887,9 @@ Skill research.
 
 This skill merges three sources. Each one is under the MIT License, and `credits.md` holds the license text with all three copyright lines.
 
-The base is the [`source-driven-development`](https://github.com/addyosmani/agent-skills/tree/main/skills/source-driven-development) skill by Addy Osmani, at revision `301b02b12bff98e4688e6984af6556802322bbde`. It gives the version detection, the docs fetching, the source ranking, the untrusted content rules, and the citation rules. The rationalizations table, the verification checklist, and the link to `security-and-hardening` were removed. The advice to cite sources in code comments was removed too. The text was rewritten to the plugin's style.
+The base is the [`source-driven-development`](https://github.com/addyosmani/agent-skills/tree/main/skills/source-driven-development) skill by Addy Osmani, at revision `301b02b12bff98e4688e6984af6556802322bbde`. It gives the version detection, the docs fetching, the source ranking, the untrusted content rules, and the citation rules. The rationalizations table, the verification checklist, the list of situations, the table of dependency files, the red flags, and the link to `security-and-hardening` were removed. The advice to cite sources in code comments was removed too. The text was rewritten to the plugin's style.
 
-The evidence rules and the final report come from the [`research`](https://github.com/taecontrol/skills/tree/main/skills/engineering/research) skill by Taecontrol, at revision `3f079b0eca9f4adc0707fdfce2ee1c8803226a93`. Its two-researcher and judge process was left out. The method note now covers searches and single-source claims instead of agent roles.
+The evidence rules and the final report come from the [`research`](https://github.com/taecontrol/skills/tree/main/skills/engineering/research) skill by Taecontrol, at revision `3f079b0eca9f4adc0707fdfce2ee1c8803226a93`. Its two-researcher and judge process was left out, and the evidence rules that the other sections already state were merged into the citation rules. The method note now covers searches and single-source claims instead of agent roles.
 
 The delegation pattern comes from the [`research`](https://github.com/mattpocock/skills/tree/main/skills/engineering/research) skill by Matt Pocock, at revision `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d`. A report file is written only when the user asks for one, as the plugin's coding instructions require.
 
@@ -987,7 +987,7 @@ This skill merges several sources. The MIT sources share the license text in `cr
 
 The claim table in `../SKILL.md` comes from [`verification-before-completion`](https://github.com/obra/superpowers/tree/main/skills/verification-before-completion) in obra/superpowers, under MIT. The rest of that skill was left out, because the `verification` block of the coding instructions covers it.
 
-The test sizes and the level guide in `../SKILL.md` come from [`test-driven-development`](https://github.com/addyosmani/agent-skills/tree/main/skills/test-driven-development) by Addy Osmani, under MIT. The revision is `301b02b12bff98e4688e6984af6556802322bbde`. The "Beyonce Rule" was removed, because it asks for tests on every change, and the coding instructions limit new tests. The test pyramid with its fixed shares was removed too. The Supertest example in `cli-and-api.md` comes from `references/testing-patterns.md` in the same repository.
+The level guide in `../SKILL.md` comes from [`test-driven-development`](https://github.com/addyosmani/agent-skills/tree/main/skills/test-driven-development) by Addy Osmani, under MIT. The revision is `301b02b12bff98e4688e6984af6556802322bbde`. The table of test sizes was removed, because it restates common knowledge. The "Beyonce Rule" was removed, because it asks for tests on every change, and the coding instructions limit new tests. The test pyramid with its fixed shares was removed too. The Supertest example in `cli-and-api.md` comes from `references/testing-patterns.md` in the same repository.
 
 The security boundaries and the clean console rule in `chrome-devtools/chrome-devtools.md` come from [`browser-testing-with-devtools`](https://github.com/addyosmani/agent-skills/tree/main/skills/browser-testing-with-devtools) by Addy Osmani, under MIT. They were shortened to the rules, without the tables and diagrams.
 
@@ -1445,7 +1445,7 @@ Skill typescript.
 
 This skill merges two MIT-licensed sources.
 
-The skill text and the files in `rules/` come from the `typescript-magician` skill in [mcollina/skills](https://github.com/mcollina/skills) by Matteo Collina. Its license is in the `credits.md` file of this folder. The text was restyled for this plugin, and examples that current TypeScript no longer supports were corrected.
+The workflow in `../SKILL.md` comes from the `typescript-magician` skill in [mcollina/skills](https://github.com/mcollina/skills) by Matteo Collina. Its license is in the `credits.md` file of this folder. The text was restyled for this plugin. The 14 technique files of that skill and its two quick examples were removed, because they explain language features that current models already know.
 
 The facts in `typescript-6-7.md` come from the `typescript-knowledge-patch` in [nevaberry/nevaberry-plugins](https://github.com/nevaberry/nevaberry-plugins) by Nevaberry. That patch was extracted by a language model. Each kept fact was checked against the TypeScript release notes on typescriptlang.org, the TypeScript blog, or the microsoft/typescript-go repository. Facts that could not be confirmed were left out. The license of that source follows.
 

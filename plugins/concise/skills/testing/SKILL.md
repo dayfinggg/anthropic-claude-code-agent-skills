@@ -23,29 +23,8 @@ The reference files hold the procedures, which this file does not repeat. Read a
 The rest of this file holds for any language, test runner, and browser tool. A tool without a reference file here follows its own documentation for the installed version.
 </references>
 
-<test_sizes>
-Tests differ by the resources they use.
-
-| Size | Constraints | Speed | Example |
-|---|---|---|---|
-| Small | Single process, no I/O, no network, no database | Milliseconds | Pure function tests, data transforms |
-| Medium | Several processes allowed, localhost only, no external services | Seconds | API tests with a test database, component tests |
-| Large | Several machines allowed, external services allowed | Minutes | E2E tests, performance benchmarks, staging integration |
-
-Small tests make up most of a healthy suite. They are fast, reliable, and easy to debug when they fail.
-</test_sizes>
-
-<pick_the_level>
-The code under test decides the level.
-- Pure logic with no side effects gets a unit test, which is small.
-- Code that crosses a boundary gets an integration test, which is medium. Such boundaries are an API, a database, or the file system.
-- A critical user flow that must work from end to end gets an E2E test, which is large. Keep these to the critical paths.
-
-Choose the lowest level that can catch the break the test names, as [good-tests.md](references/good-tests.md) explains.
-</pick_the_level>
-
 <check_by_change>
-Each kind of change has its check. The `references` section names the file with the procedure.
+Each kind of change has its check. The `references` section names the file with the procedure. Choose the lowest test level that can catch the break the test names. Pure logic gets a unit test, code that crosses a boundary such as an API, a database, or the file system gets an integration test, and only a critical user flow gets an end-to-end test.
 
 | Change | Check |
 |---|---|
