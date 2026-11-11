@@ -40,7 +40,7 @@ Invoking a skill adds its rendered `SKILL.md` content to the conversation as one
 
 After auto-compaction, Claude Code re-attaches the most recent invocation of each skill but keeps only its first 5,000 tokens. All re-attached skills share a budget of 25,000 tokens, filled from the most recently invoked skill. So put the most important instructions near the top of the skill's `SKILL.md`. Invoking the skill again after compaction restores its full text.
 
-The docs ask for a skill's `SKILL.md` to stay under 500 lines. Move detailed reference to separate files in the skill folder. Link each one from `SKILL.md` with the condition for reading it.
+The docs ask for a skill's `SKILL.md` to stay under 500 lines. Move detailed reference to separate files in the skill folder. Link each one from `SKILL.md` with the condition for reading it, and put the condition before the link. Place those links right after the overview. A pointer below a long body is rarely followed, and after compaction it falls outside the 5,000 tokens that are kept.
 </the_body>
 
 <splitting_by_invocation>

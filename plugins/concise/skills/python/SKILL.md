@@ -8,6 +8,13 @@ license: MIT for SKILL.md (uv, ruff, and ty guidance from astral-sh/claude-code-
 The project's own Python version and tools come first, as `code_rules` requires. Read `requires-python` in `pyproject.toml`, `.python-version`, and the lockfile before you write code. The lockfile shows the package manager, such as `uv.lock`, `poetry.lock`, `pdm.lock`, `Pipfile.lock`, or plain `requirements*.txt`. The `pyproject.toml` tool tables and config files show the linter, formatter, type checker, and test runner. Use only syntax that the lowest allowed Python version supports. The modern defaults in this skill apply to new projects, or when the user asks for them.
 </project_first>
 
+<framework_references>
+The framework reference files hold rules that this file does not repeat. The dependencies in `pyproject.toml` or the lockfile show the framework. Read a file whole before you change code on its topic, also when the work reaches that topic later in the task.
+- In a Django project, read [django.md](references/django.md). It covers Django 5.2 LTS, 6.0, and 6.1 facts and access control for views, Django REST framework, and the admin.
+- For a Django performance review, or work on slow views and querysets, read [django-performance.md](references/django-performance.md). It finds N+1 queries, unbounded querysets, and missing indexes, and it validates each finding before it reports.
+- In a FastAPI project, read [fastapi.md](references/fastapi.md). It covers the FastAPI releases up to 0.162, dependencies, lifespan, request and response models, streaming, security, and testing.
+</framework_references>
+
 <python_versions>
 Python 3.15 is the current release. It came out on October 9, 2026, and 3.14 came out on October 7, 2025. A new project targets 3.14 or 3.15, as long as its main dependencies support that version.
 
@@ -164,10 +171,3 @@ testpaths = ["tests"]
 addopts = ["-ra"]
 ```
 </pytest>
-
-<framework_references>
-Read the framework reference before you change code in a framework project. The dependencies in `pyproject.toml` or the lockfile show the framework.
-- A Django project starts with [references/django.md](references/django.md). It covers Django 5.2 LTS, 6.0, and 6.1 facts and access control for views, Django REST framework, and the admin.
-- A Django performance review, or work on slow views and querysets, uses [references/django-performance.md](references/django-performance.md). It finds N+1 queries, unbounded querysets, and missing indexes, and it validates each finding before it reports.
-- A FastAPI project reads [references/fastapi.md](references/fastapi.md). It covers the FastAPI releases up to 0.162, dependencies, lifespan, request and response models, streaming, security, and testing.
-</framework_references>

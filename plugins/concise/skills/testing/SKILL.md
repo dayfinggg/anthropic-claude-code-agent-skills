@@ -8,6 +8,19 @@ license: MIT and Apache-2.0. The playwright folder is adapted from microsoft/pla
 This skill picks the kind of test or check a change needs, and routes to the file with the procedure. The `tdd` skill covers the red-green loop, and the `debugging` skill covers the diagnosis of a failure. Verify as the `verification` block of the coding instructions requires, with the smallest check that would fail if the change were wrong. Add new tests only as the `code_rules` block allows.
 </overview>
 
+<references>
+The reference files hold the procedures, which this file does not repeat. Read a file whole as soon as the work meets its condition, also when that happens later in the task.
+- When you write or change tests, mocks, or test helpers, read [good-tests.md](references/good-tests.md).
+- When you test a command-line tool, an HTTP API, or an API contract, read [cli-and-api.md](references/cli-and-api.md).
+- When a test passes and fails without a code change, read [flaky-tests.md](references/flaky-tests.md).
+- When you drive a browser to check a UI change, read [playwright-cli.md](references/playwright/playwright-cli.md).
+- When you run or debug a Playwright suite, read [playwright-tests.md](references/playwright/playwright-tests.md).
+- When you plan, generate, or heal Playwright tests, read [test-generation.md](references/playwright/test-generation.md).
+- When a browser check needs mocked, changed, or blocked requests, read [request-mocking.md](references/playwright/request-mocking.md).
+- When you need a detailed record of a browser session, read [tracing.md](references/playwright/tracing.md).
+- When the Chrome DevTools MCP server is connected, read [chrome-devtools.md](references/chrome-devtools/chrome-devtools.md).
+</references>
+
 <test_sizes>
 Tests differ by the resources they use.
 
@@ -60,16 +73,3 @@ The `verification` block governs evidence for test, lint, and build results. The
 | Subagent finished | The diff shows the changes | The subagent's report of success |
 | Requirements met | A line-by-line check against the request | Passing tests |
 </claims_need_evidence>
-
-<references>
-Read each file when its task comes up.
-- [good-tests.md](references/good-tests.md) when you write or change tests, mocks, or test helpers.
-- [cli-and-api.md](references/cli-and-api.md) when you test a command-line tool, an HTTP API, or an API contract.
-- [flaky-tests.md](references/flaky-tests.md) when a test passes and fails without a code change.
-- [playwright-cli.md](references/playwright/playwright-cli.md) when you drive a browser to check a UI change.
-- [playwright-tests.md](references/playwright/playwright-tests.md) when you run or debug a Playwright suite.
-- [test-generation.md](references/playwright/test-generation.md) when you plan, generate, or heal Playwright tests.
-- [request-mocking.md](references/playwright/request-mocking.md) when a browser check needs mocked, changed, or blocked requests.
-- [tracing.md](references/playwright/tracing.md) when you need a detailed record of a browser session.
-- [chrome-devtools.md](references/chrome-devtools/chrome-devtools.md) when the Chrome DevTools MCP server is connected.
-</references>

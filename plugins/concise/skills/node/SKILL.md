@@ -18,6 +18,27 @@ Use an API only when the project's Node.js version has it. [node-lts.md](referen
 This skill covers the Node.js runtime, its built-in servers and APIs, and running TypeScript in Node.js. Web frameworks are out of scope, so follow the framework's own docs for the installed version. Type-level work and tsconfig design belong to the `typescript` skill. Language features, browser code, and React belong to the `javascript` skill. Test strategy in general belongs to the `testing` skill, and this skill covers the `node:test` mechanics.
 </scope>
 
+<references>
+Each reference file holds the rules for one topic, which this file does not repeat. Read the whole file as soon as the work reaches its topic, also later in the task, and apply every rule in it that fits the case.
+
+- Before you write async/await code, run work in parallel, limit concurrency, or cancel work, read [async-patterns.md](references/async-patterns.md).
+- Before you throw, catch, classify, or log an error, including async errors, read [error-handling.md](references/error-handling.md).
+- Before you build a pipeline, a transform, or a stream consumer, or handle backpressure, read [streams.md](references/streams.md).
+- Before you choose between ESM and CommonJS, use `require(esm)`, or change import paths, read [modules.md](references/modules.md).
+- Before you write or change tests with `node:test`, mocks, snapshots, or hooks, read [testing.md](references/testing.md).
+- When a test passes and fails without a code change, read [flaky-tests.md](references/flaky-tests.md).
+- When a process or test run never exits, read [stuck-processes-and-tests.md](references/stuck-processes-and-tests.md).
+- Before you look up installed versions, dependency trees, or package internals, read [node-modules-exploration.md](references/node-modules-exploration.md).
+- When the event loop blocks, or before you add worker threads, pools, or hunt a leak, read [performance.md](references/performance.md).
+- Before you add a cache or change how one is invalidated, read [caching.md](references/caching.md).
+- Before you profile, benchmark, or take a diagnostic report, read [profiling.md](references/profiling.md).
+- Before you add or change logging, redaction, or debug output, read [logging.md](references/logging.md).
+- Before you read env files, validate config, or handle secrets, read [environment.md](references/environment.md).
+- Before you handle signals, shut a server down, or add a health check, read [graceful-shutdown.md](references/graceful-shutdown.md).
+- Before you run TypeScript in Node.js, write its tsconfig, or publish a TypeScript package, read [typescript.md](references/typescript.md).
+- Before you rely on a Node.js API that depends on the version, or upgrade Node.js, read [node-lts.md](references/node-lts.md).
+</references>
+
 <typescript_in_node>
 Node.js runs `.ts` files directly through type stripping on every supported line. Only erasable syntax works, so use `import type`, const objects instead of enums, and no runtime namespaces or parameter properties. Write `.ts` extensions in relative imports. Type stripping does not check types, so run `tsc --noEmit` as well. This file runs with `node greet.ts`.
 
@@ -51,24 +72,3 @@ Apply this checklist to CSV, ETL, ingestion pipelines, large files, and backpres
 
 For large CSV or ETL inputs, `createReadStream(input)` and `await pipeline(...)` keep memory bounded. Reuse the existing parser and add enrichment or caching only when the task needs them. [references/streams.md](references/streams.md) and [references/caching.md](references/caching.md) have the details.
 </streams_and_caching>
-
-<references>
-Each file below holds the rules for one topic. Read the whole file before you write or change code on its topic, and apply every rule in it that fits the case.
-
-- [references/async-patterns.md](references/async-patterns.md) before you write async/await code, run work in parallel, limit concurrency, or cancel work.
-- [references/error-handling.md](references/error-handling.md) before you throw, catch, classify, or log an error, including async errors.
-- [references/streams.md](references/streams.md) before you build a pipeline, a transform, or a stream consumer, or handle backpressure.
-- [references/modules.md](references/modules.md) before you choose between ESM and CommonJS, use `require(esm)`, or change import paths.
-- [references/testing.md](references/testing.md) before you write or change tests with `node:test`, mocks, snapshots, or hooks.
-- [references/flaky-tests.md](references/flaky-tests.md) when a test passes and fails without a code change.
-- [references/stuck-processes-and-tests.md](references/stuck-processes-and-tests.md) when a process or test run never exits.
-- [references/node-modules-exploration.md](references/node-modules-exploration.md) before you look up installed versions, dependency trees, or package internals.
-- [references/performance.md](references/performance.md) when the event loop blocks, or before you add worker threads, pools, or hunt a leak.
-- [references/caching.md](references/caching.md) before you add a cache or change how one is invalidated.
-- [references/profiling.md](references/profiling.md) before you profile, benchmark, or take a diagnostic report.
-- [references/logging.md](references/logging.md) before you add or change logging, redaction, or debug output.
-- [references/environment.md](references/environment.md) before you read env files, validate config, or handle secrets.
-- [references/graceful-shutdown.md](references/graceful-shutdown.md) before you handle signals, shut a server down, or add a health check.
-- [references/typescript.md](references/typescript.md) before you run TypeScript in Node.js, write its tsconfig, or publish a TypeScript package.
-- [node-lts.md](references/node-lts.md) before you rely on a Node.js API that depends on the version, or upgrade Node.js.
-</references>
