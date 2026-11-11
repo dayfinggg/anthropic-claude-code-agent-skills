@@ -7,6 +7,12 @@ description: Vocabulary and method for designing deep modules, which hide a lot 
 Design deep modules. A deep module puts a lot of behavior behind a small interface. That interface sits at a clean seam, and tests cross it. Use this language and these principles wherever code is designed or restructured. The aim is leverage for callers, locality for maintainers, and testability for everyone.
 </overview>
 
+<going_deeper>
+Two reference files hold procedures that this file does not repeat. Read a file whole as soon as the work meets its condition, also when that happens later in the task.
+- Before you merge modules or move a seam, read [DEEPENING.md](references/DEEPENING.md). It covers how to deepen a cluster of modules given its dependencies, with dependency categories, seam discipline, and the test strategy of replacing old tests.
+- When the user wants to compare alternative interfaces on depth, locality, and seam placement, read [DESIGN-IT-TWICE.md](references/DESIGN-IT-TWICE.md). It runs parallel sub-agents that design an interface in radically different ways.
+</going_deeper>
+
 <glossary>
 Use these terms exactly for the design concepts, and do not substitute "component", "service", "API", or "boundary" for them. Consistent language is the point of the glossary. The project's own names for its code and its domain stay as they are.
 
@@ -92,8 +98,3 @@ This skill rejects three common framings.
 - "Interface" as the TypeScript `interface` keyword or a class's public methods is too narrow. Here the interface includes every fact a caller must know.
 - "Boundary" is overloaded with DDD's bounded context. Say seam or interface instead.
 </rejected_framings>
-
-<going_deeper>
-- [DEEPENING.md](references/DEEPENING.md) covers how to deepen a cluster of modules given its dependencies, with dependency categories, seam discipline, and the test strategy of replacing old tests. Read it whole before you merge modules or move a seam.
-- [DESIGN-IT-TWICE.md](references/DESIGN-IT-TWICE.md) runs parallel sub-agents that design an interface in radically different ways. Read it when the user wants to compare alternative interfaces on depth, locality, and seam placement.
-</going_deeper>

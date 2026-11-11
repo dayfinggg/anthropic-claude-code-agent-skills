@@ -7,6 +7,15 @@ description: Guides safe, current database work on PostgreSQL and MySQL. Use it 
 Write every migration and data change as if it runs against production. Until you know the real table sizes and traffic, assume a large table, live traffic, and the previous app version still serving requests during the deploy. A change that finishes at once on a dev database can lock a production table for an hour. Data that a statement deletes or overwrites is gone unless a backup exists.
 </overview>
 
+<references>
+The reference files hold rules that this file does not repeat, one engine area each. Read a file whole as soon as the work meets its condition, also when that happens later in the task.
+- Before you write a PostgreSQL migration or change a PostgreSQL table, read [postgres-schema.md](references/postgres-schema.md). It covers data types, primary keys, foreign key indexes, idempotent constraints, identifiers, and partial and JSONB indexes.
+- When you write PostgreSQL queries or diagnose a slow one, read [postgres-queries.md](references/postgres-queries.md). It covers N+1 batching, keyset pagination, upserts, transactions, deadlocks, queues, `EXPLAIN`, statistics, and bulk loads.
+- When you configure connections or access control, read [postgres-operations.md](references/postgres-operations.md). It covers connection pooling, prepared statements, timeouts, privileges, and row level security.
+- Before any MySQL `ALTER TABLE` on a large table, read [mysql-online-ddl.md](references/mysql-online-ddl.md). It covers DDL algorithms, lock levels, and online schema change tools.
+- When you write MySQL transactions or debug locking and connection errors, read [mysql-transactions.md](references/mysql-transactions.md). It covers isolation levels, InnoDB row locks, deadlocks, and connection limits.
+</references>
+
 <data_safety>
 A destructive or production command runs only after the user confirms it in the conversation. A destructive command drops, truncates, resets, or wipes data, or changes existing rows with `UPDATE`, `DELETE`, or `MERGE`. A production command is any command whose target is not a local or disposable database. Before each such command, read the target host and database name from `DATABASE_URL`, the ORM config, or the connection string.
 
@@ -160,15 +169,6 @@ A query inside a loop over rows is an N+1 pattern. Load the related rows in one 
 - Doctrine loads an association in the same query with a fetch join, as in `->leftJoin('u.posts', 'p')->addSelect('p')`. A fetch join of a collection with `setMaxResults` needs `Doctrine\ORM\Tools\Pagination\Paginator`, because the limit applies to joined rows.
 - SQLAlchemy loads collections best with `selectinload()` and many-to-one relations with `joinedload()`. `raiseload("*")` or `lazy="raise"` turns an unplanned lazy load into an error. Under asyncio a lazy load fails anyway, so eager load every relationship the code reads.
 </n_plus_one>
-
-<references>
-Each reference file covers one engine area, so read only the one the task needs.
-- [postgres-schema.md](references/postgres-schema.md) covers data types, primary keys, foreign key indexes, idempotent constraints, identifiers, and partial and JSONB indexes. Read it whole before you write a PostgreSQL migration or change a PostgreSQL table.
-- [postgres-queries.md](references/postgres-queries.md) covers N+1 batching, keyset pagination, upserts, transactions, deadlocks, queues, `EXPLAIN`, statistics, and bulk loads. Read it when you write PostgreSQL queries or diagnose a slow one.
-- [postgres-operations.md](references/postgres-operations.md) covers connection pooling, prepared statements, timeouts, privileges, and row level security. Read it when you configure connections or access control.
-- [mysql-online-ddl.md](references/mysql-online-ddl.md) covers DDL algorithms, lock levels, and online schema change tools. Read it before any MySQL `ALTER TABLE` on a large table.
-- [mysql-transactions.md](references/mysql-transactions.md) covers isolation levels, InnoDB row locks, deadlocks, and connection limits. Read it when you write MySQL transactions or debug locking and connection errors.
-</references>
 
 <report>
 End every migration task with a migration safety report in the reply, inside the length the `writing_style` rules set. Give one sentence per risky statement that names the statement, its risk, and your change, and group statements that share a risk. An example is "`CREATE INDEX` on `orders` blocked writes, so it now runs `CONCURRENTLY` alone." Then say whether a lock timeout is set. Name the expand and contract steps left for later deploys, or say that none remain. If you could not make a statement safe, say so in the first sentence of the report.

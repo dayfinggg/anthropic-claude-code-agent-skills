@@ -7,6 +7,10 @@ description: Structures git workflow and pull request bodies. Use it when commit
 Git is your safety net. Treat commits as save points, branches as sandboxes, and history as documentation. AI agents generate code at high speed, so disciplined version control keeps changes manageable. It also keeps them reviewable and reversible.
 </overview>
 
+<pull_requests>
+Before you write a pull request body, read [pull-requests.md](references/pull-requests.md) whole and follow it. This file does not repeat its rules.
+</pull_requests>
+
 <core_principles>
 <trunk_based_development>
 Trunk-based development is the recommended default. Keep `main` always deployable. Work in short-lived feature branches that merge back within 1-3 days. Long-lived development branches are hidden costs, because they diverge, create merge conflicts, and delay integration. DORA research consistently shows that trunk-based development correlates with high-performing engineering teams.
@@ -294,10 +298,6 @@ Keep a changelog written for humans. A changelog is not `git log`. It is the cur
 Write the entry under Unreleased in the same change that makes the change, while the impact is fresh. At release time, those entries move into the new version section. Breaking changes get a migration note and a deprecation window.
 </changelog>
 </release_and_versioning>
-
-<pull_requests>
-For a pull request body, follow [pull-requests.md](references/pull-requests.md).
-</pull_requests>
 
 <red_flags>
 These signs show that the git workflow has gone wrong.
