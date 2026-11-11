@@ -1,7 +1,7 @@
 ---
 name: testing
 description: Picks the check that proves a change works and the test level for it, and routes to procedures for browser, CLI, API, contract, and flaky tests. Use it when the project gives no obvious check for the change, when you review or repair existing tests, for UI changes checked in a browser, for HTTP APIs and command-line tools, and when a test fails only sometimes. Running a test command the project already documents needs no skill, and the `tdd` skill covers writing a new test first.
-license: MIT and Apache-2.0. The playwright folder is adapted from microsoft/playwright-cli and the chrome-devtools folder from ChromeDevTools/chrome-devtools-mcp, both Apache-2.0. The changes remove code comments, headings, and links to files not shipped, rewrite the prose to the plugin style, and add commands checked against the current source. the distribution LICENSE lists every source.
+license: MIT and Apache-2.0. The playwright folder is adapted from microsoft/playwright-cli and the chrome-devtools folder from ChromeDevTools/chrome-devtools-mcp, both Apache-2.0. The changes remove code comments, headings, and links to files not shipped, rewrite the prose to the plugin style, and add commands checked against the current source.
 ---
 
 <overview>

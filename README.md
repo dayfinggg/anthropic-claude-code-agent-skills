@@ -19,4 +19,4 @@ The plugin lives in `plugins/concise`. Installation does not replace your person
 
 Each skill keeps its entry point in `SKILL.md`, guidance in `references`, runnable helpers in `scripts`, and reusable examples in `assets`.
 
-The plugin's `LICENSE` preserves source attribution and redistribution terms in one place. This is not an official Anthropic distribution. Instructions guide behavior but do not guarantee compliance on every response.
+This is not an official Anthropic distribution. Instructions guide behavior but do not guarantee compliance on every response.
