@@ -79,25 +79,7 @@ In a uv project, these replacements apply.
 | `python3.12 -c "..."` | `uvx python@3.12 -c "..."` |
 | `python -m venv .venv` and `source .venv/bin/activate` | `uv run <command>` |
 
-These commands replace the older tools when the user asks to migrate.
-
-| Old command | uv command |
-| --- | --- |
-| `pyenv install 3.14` | `uv python install 3.14` |
-| `pyenv versions` | `uv python list --only-installed` |
-| `pyenv local 3.14` | `uv python pin 3.14` |
-| `pyenv global 3.14` | `uv python install 3.14 --default` |
-| `pipx run ruff` | `uvx ruff` |
-| `pipx install ruff` | `uv tool install ruff` |
-| `pipx upgrade ruff` | `uv tool upgrade ruff` |
-| `pipx list` | `uv tool list` |
-| `pip install -r req.txt` | `uv pip install -r req.txt` |
-| `pip freeze` | `uv pip freeze` |
-| `pip-compile req.in` | `uv pip compile req.in` |
-| `pip-sync req.txt` | `uv pip sync req.txt` |
-| `virtualenv .venv` | `uv venv` |
-
-The [uv documentation index](https://docs.astral.sh/uv/llms.txt) links to a page for each workflow.
+When the user asks to move from pyenv, pipx, pip-tools, or virtualenv, the matching commands are `uv python`, `uv tool`, `uv pip`, and `uv venv`. The [uv documentation index](https://docs.astral.sh/uv/llms.txt) links to a page for each workflow.
 </uv>
 
 <ruff>

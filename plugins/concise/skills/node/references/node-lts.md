@@ -39,16 +39,18 @@ V8 brings new JavaScript features with each line. The `javascript` skill covers 
 </language_and_globals>
 
 <modules>
-Four module facts matter for current code.
+Use ES modules for a new project, and keep the module system an existing project already uses. These module facts matter for current code.
 
-- `require()` loads synchronous ES modules without a flag since 22.12, and the feature is stable since 25.4. A module with top-level `await` makes `require()` throw `ERR_REQUIRE_ASYNC_MODULE`.
+- Native ESM needs the file extension in every relative import, as in `./helper.js`, and a JSON import needs `with { type: 'json' }`. A path without an extension works only in a bundler.
+- `require()` loads synchronous ES modules without a flag since 22.12, and the feature is stable since 25.4. A module with top-level `await` in its graph makes `require()` throw `ERR_REQUIRE_ASYNC_MODULE`, so load it with `import()`. `process.features.require_module` detects support, and `--no-require-module` turns it off.
+- An ES module chooses what `require()` returns with `export { Point as 'module.exports' }`. CommonJS consumers then lose the other named exports.
 - `import.meta.main` (24.2 and 22.18) is `true` in the entry module. It is still early development.
 - `module.registerHooks()` installs synchronous, in-thread resolve and load hooks and is a release candidate. `module.register()` is runtime-deprecated in 26 (DEP0205), so move custom loaders to `registerHooks()`.
-- `import.meta.dirname` and `import.meta.filename` are stable since 24 and 22.16.
+- `import.meta.dirname` and `import.meta.filename` are stable since 24 and 22.16. They replace `__dirname` and `__filename`, which ESM lacks.
 </modules>
 
 <configuration>
-`--env-file` and `--env-file-if-exists` are stable since 24.10 and 22.21. `process.loadEnvFile()` loads a file from code.
+`--env-file` and `--env-file-if-exists` are stable since 24.10 and 22.21. With several files, later files override earlier ones, and `--env-file-if-exists` does not fail on a missing file. `process.loadEnvFile()` loads a file from code, and without an argument it reads `.env` in the current directory.
 
 `--config-file` is stable since 26.12 and loads options from a JSON file. Without a path, it reads `node.config.json` in the working directory. The file has a `nodeOptions` object for flags allowed in `NODE_OPTIONS`, plus namespaces such as `test`, `watch`, and `permission`. Command-line flags and `NODE_OPTIONS` override the file. Node.js does not validate the file, so use only trusted config files. Before 26.12 the flag is named `--experimental-config-file`, which remains as an alias.
 

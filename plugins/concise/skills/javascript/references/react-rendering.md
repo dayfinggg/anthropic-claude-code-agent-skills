@@ -1,3 +1,11 @@
+<contents>
+This file has these sections, in order.
+- components and state, with inline components, derived state, events in handlers, effect events, functional updates, and lazy initial state
+- effects and reads, with narrow dependencies, split work, deferred reads, and refs for transient values
+- transitions, deferred values, manual memoization, and activity
+- conditional rendering, hydration without flicker, one-time app init, and client data fetching
+</contents>
+
 <react_rendering>
 Extra renders and slow commits make the UI feel sluggish. These rules reduce wasted work in components, hooks, and effects. When React Compiler is on, skip the rules that only add manual memoization. The `react` section of the skill explains why.
 
