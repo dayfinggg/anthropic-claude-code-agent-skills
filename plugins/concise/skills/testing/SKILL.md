@@ -13,12 +13,14 @@ The reference files hold the procedures, which this file does not repeat. Read a
 - When you write or change tests, mocks, or test helpers, read [good-tests.md](references/good-tests.md).
 - When you test a command-line tool, an HTTP API, or an API contract, read [cli-and-api.md](references/cli-and-api.md).
 - When a test passes and fails without a code change, read [flaky-tests.md](references/flaky-tests.md).
-- When you drive a browser to check a UI change, read [playwright-cli.md](references/playwright/playwright-cli.md).
+- When you drive a browser with `playwright-cli` to check a UI change, read [playwright-cli.md](references/playwright/playwright-cli.md).
 - When you run or debug a Playwright suite, read [playwright-tests.md](references/playwright/playwright-tests.md).
 - When you plan, generate, or heal Playwright tests, read [test-generation.md](references/playwright/test-generation.md).
 - When a browser check needs mocked, changed, or blocked requests, read [request-mocking.md](references/playwright/request-mocking.md).
 - When you need a detailed record of a browser session, read [tracing.md](references/playwright/tracing.md).
 - When the Chrome DevTools MCP server is connected, read [chrome-devtools.md](references/chrome-devtools/chrome-devtools.md).
+
+The rest of this file holds for any language, test runner, and browser tool. A tool without a reference file here follows its own documentation for the installed version.
 </references>
 
 <test_sizes>

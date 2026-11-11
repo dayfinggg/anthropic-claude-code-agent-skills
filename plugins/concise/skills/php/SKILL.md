@@ -18,6 +18,8 @@ The framework reference files hold rules that this file does not repeat. Compose
 - For Pest or PHPUnit tests in a Laravel project, read [laravel-testing.md](references/laravel-testing.md), and for factories, fakes, time, and suite speed read [laravel-testing-data.md](references/laravel-testing-data.md).
 - In a project that requires `symfony/framework-bundle`, read [symfony.md](references/symfony.md). It targets Symfony 7.4 LTS and 8.x and covers services and autowiring, Messenger, forms and validation, voters, DTOs, and quality checks.
 - In a project that uses Doctrine ORM, also read [symfony-doctrine.md](references/symfony-doctrine.md) for relations, fetch modes, batch processing, and transactions with ORM 3.
+
+Every other rule of this file holds for any PHP code. A project on another framework, a CMS, or an engine of its own follows that code's existing patterns and its documentation for the installed version.
 </framework_references>
 
 <php_versions>

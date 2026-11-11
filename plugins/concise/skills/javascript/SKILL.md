@@ -16,7 +16,7 @@ Some rules name a library, such as SWR, TanStack Query, `lru-cache`, or `better-
 </project_first>
 
 <boundary>
-This skill covers the JavaScript language, browser APIs, React, and Next.js. Types, generics, and `tsconfig.json` belong to the `typescript` skill. The Node.js runtime belongs to the `node` skill. For server frameworks, use their documentation for the installed version.
+This skill covers the JavaScript language, browser APIs, React, and Next.js. The language and browser rules hold for any framework, and a project on another UI framework follows its existing patterns and that framework's documentation for the installed version. Types, generics, and `tsconfig.json` belong to the `typescript` skill. The Node.js runtime belongs to the `node` skill. For server frameworks, use their documentation for the installed version.
 </boundary>
 
 <priorities>
