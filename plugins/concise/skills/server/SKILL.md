@@ -12,6 +12,7 @@ Before the first change, find out what the host is and how the thing you will ch
 - Confirm the target with `hostname` and the OS release, and list what else runs there, such as the services, the containers, and the listening ports. A shared service such as a web server or a database serves every site on the host, so its restart reaches all of them.
 - Find the source of truth for the file or service. A config can come from a repository, a container image, a configuration tool, or a hosting panel, and such a source overwrites a hand edit on its next run. Change the source, or tell the user that the edit will not survive. Deploy the way the project deploys, through its script or pipeline, because a step run by hand skips what that path checks.
 - Check free disk space and memory before a change that writes a lot, such as an upgrade, a build, a dump, or an image pull, because a full disk stops it halfway.
+- The `shared_systems` block of the coding instructions applies before a heavy command, also a read-only one such as a crawl, a benchmark, a search over a large tree, or a scan of a large table. `nproc`, `free -m`, `uptime`, and the list of scheduled jobs show the cores, the memory, the current load, and what will start beside your command, and the response time of a real page serves as the health signal.
 </know_the_host>
 
 <config_changes>
@@ -62,8 +63,8 @@ A command you send over SSH has no terminal, so a prompt hangs it until it times
 - Connect with `ssh -o BatchMode=yes -o ConnectTimeout=10 <host> '<command>'`, so a missing key fails at once instead of asking for a password.
 - Quote the remote command in single quotes, or send a script on standard input as in `ssh <host> 'bash -s' < script.sh`, so the local shell does not expand what the remote shell should.
 - Turn off pagers and prompts, as with `systemctl --no-pager`, `journalctl --no-pager`, `sudo -n`, and the package manager's non-interactive mode. A package upgrade can restart the services it touches, so run one only when the task asks for it.
-- Start a long job, such as an upgrade, a dump, or a migration, so that it survives a dropped connection, for example under `systemd-run`, `tmux`, or `nohup`, and send its output to a log file.
-- Keep secrets out of command lines and out of the conversation. Read the names of the keys in an environment file, not their values, and pass a secret through a file or standard input.
+- Start a long job, such as an upgrade, a dump, or a migration, so that it survives a dropped connection, for example under `systemd-run`, `tmux`, or `nohup`, and send its output to a log file. Note its process id at the start, and wait for it as the `long_running_work` block of the coding instructions describes, not in an open SSH command.
+- Keep secrets out of command lines and out of the conversation, as the `secrets` block of the coding instructions describes.
 </unattended_commands>
 
 <diagnosis>

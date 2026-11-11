@@ -12,7 +12,7 @@ These rules hold for every engine, relational or not. The `postgresql` and `mysq
 <references>
 The reference files hold rules that this file does not repeat, one engine area each. Read a file whole as soon as the work meets its condition, also when that happens later in the task.
 - Before you write a PostgreSQL migration or change a PostgreSQL table, read [postgres-schema.md](references/postgres-schema.md). It covers data types, primary keys, foreign key indexes, idempotent constraints, identifiers, and partial and JSONB indexes.
-- When you write PostgreSQL queries or diagnose a slow one, read [postgres-queries.md](references/postgres-queries.md). It covers N+1 batching, keyset pagination, upserts, transactions, deadlocks, queues, `EXPLAIN`, statistics, and bulk loads.
+- When you write a PostgreSQL query that an application or a script will keep, diagnose a slow query, or load or change rows in bulk, read [postgres-queries.md](references/postgres-queries.md). It covers N+1 batching, keyset pagination, upserts, transactions, deadlocks, queues, `EXPLAIN`, statistics, and bulk loads. A one-off read to look at data needs no reference.
 - When you configure connections or access control, read [postgres-operations.md](references/postgres-operations.md). It covers connection pooling, prepared statements, timeouts, privileges, and row level security.
 - Before any MySQL `ALTER TABLE` on a large table, read [mysql-online-ddl.md](references/mysql-online-ddl.md). It covers DDL algorithms, lock levels, and online schema change tools.
 - When you write MySQL transactions or debug locking and connection errors, read [mysql-transactions.md](references/mysql-transactions.md). It covers isolation levels, InnoDB row locks, deadlocks, and connection limits.
@@ -139,6 +139,8 @@ Do the steps that belong in the current change. List the rest as follow-ups the 
 </expand_contract>
 
 <batched_backfill>
+The `shared_systems` block of the coding instructions applies to every write that changes many rows on a live database, also a one-time import, a relinking of records, a reindex, or a flag set on a whole table. Count the rows the write changes through triggers, cascades, and denormalized columns, and the indexes on each table it touches, because every changed row is rewritten in each of them. Start with a small batch, take the health signal between batches, such as the response time of a real page or the replication lag, and raise the batch or shorten the pause when the measurements leave room, because a fixed long pause only slows the work. Check for a scheduled job that works on the same rows.
+
 Keep a backfill out of the schema migration. Walk the primary key in fixed ranges and commit each batch. This statement updates one batch of 5000 rows. Repeat it with `:start` raised by 5000 until it passes `max(id)`, and pause briefly between batches.
 
 ```sql
