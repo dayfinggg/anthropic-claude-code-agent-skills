@@ -10,4 +10,4 @@ Restart Claude Code after installation. The plugin uses your configured response
 
 These are instructions, so a model follows them most of the time and not every time. Two things lie outside their reach. On Fable, Opus, and Sonnet a note between tool calls can come back as a progress update that another model summarizes, so the wording and punctuation of that summary are not the plugin's. Notices that the platform adds to a conversation cannot be removed, and the rules only ask the model not to announce each one.
 
-The distribution `LICENSE` holds source attribution and redistribution terms. This plugin is not an official Anthropic distribution.
+This plugin is not an official Anthropic distribution.

@@ -1,7 +1,7 @@
 ---
 name: python
 description: Gives current Python practice for uv, ruff, ty, and pytest, with Django and FastAPI references. Use it whenever you write, review, upgrade, or set up Python code, including dependencies, virtual environments, scripts, linting, formatting, type checking, and pytest tests. Use it for every Django or FastAPI change, because it routes to framework references.
-license: MIT for SKILL.md (uv, ruff, and ty guidance from astral-sh/claude-code-plugins). Apache-2.0 for references/django-performance.md, adapted from getsentry/skills django-perf-review with headings and checklists converted to XML sections and prose, code comments moved to prose, the report template rewritten as prose, Sentry tooling references removed, one model example fixed, and a Django 6.1 fetch mode note added. See the distribution LICENSE.
+license: MIT for SKILL.md (uv, ruff, and ty guidance from astral-sh/claude-code-plugins). Apache-2.0 for references/django-performance.md, adapted from getsentry/skills django-perf-review with headings and checklists converted to XML sections and prose, code comments moved to prose, the report template rewritten as prose, Sentry tooling references removed, one model example fixed, and a Django 6.1 fetch mode note added.
 ---
 
 <project_first>
