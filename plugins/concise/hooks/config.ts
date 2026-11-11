@@ -43,6 +43,7 @@ export const SOURCE_LIST_RULES = [
 ]
 
 export const TOOL_RULES: Record<string, string> = {
+  Read: 'read.md',
   WebSearch: 'websearch.md',
   WebFetch: 'webfetch.md',
 }
