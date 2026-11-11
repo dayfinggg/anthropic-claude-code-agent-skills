@@ -3,8 +3,6 @@ import {
   CODING_SECTION,
   COMPACT_INSTRUCTIONS,
   DEFERRED_TOOLS,
-  HEREDOC_DENIAL,
-  HEREDOC_WRITE,
   LANGUAGE_ATTACHMENT,
   LANGUAGE_FALLBACK,
   LANGUAGE_PLACEHOLDER,
@@ -23,9 +21,6 @@ import {
   TOOL_RULES,
   WORK_FILE,
 } from './config'
-
-const writesFileWithHeredoc = (command: string) =>
-  (command.split('\n')[0] ?? '').split(/&&|\|\||;/).some(segment => HEREDOC_WRITE.test(segment))
 
 const removeSourceListRules = (text: string) => SOURCE_LIST_RULES.reduce((result, rule) => result.replace(rule, ''), text)
 
@@ -82,10 +77,6 @@ export const register: Register = on => {
     const [result, rule] = await Promise.all([next(e), readInstruction($, TOOL_RULES[e.tool] ?? '')])
     return { ...result, description: `${removeSourceListRules(result.description)}\n\n${rule}` }
   })
-
-  on('tool.call', { tool: 'Bash' }, ($, e, next) =>
-    writesFileWithHeredoc(e.command) ? { deny: `${$.plugin.name}: ${HEREDOC_DENIAL}` } : next(e),
-  ).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the heredoc guard failed.` }))
 
   on('session.compact', ($, e, next) =>
     next({ ...e, instructions: [e.instructions, COMPACT_INSTRUCTIONS].filter(Boolean).join('\n\n') }),

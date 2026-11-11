@@ -50,10 +50,6 @@ export const TOOL_RULES: Record<string, string> = {
   WebFetch: 'webfetch.md',
 }
 
-export const HEREDOC_WRITE = /^\s*(cat\s*>{1,2}\s*[^\s&].*<<|cat\s*<<-?\s*\S+.*(?<![0-9&])>{1,2}\s*[^\s&]|tee\s+(-a\s+)?[^\s-]\S*.*<<)/
-
-export const HEREDOC_DENIAL = 'create or change local files with the Write or Edit tool, not a heredoc. Bash runs programs.'
-
 export const LANGUAGE_PLACEHOLDER = '{language}'
 
 export const LANGUAGE_SETTING = 'language'
