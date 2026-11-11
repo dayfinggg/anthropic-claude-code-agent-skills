@@ -47,7 +47,7 @@ From 16.3, `next dev` writes a managed block between `nextjs-agent-rules` marker
 </nextjs>
 
 <react>
-React 19.3 is the current release. React 19.2 added `<Activity>` and `useEffectEvent`. React 19.3 made `<ViewTransition>` and `<Fragment ref>` stable and added `addTransitionType` and `browser()` from `react-dom`. Check the installed version before you use any of these.
+React 19.3 is the current release in November 2026. React 19.2 added `<Activity>` and `useEffectEvent`. React 19.3 made `<ViewTransition>` and `<Fragment ref>` stable and added `addTransitionType` and `browser()` from `react-dom`. Check the installed version before you use any of these.
 
 React Compiler 1.0 is stable and memoizes components and values on its own. When the project has it on, write new code without `memo`, `useMemo`, or `useCallback`. Keep them only where a value must stay stable as an effect dependency. Leave existing memoization in place, because removing it can change the compiled output. Rules in the reference files that add manual memoization apply only to projects without the compiler.
 </react>

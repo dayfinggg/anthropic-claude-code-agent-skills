@@ -185,7 +185,7 @@ A store whose queries are objects has its own form of injection. An object such 
 <n_plus_one>
 A query inside a loop over rows is an N+1 pattern. Load the related rows in one query with a join or an `IN` list instead. A store without joins batches the lookups with its multi-get or its `in` operator.
 - Eloquent loads relations up front with `with('posts')`. `Model::preventLazyLoading(! $this->app->isProduction())` in `AppServiceProvider::boot` throws on every lazy load outside production. `chaperone()` on a `hasMany` stops the N+1 when children read their parent.
-- Doctrine loads an association in the same query with a fetch join, as in `->leftJoin('u.posts', 'p')->addSelect('p')`. A fetch join of a collection with `setMaxResults` needs `Doctrine\ORM\Tools\Pagination\Paginator`, because the limit applies to joined rows.
+- Doctrine loads an association in the same query with a fetch join, as in `->leftJoin('u.posts', 'p')->addSelect('p')`. A fetch join of a collection with `setMaxResults` needs a paginator from `Doctrine\ORM\Tools\Pagination`, because the limit applies to joined rows. That is `OffsetPaginator` from ORM 3.7 and `Paginator` before it.
 - SQLAlchemy loads collections best with `selectinload()` and many-to-one relations with `joinedload()`. `raiseload("*")` or `lazy="raise"` turns an unplanned lazy load into an error. Under asyncio a lazy load fails anyway, so eager load every relationship the code reads.
 </n_plus_one>
 

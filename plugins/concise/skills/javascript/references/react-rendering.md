@@ -301,7 +301,7 @@ function Tracker() {
 </refs_for_transient_values>
 
 <transitions>
-Mark non-urgent updates as transitions, so urgent input stays responsive. Wrap frequent updates, such as scroll position, in `startTransition`. Use `useTransition` instead of a manual loading flag, because its `isPending` resets even when the work throws. A newer transition also supersedes a pending one. This search updates the input at once and the results inside a transition.
+Mark non-urgent updates as transitions, so urgent input stays responsive. Wrap frequent updates, such as scroll position, in `startTransition`. Use the `isPending` flag of `useTransition` instead of a manual loading flag, so React tracks the pending state. This search updates the input at once and the results inside a transition.
 
 ```tsx
 import { useTransition, useState } from 'react'
