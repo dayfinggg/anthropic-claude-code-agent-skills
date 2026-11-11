@@ -100,7 +100,7 @@ export const register: Register = on => {
     const work = await readInstruction($, WORK_FILE)
     const modelRule = MODEL_RULES.find(([pattern]) => pattern.test(e.model || e.promptModel))
     const tail = [
-      ...(modelRule ? [section('model', await readInstruction($, modelRule[1]))] : []),
+      ...(modelRule ? [section('model', await withLanguage($, await readInstruction($, modelRule[1])))] : []),
       section('style', await readStyle($)),
     ]
     if (!e.outputStyle?.isKeepingCodingInstructions) return { sections: [...result.sections, section('work', work), ...tail] }
