@@ -1,4 +1,4 @@
-Concise provides 22 engineering skills, a plain output style, and coding instructions for Claude Code.
+Concise provides 24 engineering skills, a plain output style, and coding instructions for Claude Code.
 
 Install it through the repository's marketplace.
 
