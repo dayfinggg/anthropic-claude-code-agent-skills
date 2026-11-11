@@ -34,7 +34,7 @@ The brief rules below follow current Claude guidance, so a brief to a Claude sub
 <brief>
 The agent sees only the brief, so give the whole task once and precisely. Write it in English unless the task needs another language. Every brief covers these parts.
 1. Goal and finish line. State what is wrong or wanted. Say what done looks like, such as "the suite passes 30 runs in a row".
-2. Context. Give exact paths, the relevant facts you already know, and what you ruled out. Pass long material as file paths, not pasted text. Quote the user's request once, in its own words and without a translation.
+2. Context. Give exact paths, the relevant facts you already know, and what you ruled out. Pass long material as file paths, not pasted text. State the agent's own task in your words, because the user's message addresses you and can mislead the agent. Quote the user's wording only where the agent must judge against it, such as a spec, and then once, without a translation.
 3. Scope. Name the files or modules the agent owns, and what it must not touch.
 4. Rules. A native subagent receives the working rules and the report contract through the plugin's hook, so the brief does not repeat them. When the agent will write a document or a message for people, name the writing rules at `../../instructions/style.md`, relative to this skill, as an absolute path. For an agent of another provider, name that file, the working rules at `../../instructions/work.md`, and the report contract at `../../instructions/report.md` the same way. Name the skills that fit the task.
 5. Proof. Say which check proves the work, such as a command, a test, or a screenshot. Ask the agent to report any check it could not run.
