@@ -8,7 +8,7 @@ A wizard is a bash script that walks a human step by step through a manual proce
 
 [template.sh](scripts/template.sh) already solves the user experience. It provides stage-by-stage progress, confirmation gates, and URL opening across platforms, WSL included. It also provides hidden secret entry, idempotent `.env` upserts, `gh secret` and `gh variable` writes, and a closing summary. Your job is only to scope the procedure and author its stages. The library functions above `run_wizard` are identical in every wizard, and that consistency is the point. So edit only the body of `run_wizard`.
 
-A wizard is ephemeral by default. It is built for one run and saved to the session's scratchpad or a temporary directory. Delete it when the job is done. Save it to `scripts/` in the repository only when the user wants a repeatable setup path there.
+A wizard is ephemeral by default. It is built for one run and saved to the session's scratchpad or a temporary directory. Keep it available through the handoff, give the user its path and command, and remove it only after the user confirms the manual procedure is finished. Save it to `scripts/` in the repository only when the user wants a repeatable setup path there.
 </overview>
 
 <process>

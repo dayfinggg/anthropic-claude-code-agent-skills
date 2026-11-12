@@ -1,6 +1,6 @@
 ---
 name: delegation
-description: Picks the provider, model, and effort for another agent and writes its complete brief. Use it before the first subagent, child task, or parallel agent of a task, whenever the user asks to delegate, parallelize, or run agents, and before handing work to a model of another provider.
+description: Selects providers, models, and effort, assigns bounded work, supervises agents, and verifies results. Use before delegating or parallelizing, when asked to run agents or choose their models, and when coordinating, redirecting, or accepting their work across providers.
 ---
 
 <when_to_delegate>
@@ -18,6 +18,8 @@ Find out what the runtime offers before you choose a model. Never pick from memo
 - In T3 Code, the T3 orchestration instructions and tools are in your context. Follow them. Call the capabilities tool once per thread, and choose only from the providers, models, and options it returns.
 - Outside T3 Code, use only the native subagent tool, such as `Agent` in Claude Code or `spawn_agent` in Codex. Choose only among the models its schema or the session lists.
 - When the user names a provider or model that the runtime does not offer, say so. Do not switch to another one unasked.
+
+Before launching, identify how this runtime delivers progress, accepts corrections, cancels work, and resumes a waiting worker. Keep the IDs it returns. A new top-level thread is not a substitute for a subagent. Follow runtime-specific routing and waiting rules rather than assuming that native agents, delegated sessions, and background jobs share a lifecycle.
 </runtime>
 
 <model_and_effort>
@@ -33,13 +35,13 @@ The brief rules below follow current Claude guidance, so a brief to a Claude sub
 
 <brief>
 The agent sees only the brief, so give the whole task once and precisely. Write it in English unless the task needs another language. Every brief covers these parts.
-1. Goal and finish line. State what is wrong or wanted. Say what done looks like, such as "the suite passes 30 runs in a row".
+1. Goal and acceptance. Name the requested outcome and the check that proves it, with the required cases and target revision. A partial check does not close a larger requirement.
 2. Context. Give exact paths, the relevant facts you already know, and what you ruled out. Pass long material as file paths, not pasted text. State the agent's own task in your words, because the user's message addresses you and can mislead the agent. Quote the user's wording only where the agent must judge against it, such as a spec, and then once, without a translation.
-3. Scope. Name the files or modules the agent owns, and what it must not touch.
+3. Scope and ownership. Name the allowed files or modules, hosts or datasets when applicable, and whether the task permits reading, editing, running checks, or publishing. State exclusions and preserve the user's counts and deadlines. A count limits all agents launched for that allocation unless the user explicitly means simultaneous agents. Name dependencies and their owners. The worker reports an out-of-scope dependency instead of changing it or starting another worker.
 4. Rules. An agent that runs under this plugin already has the working rules, which include the rules for delegated work, a native subagent through its task and a separate session through its system prompt, so the brief does not repeat or reword them. A separate session has the writing rules too, and a native subagent has a short report contract in their place. For a native subagent that will write a document or a message for people, name the writing rules at `../../instructions/style.md`, relative to this skill, as an absolute path. For an agent of another provider, name that file, the working rules at `../../instructions/work.md`, and the report contract at `../../instructions/report.md` the same way. Name the skills that fit the task, and add only the limits that this task sets, such as the hosts and data the agent may change.
-5. Proof. Say which check proves the work, such as a command, a test, or a screenshot. Ask the agent to report any check it could not run.
-6. Stop conditions and caps. The agent asks only when it cannot continue, or before a destructive or external action. It works through ordinary obstacles such as errors and timeouts, and it reports a deliberate barrier, such as denied access, instead of working around it. Give it a cap on turns or spend where the runtime offers one, and name who approves the result.
-7. Return contract. The agent's own rules already ask for a plain report in the user's language that opens with the outcome, gives evidence with file and line, and marks unverified claims. Say only what the report must contain and the length you need, and name another language only when the report itself must be in it. Ask for long material as a file path, not as report text.
+5. Evidence. Require the check to run, its actual result, and the files or artifacts needed to inspect it. A worker resolves ordinary setup and command failures before returning. A genuine blocker identifies the missing prerequisite and affected outcome.
+6. Checkpoints and stopping conditions. For long or shared work, name when the lead needs an update, such as the first concrete finding, a changed assumption, or a shared-resource operation, and name the channel that carries it while the worker runs, such as the runtime's message tool and the lead's address. A worker's text between tool calls reaches the lead only where the runtime delivers it, and a worker that ends its turn to send an update hands back unfinished work, so ask for checkpoints only where such a channel exists. State which actions require approval and which the worker can continue without waiting. Destructive or external actions need authorization covering that action, and a deliberate denial of access is reported rather than bypassed. The lead cannot grant permission the user withheld. Keep checkpoints proportional to risk, without turning every edit into an approval. Give a cap only when the task or runtime supplies one, and name who accepts the result.
+7. Return contract. Request the result, supporting evidence, and integration-relevant side effects in the user's language, unless another report language is explicitly needed. State the length you need, because the worker's own rules otherwise cap the report at a short default. Omit routine non-actions. Say only what this task adds to the existing report rules. Long artifacts belong at the specified path rather than in the report body.
 
 Keep the brief at the level of goals and checks. Overly specific steps or "stop for review" lines make current models end early or over-ask.
 </brief>
@@ -47,17 +49,27 @@ Keep the brief at the level of goals and checks. Overly specific steps or "stop 
 <parallel_work>
 Run parallel agents only on independent tracks, and split them along file boundaries. Send all parallel spawns in one message so they run together. Give each agent that writes code its own checkout, such as a worktree, when the runtime offers one. Keep spawn counts low, and use one agent when one is enough.
 
-The `shared_systems` block of the coding instructions binds each agent, and a limit for each agent does not bound their sum. Before you choose how many agents to start on one machine, one database, or one live service, read what it can take. Give every brief the same facts about it and the one way the agents take turns at heavy work, such as a lock that each heavy job holds while it runs. When one agent finds a hazard that the others can meet, such as a trigger that multiplies a write or a scheduled job on the same rows, send it to each of them at once.
+The `shared_systems` block binds the whole team. Before choosing how much work to run on one host or service, inspect capacity and existing jobs. Assign one owner for heavy operations and one shared coordination method. Include browser runs, broad scans, builds, and indirect database writes in the same budget. The lead's own jobs count too. Broadcast a newly found shared hazard to affected workers before they reach it. Keep file ownership distinct and transfer ownership explicitly when another worker must take over.
+
+One worker on a short task needs no record beyond the conversation. With two or more workers, or work long enough to outlast one context, keep a team record of each task's ID, owner, scope, dependencies, last checkpoint, outstanding check, and acceptance state. Use the session's task list where it has one and one file in the session scratchpad otherwise. Update it when those facts change, so the state survives compaction. Do not infer completion from an agent becoming idle or its message being labelled completed.
 </parallel_work>
 
+<supervision>
+The lead remains responsible while workers run. Use the runtime's progress events, checkpoint messages, or permitted incremental activity reads to inspect actual actions and results. A final report alone arrives too late to correct expensive drift. If the runtime offers no intermediate visibility, split long work at useful checkpoints rather than assigning an opaque unbounded task. When the user requests scheduled supervision and the runtime supports it, use that mechanism and read only activity since the last check. Never replace a runtime prohibition on polling with a sleep loop or a different watcher.
+
+At a checkpoint, compare the next action and observed result with the assigned scope and acceptance check. Look for changes outside ownership, a different target, repeated failing commands, foreground waiting, overlapping heavy work, leaked secrets, weakened checks, or a completion claim ahead of evidence. Inspect the relevant command or artifact instead of trusting a progress summary alone.
+
+Correct a deviation promptly with the observed action, the boundary it crosses, and the next allowed action. Ask one focused question when a missing fact changes the method. Stop affected work before a dangerous or conflicting action, then verify that the identified job stopped before replacing it. If an out-of-scope edit already happened, inspect its diff and ownership before assigning a repair. Do not order a blanket revert of shared files that may contain another person's work. Keep independent work moving. A correction is complete only when a later action or result shows the worker followed it. Record recurring failures and change the approach or reassign the remaining bounded work within the user's allocation. Do not keep sending the same reminder to an unchanged failing process.
+</supervision>
+
 <waiting>
-Do not poll an agent, sleep, or re-brief it while it runs. Keep working on what does not depend on it, and follow the runtime's instructions for completion notices. Send a follow-up to a running agent only to correct its course. Cancel an agent you no longer need with the runtime's cancel tool.
+Keep doing independent work between supervision events and follow the runtime's instructions for completion notices. Do not poll status, sleep, or send repeated progress requests while a notification is pending. Send a correction when evidence calls for one, and cancel a worker you no longer need with the runtime's cancellation tool.
 
 A completion notice says that the agent's turn ended, and the agent's last message says whether the work did. When that message reports a wait or a next step, the task is still open. Wait for the next notice where the runtime wakes the agent by itself, and tell the agent to continue where it does not.
 
-When the user asks you to watch the agents on a schedule, set the check up with the runtime's scheduler. Read in each check only what changed since the last one, and correct an agent as soon as you see it leave its brief or these rules.
+End a scheduled supervisor when its assigned workers and required follow-up work are settled. Keep it active while its supervision is still needed.
 </waiting>
 
 <results>
-Check each report's evidence before you accept it, such as the command, its output, and the cited lines. Do not redo the agent's work or re-derive its findings when the evidence holds. When several agents changed code, check for conflicts. Then run the project's checks on the combined result, as the `verification` block of the coding instructions requires. Tell the user the verified findings in your own words under the `writing_style` rules, and name each agent or thread as the runtime shows it.
+Accept a result only when its artifact and executed check cover the assigned requirement at the current revision. A partial result remains open. Resolve contradictions between a report, command output, and diff before using the report. Do not rerun a still-valid check merely to reproduce the worker's result. Check integration across workers and run the checks the combined changes require. Confirm that owned jobs, shared allocations, and temporary artifacts are settled. Tell the user the established outcome and necessary next action, with material blockers only where they remain. Do not append a roster of routine non-actions or pass an avoidably unchecked report on to the user.
 </results>

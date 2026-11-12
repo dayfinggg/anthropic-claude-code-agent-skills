@@ -35,11 +35,7 @@ Check for a local Playwright first, because a project install pins the version t
 npx --no-install playwright --version
 ```
 
-When the local version supports it, use `npx playwright cli` in place of `playwright-cli`. Confirm the command with its help output. If neither command is available, use another browser tool supported by the harness. Installing a new tool requires the user's request under `code_rules`. The following command applies only to an authorized installation.
-
-```bash
-npm install -g @playwright/cli@latest
-```
+When the local version supports it, use `npx --no-install playwright cli` in place of `playwright-cli`. Confirm the command with its help output. If neither command is available, use another browser tool supported by the harness. Installing a new tool requires the user's request under `code_rules`. For an authorized installation, follow the `dependencies` skill to verify `@playwright/cli` and select a specific version.
 </installation>
 
 <commands>
@@ -288,15 +284,25 @@ playwright-cli -s=msedge detach
 </open_parameters>
 
 <windows_urls>
-On Windows, `cmd.exe` and PowerShell treat `&` as a command separator. A URL with several query parameters then gets cut before `playwright-cli` runs. Escape `&` with `^&` in `cmd.exe`, or use `--%` in PowerShell.
+Quote the entire URL so an ampersand remains part of the argument. In `cmd.exe`, do not add a caret inside the quoted URL, because it becomes a literal character. The [cmd documentation](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cmd#remarks) describes quoting special characters.
 
 ```batch
-playwright-cli goto "https://example.com/?a=1^&b=2"
+playwright-cli goto "https://example.com/?a=1&b=2"
 ```
 
+In PowerShell the form depends on the launcher that the command name resolves to, which `(Get-Command playwright-cli).Source` shows. npm writes a `.ps1` and a `.cmd` launcher for a command, and PowerShell takes the `.ps1` one when both exist. For a `.ps1` launcher or a native executable, single quotes pass the URL as one literal argument, as the [argument parsing documentation](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parsing#argument-mode) describes.
+
 ```powershell
-playwright-cli --% goto "https://example.com/?a=1&b=2"
+playwright-cli goto 'https://example.com/?a=1&b=2'
 ```
+
+A `.cmd` launcher gets its arguments through `cmd.exe` as a raw command line, where the ampersand of that single-quoted URL ends the command. This applies when only the `.cmd` launcher exists, and when you name it because script execution is disabled and the `.ps1` launcher fails. Use the [stop-parsing token](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parsing#the-stop-parsing-token) with double quotes there. The token turns the rest of the line into literal arguments, so keep redirections off that line.
+
+```powershell
+playwright-cli.cmd --% goto "https://example.com/?a=1&b=2"
+```
+
+The same choice applies to `npx`, which has both launchers.
 </windows_urls>
 
 <snapshots>
@@ -340,7 +346,7 @@ playwright-cli click "getByTestId('submit-button')"
 </targeting_elements>
 
 <sessions>
-`-s=<name>` runs a command in a named browser session, so several browsers can run at once. A headless session shuts down after an hour without commands. Stop every session you started before you report, as the `verification` block requires.
+`-s=<name>` runs a command in a named browser session, so several browsers can run at once. A headless session shuts down after an hour without commands. Stop the sessions this task started before you report, as the `verification` block requires. Target their names so another task's browser stays available.
 
 ```bash
 playwright-cli -s=mysession open example.com --persistent
@@ -349,8 +355,6 @@ playwright-cli -s=mysession click e6
 playwright-cli -s=mysession close
 playwright-cli -s=mysession delete-data
 playwright-cli list
-playwright-cli close-all
-playwright-cli kill-all
 ```
 </sessions>
 

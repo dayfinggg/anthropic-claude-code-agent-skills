@@ -12,7 +12,7 @@ One reference file holds the settings and commands of each package manager, whic
 </references>
 
 <names_and_versions>
-- Look the package up in its registry before you install it. Confirm the exact name, the repository it links to, and that its publish history fits the library you mean. A model can name a package that no registry holds, and an attacker can register that name. In a [2025 study](https://www.usenix.org/conference/usenixsecurity25/presentation/spracklen) of 576,000 code samples, at least 5.2 percent of the packages that commercial models named did not exist.
+- Before introducing a package or running a registry tool, confirm its exact registry name, linked repository, and publish history. A routine restore of the project's existing lockfile uses its declared identities and integrity checks rather than researching every transitive dependency again. A model can name a package that no registry holds, and an attacker can register that name. In a [2025 study](https://www.usenix.org/conference/usenixsecurity25/presentation/spracklen) of 576,000 code samples, at least 5.2 percent of the packages that commercial models named did not exist.
 - Write no version number from memory. Let the package manager resolve the current version, as `npm install <pkg>`, `uv add <pkg>`, `composer require <pkg>`, and `cargo add <pkg>` do, or read the version from the registry. The same holds for a container image tag, a CI action, and a script URL on a CDN.
 - Before you add a version, check in the package's own metadata that it supports the project's runtime and framework versions.
 </names_and_versions>
@@ -31,5 +31,5 @@ One reference file holds the settings and commands of each package manager, whic
 </upgrades>
 
 <audit>
-Run the manager's audit command after you add or upgrade a package, and when the user asks about vulnerabilities. For each finding, report the package, the advisory, the version that fixes it, and whether the project reaches the vulnerable code. A forced fix, such as `npm audit fix --force`, can install a breaking major version, so it waits for the user's word.
+Run the manager's audit command after adding or upgrading a package, and when the user asks about vulnerabilities. Resolve findings introduced by the change within scope. Report the package, advisory, fixed version, and reachability for a finding that affects the result or requires the user's decision. An explicitly requested audit covers all findings. A forced fix, such as `npm audit fix --force`, can install a breaking major version, so it waits for the user's word.
 </audit>
