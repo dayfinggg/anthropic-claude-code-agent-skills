@@ -4,7 +4,7 @@ description: Builds and sharpens a project's domain model as design work happens
 ---
 
 <overview>
-Actively build and sharpen the project's domain model as you design. This is the active discipline. It challenges terms, invents edge-case scenarios, and writes the glossary and decisions down the moment they settle. Merely reading `GLOSSARY.md` for vocabulary is not this skill, because any task can do that. This skill is for changing the model, not just consuming it.
+Build and sharpen the project's domain model while its terms or decisions are unresolved. Challenge a material ambiguity with a concrete scenario and record the decision when it settles. A request to record an already settled definition does not reopen that decision or require an interview. Merely reading `GLOSSARY.md` for vocabulary is not this skill, because any task can do that.
 </overview>
 
 <file_structure>

@@ -20,7 +20,7 @@ This skill covers types, type errors, and compiler configuration. Running TypeSc
 <workflow>
 A type problem takes four steps.
 
-1. Capture the full compiler output before you change code. Use the project's type-check script, or `npx tsc --noEmit` when it has none.
+1. Capture the full compiler output before changing code. Use the project's type-check script. If it has none, confirm the project's `typescript` package is installed and run its compiler with `--noEmit`. Restore missing declared dependencies with the project's package manager within the task's permissions. Do not let `npx tsc` fetch the unrelated registry package named `tsc`.
 2. Find the root cause as the `debugging` block requires. Typical causes are unsound inference, a missing constraint, an implicit `any`, or a widened literal.
 3. Fix the cause with the simplest precise type. Replace each `any` with a real type, and check that every call site still compiles.
 4. Run the type check again and read the output, as the `verification` block requires.

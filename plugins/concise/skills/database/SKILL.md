@@ -19,9 +19,11 @@ The reference files hold rules that this file does not repeat, one engine area e
 </references>
 
 <data_safety>
-A destructive or production command runs only after the user confirms it in the conversation. A destructive command drops, truncates, resets, flushes, or wipes data, or changes existing rows, documents, or keys, as `UPDATE`, `DELETE`, and `MERGE` do in SQL. A production command is any command whose target is not a local or disposable database. Before each such command, read the target host and database name from `DATABASE_URL`, the ORM config, or the connection string.
+A destructive or production command needs authorization covering its target and effect. An authorized read-only investigation covers its read-only queries without repeated confirmation. A destructive command drops, truncates, resets, flushes, or wipes data, or changes existing rows, documents, or keys, as `UPDATE`, `DELETE`, and `MERGE` do in SQL. A production command is any command whose target is not a local or disposable database. Before each such command, confirm the target host and database name from the relevant configuration without printing credentials.
 
-These steps apply to every destructive change.
+One narrow exception covers an isolated local test database created by this task with only synthetic data. An authorized test run also covers resetting and removing that database after verifying its exact identity and that no other task or service uses it. This exception grants no access to a real, shared, or pre-existing database and does not override a read-only request or a runtime restriction.
+
+These steps apply to destructive changes outside that isolated test database.
 1. Work on a copy first when one exists, such as a local database, a branch database, or a restored dump.
 2. Back up the data the command touches. Check that the backup exists and holds the expected number of rows or documents.
 3. Count what the command will touch with the same filter, as `SELECT count(*)` with the same `WHERE` clause does, and note the count.
@@ -56,7 +58,7 @@ These commands wipe data or schema, so you never run them on your own initiative
 - Raw `DROP`, `TRUNCATE`, or a `DELETE` without `WHERE` in a database client
 - `dropDatabase()`, `drop()`, or `deleteMany({})` in MongoDB, `FLUSHALL` or `FLUSHDB` in Redis, and the delete of a whole index, bucket, or table in any other store
 
-If one of these looks necessary, tell the user what it would destroy and which database it points at. Let the user run it. Run it yourself only when the user confirms that exact command and the target is local. `prisma migrate dev` asks to reset the database when it detects drift. Answer no and report the drift to the user.
+Outside the isolated test-database exception in data_safety, tell the user what such a command would destroy and which database it targets. Let the user run it. Run it yourself only when the user confirms that exact command and the target is local. If `prisma migrate dev` asks to reset a pre-existing database because of drift, answer no and investigate the drift.
 </never_run>
 
 <how_migrations_fail>
@@ -135,7 +137,7 @@ Renames, type changes, and column splits go through six steps.
 5. Deploy code that stops writing the old column.
 6. Contract by dropping the old column in a migration of a later release.
 
-Do the steps that belong in the current change. List the rest as follow-ups the user must schedule. Never collapse all six steps into one migration.
+Do the steps that belong in the current change and identify necessary later deployments. Keep them separate while old and new application versions can overlap or live data may be affected. Combine phases only when the target is verified empty or exclusively offline, the request authorizes that operation, and no caller or data needs the transition period.
 </expand_contract>
 
 <batched_backfill>
@@ -192,5 +194,5 @@ A query inside a loop over rows is an N+1 pattern. Load the related rows in one 
 </n_plus_one>
 
 <report>
-End every migration task with a migration safety report in the reply, inside the length the `writing_style` rules set. Give one sentence per risky statement that names the statement, its risk, and your change, and group statements that share a risk. An example is "`CREATE INDEX` on `orders` blocked writes, so it now runs `CONCURRENTLY` alone." Then say whether a lock timeout is set. Name the expand and contract steps left for later deploys, or say that none remain. If you could not make a statement safe, say so in the first sentence of the report.
+End a migration task with its result and the safety facts needed to use it, within the writing_style rules. Explain a risky statement and its mitigation when the risk affects use or rollback, grouping statements with the same risk. Include the lock timeout where it protects the operation and name expand and contract steps that still need a later deployment. Omit a routine statement that no steps remain. A statement that cannot be made safe stays blocked, with its concrete reason and the decision needed before it runs.
 </report>

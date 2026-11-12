@@ -1,19 +1,19 @@
-This parallel sub-agent pattern explores alternative interfaces for a module that you deepen or design. Use it when the user wants to compare such alternatives. It follows "Design It Twice" from Ousterhout, because the first idea is rarely the best. It uses the vocabulary of [SKILL.md](../SKILL.md), such as module, interface, seam, adapter, and leverage.
+This procedure compares alternative interfaces for a module that you deepen or design. It follows "Design It Twice" from Ousterhout, because the first idea is rarely the best. Compare bounded alternatives yourself for a small decision. Use independent agents when the user requests them or the size and independence of the design work justify them under the delegation skill and runtime rules. It uses the vocabulary of [SKILL.md](../SKILL.md).
 
 <process>
 <step_1_frame_the_problem_space>
-Before you spawn sub-agents, write a user-facing explanation of the problem space for the module. It covers three things.
+Before comparing designs, establish the problem space for the module. It covers three things.
 - The constraints that any new interface must satisfy.
 - The dependencies it relies on, and the category of each from [DEEPENING.md](DEEPENING.md).
 - A rough code sketch that makes the constraints concrete. It illustrates them and is not a proposal.
 
-Show this to the user, then go straight to step 2. The user reads and thinks while the sub-agents work in parallel.
+Use this context in the comparison and proceed to step 2 without an extra approval when the requested scope is clear.
 </step_1_frame_the_problem_space>
 
 <step_2_spawn_sub_agents>
-Spawn three or more sub-agents in parallel, each with a fresh context window. Each one must produce a radically different interface for the module.
+Produce genuinely distinct interfaces. If delegating, choose the number of agents from the independent alternatives and the user's allocation rather than a fixed minimum. Give each a fresh context and a distinct design constraint. Otherwise evaluate the applicable alternatives yourself.
 
-Give each sub-agent its own technical brief, separate from the user-facing explanation in step 1. The brief holds file paths, coupling details, the dependency category, and what sits behind the seam. Include the vocabulary of this skill, and the vocabulary of `GLOSSARY.md` if the project has one. Each sub-agent then names things in the architecture language and the project's domain language.
+Give each sub-agent its own technical brief, built on the problem space from step 1. The brief holds file paths, coupling details, the dependency category, and what sits behind the seam. Include the vocabulary of this skill, and the vocabulary of `GLOSSARY.md` if the project has one. Each sub-agent then names things in the architecture language and the project's domain language.
 
 Each sub-agent gets a different design constraint.
 - Agent 1 gets "Minimize the interface, with 1-3 entry points at most. Maximize leverage per entry point."

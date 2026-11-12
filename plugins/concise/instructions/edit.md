@@ -1,0 +1,1 @@
+Use this tool for changes to existing local files. Match the smallest unique fragment that makes the intended change. If the match is missing or ambiguous, reread and correct it here instead of switching to a shell rewrite. Preserve changes outside your task. Complete the checks required by the verification rules.

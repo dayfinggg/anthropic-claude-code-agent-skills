@@ -72,5 +72,5 @@ Diagnose a live service read-only first. Read the service state, its log for the
 </diagnosis>
 
 <report>
-End a task that changed a host with these facts in the reply, inside the length the `writing_style` rules set. Name the host, each file you changed with the path of its copy, each command that changed state, the check that proved the result, and the way back. Remove the temporary files you created on the host, and name any you left on purpose.
+End a task that changed a host with the result, target, meaningful verification, and recovery information needed to use it safely. Group related changes rather than listing every command in the reply. Preserve detailed commands and backup paths in the existing operational record where the project keeps one. Remove temporary files this task created, and mention a retained artifact only when it is needed for use, recovery, or follow-up. Follow the writing_style rules without omitting a material risk or the way back.
 </report>

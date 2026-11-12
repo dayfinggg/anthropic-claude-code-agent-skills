@@ -10,11 +10,11 @@ Design deep modules. A deep module puts a lot of behavior behind a small interfa
 <going_deeper>
 Two reference files hold procedures that this file does not repeat. Read a file whole as soon as the work meets its condition, also when that happens later in the task.
 - Before you merge modules or move a seam, read [DEEPENING.md](references/DEEPENING.md). It covers how to deepen a cluster of modules given its dependencies, with dependency categories, seam discipline, and the test strategy of replacing old tests.
-- When the user wants to compare alternative interfaces on depth, locality, and seam placement, read [DESIGN-IT-TWICE.md](references/DESIGN-IT-TWICE.md). It runs parallel sub-agents that design an interface in radically different ways.
+- When the user wants to compare alternative interfaces on depth, locality, and seam placement, read [DESIGN-IT-TWICE.md](references/DESIGN-IT-TWICE.md). It compares distinct designs, with independent agents only when that work justifies delegation.
 </going_deeper>
 
 <glossary>
-Use these terms exactly for the design concepts, and do not substitute "component", "service", "API", or "boundary" for them. Consistent language is the point of the glossary. The project's own names for its code and its domain stay as they are.
+Keep these design concepts distinct and use consistent terms. The project's own names stay as they are. In explanations to people, use the reply language and explain a specialized concept only when needed. This glossary does not require English jargon in the answer.
 
 A module is anything with an interface and an implementation. The term is deliberately scale-agnostic. It covers a function, class, package, or tier-spanning slice. Do not call it a unit, component, or service.
 
@@ -35,7 +35,7 @@ Locality is what maintainers get from depth. Change, bugs, knowledge, and verifi
 
 <principles>
 - Three questions deepen an interface. Can the number of methods shrink, can the parameters get simpler, and can more complexity move inside?
-- Depth is a property of the interface, not the implementation. A deep module can be built from small, mockable, swappable parts, as long as they stay out of the interface. Such a module can have internal seams as well as the external seam at its interface. Internal seams stay private to the implementation and serve its own tests.
+- Depth is a property of the interface, not the implementation. A deep module can be built from small, mockable, swappable parts, as long as they stay out of the interface. Internal seams can permit substitution behind the public interface, while test assertions still exercise behavior through that public interface.
 - The deletion test checks whether a module earns its place. Imagine deleting it. If complexity vanishes, the module was a pass-through. If complexity reappears across many callers, it was earning its keep.
 - The interface is the test surface. Callers and tests cross the same seam. If you want to test past the interface, the module probably has the wrong shape.
 - One adapter means a hypothetical seam, and two adapters mean a real one. Do not add a seam unless something actually varies across it.

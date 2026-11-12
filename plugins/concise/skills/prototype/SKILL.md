@@ -22,5 +22,5 @@ Six rules apply to both branches.
 3. It has no persistence by default, so state lives in memory. Persistence is the thing a prototype may check, not something it depends on. If the question involves a database, use a scratch database or a local file. Give it a clear "PROTOTYPE, wipe me" name.
 4. It skips the polish. It has no test suite, no error handling beyond what keeps it runnable, and no abstractions. Run it once and use it yourself before you hand it over. The point is to learn something fast.
 5. It surfaces the state. After every action (logic) or variant switch (UI), render the full relevant state. The user then sees what changed.
-6. It ends with a captured answer. Report the verdict and the question it settled. Fold the validated decision into the real code when the user wants that. Then remove the prototype files from the main code. Keep them only where the user asks, such as a throwaway branch.
+6. It ends with a captured answer to the design question. Keep the prototype available while the user is comparing or trying it. For a choice of appearance or interaction, capture the user's verdict before cleanup. Fold the validated decision into the real code when requested, then remove this task's prototype files from the main code. Keep them elsewhere when the user asks, such as a throwaway branch.
 </rules_for_both>

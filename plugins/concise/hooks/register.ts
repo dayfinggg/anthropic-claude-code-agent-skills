@@ -10,6 +10,7 @@ import {
   MODEL_RULES,
   OUTPUT_STYLE_ATTACHMENT,
   REMOVED_SECTIONS,
+  REPORTING_REWRITE,
   REPLY_REMINDER,
   REPORT_FILE,
   SECTION_REWRITES,
@@ -75,7 +76,10 @@ export const register: Register = on => {
 
   on('tool.describe', { tool: Object.keys(TOOL_RULES) }, async ($, e, next) => {
     const [result, rule] = await Promise.all([next(e), readInstruction($, TOOL_RULES[e.tool] ?? '')])
-    return { ...result, description: `${removeSourceListRules(result.description)}\n\n${rule}` }
+    const description = e.tool === 'WebSearch' || e.tool === 'WebFetch'
+      ? removeSourceListRules(result.description)
+      : result.description
+    return { ...result, description: `${description}\n\n${rule}` }
   })
 
   on('session.compact', ($, e, next) =>
@@ -103,9 +107,10 @@ export const register: Register = on => {
       ...(modelRule ? [section('model', await withLanguage($, await readInstruction($, modelRule[1])))] : []),
       section('style', await readStyle($)),
     ]
-    if (!e.outputStyle?.isKeepingCodingInstructions) return { sections: [...result.sections, section('work', work), ...tail] }
+    const baseSections = result.sections.map(item => ({ ...item, text: item.text.replace(...REPORTING_REWRITE) }))
+    if (!e.outputStyle?.isKeepingCodingInstructions) return { sections: [...baseSections, section('work', work), ...tail] }
 
-    const sections = result.sections
+    const sections = baseSections
       .filter(section => !REMOVED_SECTIONS.some(id => section.id.startsWith(id)))
       .map(section => {
         if (section.id === CODING_SECTION) return { ...section, text: work }

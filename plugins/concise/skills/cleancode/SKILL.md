@@ -17,9 +17,9 @@ Each reference file covers one book.
 
 <precedence>
 The coding instructions win where a book disagrees with them. The `code_rules` block already sets KISS, YAGNI, DRY, the least code, comments only where the repository keeps them, and the project's style. The reference files leave those rules out. Three book habits still meet `code_rules`, and `code_rules` decides each one.
-- The books invite cleanup of nearby code. Refactor only what the request names or needs, and mention other smells in the report.
+- The books invite cleanup of nearby code. Refactor only what the request names or needs. Mention an unrelated defect only when it affects correctness, safety, or a decision the user must make.
 - Characterization tests and new edge-case tests stay only where `code_rules` allows new tests. Otherwise use them as temporary checks and delete them.
-- Release It defenses, such as timeouts and circuit breakers, go into code that the task adds or changes. For other code, propose them in the report.
+- Release It defenses, such as timeouts and circuit breakers, go into code that the task adds or changes. Propose them for other code only when an observed risk requires the user's decision.
 
 The `design` skill owns module interfaces, depth, and seam placement.
 </precedence>

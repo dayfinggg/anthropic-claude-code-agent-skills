@@ -58,14 +58,14 @@ A project has `pyproject.toml` or `uv.lock`, and these commands manage it.
 - `uv sync` installs the environment from the lockfile. In CI, `uv sync --locked` fails if the lockfile is out of date.
 - `uv lock --upgrade-package requests` upgrades one locked package.
 - `uv run <command>` runs a command in the project environment, and `uv run python -c "..."` runs Python there.
-- `uv run -p 3.14 <command>` runs a command with a specific Python version.
+- `uv run -p 3.14 <command>` runs a command with a specific Python version. When the project environment uses another version, uv first removes it and recreates it on the requested one, so this command moves the project and is not a way to try an interpreter.
 
 A standalone script uses inline metadata (PEP 723), and these commands manage it.
 - `uv run script.py` runs the script.
 - `uv run --with requests script.py` runs it with an extra package.
 - `uv add --script script.py requests` writes the dependency into the script's metadata.
 
-`uvx <tool>` runs a command-line tool from PyPI without installing it, and `uvx <tool>@<version>` runs a specific version. It installs packages by name, so run only well-known tools. Use `uv tool install` only when the user asks for it.
+`uvx <tool>` runs a command-line tool from PyPI in an isolated environment, and `uvx <tool>@<version>` runs a specific version. Verify the package identity and pin the version under the `dependencies` skill before executing it. Prefer the project's existing tool and version. `uvx python@3.12` installs no PyPI package. uv runs that interpreter in a temporary environment, downloads it only when the machine lacks it, and leaves the project environment as it is. Use `uv tool install` only when the user asks for it.
 
 The pip interface serves projects that keep `requirements.txt` files and have no `uv.lock`. It uses `uv venv`, `uv pip install -r requirements.txt`, `uv pip compile requirements.in -o requirements.txt`, and `uv pip sync requirements.txt`. Add `--universal` to `uv pip compile` for a platform-independent result. Do not add new `requirements.txt` files to a uv project.
 
@@ -83,7 +83,7 @@ When the user asks to move from pyenv, pipx, pip-tools, or virtualenv, the match
 </uv>
 
 <ruff>
-Ruff is Astral's linter and formatter. It replaces Flake8, isort, Black, pyupgrade, and autoflake. The current release in November 2026 is 0.17. Use it when the project has a `[tool.ruff]` table, a `ruff.toml`, or a `.ruff.toml` file. Run `uv run ruff` when ruff is a project dependency, so that the pinned version runs. Run `uvx ruff` when it is not a dependency.
+Ruff is Astral's linter and formatter. It replaces Flake8, isort, Black, pyupgrade, and autoflake. The current release in November 2026 is 0.17. Use it when the project has a `[tool.ruff]` table, a `ruff.toml`, or a `.ruff.toml` file. Run the project's pinned tool through its own environment, such as `uv run ruff` in a uv project. If it is not a dependency, check the version used by CI or pre-commit before choosing a pinned registry invocation under the `dependencies` skill.
 
 Keep ruff's changes inside the task. If `ruff format --diff` changes a whole file, the project does not format with ruff. Leave that file unformatted. `ruff check --diff` shows the fixes for the code you change. Apply fixes only to the files you modify, unless the user asks for more.
 
@@ -113,7 +113,7 @@ Without a configured Python version, ruff 0.17 assumes Python 3.11. Set `require
 <type_checking>
 Use the type checker that the project already runs, such as mypy, Pyright, basedpyright, or ty. Its config sits in `pyproject.toml` or in `mypy.ini`, `pyrightconfig.json`, or `ty.toml`. Run it through the project's environment, as in `uv run mypy .`. For a new project, ty is the fast default from Astral. It is still versioned 0.0.x and renames rules at times, so pin its version.
 
-ty runs as `uv run ty check` when it is a project dependency, and as `uvx ty check` otherwise. `ty check src/` or `ty check path/to/file.py` checks a part of the project. These options control the run.
+Run ty through the project's environment, such as `uv run ty check` in a uv project. If it is not a dependency, select and verify a pinned version under the `dependencies` skill before a registry invocation. `ty check src/` or `ty check path/to/file.py` checks a part of the project. These options control the run.
 - `--python-version 3.14` and `--python-platform linux` set the target environment.
 - `--error <rule>`, `--warn <rule>`, and `--ignore <rule>` change the level of one rule.
 - `--output-format concise` prints one line per diagnostic.

@@ -18,7 +18,7 @@ Read [tests.md](references/tests.md) whole before you write the first test of a 
 <seams>
 A seam is the public boundary you test at. It is the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.
 
-Test only at chosen seams. Before you write any test, write down the seams under test. Give each one a one-line note on what it catches and what it misses. Choose the seams and state the choice in the report, and ask the user first only when the choice changes what gets built. You cannot test everything, so choosing the seams up front puts testing effort on the critical paths and complex logic.
+Test only at chosen seams. Before writing a test, decide which seam it exercises and which failure it catches. Mention that choice in the reply only when it changes the requested coverage or leaves a material risk for the user's decision. Ask first only when the choice changes what gets built. Choosing the seams up front puts testing effort on the critical paths and complex logic.
 
 When the shape of the interface is in question, such as module depth or seam placement, consult the `design` skill.
 </seams>
