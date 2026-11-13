@@ -23,7 +23,8 @@
       "source": {
         "source": "github",
         "repo": "dayfinggg/anthropic-claude-code-agent-skills"
-      }
+      },
+      "autoUpdate": true
     }
   },
   "feedbackSurveyRate": 0,
