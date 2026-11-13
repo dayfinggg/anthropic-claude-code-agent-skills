@@ -3,11 +3,18 @@ name: rust
 description: Current Rust practice (stable 1.100, edition 2024) for writing, reviewing, debugging and upgrading Rust code and Cargo projects. Use when working with .rs files, Cargo.toml, Cargo.lock, rust-toolchain.toml, .cargo/config.toml, clippy.toml or rustfmt.toml, running cargo build, check, test, clippy, fmt, fix, add, update or publish, fixing rustc, borrow checker or lifetime errors, choosing or raising rust-version (MSRV) or the toolchain, migrating to edition 2024, configuring lints, writing async code with tokio, async traits or async closures, writing unsafe code, FFI, static mut or Miri tests, or when asked which Rust version or std API is current or whether a crate is still needed.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/edition-2024.md` in full with the Read tool (Migration, Language, Standard library, Cargo, Rustdoc, Rustfmt).
+2. Read `references/std-apis.md` in full with the Read tool (Stable std APIs by version).
+3. Open https://blog.rust-lang.org/releases/latest/ (Current stable (the page redirects to its release post)) and compare it with the facts below.
+
 ## Check first
 
 - Read `edition`, `rust-version`, `resolver` and `[lints]` in `Cargo.toml` and in the workspace root manifest. Read `rust-toolchain.toml`, `.cargo/config.toml`, `clippy.toml` and `rustfmt.toml` if present.
 - Run `rustc -V` and `cargo -V`. The local toolchain is often newer than `rust-version`, so a clean local build proves nothing about the MSRV. Check the "since" version on the std docs page of any API you are not sure about.
-- Current stable (the page redirects to its release post): https://blog.rust-lang.org/releases/latest/
 - When raising the toolchain or `rust-version`, read each release post in between and the Compatibility Notes in its linked detailed release notes.
 - Look up crate versions and each version's `rust_version` in the crates.io API (`crates.io/api/v1/crates/<name>`). It returns 403 without a User-Agent header.
 - Facts verified 2026-11.
@@ -86,8 +93,3 @@ global-min-publish-age = "3 days"
 - Matching a union field together with other values in one pattern can read the union before the tag is checked, which is undefined behavior. Match the tag first, then read the field.
 - Run unsafe code under Miri with `cargo +nightly miri test` after `rustup +nightly component add miri`. Miri has no FFI or networking, so mark such tests `#[cfg_attr(miri, ignore)]`. Vary addresses and thread schedules with `MIRIFLAGS="-Zmiri-many-seeds=0..16"`. On Windows add `--target x86_64-unknown-linux-gnu`. A pass covers only the executions it tried, so a `// SAFETY:` comment must argue the invariant rather than cite Miri, fuzzing or sanitizers.
 - rand 0.9 renamed `thread_rng()` to `rng()`, `gen` to `random` and `gen_range` to `random_range`. rand 0.10 (current 0.10.3, MSRV 1.85) renamed the `Rng` trait to `RngExt` and `OsRng` to `SysRng`.
-
-## References
-
-- Read references/edition-2024.md when migrating a crate to edition 2024 or fixing errors that appear after an edition change.
-- Read references/std-apis.md when writing or reviewing code against a specific `rust-version`, or before adding a crate for something std may already provide.

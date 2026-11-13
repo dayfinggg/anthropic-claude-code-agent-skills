@@ -13,7 +13,7 @@ claude plugin marketplace update concise
 claude plugin update concise@concise
 ```
 
-The working rules live in `plugins/concise/instructions`, one Markdown file per topic: scope, changes, design, testing, security, evidence, obstacles, research, and skills. The plugin loads every `.md` file in that folder into the system prompt of the main session and of every subagent, so you can edit, add, or remove a file to change the rules.
+The working rules live in `plugins/concise/instructions`, one Markdown file per topic: scope, changes, design, solutions, testing, security, live systems, evidence, questions, obstacles, research, and skills. The plugin loads every `.md` file in that folder into the system prompt of the main session and of every subagent, so you can edit, add, or remove a file to change the rules.
 
 The skills live in `plugins/concise/skills`: planning, orchestration, agent-docs, architecture, codebase-analysis, codemods, debugging, testing, code-review, git, github-actions, containers-iac, shell, web-security, backend-api, react-next, frontend-ui, typescript-javascript, php, database, python, and rust. Each one holds only current facts and traps a strong model gets wrong, checked against official sources, with a `SKILL.md` and at most three files in `references`. Claude loads a skill before it answers or acts and again when the work reaches the skill's area, then reads its references and checks the links it gives for current versions.
 

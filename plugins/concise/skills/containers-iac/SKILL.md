@@ -3,6 +3,17 @@ name: containers-iac
 description: Current practice for Dockerfiles and BuildKit, Docker Compose, Kubernetes manifests, Terraform and OpenTofu, and OpenTelemetry. Use when writing, reviewing or debugging a Dockerfile, docker build or buildx flags, build cache or build secrets, compose.yaml or docker-compose.yml, depends_on, healthchecks or Compose watch, Kubernetes YAML, Helm or Kustomize output, probes, sidecars, Ingress or Gateway API, cluster upgrades, .tf, .tofu or .tftest.hcl files, state locking, import, moved or removed blocks, .terraform.lock.hcl, OTEL_* environment variables, semantic conventions or Collector config. Also use for errors like "no matches for kind", "version is obsolete", "Error acquiring the state lock" or "too many open files" in containers, and when choosing versions of these tools.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/kubernetes.md` in full with the Read tool (Kubernetes defaults, Kubernetes gotchas).
+2. Read `references/terraform-opentofu.md` in full with the Read tool (Terraform and OpenTofu defaults, Terraform and OpenTofu gotchas).
+3. Read `references/opentelemetry.md` in full with the Read tool (OpenTelemetry defaults, OpenTelemetry gotchas).
+4. Open https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml (Kubernetes minors and end-of-life dates) and compare it with the facts below.
+5. Open https://checkpoint-api.hashicorp.com/v1/check/terraform (Current Terraform release) and compare it with the facts below.
+6. Open https://github.com/open-telemetry/semantic-conventions/tags.atom (Current semantic conventions release) and compare it with the facts below.
+
 ## Check first
 
 - Read what the project pins before writing syntax: the `# syntax=` line and `FROM` tags in Dockerfiles, then `docker version`, `docker buildx version` and `docker compose version`.
@@ -10,9 +21,6 @@ description: Current practice for Dockerfiles and BuildKit, Docker Compose, Kube
 - Terraform or OpenTofu: read `required_version`, the provider hosts in `.terraform.lock.hcl` (`registry.opentofu.org` means OpenTofu), any `.tofu` files, and the binary the CI job runs. Then run `terraform version` or `tofu version`.
 - OpenTelemetry: read SDK and instrumentation versions in the lockfile, every `OTEL_*` variable in the deployment config, and the Collector image name and tag.
 - Latest releases on 2026-11-12: Docker Engine 29.9.3, Buildx 0.39.0, Compose 5.7.1, Dockerfile frontend 1.29.0, Kubernetes 1.37.2, Terraform 1.17.2, OpenTofu 1.13.9, semantic conventions 1.45.0, Collector 0.165.0.
-- Kubernetes minors and end-of-life dates: https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml
-- Current Terraform release: https://checkpoint-api.hashicorp.com/v1/check/terraform
-- Current semantic conventions release: https://github.com/open-telemetry/semantic-conventions/tags.atom
 - Facts verified 2026-11.
 
 ## Defaults
@@ -70,9 +78,3 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 - Watch `ignore` and `include` patterns are relative to the rule's `path`, not the project root. Quote patterns that start with `*`, since YAML reads `*` as an alias.
 - `healthcheck.start_interval` needs Docker Engine 25 or later.
 - From Git Bash on Windows, `docker -v` and `docker exec` path arguments get rewritten, and CRLF scripts fail inside Linux containers. Apply concise:shell before running them.
-
-## References
-
-- Read references/kubernetes.md when writing or reviewing Kubernetes manifests, Helm or Kustomize output, or planning a cluster upgrade.
-- Read references/terraform-opentofu.md when working on Terraform or OpenTofu configuration, state, modules, imports or tests.
-- Read references/opentelemetry.md when adding OpenTelemetry instrumentation, setting `OTEL_*` variables, or configuring a Collector.

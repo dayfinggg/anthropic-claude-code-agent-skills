@@ -3,13 +3,18 @@ name: backend-api
 description: Current practice for HTTP API design and reliability, covering error bodies, idempotency keys, retries and unknown outcomes, incoming and outgoing webhooks, Stripe payments, queues, rate limits, pagination, versioning and deprecation. Use when designing or reviewing REST endpoints or an OpenAPI document, adding retries, timeouts or an Idempotency-Key header, building a webhook receiver or sender, integrating Stripe Checkout, PaymentIntents, subscriptions or Stripe webhooks, writing queue consumers or job workers, adding rate limiting or handling 429 responses, paginating a list endpoint, versioning or deprecating an API, or a quick question about which status code or header to use.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Open https://docs.stripe.com/api/versioning.md (Current Stripe API version and release model) and compare it with the facts below.
+2. Open https://docs.stripe.com/api/idempotent_requests.md (Stripe idempotency rules) and compare it with the facts below.
+
 ## Check first
 
 - Read the existing contract before adding to it: the OpenAPI document (`openapi.yaml` or `openapi.json` and its `openapi` version), the error body shape, the pagination style, auth, and any idempotency table or middleware. Match them.
 - Find every layer that already retries (SDK defaults, HTTP client options, queue redelivery, the caller's own retries) before adding one.
 - For Stripe, read the SDK version in the lockfile, the API version that SDK pins, and each webhook endpoint's API version in the Dashboard.
-- Current Stripe API version and release model: https://docs.stripe.com/api/versioning.md
-- Stripe idempotency rules: https://docs.stripe.com/api/idempotent_requests.md
 - Facts verified 2026-11.
 
 ## Defaults

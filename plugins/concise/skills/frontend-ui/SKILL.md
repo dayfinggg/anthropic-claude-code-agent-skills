@@ -3,6 +3,15 @@ name: frontend-ui
 description: Current web UI practice for Tailwind CSS v4, shadcn/ui, WCAG 2.2 accessibility, Core Web Vitals (LCP, INP, CLS), responsive images and visual design that does not look templated. Use when building, styling, reviewing or debugging components, pages, forms, dialogs or landing pages, editing CSS, globals.css, tailwind.config or components.json, writing Tailwind classes, running shadcn init or add, upgrading Tailwind from v3, fixing contrast, focus, keyboard or screen reader issues, running an accessibility audit, chasing slow LCP, poor INP, layout shift or a low Lighthouse or PageSpeed score, loading images, adding dark mode, or when asked to make a page look better or less generic.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/tailwind-v4.md` in full with the Read tool (v3 habits and their v4 form, Behavior changes without a rename).
+2. Read `references/visual-design.md` in full with the Read tool (Before building, Defaults that read as generated, Choices that hold up, Copy).
+3. Open https://registry.npmjs.org/tailwindcss/latest (Current versions) and compare it with the facts below.
+4. Open https://registry.npmjs.org/shadcn/latest (Current versions) and compare it with the facts below.
+
 ## Check first
 
 - Read `package.json` for the Tailwind major and integration (`tailwindcss`, `@tailwindcss/vite`, `@tailwindcss/postcss`, `@tailwindcss/webpack`, `@tailwindcss/cli`). A v4 project imports Tailwind in CSS with `@import "tailwindcss"`, and a `tailwind.config.*` there loads only through `@config`.
@@ -10,7 +19,6 @@ description: Current web UI practice for Tailwind CSS v4, shadcn/ui, WCAG 2.2 ac
 - Read the browser targets (`browserslist` or the documented support policy). Tailwind v4 needs Safari 16.4, Chrome 111 and Firefox 128. Check a feature's Baseline status before using it without a fallback.
 - Measure before optimizing: field data at p75 (CrUX, RUM) first, then a lab trace of the failing metric. Claim a field improvement only after new visits arrive.
 - Fetch web.dev and developer.chrome.com pages as markdown by appending `.md.txt` to the URL. A `.md` suffix returns HTML.
-- Current versions: https://registry.npmjs.org/tailwindcss/latest and https://registry.npmjs.org/shadcn/latest
 - Facts verified 2026-11.
 
 ## Defaults
@@ -62,8 +70,3 @@ description: Current web UI practice for Tailwind CSS v4, shadcn/ui, WCAG 2.2 ac
 - Speculation Rules prerendering is Chromium-only and runs page scripts before the user navigates. Gate analytics and other side effects on `document.prerendering` and the `prerenderingchange` event.
 - `content-visibility: auto` (Baseline since September 2025) needs `contain-intrinsic-size: auto 500px` (a realistic size), or the scrollbar jumps. Leave it off above-the-fold content.
 - An element that moved is often the victim of a layout shift. Find the inserted or resized node from the `layout-shift` entry sources before changing the moved element.
-
-## References
-
-- Read [tailwind-v4.md](references/tailwind-v4.md) when writing Tailwind classes or CSS config, reviewing class names, or migrating from v3.
-- Read [visual-design.md](references/visual-design.md) when designing a new page or component, restyling an existing one, or writing UI copy.

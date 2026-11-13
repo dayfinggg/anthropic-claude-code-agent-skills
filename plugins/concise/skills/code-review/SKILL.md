@@ -3,6 +3,12 @@ name: code-review
 description: Reviewing code changes and pull requests, and acting on review feedback. Use when asked to review a PR, a branch, a commit range, staged or uncommitted changes, "review since main", "look over this diff", "is this safe to merge", to re-review after new pushes or a force-push, to give a second opinion on another agent's work, to address, answer or push back on review comments (human or bot, such as Copilot or Claude Code Review), to reply to or resolve review threads, or when a review involves gh pr diff, gh pr review, gh api pulls comments, reviewThreads, git diff ranges, git range-diff, REVIEW.md, CLAUDE.md or CODEOWNERS.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/review-threads.md` in full with the Read tool (Read every thread with its state, Reply in a thread, Resolve a thread, Post one review with inline comments).
+
 ## Check first
 
 - Pin the comparison point. For a branch, run `git fetch` and diff against the merge base: `git diff --no-ext-diff --no-textconv origin/<base>...HEAD`. With no base given, use `git symbolic-ref --short refs/remotes/origin/HEAD`, and ask if that ref is missing.
@@ -47,7 +53,3 @@ description: Reviewing code changes and pull requests, and acting on review feed
 - The PR API lists at most 3,000 files and 250 commits. For bigger PRs diff locally.
 - Reading an untrusted PR is safe, running it is not. Installs, builds, test runs, `conftest.py`, Makefiles, package scripts and `.envrc` execute the author's code. Run them only in a sandbox or after the user agrees.
 - In a stacked PR each layer's diff is against the branch below it, so review that layer only. Stack rules are in concise:git.
-
-## References
-
-- references/review-threads.md: read before fetching review threads, replying to or resolving a thread, or posting a review with inline comments through `gh api`.

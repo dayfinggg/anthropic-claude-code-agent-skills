@@ -3,13 +3,21 @@ name: testing
 description: Test design that catches real bugs, proof that a change works, and quality gates that cannot be gamed, plus property-based testing, mutation testing and Playwright end-to-end tests. Use when writing, reviewing, fixing or deleting tests, choosing what to mock or fake, building fixtures or test data, when tests pass but bugs ship, when asked to prove a fix works or show before and after evidence, when checking whether a green run or another agent's change skipped tests, suppressed checks or loosened thresholds, for snapshot tests, Hypothesis, fast-check, proptest or other property tests, shrunk counterexamples, mutation testing with StrykerJS, mutmut, cargo-mutants, Infection or PIT, surviving mutants, Playwright specs, playwright.config, locators, flaky or slow end-to-end tests, storageState login, traces, or questions like "is this test useful" and "how do I test this".
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/verification.md` in full with the Read tool (Proving a change, Gate integrity).
+2. Read `references/property-and-mutation.md` in full with the Read tool (Property-based testing, Mutation testing, Mutation testing gotchas).
+3. Read `references/playwright.md` in full with the Read tool (Playwright defaults, Debugging from an agent, Playwright gotchas).
+4. Open https://registry.npmjs.org/@playwright/test/latest (Current Playwright release) and compare it with the facts below.
+5. Open https://github.com/HypothesisWorks/hypothesis/tags.atom (Current Hypothesis release) and compare it with the facts below.
+6. Open https://registry.npmjs.org/@stryker-mutator/core/latest (Current StrykerJS release) and compare it with the facts below.
+
 ## Check first
 
 - Find the test command CI actually runs (workflow files, package scripts, `pyproject.toml`, `Makefile`) and run that, scoped to the files you touch. Use a mode that exits: `vitest run`, not bare `vitest`, which watches when it misdetects the terminal.
 - Find the tools already in use before proposing one: `rg -l "from hypothesis|fast-check|proptest|pgregory.net/rapid|net.jqwik|@stryker-mutator|mutmut|cargo-mutants|infection/infection|pitest"`, plus `playwright.config.*`, `stryker.config.*`, `infection.json5`, `.cargo/mutants.toml` and the lockfile versions. Adding a property or mutation testing tool to a project without one is the user's decision.
-- Current Playwright release: https://registry.npmjs.org/@playwright/test/latest
-- Current Hypothesis release: https://github.com/HypothesisWorks/hypothesis/tags.atom
-- Current StrykerJS release: https://registry.npmjs.org/@stryker-mutator/core/latest
 - Facts verified 2026-11.
 
 ## Defaults
@@ -42,9 +50,3 @@ description: Test design that catches real bugs, proof that a change works, and 
 - Methods that only tests call (reset, destroy, setters for private state) do not belong on production classes. Put them in test utilities.
 - Snapshot updates (`-u`, `--update-snapshots`) accept whatever the code now outputs. Read every changed snapshot and justify it, or replace a large snapshot with targeted assertions.
 - Float equality, dict and set iteration order, wall-clock time and unseeded randomness make tests flaky. Use tolerances, sort before comparing, inject the clock, and fix and print the seed. Waiting rules are in concise:debugging.
-
-## References
-
-- references/verification.md: read before claiming a change works end to end, and before accepting a green run or a diff that touches tests, CI or quality gates, yours or another agent's.
-- references/property-and-mutation.md: read before writing or reviewing property-based tests, when a property test fails, and before setting up, scoping or reading a mutation testing run.
-- references/playwright.md: read before writing, running, debugging or fixing Playwright tests.

@@ -3,14 +3,19 @@ name: python
 description: Current Python 3.15 practice for uv, ruff, ty, mypy and pytest, pyproject.toml packaging, dependency groups and inline script metadata. Use when writing, reviewing, debugging or setting up Python code or projects, adding or upgrading packages or Python versions, creating a virtual environment, running a .py script, choosing a Python version, or configuring linting, formatting, type checking or tests. Triggers include pyproject.toml, uv.lock, requirements.txt, .python-version, ruff.toml, ty.toml and conftest.py, commands such as pip install, uvx, uv add and pytest, moving off Poetry, Black, Flake8 or mypy, PEP 723 and PEP 735, and errors such as externally-managed-environment.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Open https://peps.python.org/api/release-cycle.json (Python branch status) and compare it with the facts below.
+2. Open https://pypi.org/rss/project/uv/releases.xml (Current uv release) and compare it with the facts below.
+3. Open https://pypi.org/rss/project/ruff/releases.xml (Current ruff release) and compare it with the facts below.
+
 ## Check first
 
 - Read `requires-python`, `.python-version` and the lockfile before choosing syntax or commands. `uv.lock` means uv, `poetry.lock` Poetry, `pdm.lock` PDM, and bare `requirements*.txt` means pip or `uv pip`. Keep the project's tool. The uv defaults below apply to uv projects and new projects.
 - Tool config sits in `[tool.ruff]` or `ruff.toml`, `[tool.ty]` or `ty.toml`, `[tool.mypy]` or `mypy.ini`, and `[tool.pytest]`, `[tool.pytest.ini_options]` or `pytest.toml`.
 - Run `uv --version`, `uv run python -VV`, `uv run ruff --version`, `uv run ty --version` and `uv tree --depth 1` for the versions actually in use.
-- Python branch status: https://peps.python.org/api/release-cycle.json
-- Current uv release: https://pypi.org/rss/project/uv/releases.xml
-- Current ruff release: https://pypi.org/rss/project/ruff/releases.xml
 - Facts verified 2026-11.
 
 ## Defaults

@@ -3,11 +3,16 @@ name: planning
 description: Turning a software request into an approved design, an implementation plan and tracker tickets with blocking edges. Use when the user asks to plan, design, spec, scope, break down or think through a feature, says "grill me", "interview me", "write a spec", "make tickets" or "create issues for this", hands over a PRD, SPEC.md, design doc, epic or issue to split, asks how to approach or sequence work, when a request is too vague or too large to start, when a wide rename, retype or migration must be split into tickets or sequenced across PRs, or when work will span several sessions or branches.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Open https://docs.github.com/api/article/body?pathname=/en/issues/tracking-your-work-with-issues/using-issues/creating-issue-dependencies (Issue dependencies) and compare it with the facts below.
+
 ## Check first
 
 - Find where this project keeps plans and tickets: a tracker or plan folder named in `CLAUDE.md` or `AGENTS.md`, existing `docs/`, `specs/` or ADR files, and open issues (`gh issue list`).
 - For GitHub tickets, run `gh --version`. Native blocking edges and sub-issues need gh 2.94.0 or later: `gh issue create --blocked-by N --blocking N --parent N` and `gh issue edit N --add-blocked-by N --add-sub-issue N`. On GitHub Enterprise Server, sub-issues need 3.17 and blocking relationships 3.19 or later. Without them, write the edges as a "Blocked by" section in each body.
-- Issue dependencies: https://docs.github.com/api/article/body?pathname=/en/issues/tracking-your-work-with-issues/using-issues/creating-issue-dependencies
 - Facts verified 2026-11.
 
 ## Defaults
