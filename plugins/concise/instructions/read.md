@@ -1,1 +1,0 @@
-Use this tool for every local file whose content you need, also for a few lines of it, for the output file of a background command, or for several files at once, where a shell command such as cat, head, tail, or sed -n would print the same text. Read calls sent in one message run in parallel, and the user sees each file you opened.

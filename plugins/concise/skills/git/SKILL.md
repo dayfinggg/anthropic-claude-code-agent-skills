@@ -1,61 +1,62 @@
 ---
 name: git
-description: Structures git workflow and pull request bodies. Use it when committing, branching, pushing, resolving conflicts, splitting uncommitted work into atomic commits, opening a pull request (PR), or cutting a release with a version bump, a tag, or a changelog. Use it for a commit message, a PR description, or a changelog entry, even when the diff is pasted inline and the message looks easy to write.
+description: Current Git 2.56 and GitHub practice for commits, history rewriting, pushes, signing, pull requests, merging and branch rules. Use when committing, amending, rebasing, squashing or fixing up commits, force-pushing, resolving conflicts, cleaning up branches, working in worktrees, setting up or debugging commit signing (SSH, GPG, gitsign, an Unverified badge), opening, updating or merging PRs with gh, taking a PR to merge once CI is green, stacked PRs and gh stack, merge queues, rulesets, branch protection, CODEOWNERS, push protection blocking a push, removing a secret or file from history with git filter-repo, choosing gitleaks or TruffleHog, release-please versions and release notes, .gitattributes and CRLF line endings, or checking which Git or gh version is current.
 ---
 
-<overview>
-The project's own convention wins over every default in this skill. Read it first from `git log`, the existing branch and tag names, and the project's contribution notes. Commit and push only when the user asks, as Claude Code's instructions require.
-</overview>
+## Check first
 
-<pull_requests>
-Before you write a pull request body, read [pull-requests.md](references/pull-requests.md) whole and follow it. This file does not repeat its rules.
-</pull_requests>
+- Run `git version` and `gh --version`. Git older than 2.56.1 (or 2.55.1, 2.54.1, 2.53.1, 2.52.1, 2.51.3, 2.50.2 on older lines) is open to CVE-2026-111760, a remote code execution on recursive clone, and five other CVEs. Tell the user before cloning anything untrusted.
+- Run `gh ruleset check <branch>` to see every rule that applies to the target branch, from repo and org rulesets alike. The branch does not need to exist.
+- Read the merge settings: `gh api repos/{owner}/{repo} --jq '{allow_squash_merge, allow_rebase_merge, allow_merge_commit, squash_merge_commit_title}'`.
+- Find config that changes behavior: `git config --show-origin --get-regexp '^(user|commit|tag|gpg|push|pull|rebase|merge)\.'`. Since Git 2.54 hooks can also come from config files, so list what will run with `git hook list --show-scope pre-commit`.
+- Current Git release (`DEF_VER`): https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN
+- Current gh release: https://github.com/cli/cli/tags.atom
+- Stacked PR rules: https://docs.github.com/api/article/body?pathname=/en/pull-requests/reference/stacked-pull-requests
+- Facts verified 2026-11.
 
-<commits>
-Each commit holds one logical change that can be reviewed and reverted alone. A formatting change, a refactor, a behavior change, and an unrelated fix each get their own commit. Once the user wants commits during a longer task, commit each increment when its check passes, so a later mistake costs one step and not the whole task.
+## Defaults
 
-Write the message the way `git log` shows, including its language, prefixes, and suffixes. Without a convention, use [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/), where a message is `<type>[optional scope]: <description>` with an optional body and footers. The spec defines `feat` for a minor bump and `fix` for a patch, and a `!` before the colon or a `BREAKING CHANGE:` footer marks a major. Other common types are `refactor`, `test`, `docs`, and `chore`. The subject names the change and the body gives the reason, because the diff already shows what the code does.
+- Current releases: Git 2.56.1, gh 2.104.0, gh-stack 0.3.0, git-filter-repo 2.47.0, gitleaks 8.30.1, TruffleHog 3.99.
+- Commit only your paths: `git add <new files>`, then `git commit -m '<msg>' -- <paths>`. A bare `git commit` also commits whatever the user had staged before.
+- Agent shells have no TTY, so rewrite history without an editor. Fix an older commit with `git commit --fixup=<sha>` and then `git rebase --autosquash <base>`. Since Git 2.44 `--autosquash` works without `-i`.
+- `git history` (experimental) edits history in place without a rebase: `fixup <sha>` folds the staged changes into that commit (2.55+) and `drop <sha>` removes one (2.56). `reword` and `split` need an editor or a TTY. The master-branch docs on GitHub already list `squash` and `--gpg-sign`, which 2.56.1 does not have.
+- Use `git rebase --update-refs` (or `rebase.updateRefs=true`) when other local branches sit inside the rebased range, so their pointers move too. Branches checked out in another worktree are not moved.
+- After resolving conflicts, stage with `git add --resolved` (2.56). It stages only the conflicted paths and stops if a conflict marker is left.
+- Before pushing a rewrite, run `git range-diff @{u}...HEAD` to compare the rewritten commits with the pushed ones.
+- Force-push only with a lease tied to the commit you rewrote from: `git push --force-with-lease=<branch>:<old-sha> origin <branch>`, or `--force-with-lease --force-if-includes`. Set `push.useForceIfIncludes=true`.
+- A squash merge on GitHub takes its default message from the commit title and body when the PR has one commit, and from the PR title when it has two or more, unless the repo sets `squash_merge_commit_title` to `PR_TITLE`. Where release tooling parses Conventional Commits, keep both the PR title and a single commit's subject in that format.
+- release-please: a `Release-As: 2.0.0` line in the body of a commit on the default branch forces that version (an empty commit works). To fix the notes of a squash-merged PR, add a `BEGIN_COMMIT_OVERRIDE` ... `END_COMMIT_OVERRIDE` block with the replacement messages to its PR body. That fails for plain merges. A `chore` or `build` commit opens no release PR.
+- After a squash or rebase merge, `git branch -d` refuses because the SHAs differ. Prove the content landed with `git cherry -v origin/main <branch>` (no `+` lines) or the merged PR, then use `git branch -D`.
+- Worktrees: one branch per worktree. A new worktree has no ignored files (`.env`, `node_modules`, build output). All refs, the stash, hooks, config and `.git/info/exclude` are shared by every worktree. Submodule support in worktrees is incomplete.
+- Fix line endings in `.gitattributes`, which overrides every contributor's `core.autocrlf`: `* text=auto`, plus `*.sh text eol=lf` for files that must stay LF on Windows. Then run `git add --renormalize .` and commit the result.
+- Signing: prefer SSH. Set `gpg.format=ssh`, `user.signingKey` to the `.pub` path or `key::ssh-ed25519 ...` (a bare `ssh-...` value is deprecated), `commit.gpgSign=true` and `tag.gpgSign=true`, because `commit.gpgSign` does not sign tags.
+- Upload the key a second time as a signing key: `gh ssh-key add ~/.ssh/id_ed25519.pub --type signing`. The default type is authentication, which does not verify commits.
+- Local checks of SSH signatures need `gpg.ssh.allowedSignersFile`. Without it `git verify-commit` and `git log --show-signature` report failure.
+- Diagnose an Unverified badge with `gh api repos/{owner}/{repo}/commits/<sha> --jq .commit.verification`. The `reason` says what to fix: `unverified_email` or `no_user` (committer email is not a verified address on the account), `unknown_key` (key not uploaded as a signing key), `bad_email` (GPG key identities lack that email).
+- Create PRs non-interactively: push the branch, then `gh pr create --base <base> --head <branch> --title '<title>' --body-file <file>`. `--head` skips gh's push and fork prompts. Without `--base`, gh uses `branch.<name>.gh-merge-base`, then the default branch.
+- Merge with `gh pr merge <n> --squash --match-head-commit <reviewed-sha>` so a push after review cannot slip in.
+- On a branch with a merge queue, `gh pr merge` needs no merge method because the queue sets it. It adds the PR to the queue when checks have passed and only turns on auto-merge when they have not. Confirm with `gh pr view <n> --json state,autoMergeRequest,mergeStateStatus`.
+- Merge from scripts with the async merge API, `PUT /repos/{owner}/{repo}/pulls/{n}/merge-async` (GA 2026-10-01). It is the only API that merges stacked PRs, and unlike the legacy endpoint it can also queue a PR. It returns 202 with a request UUID to poll, an `enqueued` result is not a merge, and rules are checked when the merge runs, not at request time. Pass `sha` to pin the head.
+- Wait for CI with `gh pr checks <n> --watch --fail-fast` (exit code 8 means pending, `--required` limits to required checks). Judge merge readiness by `mergeStateStatus` `CLEAN` on the head you verified, not by the absence of red checks, because a required check that never reported is missing, not failed.
 
-Run these checks before each commit.
-1. Stage the files of this change by path, and read `git diff --staged`. Work of the user or of another task stays out of the commit. An agent has no interactive prompt, so split the changes inside one file by staging a patch with `git apply --cached`, not with `git add -p`.
-2. Search the staged diff for secrets. `git diff --staged -i -G'password|secret|api_key|token' --name-only` lists the files to read again.
-3. Leave out build output, dependency folders, environment files, and keys. Commit a generated file only where the project tracks its kind, such as a lockfile or a migration.
-4. Run the project's checks as the `verification` block of the coding instructions requires. A failing hook is a finding, so fix its cause, and skip a hook with `--no-verify` only when the user asks for that.
-</commits>
+## Gotchas
 
-<branches>
-Follow the branching model the history shows. When it shows commits made directly on the default branch, commit there. Otherwise branch from the default branch, name the branch by its kind and subject, as in `fix/duplicate-tasks`, keep it short-lived, and delete it after the merge.
-</branches>
+- A bare `--force-with-lease` compares against your remote-tracking ref. IDEs, gh and background fetches update that ref silently, so the lease passes and the push drops other people's commits. Give the expected SHA or add `--force-if-includes`.
+- `--force` turns off every lease check, even when `--force-with-lease` is also on the command line.
+- `git history` runs no hooks. Run the pre-commit checks and secret scan yourself after using it.
+- `git history` rewrites every local branch that descends from the edited commit. Pass `--update-refs=head` to touch only the current branch, and `--dry-run` to print the ref updates first. In 2.56 it refuses any history that contains a merge and aborts on any conflict.
+- Rewrites lose signatures. Rebase, amend and cherry-pick sign again only when `commit.gpgSign` is on or `-S` is passed. `git replay` writes unsigned commits, 2.56 `git history` has no signing option, and `git filter-repo` strips signatures. Branches that require signed commits then reject the push.
+- In an agent shell GPG cannot ask for a passphrase and fails with `gpg failed to sign the data`. Ask the user to unlock gpg-agent or to use an SSH key loaded in ssh-agent.
+- gitsign (Sigstore) signatures show as Unverified on GitHub and fail required-signature rules.
+- Closing keywords such as `Fixes #12` act only in PRs that target the default branch, or in commits that land on it. They are ignored while a PR targets another branch, such as a mid-stack PR or a release branch.
+- `gh pr merge --admin` merges around the merge queue and the rules. It is a bypass, not a fix for a blocked merge.
+- Branch names from other people are shell input. Git allows `$(...)`, backticks and `|` in them, so single-quote them in every command.
+- An untrusted clone can contain an embedded bare repository whose hooks fire when a shell prompt runs `git status` in it. Set `git config --global safe.bareRepository explicit`, which becomes the default in Git 3.0, and avoid `--recurse-submodules` on unpatched Git.
+- Git 3.0 will default new repositories to SHA-256, reftable and a `main` branch. Scripts that hard-code `master` or 40-character SHAs break there, so read the branch from `git symbolic-ref --short refs/remotes/origin/HEAD` and the hash length from `git rev-parse --show-object-format`.
+- For CI triggers, workflow security (`merge_group`, `pull_request_target`) and reading or rerunning failed checks see concise:github-actions. For `git bisect` see concise:debugging. For reviewing a diff or answering review threads see concise:code-review.
 
-<discarding_work>
-Some commands discard work that no commit holds, or rewrite history that others already pulled. They include `git reset --hard`, `git checkout -- <path>`, `git restore`, `git clean`, `git stash drop`, `git branch -D`, `git push --force`, and `git rebase` or `git commit --amend` on pushed commits. Before you run one, inspect the staged and unstaged changes and the commits it would drop. Run it only when everything it discards belongs to this task, or after the user confirms. Never force-push a branch that other people use, and on your own branch use `git push --force-with-lease`.
+## References
 
-`git restore --source=HEAD --staged --worktree <path>` discards the staged and unstaged changes of one path, which is the narrow way back to the last commit after a failed step.
-</discarding_work>
-
-<conflicts>
-Resolve a conflict by intent, not by side. Read both versions and the commits that produced them, with `git log --merge -p -- <path>` during a merge, and write the result that keeps what each side meant. Taking one side wholesale, as `git checkout --ours` or `-X theirs` does, drops the other side's work, so do it only when that work is superseded, and say so in the report. During a rebase the sides swap, so `--ours` is the branch you rebase onto. Afterward search for leftover conflict markers and run the project's checks, because a merge without conflicts can still break the build.
-</conflicts>
-
-<releases>
-A release follows the project's convention too. Read from the history where the version number lives, how the tags are named, and how the changelog is kept, and do the same. Change every file that carries the version in one commit, so the manifest, the tag, and the changelog agree.
-
-Without a convention, these defaults apply to anything that has consumers.
-- The version is `MAJOR.MINOR.PATCH` under [SemVer 2.0.0](https://semver.org/). A breaking change raises the major, a backward-compatible feature or a deprecation raises the minor, and a backward-compatible fix raises the patch. Major version zero is initial development, where anything may change. When you cannot tell whether a change breaks consumers, treat it as breaking.
-- Each release gets an annotated tag, as in `git tag -a v1.4.0 -m "Release 1.4.0"`, pushed with `git push origin v1.4.0`. The `v` prefix belongs to the tag, and the version itself is `1.4.0`.
-- The changelog follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). The newest version comes first with an ISO 8601 date, and entries are grouped as Added, Changed, Deprecated, Removed, Fixed, and Security. Write each entry for the consumer, about the effect and not the internal mechanics, under `Unreleased` in the same change that causes it. A breaking change gets a migration note.
-
-This changelog collects upcoming entries under `Unreleased` above the last release.
-
-```markdown
-## [Unreleased]
-### Changed
-- Task list loads 50 items per page instead of 20
-
-## [1.4.0] - 2026-06-12
-### Added
-- Bulk task import via CSV
-### Deprecated
-- `GET /v1/tasks/all`, replaced by the paginated `GET /v1/tasks` (removal in 2.0)
-```
-</releases>
+- references/stacked-prs.md: read when creating, updating, syncing, restructuring or merging stacked PRs, or when a `gh stack` command fails.
+- references/github-rules.md: read when a merge or push is blocked, or when setting up or debugging rulesets, merge queues, required checks, required signatures or CODEOWNERS.
+- references/secrets.md: read when push protection blocks a push, a secret was committed or pushed, history must be purged, or a secret scanner must be chosen or run.

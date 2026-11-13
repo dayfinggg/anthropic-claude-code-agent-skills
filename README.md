@@ -1,4 +1,4 @@
-This repository distributes the Concise plugin for Claude Code. It includes 24 engineering skills, the Concise output style, and coding instructions.
+This repository distributes the Concise plugin for Claude Code. It adds the official Concise output style reworked for any reply language, always-on working rules, 22 engineering skills, and a lighter context: rarely used built-in tools wait behind ToolSearch.
 
 Install the plugin with Claude Code's plugin manager.
 
@@ -13,10 +13,12 @@ claude plugin marketplace update concise
 claude plugin update concise@concise
 ```
 
-The file `settings.example.json` holds the author's optional Claude Code settings, such as high effort and memory, recaps, tips, and surveys turned off. Copy the keys you want into `~/.claude/settings.json`, and add `language` to set the reply language. The example leaves permission settings out, so your own permission mode stays in force.
+The working rules live in `plugins/concise/instructions`, one Markdown file per topic: scope, changes, design, testing, security, evidence, obstacles, research, and skills. The plugin loads every `.md` file in that folder into the system prompt of the main session and of every subagent, so you can edit, add, or remove a file to change the rules.
 
-The plugin lives in `plugins/concise`. Installation does not replace your personal skills, global instructions, permissions, or language settings.
+The skills live in `plugins/concise/skills`: planning, orchestration, agent-docs, architecture, codebase-analysis, codemods, debugging, testing, code-review, git, github-actions, containers-iac, shell, web-security, backend-api, react-next, frontend-ui, typescript-javascript, php, database, python, and rust. Each one holds only current facts and traps a strong model gets wrong, checked against official sources, with a `SKILL.md` and at most three files in `references`. Claude loads a skill before it answers or acts and again when the work reaches the skill's area, then reads its references and checks the links it gives for current versions.
 
-Each skill keeps its entry point in `SKILL.md`, guidance in `references`, runnable helpers in `scripts`, and reusable examples in `assets`.
+The file `settings.example.json` holds the author's optional Claude Code settings: the short system prompt, a larger skill listing budget so no skill description is dropped, high effort, and memory, recaps, tips, and surveys turned off. Copy the keys you want into `~/.claude/settings.json`, and add `language` to set the reply language. The example leaves permission settings out, so your own permission mode stays in force.
+
+Installation does not replace your personal skills, global instructions, permissions, or language settings.
 
 This is not an official Anthropic distribution. Instructions guide behavior but do not guarantee compliance on every response.

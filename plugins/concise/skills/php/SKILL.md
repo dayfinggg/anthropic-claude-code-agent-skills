@@ -1,125 +1,69 @@
 ---
 name: php
-description: Gives current PHP practice for language features, Composer, static analysis, and tests, with Laravel and Symfony references. Use it whenever you write, review, upgrade, or set up PHP code, including Composer packages, PHPStan or Rector configuration, and PHPUnit or Pest tests. Use it for every Laravel or Symfony change, because it routes to framework references for Eloquent, validation, queues, testing, Doctrine, Messenger, forms, and voters.
-license: MIT
+description: Current PHP 8.4 to 8.6 practice for the language, Composer, PHPStan, PHPUnit, Rector, PHP-CS-Fixer, Symfony and Doctrine DBAL and ORM. Use when writing, reviewing, debugging, testing or upgrading PHP code, when editing .php files, composer.json, composer.lock, phpstan.neon, phpunit.xml, rector.php or .php-cs-fixer.dist.php, when working on Symfony controllers, services, console commands, Messenger, security or config, or on Doctrine entities, repositories, DQL or DBAL queries, when Composer refuses an update or PHPStan or PHPUnit report errors or deprecations, when choosing which PHP, Symfony, PHPUnit or PHPStan version to target, and for quick PHP syntax questions.
 ---
 
-<project_first>
-The project's own PHP version and tools come first, as `code_rules` requires. Read `composer.json` for `require.php`, `config.platform.php`, the framework, and the dev tools. Read `composer.lock` or run `composer show <vendor/package>` for the installed versions. Use only language features that the lowest allowed PHP version supports. Run tools the way the project runs them, such as `composer` scripts, `vendor/bin/`, a Makefile, Docker, or Sail. The modern defaults in this skill apply to new projects, or when the user asks for them.
-</project_first>
+## Check first
 
-<framework_references>
-The framework reference files hold rules that this file does not repeat. Composer's `require` section shows the framework. Read a file whole before you change code on its topic, also when the work reaches that topic later in the task.
-- In a project that requires `laravel/framework`, read [laravel.md](references/laravel.md) first. It covers versions, structure, Artisan, and Pint.
-- For Eloquent models, queries, eager loading, indexes, and migrations, read [laravel-database.md](references/laravel-database.md).
-- For routes, controllers, middleware, form requests, validation, authorization, outbound HTTP calls, and error handling, read [laravel-http.md](references/laravel-http.md).
-- For queued jobs, scheduled tasks, events, notifications, mail, and caching, read [laravel-async.md](references/laravel-async.md).
-- For actions, dependency injection, config and environment values, locks, collections, and Blade, read [laravel-app.md](references/laravel-app.md).
-- For Pest or PHPUnit tests in a Laravel project, read [laravel-testing.md](references/laravel-testing.md), and for factories, fakes, time, and suite speed read [laravel-testing-data.md](references/laravel-testing-data.md).
-- In a project that requires `symfony/framework-bundle`, read [symfony.md](references/symfony.md). It targets Symfony 7.4 LTS and 8.x and covers services and autowiring, Messenger, forms and validation, voters, DTOs, and quality checks.
-- In a project that uses Doctrine ORM, also read [symfony-doctrine.md](references/symfony-doctrine.md) for relations, fetch modes, batch processing, and transactions with ORM 3.
+- Read `require.php` and `config.platform.php` in `composer.json`. Write code that runs on the lowest PHP version they allow.
+- Read installed versions from `composer.lock` or `composer show --locked --direct`. Run `composer outdated --direct` for newer releases.
+- Before raising the PHP floor, run `composer why-not php 8.5` to list the packages that block it.
+- Run tools through the project's own configs and `composer.json` scripts: `phpstan.neon` or `phpstan.dist.neon`, `phpunit.xml` or `phpunit.xml.dist`, `rector.php`, `.php-cs-fixer.dist.php`, `config/bundles.php`.
+- Current PHP patch releases: https://www.php.net/releases/active.php
+- Current PHPUnit releases: https://github.com/sebastianbergmann/phpunit/tags.atom
+- Symfony versions and PHP floors: https://symfony.com/releases.json
+- Facts verified 2026-11.
 
-Every other rule of this file holds for any PHP code. A project on another framework, a CMS, or an engine of its own follows that code's existing patterns and its documentation for the installed version.
-</framework_references>
+## Defaults
 
-<php_versions>
-On November 11, 2026, PHP 8.5 was the newest stable branch and PHP 8.6 was at RC5, with general availability planned for November 19, 2026. Each branch gets 2 years of active support and 2 more years of security fixes, as [php.net](https://www.php.net/supported-versions.php) lists.
+- PHP 8.5 is the newest stable branch. PHP 8.6.0 is at RC7 with general availability planned for 2026-11-19. Use 8.6-only features only when `require.php` excludes older versions.
+- Security support ends 2026-12-31 for 8.2, 2027-12-31 for 8.3, 2028-12-31 for 8.4 and 2029-12-31 for 8.5. PHP 8.1 and older get no fixes.
+- The minimum safe patch releases are 8.5.12, 8.4.27, 8.3.36 and 8.2.35, from 2026-10-21. Older builds have two critical unauthenticated remote code execution bugs (CVE-2026-109618, CVE-2026-109619). Pin at least these wherever a PHP version is pinned.
+- Symfony 8, PHPUnit 13 and DoctrineBundle 3 need PHP 8.4 or later. Symfony 7.4 LTS needs PHP 8.2.
 
-| Branch | Released | Active support until | Security fixes until |
-| --- | --- | --- | --- |
-| 8.2 | December 8, 2022 | December 31, 2024 | December 31, 2026 |
-| 8.3 | November 23, 2023 | December 31, 2025 | December 31, 2027 |
-| 8.4 | November 21, 2024 | December 31, 2026 | December 31, 2028 |
-| 8.5 | November 20, 2025 | December 31, 2027 | December 31, 2029 |
+- Composer 2.11.2 is current. It fixes command execution and credential leaks triggered by a crafted `composer.lock`. Run `composer self-update` before installing a lock file from an untrusted source.
+- Since Composer 2.9, `update`, `require` and `remove` refuse versions with security advisories (`config.policy.advisories.block` defaults to true). Move to a patched version. Ignore an advisory that does not apply by its ID, with a reason, under `config.policy.advisories.ignore-id`.
+- Since Composer 2.10, `config.policy` replaces `config.audit`. The legacy `audit` keys are read only when the matching `policy` section is absent. Versions flagged as malware are also blocked during `install`. A failed dist download no longer falls back to a source checkout.
+- Composer 2.11 adds `config.policy.cooldown.period`, such as `"7 days"`, which withholds fresh releases from updates. `--no-cooldown` skips it for one run. `--no-blocking` replaces the deprecated `--no-security-blocking`.
+- `composer update --minimal-changes` (2.9+) changes only what the edited constraints require.
 
-A new project targets PHP 8.4 or 8.5. Laravel 13 needs PHP 8.3 or later, and Symfony 8 needs PHP 8.4 or later.
-</php_versions>
+- PHPStan 2.3 is current. Level 10 is the top level. It also reports implicit `mixed` that comes from untyped code.
+- PHPStan 2 rejects configs that set `checkMissingIterableValueType`, `checkGenericClassInNonGenericObjectType`, `checkAlwaysTrue*` or `excludes_analyse`. Ignore the identifiers `missingType.iterableValue` or `missingType.generics` instead, and use `excludePaths`. A path that may not exist needs a `(?)` suffix. phpstan-symfony 2 reads `containerXmlPath`, not `container_xml_path`.
+- Suppress one error with `// @phpstan-ignore argument.type (reason)`. The table output prints each identifier. `@phpstan-ignore-next-line` hides every error on the line, and `reportIgnoresWithoutComments: true` (2.1.41+) bans it.
+- PHPStan 2.3.5 adds `phpstan analyse --fix`. It rewrites source files for fixable errors and removes unmatched ignores and baseline entries, so review its diff. Prune a stale baseline with it rather than with `--generate-baseline`, which also absorbs every new error.
+- PHPStan 2.2 adds unsealed array shapes such as `array{id: int, ...<string, mixed>}`. With bleeding edge, plain shapes reject extra keys.
+- The PHPStan 2.3 rules for unused variables and parameters, and closure type inference from later usage, run only with bleeding edge: include `phar://phpstan.phar/conf/bleedingEdge.neon`.
 
-<php_8_4>
-PHP 8.4 adds these features, which apply when the project allows PHP 8.4 or later. The [8.4 release page](https://www.php.net/releases/8.4/en.php) has the full list.
-- Property hooks give a property `get` and `set` logic, as in `public string $name { set => trim($value); }`. Interfaces can declare hooked properties.
-- Asymmetric visibility separates read and write access, as in `public private(set) string $version`.
-- `#[\Deprecated]` marks user functions, methods, and class constants as deprecated.
-- `array_find`, `array_find_key`, `array_any`, and `array_all` replace manual search loops when the code does not use collections.
-- A method call on `new Foo()` needs no wrapping parentheses, as in `new Foo()->run()`.
-- Lazy objects come from `ReflectionClass::newLazyGhost()` and `newLazyProxy()`.
-- `Dom\HTMLDocument` parses HTML5, and `BcMath\Number` is an immutable number object with operators.
-- `mb_trim`, `mb_ucfirst`, `mb_lcfirst`, the `RoundingMode` enum, and `PDO::connect()` with driver subclasses such as `Pdo\Sqlite` are new.
+- PHPUnit 13.4 is current and needs PHP 8.4. PHPUnit 12 needs PHP 8.3 and gets bug fixes until 2027-02-05. PHPUnit 14 is planned for 2027-02-05.
+- PHPUnit metadata goes in attributes such as `#[Test]`, `#[DataProvider('cases')]` and `#[CoversClass(Foo::class)]`. PHPUnit 12 and later ignore docblock annotations like `@dataProvider`.
+- PHPUnit 12 removed `getMockForAbstractClass()` and `getMockForTrait()`. Test through a concrete class.
+- Use PHPUnit `createStub()` when the test verifies no calls. Since 12.5 a `createMock()` double without `expects()` triggers a notice. In 13, `any()` and `with()` without `expects()` are hard-deprecated. `#[AllowMockObjectsWithoutExpectations]` opts a test out.
+- PHPUnit `withConsecutive()` is gone. Use `withParameterSetsInOrder()` or `withParameterSetsInAnyOrder()` (13.0).
+- PHPUnit `expectExceptionMessage()` matches a substring and is deprecated since 13.2. On 13.2 and later use `expectExceptionMessageIs()` for an exact match or `expectExceptionMessageIsOrContains()`.
+- PHPUnit 13 removed `assertContainsOnly()`, `isType()` and `#[RunClassInSeparateProcess]`. Use typed variants such as `assertContainsOnlyString()` or `assertContainsOnlyInstancesOf()`. It added `assertArraysAreIdenticalIgnoringOrder()`, `assertArraysHaveIdenticalValues()` and their loose `Equal` siblings, and `seal()` for test doubles.
 
-PHP 8.4 deprecates implicitly nullable parameters. Write `?Type $x = null` instead of `Type $x = null`. It also deprecates `E_STRICT` and `trigger_error()` with `E_USER_ERROR`.
-</php_8_4>
+- In Rector 2, `->withPhpSets()` without arguments applies every PHP set up to the `composer.json` version in one run. On an existing codebase start with `->withPhpLevel(1)` and raise the level one merged PR at a time, or cap a run with `--max-changes=N`. `->withComposerBased(phpunit: true, symfony: true, doctrine: true)` loads the rules that match installed package versions, and `vendor/bin/rector process --composer-based --dry-run` runs only those after a package upgrade.
+- PHP-CS-Fixer 3.88 renamed versioned sets to the `@PHP8x4Migration` and `@PER-CS3x0` form. The old `@PHP84Migration` and `@PER-CS2.0` names are deprecated. `@auto` applies the newest PER-CS plus the migrations for the `composer.json` PHP version.
+- For locks, indexes and migration safety see concise:database.
 
-<php_8_5>
-PHP 8.5 adds these features, which apply when the project allows PHP 8.5 or later. The [8.5 release page](https://www.php.net/releases/8.5/en.php) has the full list.
-- The pipe operator `|>` passes a value through callables from left to right. It replaces nested calls, as in `$slug = $title |> trim(...) |> strtolower(...);`.
-- `clone($object, ['prop' => $value])` changes properties while it clones, which suits `readonly` classes.
-- `array_first()` and `array_last()` return the first or last value, or `null` for an empty array.
-- `#[\NoDiscard]` warns when a caller ignores the return value, and a `(void)` cast marks an intentional discard.
-- The built-in URI extension parses URLs with `Uri\Rfc3986\Uri` and `Uri\WhatWg\Url`. Prefer it over `parse_url()` in new code.
-- Static closures and first-class callables work in constant expressions, such as attribute arguments and default values.
-- Constructor promotion accepts `final` properties, and `#[\Override]` works on properties.
+## Gotchas
 
-PHP 8.5 deprecates the backtick operator, the casts `(boolean)`, `(integer)`, `(double)`, and `(binary)`, and `null` as an array offset. It soft-deprecates `__sleep()` and `__wakeup()` in favor of `__serialize()` and `__unserialize()`.
-</php_8_5>
+- In a pipe chain an arrow function needs parentheses, as in `$s |> (fn($x) => trim($x, '/'))`. Without them PHP 8.5 raises a fatal error. The right side must take exactly one parameter, and not by reference.
+- `clone($obj, ['prop' => $v])` honours visibility. A readonly property is `protected(set)` by default, so the call fails outside the class. Call it inside a `with*()` method. It skips the constructor, so validation must live in property hooks or in that method.
+- `(void) f();` discards a `#[\NoDiscard]` result only as a statement. Inside an expression it is a parse error.
+- `curl_close()`, `curl_share_close()`, `finfo_close()`, `imagedestroy()`, `xml_parser_free()` and every `setAccessible()` reflection call are deprecated no-ops in 8.5. Delete them.
+- `PDO::MYSQL_ATTR_*`, `PDO::PGSQL_*` and `PDO::SQLITE_*` constants are deprecated in 8.5. On 8.4 and later use `Pdo\Mysql::ATTR_SSL_CA` and the other driver subclasses.
+- `array_find()`, `array_find_key()`, `array_any()` and `array_all()` call the callback with `($value, $key)`. A first-class callable of a one-parameter built-in such as `is_numeric(...)` then throws `ArgumentCountError`, and `intval(...)` takes the key as `$base`. Pass `fn($v) => is_numeric($v)`, or on 8.6 `is_numeric(?)`.
+- A parameter like `Foo $x = null` is deprecated since 8.4. Write `?Foo $x = null`.
+- Throwing `RecoverableMessageHandlingException` from a Messenger handler retries regardless of `max_retries`, so a permanent failure loops forever. On Symfony 8.1 pass `forceRetry: false` to keep the limit, or throw another exception.
+- With a Composer cooldown set, a full `composer update` replaces a locked version that is still inside the period with an older release, or fails. Update single packages, or list trusted ones under `config.policy.cooldown.ignore`.
+- Doctrine DBAL 4 `datetime`, `date` and `time` types reject `DateTimeImmutable`. Map such properties to `datetime_immutable`, `date_immutable` or `time_immutable`.
+- Rector resolves types through PHPStan. On a `mixed` value it cannot rename the call, add a return type or remove dead code, and a PHPStan baseline hides those unknown types. Fix the types before expecting Rector to change such code.
+- Many Rector rules change only private members and final classes. Add `->withTreatClassesAsFinal()` when no code outside the project extends its classes.
+- Rector's parallel mode can fail on Windows under PowerShell 7. Run it from cmd or Git Bash there.
+- A Rector rule fixture (`.php.inc`) without a `-----` line asserts that the rule leaves the file unchanged. Name such fixtures `skip_*.php.inc`.
 
-<php_8_6>
-Use PHP 8.6 features only in a project that already requires 8.6. Its [UPGRADING](https://github.com/php/php-src/blob/PHP-8.6/UPGRADING) file lists these changes.
-- Partial function application creates a closure with `?` for one missing argument and `...` for the rest.
-- `clamp()` limits a value to a range.
-- Readonly properties can declare default values.
-- `Time\Duration` is a new class in the date extension.
-- A `return` inside `finally` is deprecated, and so are `spl_object_hash()`, `is_long()`, `is_integer()`, `is_double()`, and `doubleval()`.
-</php_8_6>
+## References
 
-<code_style>
-Modern PHP code follows these defaults where the project has no other convention.
-- Start each new file with `declare(strict_types=1);` if the project's other files do, and in every new project. Strict types apply to calls made from that file, so a caller without it still gets type coercion.
-- Use curly braces for every control structure, even a single-line body.
-- Use constructor property promotion, and remove an empty constructor without parameters unless it is private.
-- Declare parameter, return, and property types everywhere. Prefer `readonly` properties or `readonly` classes for value objects.
-- Use backed enums instead of class constants for a fixed set of values. Name enum cases in PascalCase, such as `Monthly`, unless the project's enums use another style.
-- Add a PHPDoc type tag only for types that native types cannot express, such as `list<User>`, `array{id: int, name: string}`, generics, and `@throws`. PHPStan and the Symfony serializer read these tags as types, so the rule on comments in `code_rules` does not cover them. Write no descriptive PHPDoc text.
-- Use `match` instead of `switch` when each branch returns a value, and use first-class callables such as `strlen(...)`.
-
-The shared format is [PER Coding Style 3.1](https://www.php-fig.org/per/coding-style/), which extends PSR-12. It also covers enums, property hooks, asymmetric visibility, and the pipe operator. Run the formatter that the project has configured. Laravel projects use Pint, many others use PHP-CS-Fixer with the `@PER-CS` rule set, and some use PHP_CodeSniffer. Format only the files you change.
-</code_style>
-
-<composer>
-Composer manages dependencies and autoloading. The current release in November 2026 is 2.11.
-- Add a package with `composer require vendor/package`, and a dev tool with `composer require --dev vendor/package`. Never edit `composer.lock` by hand.
-- Install from the lockfile with `composer install`, and in CI or production add `--no-dev --optimize-autoloader` where the project deploys that way.
-- Update one package with `composer update vendor/package --with-dependencies`. Add `--minimal-changes` to keep the other locked versions.
-- Run `composer audit` to check installed packages against security advisories. Composer 2.10 and later can also block versions flagged for malware through the `policy` config.
-- Run `composer validate --strict` after you edit `composer.json`, and `composer dump-autoload` after you change the `autoload` section.
-- Map namespaces with PSR-4 in `autoload` and `autoload-dev`, so that each class lives in a file that matches its name.
-</composer>
-
-<static_analysis>
-PHPStan is the common static analyzer, and its current major is 2.x. Its [rule levels](https://phpstan.org/user-guide/rule-levels) run from 0 to 10, and `max` is level 10. Level 9 rejects most operations on explicit `mixed`, and level 10 also rejects implicit `mixed` from missing types. Read the level and paths from `phpstan.neon` or `phpstan.neon.dist`, and run `vendor/bin/phpstan analyse`. A legacy project often keeps a baseline file that `vendor/bin/phpstan analyse --generate-baseline` created. Leave existing baseline entries alone, and keep new code free of new errors. Framework extensions improve the results, such as `larastan/larastan` for Laravel and `phpstan/phpstan-symfony` with `phpstan/phpstan-doctrine` for Symfony. A project that uses Psalm instead keeps its `psalm.xml` and runs `vendor/bin/psalm`.
-
-Fix type errors in the code. Do not hide them, as the `verification` block of the coding instructions requires.
-</static_analysis>
-
-<rector>
-Rector rewrites code automatically, for example to adopt newer PHP syntax or remove dead code. Its current major is 2.x. Run `vendor/bin/rector process --dry-run` first to see the diff. Then run `vendor/bin/rector process` on the paths of the task only. This `rector.php` reads the PHP version from `composer.json` and enables two prepared sets.
-
-```php
-<?php
-
-use Rector\Config\RectorConfig;
-
-return RectorConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-        __DIR__ . '/tests',
-    ])
-    ->withPhpSets()
-    ->withPreparedSets(deadCode: true, codeQuality: true);
-```
-
-An existing project adopts Rector gradually with `withTypeCoverageLevel(0)`, `withDeadCodeLevel(0)`, or `withPhpLevel(0)`, and raises the level step by step. `withComposerBased()` adds sets that match the installed framework packages, such as Laravel, Symfony, Doctrine, and PHPUnit.
-</rector>
-
-<testing>
-Use the test runner that the project already has. PHPUnit 13 needs PHP 8.4 and PHPUnit 12 needs PHP 8.3, and both [read metadata only from attributes](https://phpunit.de/announcements/phpunit-12.html). Write `#[Test]`, `#[DataProvider('cases')]`, and `#[CoversClass(Foo::class)]` instead of docblock annotations such as `@test`. Data provider methods are `public static`. Pest 5 runs on PHPUnit 13 and needs PHP 8.4, and Pest 4 runs on PHPUnit 12. Run one file or test with `vendor/bin/phpunit tests/FooTest.php --filter testName` or `vendor/bin/pest tests/FooTest.php --filter "name"`. The `tdd` and `testing` skills cover test design.
-</testing>
+- Read references/php-language.md when code may use or must avoid PHP 8.5 or 8.6 syntax, functions or deprecations, or when upgrading PHP.
+- Read references/symfony-doctrine.md when the project requires `symfony/*` or `doctrine/*` packages.
