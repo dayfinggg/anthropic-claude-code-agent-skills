@@ -1,180 +1,45 @@
 ---
 name: planning
-description: Breaks work into ordered, verifiable tasks before implementation. Use it whenever the user asks for a plan, a roadmap, or an estimate, when requirements or a spec must become tasks, when the work spans several modules, sessions, or agents, or when a task feels too large or vague to start. Skip it for a change whose scope and order are already obvious.
+description: Turning a software request into an approved design, an implementation plan and tracker tickets with blocking edges. Use when the user asks to plan, design, spec, scope, break down or think through a feature, says "grill me", "interview me", "write a spec", "make tickets" or "create issues for this", hands over a PRD, SPEC.md, design doc, epic or issue to split, asks how to approach or sequence work, when a request is too vague or too large to start, when a wide rename, retype or migration must be split into tickets or sequenced across PRs, or when work will span several sessions or branches.
 ---
 
-<overview>
-Break work into small, verifiable tasks with explicit acceptance criteria. Make each task small enough to implement, test, and verify in one focused session. A plan holds the requested work and what that work requires, and nothing more.
-</overview>
+## Check first
 
-<planning_process>
-<read_only_first>
-Before you write any code, work in read-only mode.
-- Read the spec and the relevant parts of the codebase.
-- Identify existing patterns and conventions.
-- Map the dependencies between components.
-- Note risks and unknowns.
+- Find where this project keeps plans and tickets: a tracker or plan folder named in `CLAUDE.md` or `AGENTS.md`, existing `docs/`, `specs/` or ADR files, and open issues (`gh issue list`).
+- For GitHub tickets, run `gh --version`. Native blocking edges and sub-issues need gh 2.94.0 or later: `gh issue create --blocked-by N --blocking N --parent N` and `gh issue edit N --add-blocked-by N --add-sub-issue N`. On GitHub Enterprise Server, sub-issues need 3.17 and blocking relationships 3.19 or later. Without them, write the edges as a "Blocked by" section in each body.
+- Issue dependencies: https://docs.github.com/api/article/body?pathname=/en/issues/tracking-your-work-with-issues/using-issues/creating-issue-dependencies
+- Facts verified 2026-11.
 
-Write no code during planning. The output is a plan document and a task list in the task list target, not implementation. The `output_files` block describes both. When the user asked for the work itself and not only for a plan, start the first task as soon as the plan is written, because the plan is a step of that work and needs no approval of its own.
-</read_only_first>
+## Defaults
 
-<vertical_slices>
-Build one complete feature path at a time. Do not build the whole database, then the whole API, then the whole UI. That horizontal slicing gives a plan like this bad one.
+- When the user asked for a plan or design, stop at the approved document. When they asked for the work itself, the plan is a step of that work: write it and continue, stopping only for decisions that change what gets built.
+- Look facts up yourself (an Explore subagent for wide lookups) and ask the user only for decisions. State each call you make yourself, with its reason, so the user can correct it.
+- When the goal behind the request is unclear and would change the design, ask about it first, as one open question with no options attached. Options steer the answer away from the user's own intent.
+- After that, ask in rounds. A round holds every open decision whose prerequisites are settled. Number each question, give your recommended answer, and word it so "yes" accepts the recommendation. A question that depends on another open one waits for the next round. One the user leaves unanswered takes your recommendation, recorded as an assumption in the plan.
+- For a design beyond a few lines, show 2 or 3 real approaches with their trade-offs and your pick, and wait for the choice. Drop options the existing code or the user's goal rules out. When only one approach fits, say why in one line and continue.
+- Size the design to the work. A small change gets a few lines. A project gets a written design that also names non-goals, constraints, the rejected approaches, and what is left to the builder.
+- Before handing over a project design, brief a fresh subagent as a builder who cannot talk to the author and must plan from the document. It returns only the questions where a wrong guess changes the plan. Write already-answered ones into the doc, settle minor ones yourself and mark them as your calls, and bring the rest to the user in one message.
+- A plan holds the decisions the implementer cannot make alone: the files per task, exact signatures, what each task consumes from earlier tasks and produces for later ones, the spec's values copied verbatim, test names with their assertions, and each verification command with the output that means pass.
+- Open the plan with the spec's project-wide constraints copied verbatim: version floors, limits, naming and copy rules. Every task inherits them.
+- In the design and plan documents, present first the decisions the user is most likely to change: data model, interfaces, user-visible behavior. Mechanical refactoring goes last. This is reading order. Execution order follows the blocking edges.
+- A task is the smallest unit with its own test cycle that a reviewer could reject while approving its neighbor. Each task passes its checks before any later task exists, and a task that adds an interface also adds its first caller. Fold setup, config and docs steps into the task that needs them.
+- List the inputs the spec implies but no task's tests exercise (empty, huge, duplicate, concurrent, malformed). Add a test for each to the task that owns the code. The spec's silence is not permission for that input to break the program.
+- Slice tickets vertically: each one a narrow path through every layer (schema, API, UI, tests), demoable on its own and sized for one fresh context window. Prefactoring tickets come first.
+- Give every ticket its blocking edges. The frontier is every open ticket whose blockers are all closed, and that is what runs next.
+- A wide refactor (one mechanical change whose blast radius breaks many call sites at once) gets expand-contract instead of slices: an expand ticket that adds the new form beside the old, migrate tickets in batches per package or directory each blocked by the expand, and a contract ticket blocked by every batch. If a batch cannot stay green alone, run the batches on one integration branch that ends in an integrate-and-verify ticket. For schema changes, see concise:database.
+- A ticket that may wait days describes behavior, interfaces, acceptance criteria and what is out of scope. File paths and line numbers go stale, so leave them out. A prototype snippet that pins a decision (a type, a reducer, a state machine) may stay.
+- Work too large for one session gets a map: one issue or file that is only an index. Sections: Destination (what done looks like), Decisions so far (one line and a link per resolved ticket), Not yet specified, Out of scope. Each decision lives in exactly one ticket.
+- Make a ticket for a question once you can state it precisely, even while it is blocked. Leave it under Not yet specified until then. By default resolve one decision ticket per session, so each starts with a fresh context, and claim it (assign it) before starting, since other sessions may run in parallel.
+- When implementation waits for a later session, start it fresh from the spec, the plan and `git log`, not from the planning conversation. Mark each task done in the plan as it lands, with any discovery the next session needs, and check the plan's claims against the tree before continuing. To run the tasks through subagents, use concise:orchestration.
 
-```
-Task 1. Build entire database schema
-Task 2. Build all API endpoints
-Task 3. Build all UI components
-Task 4. Connect everything
-```
+## Gotchas
 
-Vertical slicing builds every layer for one feature in each task, as in this good plan.
-
-```
-Task 1. User can create an account (schema + API + UI for registration)
-Task 2. User can log in (auth schema + API + UI for login)
-Task 3. User can create a task (task schema + API + UI for creation)
-Task 4. User can view task list (query + API + UI for list view)
-```
-
-Each vertical slice delivers working, testable functionality.
-</vertical_slices>
-
-<task_template>
-Each task follows this structure in the markdown task list. An item in an external tracker carries the same parts.
-
-```markdown
-- [ ] Task [N]. [Short descriptive title]
-
-[One paragraph that explains what this task accomplishes.]
-
-It is done when [specific, testable condition] and [specific, testable condition].
-
-This check verifies it.
-- [ ] [The check that would fail if this task were wrong, such as the repository's focused-test command, its build, or a manual check of the behavior.]
-
-It depends on [task numbers, or no other task].
-
-It likely touches `src/path/to/file.ts` and `tests/path/to/test.ts`.
-
-Its size is [XS, S, M, or L], from the file counts in the `task_sizing` table.
-```
-</task_template>
-
-<order_and_checkpoints>
-Four rules set the task order.
-1. Dependencies are satisfied, so the foundation comes first.
-2. Each task leaves the system in a working state.
-3. A checkpoint follows a group of tasks where an integration point, a risk, or a decision of the user sits.
-4. High-risk tasks come early, so they fail fast.
-
-Add explicit checkpoints to the task list target. This checkpoint follows tasks 1-3.
-
-```markdown
-Checkpoint after tasks 1-3.
-- [ ] The tests that cover tasks 1-3 pass.
-- [ ] The core user flow works end to end.
-```
-</order_and_checkpoints>
-</planning_process>
-
-<task_sizing>
-Task size follows the number of files and the scope.
-
-| Size | Files | Scope | Example |
-|------|-------|-------|---------|
-| XS | 1 | Single function or config change | Add a validation rule |
-| S | 1-2 | One component or endpoint | Add a new API endpoint |
-| M | 3-5 | One feature slice | User registration flow |
-| L | 6-8 | Multi-component feature | Search with filtering and pagination |
-| XL | 9+ | Too large, so break it down further | None |
-
-Break an L or larger task into smaller tasks, because S and M tasks are easier to verify and review.
-
-Four signs show that a task needs a further split.
-- It would take more than one focused session.
-- You cannot describe its acceptance criteria in 3 or fewer points.
-- It touches two or more independent subsystems, such as auth and billing.
-- Its title contains "and", which signals two tasks.
-</task_sizing>
-
-<output_files>
-The planning output has two parts.
-- The plan document is `plan.md` in the plan directory. It is always a markdown file, because design decisions, risks, and open questions do not fit tracker issues.
-- The task list goes into the task list target, which the `task_list_target` block defines.
-
-The plan directory is `tasks/` in the repository when the user or the project's agent rules ask for plans there. Otherwise it is the session's scratchpad or temporary directory. The repository then gets no files the user did not ask for. Create the directory if it does not exist. Below, `tasks/plan.md` and `tasks/todo.md` mean these files in the plan directory.
-
-<no_overwrite>
-Never overwrite an incomplete plan. Before you write `tasks/plan.md` or `tasks/todo.md`, check whether they exist and still hold unchecked tasks.
-- If the user asked to revise or extend this same plan, update the existing files in place.
-- If the files hold different work, stop and ask. Their unchecked tasks may be mid-build in another session. Do not delete, overwrite, or rename the files yourself. Present the conflict and let the user decide. The user can finish the old plan first, discard it, or name a place for the new plan.
-
-The same rule holds for an external task list target. Never bulk-close or delete the open tracker items of another plan to make room for new ones.
-</no_overwrite>
-
-<task_list_target>
-The task list target is where you record tasks and checkpoints. This block defines it once, and every other block in this skill defers to it.
-
-By default it is a checklist-style markdown file named `todo.md` in the plan directory defined by `output_files`. Mirror the current tasks in the session's task tool when one exists.
-
-The user or the project's agent rules, such as `CLAUDE.md` or `AGENTS.md`, may name an issue tracker. Examples are GitHub Issues, Jira, Linear, and `bd` (beads). Then create one tracker item per task instead of writing `tasks/todo.md`. Map the task template onto the tracker fields. Acceptance criteria and verification steps go in the item body. Dependencies use the tracker's links, such as `bd dep add` or "blocked by".
-
-Record the checkpoints as tracker items too. If the tracker has no natural equivalent, keep them as a checklist in the plan document. Note the tracker in `tasks/plan.md`, as in "Tasks tracked in Linear project FOO." Later steps and future sessions then know where to look. The task list in the plan document then holds an ordered index of tracker items. It is not a duplicate checklist.
-</task_list_target>
-</output_files>
-
-<plan_document_template>
-The plan document follows this template.
-
-```markdown
-This plan covers [feature or project name]. [One paragraph that sums up what we are building.]
-
-These decisions shape the architecture.
-- [Key decision 1], chosen because [rationale].
-- [Key decision 2], chosen because [rationale].
-
-Phase 1 builds the foundation.
-- [ ] Task 1. ...
-- [ ] Task 2. ...
-- [ ] The foundation checkpoint passes when tests pass and the build is clean.
-
-Phase 2 builds the core features.
-- [ ] Task 3. ...
-- [ ] Task 4. ...
-- [ ] The core checkpoint passes when the end-to-end flow works.
-
-Phase 3 finishes the remaining requested work.
-- [ ] Task 5. ...
-- [ ] Task 6. ...
-- [ ] The final checkpoint passes when all acceptance criteria are met.
-
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| [Risk] | [High, medium, or low] | [Strategy] |
-
-These questions need the user's input.
-- [Question]?
-```
-</plan_document_template>
-
-<parallel_work>
-With several agents or sessions available, the work falls into three groups.
-- Independent feature slices, tests for features already built, and documentation are safe to run in parallel.
-- Database migrations, shared state changes, and dependency chains must run in sequence.
-- Features that share an API contract need coordination. Define the contract first, then split the work.
-</parallel_work>
-
-<plan_check>
-Confirm these points before you start implementation.
-- [ ] Every task has acceptance criteria.
-- [ ] Every task has a verification step.
-- [ ] Task dependencies are identified and ordered correctly.
-- [ ] Tasks are in the task list target, by default `tasks/todo.md`.
-- [ ] No existing incomplete plan was overwritten without the user's explicit confirmation.
-- [ ] No task touches more than about 5 files.
-- [ ] Checkpoints sit at the integration points and risks.
-- [ ] The plan's open questions and assumptions are stated for the user.
-
-Acceptance criteria belong to each task and answer whether we built the right thing. They sit on top of the `verification` block of the coding instructions. That block is the standing bar every task clears before it counts as done.
-</plan_check>
+- A plan longer than the code it describes has written the code. Replace bodies with signatures, test names and assertions. A line that decides nothing ("TBD", "handle edge cases", "add validation", a type no task defines) is a gap, not a step.
+- Names drift between tasks, such as `clearLayers()` in task 3 and `clearFullLayers()` in task 7. Check every consumed name and type against the task that produces it, and every spec requirement against a task that implements it.
+- "Sounds good" to an idea is not approval of a design you have not shown. Approval covers only what the user saw.
+- A spike is throwaway. Keeping its code is a new request that goes back through design.
+- A request that turns out to be several independent projects gets split. Agree on an order and plan one project at a time.
+- In GitHub text, `#3` links to issue 3 of the repository. Create every ticket first, blockers first, then wire the edges and cross-references in a second pass with the real numbers. Call draft tickets T1, T2 until then.
+- The session scratchpad belongs to one session, and the next session gets another. Keep plans that span sessions in the tracker or in a repository path the user agreed to.
+- Decisions and boundaries stated only in conversation can vanish at compaction, including a "don't push" that auto mode enforces from the transcript. Write each decision into the spec as it lands, and use a deny rule for a hard limit.
+- When the user says "just do it" or "skip the questions", stop asking. State any significant choice of platform, language or library in one line and proceed.

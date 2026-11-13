@@ -1,7 +1,9 @@
 {
   "env": {
-    "CLAUDE_CODE_ENABLE_AWAY_SUMMARY": "0"
+    "CLAUDE_CODE_ENABLE_AWAY_SUMMARY": "0",
+    "CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT": "1"
   },
+  "skillListingBudgetFraction": 0.02,
   "attribution": {
     "commit": "",
     "pr": "",
