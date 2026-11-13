@@ -1,17 +1,17 @@
 ---
 name: typescript-javascript
-description: Current JavaScript and TypeScript practice, covering ES2025 to ES2027 features and where they run, TypeScript 6 and 7, tsconfig and type patterns, Node.js LTS lines and runtime, npm, pnpm, Bun and Deno, and Vite, Rolldown, Vitest, ESLint, Biome and Prettier. Use when writing, reviewing, debugging or upgrading .ts, .tsx, .js, .mjs or .cjs code or package.json, tsconfig.json, vite.config, vitest.config, eslint.config, biome.json, bunfig.toml or deno.json, fixing tsc, lint, build, test runner or install errors, choosing a target, lib, module setting, runtime or package manager, running .ts files with node, bun or deno, or answering any plain JavaScript or TypeScript question, such as which version or feature is current.
+description: Current JavaScript and TypeScript practice, covering ES2025 to ES2027 features and where they run, TypeScript 6 and 7, tsconfig and type patterns, Node.js LTS lines and runtime, npm, pnpm, Bun and Deno, and Vite, Rolldown, Vitest, ESLint, Biome and Prettier. Use when writing, reviewing, debugging or upgrading .ts, .tsx, .js, .mjs or .cjs code or package.json, including browser scripts, jQuery and editor plugins in a site or admin panel, tsconfig.json, vite.config, vitest.config, eslint.config, biome.json, bunfig.toml or deno.json, fixing tsc, lint, build, test runner or install errors, choosing a target, lib, module setting, runtime or package manager, running .ts files with node, bun or deno, or answering any plain JavaScript or TypeScript question, such as which version or feature is current.
 ---
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/ecmascript.md` in full with the Read tool (Where ES2025 to ES2027 features run, TypeScript types for them, Traps).
 2. Read `references/typescript.md` in full with the Read tool (Compiler and tsconfig, Errors after an upgrade, Types that models get wrong).
 3. Read `references/node-and-packages.md` in full with the Read tool (Node.js runtime, Package managers).
-4. Open https://registry.npmjs.org/typescript/latest (Current TypeScript release) and compare it with the facts below.
-5. Open https://raw.githubusercontent.com/nodejs/Release/main/schedule.json (Node.js release lines and dates) and compare it with the facts below.
+4. Fetch https://registry.npmjs.org/typescript/latest (Current TypeScript release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+5. Fetch https://raw.githubusercontent.com/nodejs/Release/main/schedule.json (Node.js release lines and dates) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

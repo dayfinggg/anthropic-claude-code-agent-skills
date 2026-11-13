@@ -5,11 +5,11 @@ description: Current Python 3.15 practice for uv, ruff, ty, mypy and pytest, pyp
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
-1. Open https://peps.python.org/api/release-cycle.json (Python branch status) and compare it with the facts below.
-2. Open https://pypi.org/rss/project/uv/releases.xml (Current uv release) and compare it with the facts below.
-3. Open https://pypi.org/rss/project/ruff/releases.xml (Current ruff release) and compare it with the facts below.
+1. Fetch https://peps.python.org/api/release-cycle.json (Python branch status) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+2. Fetch https://pypi.org/rss/project/uv/releases.xml (Current uv release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+3. Fetch https://pypi.org/rss/project/ruff/releases.xml (Current ruff release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

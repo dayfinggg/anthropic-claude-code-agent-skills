@@ -1,18 +1,18 @@
 ---
 name: testing
-description: Test design that catches real bugs, proof that a change works, and quality gates that cannot be gamed, plus property-based testing, mutation testing and Playwright end-to-end tests. Use when writing, reviewing, fixing or deleting tests, choosing what to mock or fake, building fixtures or test data, when tests pass but bugs ship, when asked to prove a fix works or show before and after evidence, when checking whether a green run or another agent's change skipped tests, suppressed checks or loosened thresholds, for snapshot tests, Hypothesis, fast-check, proptest or other property tests, shrunk counterexamples, mutation testing with StrykerJS, mutmut, cargo-mutants, Infection or PIT, surviving mutants, Playwright specs, playwright.config, locators, flaky or slow end-to-end tests, storageState login, traces, or questions like "is this test useful" and "how do I test this".
+description: Test design that catches real bugs, proof that a change works, and quality gates that cannot be gamed, plus property-based testing, mutation testing and Playwright end-to-end tests. Use when writing, reviewing, fixing or deleting tests, choosing what to mock or fake, building fixtures or test data, when tests pass but bugs ship, when asked to prove a fix works or show before and after evidence, when checking whether a green run or another agent's change skipped tests, suppressed checks or loosened thresholds, for snapshot tests, Hypothesis, fast-check, proptest or other property tests, shrunk counterexamples, mutation testing with StrykerJS, mutmut, cargo-mutants, Infection or PIT, surviving mutants, checking a change in a real browser with Playwright, Playwright specs, playwright.config, locators, flaky or slow end-to-end tests, storageState login, traces, or questions like "is this test useful" and "how do I test this".
 ---
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/verification.md` in full with the Read tool (Proving a change, Gate integrity).
 2. Read `references/property-and-mutation.md` in full with the Read tool (Property-based testing, Mutation testing, Mutation testing gotchas).
 3. Read `references/playwright.md` in full with the Read tool (Playwright defaults, Debugging from an agent, Playwright gotchas).
-4. Open https://registry.npmjs.org/@playwright/test/latest (Current Playwright release) and compare it with the facts below.
-5. Open https://github.com/HypothesisWorks/hypothesis/tags.atom (Current Hypothesis release) and compare it with the facts below.
-6. Open https://registry.npmjs.org/@stryker-mutator/core/latest (Current StrykerJS release) and compare it with the facts below.
+4. Fetch https://registry.npmjs.org/@playwright/test/latest (Current Playwright release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+5. Fetch https://github.com/HypothesisWorks/hypothesis/tags.atom (Current Hypothesis release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+6. Fetch https://registry.npmjs.org/@stryker-mutator/core/latest (Current StrykerJS release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

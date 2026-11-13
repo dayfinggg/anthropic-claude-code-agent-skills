@@ -5,13 +5,13 @@ description: Current GitHub Actions practice on github.com for workflow security
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/untrusted-triggers.md` in full with the Read tool (Attacker-controlled data, pull_request_target, workflow_run, Comment and label gates, Platform controls, Reporting a finding).
 2. Read `references/ai-agents.md` in full with the Read tool (Where attacker text reaches the agent, Containment, claude-code-action, Other agent actions, gh aw agentic workflows).
 3. Read `references/ci-failures.md` in full with the Read tool (Reading the failure, Whose failure it is, Reruns).
-4. Open https://github.com/actions/runner/tags.atom (Current runner release) and compare it with the facts below.
-5. Open https://github.com/actions/checkout/tags.atom (Current `actions/checkout` release) and compare it with the facts below.
+4. Fetch https://github.com/actions/runner/tags.atom (Current runner release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+5. Fetch https://github.com/actions/checkout/tags.atom (Current `actions/checkout` release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

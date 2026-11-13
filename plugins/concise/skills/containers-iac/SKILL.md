@@ -5,14 +5,14 @@ description: Current practice for Dockerfiles and BuildKit, Docker Compose, Kube
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/kubernetes.md` in full with the Read tool (Kubernetes defaults, Kubernetes gotchas).
 2. Read `references/terraform-opentofu.md` in full with the Read tool (Terraform and OpenTofu defaults, Terraform and OpenTofu gotchas).
 3. Read `references/opentelemetry.md` in full with the Read tool (OpenTelemetry defaults, OpenTelemetry gotchas).
-4. Open https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml (Kubernetes minors and end-of-life dates) and compare it with the facts below.
-5. Open https://checkpoint-api.hashicorp.com/v1/check/terraform (Current Terraform release) and compare it with the facts below.
-6. Open https://github.com/open-telemetry/semantic-conventions/tags.atom (Current semantic conventions release) and compare it with the facts below.
+4. Fetch https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml (Kubernetes minors and end-of-life dates) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+5. Fetch https://checkpoint-api.hashicorp.com/v1/check/terraform (Current Terraform release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+6. Fetch https://github.com/open-telemetry/semantic-conventions/tags.atom (Current semantic conventions release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

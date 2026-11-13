@@ -1,17 +1,17 @@
 ---
 name: php
-description: Current PHP 8.4 to 8.6 practice for the language, Composer, PHPStan, PHPUnit, Rector, PHP-CS-Fixer, Symfony and Doctrine DBAL and ORM. Use when writing, reviewing, debugging, testing or upgrading PHP code, when editing .php files, composer.json, composer.lock, phpstan.neon, phpunit.xml, rector.php or .php-cs-fixer.dist.php, when working on Symfony controllers, services, console commands, Messenger, security or config, or on Doctrine entities, repositories, DQL or DBAL queries, when Composer refuses an update or PHPStan or PHPUnit report errors or deprecations, when choosing which PHP, Symfony, PHPUnit or PHPStan version to target, and for quick PHP syntax questions.
+description: Current PHP 8.4 to 8.6 practice for the language, Composer, PHPStan, PHPUnit, Rector, PHP-CS-Fixer, Symfony and Doctrine DBAL and ORM. Use when writing, reviewing, debugging, testing or upgrading PHP code, when editing .php files or Smarty and other .tpl templates of a custom PHP framework or CMS, composer.json, composer.lock, phpstan.neon, phpunit.xml, rector.php or .php-cs-fixer.dist.php, when working on Symfony controllers, services, console commands, Messenger, security or config, or on Doctrine entities, repositories, DQL or DBAL queries, when Composer refuses an update or PHPStan or PHPUnit report errors or deprecations, when choosing which PHP, Symfony, PHPUnit or PHPStan version to target, and for quick PHP syntax questions.
 ---
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/php-language.md` in full with the Read tool (PHP 8.4 idioms, PHP 8.5 features, PHP 8.5 deprecations and breaks, PHP 8.6 features (GA planned 2026-11-19), PHP 8.6 breaks, PHP 8.6 deprecations).
 2. Read `references/symfony-doctrine.md` in full with the Read tool (Symfony versions, Removed in Symfony 8.0, Current Symfony idioms, Doctrine DBAL 4 (4.5 is current), Doctrine ORM 3 (3.7 is current)).
-3. Open https://www.php.net/releases/active.php (Current PHP patch releases) and compare it with the facts below.
-4. Open https://github.com/sebastianbergmann/phpunit/tags.atom (Current PHPUnit releases) and compare it with the facts below.
-5. Open https://symfony.com/releases.json (Symfony versions and PHP floors) and compare it with the facts below.
+3. Fetch https://www.php.net/releases/active.php (Current PHP patch releases) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+4. Fetch https://github.com/sebastianbergmann/phpunit/tags.atom (Current PHPUnit releases) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+5. Fetch https://symfony.com/releases.json (Symfony versions and PHP floors) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

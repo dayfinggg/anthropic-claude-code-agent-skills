@@ -5,11 +5,11 @@ description: Current React 19.3 and Next.js 16 App Router practice, covering Cac
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/cache-components.md` in full with the Read tool (Replacing the previous caching model, Adopting in an existing app).
-2. Open https://registry.npmjs.org/next/latest (Current Next.js release) and compare it with the facts below.
-3. Open https://registry.npmjs.org/react/latest (Current React release) and compare it with the facts below.
+2. Fetch https://registry.npmjs.org/next/latest (Current Next.js release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+3. Fetch https://registry.npmjs.org/react/latest (Current React release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

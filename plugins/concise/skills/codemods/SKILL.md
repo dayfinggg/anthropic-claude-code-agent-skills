@@ -5,10 +5,10 @@ description: Structural code search and large mechanical code changes, plus fram
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
-1. Open https://ast-grep.github.io/llms.txt (ast-grep docs index, every page also served as `.md`) and compare it with the facts below.
-2. Open https://registry.npmjs.org/@ast-grep/cli/latest (Current ast-grep release) and compare it with the facts below.
+1. Fetch https://ast-grep.github.io/llms.txt (ast-grep docs index, every page also served as `.md`) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+2. Fetch https://registry.npmjs.org/@ast-grep/cli/latest (Current ast-grep release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

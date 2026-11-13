@@ -5,7 +5,7 @@ description: Reviewing code changes and pull requests, and acting on review feed
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/review-threads.md` in full with the Read tool (Read every thread with its state, Reply in a thread, Resolve a thread, Post one review with inline comments).
 
