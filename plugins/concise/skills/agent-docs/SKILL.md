@@ -5,12 +5,12 @@ description: Writing and auditing the instructions coding agents read, such as C
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/claude-code-loading.md` in full with the Read tool (`AGENTS.md` in Claude Code, Load order and size, Imports and comments, Rules files).
 2. Read `references/skill-files.md` in full with the Read tool (Frontmatter, Description, Body, Testing).
-3. Open https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release (the facts here match 2.1.323)) and compare it with the facts below.
-4. Open https://agentskills.io/specification.md (Portable skill format) and compare it with the facts below.
+3. Fetch https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release (the facts here match 2.1.323)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+4. Fetch https://agentskills.io/specification.md (Portable skill format) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

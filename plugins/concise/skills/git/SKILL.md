@@ -1,18 +1,18 @@
 ---
 name: git
-description: Current Git 2.56 and GitHub practice for commits, history rewriting, pushes, signing, pull requests, merging and branch rules. Use when committing, amending, rebasing, squashing or fixing up commits, force-pushing, resolving conflicts, cleaning up branches, working in worktrees, setting up or debugging commit signing (SSH, GPG, gitsign, an Unverified badge), opening, updating or merging PRs with gh, taking a PR to merge once CI is green, stacked PRs and gh stack, merge queues, rulesets, branch protection, CODEOWNERS, push protection blocking a push, removing a secret or file from history with git filter-repo, choosing gitleaks or TruffleHog, release-please versions and release notes, .gitattributes and CRLF line endings, or checking which Git or gh version is current.
+description: Current Git 2.56 and GitHub practice for commits, history rewriting, pushes, signing, pull requests, merging and branch rules. Use when committing, amending, rebasing, squashing or fixing up commits, force-pushing, resolving conflicts, merging or pulling branches in clones on a server, cleaning up branches, working in worktrees, setting up or debugging commit signing (SSH, GPG, gitsign, an Unverified badge), opening, updating or merging PRs with gh, taking a PR to merge once CI is green, stacked PRs and gh stack, merge queues, rulesets, branch protection, CODEOWNERS, push protection blocking a push, removing a secret or file from history with git filter-repo, choosing gitleaks or TruffleHog, release-please versions and release notes, .gitattributes and CRLF line endings, or checking which Git or gh version is current.
 ---
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/stacked-prs.md` in full with the Read tool (Facts, Commands safe without a TTY, Editing a stack, Exit codes).
 2. Read `references/github-rules.md` in full with the Read tool (Rulesets and branch protection, Required signed commits, Merge queues, CODEOWNERS).
 3. Read `references/secrets.md` in full with the Read tool (First move, Push protection blocked a push, Purging history, Scanners).
-4. Open https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN (Current Git release (`DEF_VER`)) and compare it with the facts below.
-5. Open https://github.com/cli/cli/tags.atom (Current gh release) and compare it with the facts below.
-6. Open https://docs.github.com/api/article/body?pathname=/en/pull-requests/reference/stacked-pull-requests (Stacked PR rules) and compare it with the facts below.
+4. Fetch https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN (Current Git release (`DEF_VER`)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+5. Fetch https://github.com/cli/cli/tags.atom (Current gh release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+6. Fetch https://docs.github.com/api/article/body?pathname=/en/pull-requests/reference/stacked-pull-requests (Stacked PR rules) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

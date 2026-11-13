@@ -5,10 +5,10 @@ description: Current practice for HTTP API design and reliability, covering erro
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
-1. Open https://docs.stripe.com/api/versioning.md (Current Stripe API version and release model) and compare it with the facts below.
-2. Open https://docs.stripe.com/api/idempotent_requests.md (Stripe idempotency rules) and compare it with the facts below.
+1. Fetch https://docs.stripe.com/api/versioning.md (Current Stripe API version and release model) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+2. Fetch https://docs.stripe.com/api/idempotent_requests.md (Stripe idempotency rules) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

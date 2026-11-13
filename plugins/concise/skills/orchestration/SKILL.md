@@ -5,12 +5,12 @@ description: Dispatching and supervising agents on Claude or other providers, su
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/other-agents.md` in full with the Read tool (Any worker outside the Agent tool, Codex CLI: `codex exec`, Gemini CLI: `gemini -p`, Cursor CLI: `agent -p`, Claude Code: `claude -p`, Host delegation tools).
-2. Open https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release) and compare it with the facts below.
-3. Open https://registry.npmjs.org/@openai/codex/latest (Current Codex CLI release) and compare it with the facts below.
-4. Open https://registry.npmjs.org/@google/gemini-cli/latest (Current Gemini CLI release) and compare it with the facts below.
+2. Fetch https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+3. Fetch https://registry.npmjs.org/@openai/codex/latest (Current Codex CLI release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+4. Fetch https://registry.npmjs.org/@google/gemini-cli/latest (Current Gemini CLI release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

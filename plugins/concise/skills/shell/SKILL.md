@@ -1,13 +1,13 @@
 ---
 name: shell
-description: Writing and running shell commands and scripts in Bash, zsh, sh and PowerShell 7 on Windows with Git Bash, Linux and macOS. Use when writing, reviewing or debugging a .sh, .bash or .ps1 script or a one-line command, for quoting, pipes, exit codes, set -euo pipefail, $ErrorActionPreference or $LASTEXITCODE, when a command works on Linux but fails on macOS or Windows (sed -i, grep -P, date -d, stat, xargs), when Git Bash turns an argument into "C:/Program Files/Git/...", a script fails with "bash\r", PowerShell reports a ParserError, ConvertTo-Json output is cut off, python3 prints "Python was not found", a delete fails with "Device or resource busy", a package.json script fails on Windows, a command hangs on a password or sign-in, or long output must be read. Also for ShellCheck and PSScriptAnalyzer findings.
+description: Writing and running shell commands and scripts in Bash, zsh, sh and PowerShell 7 on Windows with Git Bash, Linux and macOS. Use when writing, reviewing or debugging a .sh, .bash or .ps1 script or a one-line command, including commands run on a remote server over ssh, for quoting, pipes, exit codes, set -euo pipefail, $ErrorActionPreference or $LASTEXITCODE, when a command works on Linux but fails on macOS or Windows (sed -i, grep -P, date -d, stat, xargs), when Git Bash turns an argument into "C:/Program Files/Git/...", a script fails with "bash\r", PowerShell reports a ParserError, ConvertTo-Json output is cut off, python3 prints "Python was not found", a delete fails with "Device or resource busy", a package.json script fails on Windows, a command hangs on a password or sign-in, or long output must be read. Also for ShellCheck and PSScriptAnalyzer findings.
 ---
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
-1. Open https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json (Current PowerShell stable and LTS tags) and compare it with the facts below.
+1. Fetch https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json (Current PowerShell stable and LTS tags) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

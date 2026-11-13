@@ -1,13 +1,13 @@
 ---
 name: debugging
-description: Diagnosing bugs, failing or flaky tests, crashes, hangs, wrong output and performance regressions. Use when something is reported broken, failing, throwing, slow or intermittent, when a fix did not work, when a test fails only in CI, on one machine or in the full suite, when the user pastes a stack trace or mentions a race, deadlock, memory leak or segfault, says "debug this", "why is this happening", "it worked yesterday" or "find what broke it", before changing code whose failure the error alone does not explain, and when adding diagnostic logging, running git bisect or replacing sleeps and timeouts in tests.
+description: Diagnosing bugs, failing or flaky tests, crashes, hangs, wrong output and performance regressions. Use when an error log, exception log, monitoring alert or ticket reports a problem to fix, when something is reported broken, failing, throwing, slow or intermittent, when a fix did not work, when a test fails only in CI, on one machine or in the full suite, when the user pastes a stack trace or mentions a race, deadlock, memory leak or segfault, says "debug this", "why is this happening", "it worked yesterday" or "find what broke it", before changing code whose failure the error alone does not explain, and when adding diagnostic logging, running git bisect or replacing sleeps and timeouts in tests.
 ---
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
-1. Open https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN (Current Git release (`DEF_VER`)) and compare it with the facts below.
+1. Fetch https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN (Current Git release (`DEF_VER`)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

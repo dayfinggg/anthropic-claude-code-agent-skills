@@ -1,17 +1,17 @@
 ---
 name: database
-description: Current PostgreSQL 18 and 19, MySQL 8.4, 9.7 and 26.x, PgBouncer, Prisma 7 and 8, and Drizzle practice for schema migrations, locks, indexes, row level security and connection pooling. Use when writing or reviewing SQL, a migration file, an ALTER TABLE or CREATE INDEX, an RLS policy, schema.prisma or prisma.config.ts, a Drizzle schema or drizzle.config.ts, or pooler, sslmode and connection settings, when a deploy hangs on a lock or a query is slow, when picking or upgrading a database server or ORM version, or on errors like canceling statement due to lock timeout, prepared statement already exists, cached plan must not change result type, too many clients or permission denied for table.
+description: Current PostgreSQL 18 and 19, MySQL 8.4, 9.7 and 26.x, PgBouncer, Prisma 7 and 8, and Drizzle practice for schema migrations, locks, indexes, row level security and connection pooling. Use when writing, reviewing or running SQL, including psql or mysql commands and scripts that look up, check or fix data, a migration file, an ALTER TABLE or CREATE INDEX, an RLS policy, schema.prisma or prisma.config.ts, a Drizzle schema or drizzle.config.ts, or pooler, sslmode and connection settings, when a deploy hangs on a lock or a query is slow, when picking or upgrading a database server or ORM version, or on errors like canceling statement due to lock timeout, prepared statement already exists, cached plan must not change result type, too many clients or permission denied for table.
 ---
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/orms.md` in full with the Read tool (Prisma versions, Prisma 7, Prisma 8, Drizzle).
 2. Read `references/upgrades.md` in full with the Read tool (PostgreSQL minor releases of 2026-11-12, PostgreSQL 17 to 18, PostgreSQL 18 to 19, MySQL release lines).
-3. Open https://www.postgresql.org/versions.json (PostgreSQL majors, latest minors and end-of-life dates) and compare it with the facts below.
-4. Open https://github.com/mysql/mysql-server/tags.atom (Current MySQL releases (`mysql-*` tags)) and compare it with the facts below.
-5. Open https://www.prisma.io/docs/orm/release-status.md (Prisma release lines) and compare it with the facts below.
+3. Fetch https://www.postgresql.org/versions.json (PostgreSQL majors, latest minors and end-of-life dates) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+4. Fetch https://github.com/mysql/mysql-server/tags.atom (Current MySQL releases (`mysql-*` tags)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+5. Fetch https://www.prisma.io/docs/orm/release-status.md (Prisma release lines) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

@@ -5,12 +5,12 @@ description: Current web UI practice for Tailwind CSS v4, shadcn/ui, WCAG 2.2 ac
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/tailwind-v4.md` in full with the Read tool (v3 habits and their v4 form, Behavior changes without a rename).
 2. Read `references/visual-design.md` in full with the Read tool (Before building, Defaults that read as generated, Choices that hold up, Copy).
-3. Open https://registry.npmjs.org/tailwindcss/latest (Current versions) and compare it with the facts below.
-4. Open https://registry.npmjs.org/shadcn/latest (Current versions) and compare it with the facts below.
+3. Fetch https://registry.npmjs.org/tailwindcss/latest (Current versions) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+4. Fetch https://registry.npmjs.org/shadcn/latest (Current versions) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 

@@ -5,10 +5,10 @@ description: Mapping an unfamiliar codebase or area and finding everything a cha
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
 
 1. Read `references/graph-tools.md` in full with the Read tool (Commands, Traps).
-2. Open https://raw.githubusercontent.com/ast-grep/ast-grep.github.io/main/website/reference/cli/outline.md (`ast-grep outline` flags and JSON shape) and compare it with the facts below.
+2. Fetch https://raw.githubusercontent.com/ast-grep/ast-grep.github.io/main/website/reference/cli/outline.md (`ast-grep outline` flags and JSON shape) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
 
 ## Check first
 
