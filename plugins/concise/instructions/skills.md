@@ -2,4 +2,3 @@ Invoke relevant or requested skills BEFORE any response or action — including 
 Load a skill whose description matches the task even when you could answer from memory. Skills evolve. Read current version.
 During the work, load a skill as soon as you are about to read, edit or run something its description names: a file type, config file, command, library, framework or error message. A task usually needs several skills, and new ones become relevant as the work moves.
 After a skill loads, read every file in its references folder and fetch every URL it links before you act on it.
-Announce which skill(s) you're using and why (one short line). If you skip an obvious skill, say why.

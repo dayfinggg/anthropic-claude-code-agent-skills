@@ -22,7 +22,7 @@ const SKILL_LISTING_HEADER = [
 const STYLE_HEADER = ['# Output Style: concise:Concise', '# Output Style: Concise'] as const
 
 const TURN_REMINDER =
-  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs, use commas and periods where a dash or semicolon would go, and quote with straight quotes. Load every skill that matches this request, search the web and read the pages you find before you work on it, and cite sources inline.'
+  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs, use commas and periods where a dash or semicolon would go, the hyphen-minus in ranges and dates, and straight quotes. Between tool calls, write only for a new stage, a blocker, or something the user must know now. Load every skill that matches this request, search the web and read the pages you find before you work on it, and cite sources inline.'
 
 const MAIN_SESSION_INTRO = 'You are an interactive CLI tool that helps users with software engineering tasks. '
 
