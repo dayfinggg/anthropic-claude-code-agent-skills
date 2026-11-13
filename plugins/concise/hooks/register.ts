@@ -22,7 +22,7 @@ const TURN_REMINDER =
 const LONG_CONTEXT_STEP = 100_000
 
 const LONG_CONTEXT_REMINDER =
-  'This conversation is long now, and instructions from its start lose weight as it grows. Before your next message or step, go back over the Output Style section and the rest of your system prompt, and the skills you have loaded. They are still in your context, so recall them there without reading any file, load each listed skill the current stage needs that you have not loaded yet, and follow them from here on as closely as at the start of the session.'
+  'This conversation is long now, and instructions from its start lose weight as it grows. Before your next message or step, go back over the Output Style section and the rest of your system prompt, and the skills you have loaded. They are still in your context, so recall them there without reading any file, load each listed skill the current stage needs that you have not loaded yet, and follow them from here on as closely as at the start of the session. At this length the most common slip is a short English note between tool calls that announces the next step, such as "Now the docs.", so write no such note, and write every message in the language of your replies.'
 
 const COMPACTED_REMINDER =
   "The conversation was just compacted, so earlier messages are now a summary and loaded skills may be cut short. Before your next step, check the summary for the user's requests and every constraint they gave, load the skills the current stage needs again, and read the reference files that fit the task again."
