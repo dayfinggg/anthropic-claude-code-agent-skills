@@ -3,14 +3,22 @@ name: typescript-javascript
 description: Current JavaScript and TypeScript practice, covering ES2025 to ES2027 features and where they run, TypeScript 6 and 7, tsconfig and type patterns, Node.js LTS lines and runtime, npm, pnpm, Bun and Deno, and Vite, Rolldown, Vitest, ESLint, Biome and Prettier. Use when writing, reviewing, debugging or upgrading .ts, .tsx, .js, .mjs or .cjs code or package.json, tsconfig.json, vite.config, vitest.config, eslint.config, biome.json, bunfig.toml or deno.json, fixing tsc, lint, build, test runner or install errors, choosing a target, lib, module setting, runtime or package manager, running .ts files with node, bun or deno, or answering any plain JavaScript or TypeScript question, such as which version or feature is current.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/ecmascript.md` in full with the Read tool (Where ES2025 to ES2027 features run, TypeScript types for them, Traps).
+2. Read `references/typescript.md` in full with the Read tool (Compiler and tsconfig, Errors after an upgrade, Types that models get wrong).
+3. Read `references/node-and-packages.md` in full with the Read tool (Node.js runtime, Package managers).
+4. Open https://registry.npmjs.org/typescript/latest (Current TypeScript release) and compare it with the facts below.
+5. Open https://raw.githubusercontent.com/nodejs/Release/main/schedule.json (Node.js release lines and dates) and compare it with the facts below.
+
 ## Check first
 
 - Read the TypeScript version from `node_modules/typescript/package.json` and the lockfile, and every tsconfig in the `extends` chain. TypeScript 7 provides `tsc`, `@typescript/typescript6` provides `tsc6`.
 - Read the lowest runtime the code must support: `engines`, `.nvmrc`, `.node-version`, `devEngines.runtime`, CI and container images, `browserslist` or Vite `build.target`.
 - Take the package manager from the lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock`, `deno.lock`) and `packageManager` or `devEngines.packageManager`, and run only that one.
 - Type-check the whole project with its script or `tsc --noEmit`. Vite, Vitest, tsx, Bun, Deno run and Node.js type stripping execute TypeScript without checking it.
-- Current TypeScript release: https://registry.npmjs.org/typescript/latest
-- Node.js release lines and dates: https://raw.githubusercontent.com/nodejs/Release/main/schedule.json
 - Facts verified 2026-11.
 
 ## Defaults
@@ -41,9 +49,3 @@ description: Current JavaScript and TypeScript practice, covering ES2025 to ES20
 - An ESLint config object holding only `ignores` ignores globally, while `ignores` next to other keys applies to that object alone, where a pattern like `"build/"` ignores nothing. Use `globalIgnores()` for global ignores and `"build/**"` elsewhere.
 - ESLint 10 looks up `eslint.config.*` from each linted file's folder upward, so a nested config now wins inside its subtree. `/* eslint-env */` comments are errors. On Node.js, `eslint.config.ts` needs `jiti` 2.2 or later installed.
 - Biome 2 replaced `include` and `ignore` with `files.includes`, resolves paths relative to the config file, and needs `"root": false` in every nested `biome.json`, which inherits nothing unless it uses `extends`. Run `npx @biomejs/biome migrate --write` after upgrading.
-
-## References
-
-- Read [ecmascript.md](references/ecmascript.md) before using a built-in or syntax added after ES2024, or when choosing `target`, `lib` or a polyfill.
-- Read [typescript.md](references/typescript.md) when editing tsconfig, upgrading TypeScript, fixing compiler errors or writing non-trivial types.
-- Read [node-and-packages.md](references/node-and-packages.md) when running TypeScript with Node.js, choosing a Node.js version, writing `node:test` suites, or installing dependencies with npm, pnpm, Bun or Deno.

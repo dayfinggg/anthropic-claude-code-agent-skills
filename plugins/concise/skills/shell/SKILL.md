@@ -3,6 +3,12 @@ name: shell
 description: Writing and running shell commands and scripts in Bash, zsh, sh and PowerShell 7 on Windows with Git Bash, Linux and macOS. Use when writing, reviewing or debugging a .sh, .bash or .ps1 script or a one-line command, for quoting, pipes, exit codes, set -euo pipefail, $ErrorActionPreference or $LASTEXITCODE, when a command works on Linux but fails on macOS or Windows (sed -i, grep -P, date -d, stat, xargs), when Git Bash turns an argument into "C:/Program Files/Git/...", a script fails with "bash\r", PowerShell reports a ParserError, ConvertTo-Json output is cut off, python3 prints "Python was not found", a delete fails with "Device or resource busy", a package.json script fails on Windows, a command hangs on a password or sign-in, or long output must be read. Also for ShellCheck and PSScriptAnalyzer findings.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Open https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json (Current PowerShell stable and LTS tags) and compare it with the facts below.
+
 ## Check first
 
 - Find the shell that runs the command. Claude Code's Bash tool runs `$SHELL` when it is bash or zsh, unless `CLAUDE_CODE_SHELL` overrides it: zsh on macOS 10.15 and later, Git Bash (MSYS2 bash) on Windows. Its PowerShell tool runs `pwsh` 7, or Windows PowerShell 5.1 when `pwsh` is missing. Check with `echo "$BASH_VERSION$ZSH_VERSION $OSTYPE"` or `$PSVersionTable.PSVersion`.
@@ -10,7 +16,6 @@ description: Writing and running shell commands and scripts in Bash, zsh, sh and
 - `sed --version` fails on BSD tools. Linux and Git Bash ship GNU tools, macOS ships BSD ones.
 - Lint bash with ShellCheck 0.11.0 (`shellcheck -x script.sh`, or `uvx --from shellcheck-py==0.11.0.1 shellcheck` where it is missing) and add `--enable=check-extra-masked-returns` for SC2312. Lint `.ps1` with PSScriptAnalyzer 1.25 (`Invoke-ScriptAnalyzer -Path script.ps1`).
 - PowerShell 7.7.0 (2026-11-10, .NET 11) is current, 7.6 is the LTS until 2028-11-14, and 7.4 and 7.5 reached end of support on 2026-11-10.
-- Current PowerShell stable and LTS tags: https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json
 - Facts verified 2026-11.
 
 ## Defaults

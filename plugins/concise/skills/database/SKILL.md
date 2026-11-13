@@ -3,6 +3,16 @@ name: database
 description: Current PostgreSQL 18 and 19, MySQL 8.4, 9.7 and 26.x, PgBouncer, Prisma 7 and 8, and Drizzle practice for schema migrations, locks, indexes, row level security and connection pooling. Use when writing or reviewing SQL, a migration file, an ALTER TABLE or CREATE INDEX, an RLS policy, schema.prisma or prisma.config.ts, a Drizzle schema or drizzle.config.ts, or pooler, sslmode and connection settings, when a deploy hangs on a lock or a query is slow, when picking or upgrading a database server or ORM version, or on errors like canceling statement due to lock timeout, prepared statement already exists, cached plan must not change result type, too many clients or permission denied for table.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/orms.md` in full with the Read tool (Prisma versions, Prisma 7, Prisma 8, Drizzle).
+2. Read `references/upgrades.md` in full with the Read tool (PostgreSQL minor releases of 2026-11-12, PostgreSQL 17 to 18, PostgreSQL 18 to 19, MySQL release lines).
+3. Open https://www.postgresql.org/versions.json (PostgreSQL majors, latest minors and end-of-life dates) and compare it with the facts below.
+4. Open https://github.com/mysql/mysql-server/tags.atom (Current MySQL releases (`mysql-*` tags)) and compare it with the facts below.
+5. Open https://www.prisma.io/docs/orm/release-status.md (Prisma release lines) and compare it with the facts below.
+
 ## Check first
 
 - Ask the server for its version with `SHOW server_version;` on PostgreSQL or `SELECT VERSION();` on MySQL.
@@ -10,9 +20,6 @@ description: Current PostgreSQL 18 and 19, MySQL 8.4, 9.7 and 26.x, PgBouncer, P
 - Compare with the registry: `npm view prisma dist-tags`, `npm view @prisma/client dist-tags`, `npm view drizzle-orm dist-tags`.
 - Find both connection strings, pooled and direct, in env files and ORM config (`DATABASE_URL`, `DIRECT_URL`, `DATABASE_URL_UNPOOLED`, a `-pooler` host, port 6432).
 - Before DDL on a live PostgreSQL table, look for old transactions: `SELECT pid, now() - xact_start AS age, state, query FROM pg_stat_activity WHERE xact_start IS NOT NULL ORDER BY xact_start;`
-- PostgreSQL majors, latest minors and end-of-life dates: https://www.postgresql.org/versions.json
-- Current MySQL releases (`mysql-*` tags): https://github.com/mysql/mysql-server/tags.atom
-- Prisma release lines: https://www.prisma.io/docs/orm/release-status.md
 - Facts verified 2026-11.
 
 ## Defaults
@@ -76,8 +83,3 @@ ALTER TABLE orders VALIDATE CONSTRAINT orders_status_nn;
 - MySQL `ON DUPLICATE KEY UPDATE` fires on whichever unique index collides, not only the one you meant. Avoid it on tables with more than one unique index.
 - MySQL INSTANT add or drop column fails with `ERROR 4092` once a table has 64 row versions on 8.4 (255 since 9.1). A rebuild with `ALGORITHM=INPLACE` or `OPTIMIZE TABLE` resets the count.
 - MySQL 8.4 disables `mysql_native_password` and 9.0 removed it, so old clients and accounts created with it cannot log in. 8.4 also rejects foreign keys to non-unique or partial keys while `restrict_fk_on_non_standard_key` is ON, its default.
-
-## References
-
-- Read references/orms.md when the project uses Prisma or Drizzle, or when choosing an ORM version.
-- Read references/upgrades.md when upgrading or patching a PostgreSQL or MySQL server, or when choosing a MySQL release line.

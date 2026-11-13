@@ -3,12 +3,18 @@ name: codebase-analysis
 description: Mapping an unfamiliar codebase or area and finding everything a change can break before planning or editing it. Use when starting work in a repo, package or module you have not read, when asked how something works, where it is handled, what calls or uses it, whether it is dead or safe to remove, rename, retype or tighten, or for the blast radius or impact of changing a function, type, field, endpoint, column, config key, flag or event. Also use when reading a dependency's or another repo's source, and when running LSP find references or call hierarchy, ast-grep outline, dependency-cruiser, madge, knip, pydeps, grimp, cargo tree, go list, deptrac, jdeps, git log -S or -L, or git blame.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/graph-tools.md` in full with the Read tool (Commands, Traps).
+2. Open https://raw.githubusercontent.com/ast-grep/ast-grep.github.io/main/website/reference/cli/outline.md (`ast-grep outline` flags and JSON shape) and compare it with the facts below.
+
 ## Check first
 
 - Read how the code is built, run and deployed before any source: manifests, lockfiles and workspace files, Dockerfile and Compose, CI workflows, Procfile, Helm or Kubernetes manifests, serverless, cron and queue definitions, `.env.example`. Entry points usually live in deployment config, and without it most top-level modules look unreachable.
 - List the navigation tools this session has: an `LSP` tool (present only with a code intelligence plugin and its server binary on `PATH`, inactive in cloud sessions), `ast-grep --version` (`outline` is an alpha preview since 0.44), and graph tools the repo already configures (`.dependency-cruiser.*`, `.madgerc`, `knip.json`, `[tool.importlinter]`, `deptrac.php`).
 - `git rev-parse --is-shallow-repository` prints `true` when history is cut off. Log then stops early and blame charges every older line to the oldest fetched commit (marked `^`), so run `git fetch --unshallow` first.
-- `ast-grep outline` flags and JSON shape: https://raw.githubusercontent.com/ast-grep/ast-grep.github.io/main/website/reference/cli/outline.md
 - Facts verified 2026-11.
 
 ## Defaults
@@ -50,7 +56,3 @@ description: Mapping an unfamiliar codebase or area and finding everything a cha
 - `--follow` works for one file only, and `git log -- <dir>` stops at the commit that moved the directory. Pass the old path as a second pathspec.
 - `git blame` applies `.git-blame-ignore-revs` only when `blame.ignoreRevsFile` is set. Pass `--ignore-revs-file .git-blame-ignore-revs` so reformatting commits do not hide the author of a line.
 - `vitest related --run <files>` runs only the tests that import those files statically, so a test reaching them through a dynamic `import(path)` is left out.
-
-## References
-
-- Read references/graph-tools.md before running a dependency graph, reverse dependency or unused-code tool.

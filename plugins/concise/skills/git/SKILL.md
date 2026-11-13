@@ -3,21 +3,36 @@ name: git
 description: Current Git 2.56 and GitHub practice for commits, history rewriting, pushes, signing, pull requests, merging and branch rules. Use when committing, amending, rebasing, squashing or fixing up commits, force-pushing, resolving conflicts, cleaning up branches, working in worktrees, setting up or debugging commit signing (SSH, GPG, gitsign, an Unverified badge), opening, updating or merging PRs with gh, taking a PR to merge once CI is green, stacked PRs and gh stack, merge queues, rulesets, branch protection, CODEOWNERS, push protection blocking a push, removing a secret or file from history with git filter-repo, choosing gitleaks or TruffleHog, release-please versions and release notes, .gitattributes and CRLF line endings, or checking which Git or gh version is current.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/stacked-prs.md` in full with the Read tool (Facts, Commands safe without a TTY, Editing a stack, Exit codes).
+2. Read `references/github-rules.md` in full with the Read tool (Rulesets and branch protection, Required signed commits, Merge queues, CODEOWNERS).
+3. Read `references/secrets.md` in full with the Read tool (First move, Push protection blocked a push, Purging history, Scanners).
+4. Open https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN (Current Git release (`DEF_VER`)) and compare it with the facts below.
+5. Open https://github.com/cli/cli/tags.atom (Current gh release) and compare it with the facts below.
+6. Open https://docs.github.com/api/article/body?pathname=/en/pull-requests/reference/stacked-pull-requests (Stacked PR rules) and compare it with the facts below.
+
 ## Check first
 
 - Run `git version` and `gh --version`. Git older than 2.56.1 (or 2.55.1, 2.54.1, 2.53.1, 2.52.1, 2.51.3, 2.50.2 on older lines) is open to CVE-2026-111760, a remote code execution on recursive clone, and five other CVEs. Tell the user before cloning anything untrusted.
 - Run `gh ruleset check <branch>` to see every rule that applies to the target branch, from repo and org rulesets alike. The branch does not need to exist.
 - Read the merge settings: `gh api repos/{owner}/{repo} --jq '{allow_squash_merge, allow_rebase_merge, allow_merge_commit, squash_merge_commit_title}'`.
 - Find config that changes behavior: `git config --show-origin --get-regexp '^(user|commit|tag|gpg|push|pull|rebase|merge)\.'`. Since Git 2.54 hooks can also come from config files, so list what will run with `git hook list --show-scope pre-commit`.
-- Current Git release (`DEF_VER`): https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN
-- Current gh release: https://github.com/cli/cli/tags.atom
-- Stacked PR rules: https://docs.github.com/api/article/body?pathname=/en/pull-requests/reference/stacked-pull-requests
 - Facts verified 2026-11.
 
 ## Defaults
 
 - Current releases: Git 2.56.1, gh 2.104.0, gh-stack 0.3.0, git-filter-repo 2.47.0, gitleaks 8.30.1, TruffleHog 3.99.
 - Commit only your paths: `git add <new files>`, then `git commit -m '<msg>' -- <paths>`. A bare `git commit` also commits whatever the user had staged before.
+- Before the first commit in a repo, read `git log --no-merges -20 --format=%s` and match its language, prefix style and casing. Use Conventional Commits only when the history, a commitlint config or release tooling uses them.
+- One commit is one self-contained change that addresses just one thing. It carries its own tests and the files it regenerates, and the build and tests pass after it. A rename, move or reformat goes in its own commit before the change that needs it.
+- Size: about 100 changed lines is a normal commit and about 1,000 is too large. Files count too: 200 lines in one file can be fine, spread across 50 files it is too large. A deleted file or a change from a trusted codemod counts as small. When the message body grows long, split the commit.
+- Subject: what the commit does, in the imperative mood, about 50 characters, no final period, readable alone in `git log --oneline`. "Fix bug", "Fix build", "Phase 1" and "Address review comments" say nothing.
+- Body: what is wrong without the change (present tense), why this approach is right, alternatives you rejected, and what the code cannot show, such as limits and deliberate omissions. Summarize a discussion in the body rather than only linking it.
+- Fold review fixes into the commit they fix with `git commit --fixup=<sha>`, unless the repo squash-merges.
+- Conventional Commits details: a breaking change takes `!` before the colon or a `BREAKING CHANGE:` footer (uppercase, `BREAKING-CHANGE` is a synonym). Footers are `Token: value` or `Token #value`, with `-` in place of spaces in the token.
 - Agent shells have no TTY, so rewrite history without an editor. Fix an older commit with `git commit --fixup=<sha>` and then `git rebase --autosquash <base>`. Since Git 2.44 `--autosquash` works without `-i`.
 - `git history` (experimental) edits history in place without a rebase: `fixup <sha>` folds the staged changes into that commit (2.55+) and `drop <sha>` removes one (2.56). `reword` and `split` need an editor or a TTY. The master-branch docs on GitHub already list `squash` and `--gpg-sign`, which 2.56.1 does not have.
 - Use `git rebase --update-refs` (or `rebase.updateRefs=true`) when other local branches sit inside the rebased range, so their pointers move too. Branches checked out in another worktree are not moved.
@@ -47,16 +62,8 @@ description: Current Git 2.56 and GitHub practice for commits, history rewriting
 - `git history` rewrites every local branch that descends from the edited commit. Pass `--update-refs=head` to touch only the current branch, and `--dry-run` to print the ref updates first. In 2.56 it refuses any history that contains a merge and aborts on any conflict.
 - Rewrites lose signatures. Rebase, amend and cherry-pick sign again only when `commit.gpgSign` is on or `-S` is passed. `git replay` writes unsigned commits, 2.56 `git history` has no signing option, and `git filter-repo` strips signatures. Branches that require signed commits then reject the push.
 - In an agent shell GPG cannot ask for a passphrase and fails with `gpg failed to sign the data`. Ask the user to unlock gpg-agent or to use an SSH key loaded in ssh-agent.
-- gitsign (Sigstore) signatures show as Unverified on GitHub and fail required-signature rules.
 - Closing keywords such as `Fixes #12` act only in PRs that target the default branch, or in commits that land on it. They are ignored while a PR targets another branch, such as a mid-stack PR or a release branch.
 - `gh pr merge --admin` merges around the merge queue and the rules. It is a bypass, not a fix for a blocked merge.
 - Branch names from other people are shell input. Git allows `$(...)`, backticks and `|` in them, so single-quote them in every command.
 - An untrusted clone can contain an embedded bare repository whose hooks fire when a shell prompt runs `git status` in it. Set `git config --global safe.bareRepository explicit`, which becomes the default in Git 3.0, and avoid `--recurse-submodules` on unpatched Git.
-- Git 3.0 will default new repositories to SHA-256, reftable and a `main` branch. Scripts that hard-code `master` or 40-character SHAs break there, so read the branch from `git symbolic-ref --short refs/remotes/origin/HEAD` and the hash length from `git rev-parse --show-object-format`.
 - For CI triggers, workflow security (`merge_group`, `pull_request_target`) and reading or rerunning failed checks see concise:github-actions. For `git bisect` see concise:debugging. For reviewing a diff or answering review threads see concise:code-review.
-
-## References
-
-- references/stacked-prs.md: read when creating, updating, syncing, restructuring or merging stacked PRs, or when a `gh stack` command fails.
-- references/github-rules.md: read when a merge or push is blocked, or when setting up or debugging rulesets, merge queues, required checks, required signatures or CODEOWNERS.
-- references/secrets.md: read when push protection blocks a push, a secret was committed or pushed, history must be purged, or a secret scanner must be chosen or run.

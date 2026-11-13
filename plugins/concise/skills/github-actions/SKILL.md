@@ -3,6 +3,16 @@ name: github-actions
 description: Current GitHub Actions practice on github.com for workflow security, correctness and failing checks. Use when writing, reviewing, debugging or hardening .github/workflows/*.yml, action.yml, actions.lock or dependabot.yml files, reusable workflows, triggers such as pull_request_target, workflow_run, issue_comment or merge_group, GITHUB_TOKEN permissions, pinning actions, OIDC to AWS, Azure or GCP, npm trusted publishing, secrets and masking, caches and artifacts, concurrency, runner labels, actionlint or zizmor findings, AI agent actions such as claude-code-action or gh aw agentic workflows, when a pull request check fails or a rerun is considered, or when a required check is stuck on "Waiting for status to be reported" or a workflow never starts. Also for quick questions about current action versions or recent Actions changes.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/untrusted-triggers.md` in full with the Read tool (Attacker-controlled data, pull_request_target, workflow_run, Comment and label gates, Platform controls, Reporting a finding).
+2. Read `references/ai-agents.md` in full with the Read tool (Where attacker text reaches the agent, Containment, claude-code-action, Other agent actions, gh aw agentic workflows).
+3. Read `references/ci-failures.md` in full with the Read tool (Reading the failure, Whose failure it is, Reruns).
+4. Open https://github.com/actions/runner/tags.atom (Current runner release) and compare it with the facts below.
+5. Open https://github.com/actions/checkout/tags.atom (Current `actions/checkout` release) and compare it with the facts below.
+
 ## Check first
 
 - Inventory `.github/workflows/*.yml` and `*.yaml`, every `action.yml` (often under `.github/actions/`), `.github/workflows/actions.lock`, gh aw sources (`.github/workflows/*.md` next to `*.lock.yml`), `.github/dependabot.yml` and the `CODEOWNERS` lines for `.github/`.
@@ -10,8 +20,6 @@ description: Current GitHub Actions practice on github.com for workflow security
 - Self-hosted runners: `$/` needs runner 2.336.0 or later, Node 24 actions need 2.327.1 or later. The latest runner is 2.338.2.
 - Resolve a tag to its commit before pinning, never from memory: `gh api repos/OWNER/REPO/commits/v7.0.1 --jq .sha`. In `git ls-remote --tags` output take the `^{}` line, not the annotated tag object. Confirm the commit belongs to the action's own repository, not a fork.
 - Lint with `zizmor .` (1.32.0, security audits, knows lockfiles and the 2026 syntax) and `actionlint` (1.7.12, expressions and types).
-- Current runner release: https://github.com/actions/runner/tags.atom
-- Current `actions/checkout` release: https://github.com/actions/checkout/tags.atom
 - Facts verified 2026-11.
 
 ## Defaults
@@ -79,9 +87,3 @@ concurrency:
 - Environment branch rules match `refs/pull/N/merge` for `pull_request` events and the default branch for `pull_request_target` (since 2025-12-08). Old patterns that matched the head branch no longer unlock the environment.
 - `upload-artifact` skips files and folders starting with `.` unless `include-hidden-files: true`, and a second upload with the same name in one run fails without `overwrite: true`. `download-artifact@v8` fails on a digest mismatch.
 - actionlint 1.7.12 (2026-03-30) predates `$/`, `cache-mode`, `background`, `parallel`, `wait` and `queue`, and reports them as errors. Check the workflow syntax docs before rewriting valid YAML. zizmor 1.32.0 parses them.
-
-## References
-
-- Read references/untrusted-triggers.md when a workflow uses `pull_request_target`, `workflow_run` or `issue_comment`, gates fork code on a label or comment, checks out or downloads PR content, or when auditing workflow security.
-- Read references/ai-agents.md when a workflow runs claude-code-action, codex-action, run-gemini-cli, actions/ai-inference or a gh aw agentic workflow.
-- Read references/ci-failures.md when a check fails on a pull request, before rerunning a run, or when deciding whether a change caused a failure.

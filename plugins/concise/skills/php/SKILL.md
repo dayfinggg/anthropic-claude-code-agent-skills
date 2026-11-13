@@ -3,15 +3,22 @@ name: php
 description: Current PHP 8.4 to 8.6 practice for the language, Composer, PHPStan, PHPUnit, Rector, PHP-CS-Fixer, Symfony and Doctrine DBAL and ORM. Use when writing, reviewing, debugging, testing or upgrading PHP code, when editing .php files, composer.json, composer.lock, phpstan.neon, phpunit.xml, rector.php or .php-cs-fixer.dist.php, when working on Symfony controllers, services, console commands, Messenger, security or config, or on Doctrine entities, repositories, DQL or DBAL queries, when Composer refuses an update or PHPStan or PHPUnit report errors or deprecations, when choosing which PHP, Symfony, PHPUnit or PHPStan version to target, and for quick PHP syntax questions.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/php-language.md` in full with the Read tool (PHP 8.4 idioms, PHP 8.5 features, PHP 8.5 deprecations and breaks, PHP 8.6 features (GA planned 2026-11-19), PHP 8.6 breaks, PHP 8.6 deprecations).
+2. Read `references/symfony-doctrine.md` in full with the Read tool (Symfony versions, Removed in Symfony 8.0, Current Symfony idioms, Doctrine DBAL 4 (4.5 is current), Doctrine ORM 3 (3.7 is current)).
+3. Open https://www.php.net/releases/active.php (Current PHP patch releases) and compare it with the facts below.
+4. Open https://github.com/sebastianbergmann/phpunit/tags.atom (Current PHPUnit releases) and compare it with the facts below.
+5. Open https://symfony.com/releases.json (Symfony versions and PHP floors) and compare it with the facts below.
+
 ## Check first
 
 - Read `require.php` and `config.platform.php` in `composer.json`. Write code that runs on the lowest PHP version they allow.
 - Read installed versions from `composer.lock` or `composer show --locked --direct`. Run `composer outdated --direct` for newer releases.
 - Before raising the PHP floor, run `composer why-not php 8.5` to list the packages that block it.
 - Run tools through the project's own configs and `composer.json` scripts: `phpstan.neon` or `phpstan.dist.neon`, `phpunit.xml` or `phpunit.xml.dist`, `rector.php`, `.php-cs-fixer.dist.php`, `config/bundles.php`.
-- Current PHP patch releases: https://www.php.net/releases/active.php
-- Current PHPUnit releases: https://github.com/sebastianbergmann/phpunit/tags.atom
-- Symfony versions and PHP floors: https://symfony.com/releases.json
 - Facts verified 2026-11.
 
 ## Defaults
@@ -62,8 +69,3 @@ description: Current PHP 8.4 to 8.6 practice for the language, Composer, PHPStan
 - Many Rector rules change only private members and final classes. Add `->withTreatClassesAsFinal()` when no code outside the project extends its classes.
 - Rector's parallel mode can fail on Windows under PowerShell 7. Run it from cmd or Git Bash there.
 - A Rector rule fixture (`.php.inc`) without a `-----` line asserts that the rule leaves the file unchanged. Name such fixtures `skip_*.php.inc`.
-
-## References
-
-- Read references/php-language.md when code may use or must avoid PHP 8.5 or 8.6 syntax, functions or deprecations, or when upgrading PHP.
-- Read references/symfony-doctrine.md when the project requires `symfony/*` or `doctrine/*` packages.

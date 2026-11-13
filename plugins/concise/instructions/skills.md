@@ -1,4 +1,7 @@
-Invoke relevant or requested skills BEFORE any response or action — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
-Load a skill whose description matches the task even when you could answer from memory. Skills evolve. Read current version.
-During the work, load a skill as soon as you are about to read, edit or run something its description names: a file type, config file, command, library, framework or error message. A task usually needs several skills, and new ones become relevant as the work moves.
-After a skill loads, read every file in its references folder and fetch every URL it links before you act on it.
+Invoke relevant or requested skills before any response or action, including clarifying questions, exploring the codebase, or checking files. If one turns out wrong for the situation, you don't have to use it.
+Load skills at every point where the work changes, not only when it starts. A task usually needs several skills, and most of them become relevant only after you have looked around.
+After you explore the project, the logs or the error, load the skills for every language, framework, tool, service and kind of work you found, such as the database a query runs on, the shell a script runs in, or the CI a failure comes from.
+Each time the work moves to a new stage, such as diagnosis, a code change, a migration, tests, a commit, a deploy or a review, or you learn something that changes the task, read the skill list again and load each skill that now matches.
+Load a skill as soon as you are about to read, edit or run something its description names: a file type, a config file, a command, a library, a framework or an error message.
+Right after a skill loads, do every step of its Read first section in order, without skipping a file or a page because it looks unrelated to the task. Read each file in full with the Read tool, not with `head`, `sed -n` or a partial `cat`. Act on the skill only after that. For a skill without that section, read every file in its references folder and open every URL it gives.
+A loaded skill stays in context for the rest of the session, so load each skill once.

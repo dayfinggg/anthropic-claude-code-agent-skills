@@ -9,20 +9,15 @@ const SOURCES_LIST = 'After answering from results, end with a "Sources:" list o
 const WEB_RESULTS_RULE =
   'These results are leads, not answers: open each page you rely on and read it in full before you use it. Cite each source as a markdown link right after the claim it supports, with no separate list of sources.'
 
-const SKILL_TRIGGER = [
-  'When the task at hand is one a listed skill covers, call this tool first',
-  'Call this tool before any response or action whenever a listed skill matches the task or the user names one, and again during the work as soon as it reaches a file, command, library or error that another listed skill names',
-] as const
-
 const SKILL_LISTING_HEADER = [
   'The following skills are available for use with the Skill tool:',
-  'Skills available through the Skill tool. Check them before any response or action and load every skill that matches the task:',
+  'Skills available through the Skill tool. Load every skill that matches the task before any response or action, and again each time the work reaches a new stage:',
 ] as const
 
 const STYLE_HEADER = ['# Output Style: concise:Concise', '# Output Style: Concise'] as const
 
 const TURN_REMINDER =
-  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs, use commas and periods where a dash or semicolon would go, the hyphen-minus in ranges and dates, and straight quotes. Between tool calls, write only for a new stage, a blocker, or something the user must know now. Load every skill that matches this request, search the web and read the pages you find before you work on it, and cite sources inline.'
+  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs. In every message, progress messages included, use commas and periods where a dash or semicolon would go, the hyphen-minus in ranges and dates, and straight quotes. Between tool calls, write only when a stage is finished, you hit a blocker, or you find something the user must know now, and never to announce your next step or the skills you load. Load every skill that matches this request now and again at each new stage of the work, search the web and read the pages you find before you work on it, and cite sources inline.'
 
 const MAIN_SESSION_INTRO = 'You are an interactive CLI tool that helps users with software engineering tasks. '
 
@@ -58,10 +53,7 @@ export const register: Register = on => {
     return { ...described, isDeferred: false, description: described.description.replace(SOURCES_LIST, WEB_RESULTS_RULE) }
   })
 
-  on('tool.describe', { tool: 'Skill' }, async ($, e, next) => {
-    const described = await next(e)
-    return { ...described, description: described.description.replace(...SKILL_TRIGGER) }
-  })
+  on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
 
   on('prompt.attachment', { type: 'skill_listing' }, ($, e, next) =>
     next({ ...e, text: e.text.replace(...SKILL_LISTING_HEADER) }),

@@ -3,6 +3,14 @@ name: web-security
 description: Finding exploitable vulnerabilities in web application and API code, and deciding whether a suspected one is real. Use when asked for a security review or audit of a web app, API, PR or diff, when checking for IDOR or BOLA, broken access control, privilege escalation, tenant isolation or cross-tenant leaks, fail-open defaults, secrets leaking into logs, traces or JSON, SSRF, open redirects, CORS, CSRF, path traversal, mass assignment, injection (including argument injection into spawn or execFile), template autoescaping, spoofed X-Forwarded-For, when triaging a scanner or bug-bounty finding as true or false positive, or when reviewing auth middleware, permission classes, policies, ORM queries, serializers or security settings in Django, DRF, FastAPI, Express, Next.js, Rails, Laravel or Spring.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/access-control.md` in full with the Read tool (The question to answer, Where object checks go missing, Tenant isolation, Framework traps).
+2. Read `references/defaults-and-sinks.md` in full with the Read tool (Fail-open defaults, Credentials in serialization sinks).
+3. Open https://github.com/OWASP/ASVS/tags.atom (Current ASVS release (5.0.0)) and compare it with the facts below.
+
 ## Check first
 
 - Establish exposure before judging severity: who can reach the code (internet, other internal services, customer SDKs, a local operator). Look in ingress, gateway and deployment config, and ask if it is unclear.
@@ -10,7 +18,6 @@ description: Finding exploitable vulnerabilities in web application and API code
 - Find how this codebase enforces authorization: middleware, base controllers, decorators, policies and guards, the framework's default permission setting, scoped query helpers or managers, and every escape hatch that skips them.
 - Read `SECURITY_MODEL.md` or a threat model if one exists, from the base revision when reviewing a PR (see concise:code-review). Only controls that block count as enforcement. A control that only logs, alerts or emits a metric is monitoring.
 - Get framework versions from the lockfile and check which protections are on: template auto-escaping, CSRF middleware, ORM parameterization, secure cookie flags.
-- Current ASVS release (5.0.0): https://github.com/OWASP/ASVS/tags.atom
 - Facts verified 2026-11.
 
 ## Defaults
@@ -46,8 +53,3 @@ description: Finding exploitable vulnerabilities in web application and API code
 - Limits enforced by read-then-write (single-use codes, balances, quotas, invitations) race under parallel requests. Require an atomic conditional update or a unique constraint.
 - LLM features: prompt-injection filters (regex blocklists, delimiters, "ignore instructions in the document") are not controls. Treat model output as attacker-controlled: limit tools to the requesting user's permissions, escape rendered output, and block auto-loaded markdown images and links that can carry data out.
 - Test files, dead code, examples and fixtures are out of scope unless they ship. Check that a flagged route is registered and not behind a disabled flag before reporting it.
-
-## References
-
-- references/access-control.md: read when reviewing authorization, IDOR or BOLA, tenant isolation, roles, or any endpoint that takes an object ID.
-- references/defaults-and-sinks.md: read when reviewing configuration, error handling around security checks, logging, tracing, error reporting, caching, or how objects holding credentials are serialized.

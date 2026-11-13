@@ -3,12 +3,19 @@ name: architecture
 description: Current practice for project structure, file and folder naming, module boundaries, architecture style and the decision and spec documents kept in a repo. Use when creating or reorganizing a project, monorepo or workspace (pnpm, npm, Turborepo, Nx, Cargo, Composer PSR-4, Python src layout), asking where code, tests or files should go or how to name them, adding or fixing dependency rules (dependency-cruiser, eslint-plugin-boundaries, Nx tags, deptrac, import-linter, ArchUnit), untangling circular imports, barrel files or imports that break on Linux after a rename, choosing a modular monolith, vertical slices, hexagonal, event-driven or microservices, writing ADRs, MADR, C4 or arc42 docs, working with Spec Kit, Kiro specs or OpenSpec, or making a codebase easier for agents to work in autonomously.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/boundary-tools.md` in full with the Read tool (Pick the tool, dependency-cruiser, eslint-plugin-boundaries, Nx and Turborepo, deptrac, import-linter, ArchUnit, Rust).
+2. Read `references/spec-formats.md` in full with the Read tool (Detect the format, Spec Kit, Kiro, OpenSpec).
+3. Open https://github.com/github/spec-kit/tags.atom (Current Spec Kit release) and compare it with the facts below.
+4. Open https://registry.npmjs.org/@fission-ai/openspec/latest (Current OpenSpec release) and compare it with the facts below.
+
 ## Check first
 
 - Before moving or adding modules, read what the repo already decided: ADRs (`docs/decisions/`, `docs/adr/`, `doc/arch/`), specs (`.specify/`, `.kiro/`, `openspec/`) and boundary configs (`.dependency-cruiser.*`, `boundaries/` settings in `eslint.config.*`, `tags` in `project.json`, `boundaries` in `turbo.json`, `deptrac.php`, `[tool.importlinter]`, ArchUnit tests, `deny.toml`).
 - `git config core.ignorecase` prints `true` on a checkout where a wrong-case file name passes locally and fails on Linux.
-- Current Spec Kit release: https://github.com/github/spec-kit/tags.atom
-- Current OpenSpec release: https://registry.npmjs.org/@fission-ai/openspec/latest
 - Facts verified 2026-11.
 
 ## Defaults
@@ -59,8 +66,3 @@ description: Current practice for project structure, file and folder naming, mod
 - Each `tests/*.rs` file is its own crate in Rust. Shared helpers go in `tests/common/mod.rs`, not `tests/common.rs`.
 - Turborepo errors on nested packages such as `apps/a` and `apps/a/b`. Group with a `packages/group/*` glob and no `package.json` in `packages/group/`.
 - pnpm's `linkWorkspacePackages` defaults to false, so a plain version range for a workspace package can install a same-named package from the registry. Use `workspace:*`.
-
-## References
-
-- Read references/boundary-tools.md when adding, configuring, upgrading or debugging a dependency-boundary or cycle check.
-- Read references/spec-formats.md when the repo has `.specify/`, `.kiro/` or `openspec/`, or the user asks for spec-driven development.

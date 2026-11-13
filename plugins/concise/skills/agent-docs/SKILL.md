@@ -3,13 +3,20 @@ name: agent-docs
 description: Writing and auditing the instructions coding agents read, such as CLAUDE.md, CLAUDE.local.md, AGENTS.md, .claude/rules files, auto memory and MEMORY.md, Claude Code skills (SKILL.md, descriptions, references) and subagent definitions in .claude/agents. Use when creating, editing, trimming or reviewing any of these, when a skill does not trigger or triggers too often, when Claude ignores, forgets or over-applies an instruction, when an AGENTS.md is not picked up, when sharing one instruction file across Claude Code, Codex, Cursor or Copilot, or when the user says "update CLAUDE.md", "add a rule", "write a skill", "why doesn't my skill load" or "clean up our agent docs".
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/claude-code-loading.md` in full with the Read tool (`AGENTS.md` in Claude Code, Load order and size, Imports and comments, Rules files).
+2. Read `references/skill-files.md` in full with the Read tool (Frontmatter, Description, Body, Testing).
+3. Open https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release (the facts here match 2.1.323)) and compare it with the facts below.
+4. Open https://agentskills.io/specification.md (Portable skill format) and compare it with the facts below.
+
 ## Check first
 
 - Run `claude --version`. Reading `AGENTS.md` directly needs v2.1.277 or later, `/doctor prompt-audit` v2.1.283 or later.
 - List every instruction file in play: `CLAUDE.md`, `.claude/CLAUDE.md`, `CLAUDE.local.md` and `AGENTS.md` in the working directory and above, nested ones below, `.claude/rules/`, `~/.claude/CLAUDE.md`, `~/.claude/rules/`, `.claude/skills/`, `.claude/agents/`, and other tools' files (`.cursor/rules/`, `.github/copilot-instructions.md`).
 - `/context all` lists the memory files loaded at launch. `/doctor prompt-audit [path]` flags outdated, broken and conflicting instructions. `claude plugin validate <dir>` finds frontmatter that does not parse. `/skill-doctor` shows each skill's context cost and use.
-- Current Claude Code release (the facts here match 2.1.323): https://registry.npmjs.org/@anthropic-ai/claude-code/latest
-- Portable skill format: https://agentskills.io/specification.md
 - Facts verified 2026-11.
 
 ## Defaults
@@ -38,8 +45,3 @@ description: Writing and auditing the instructions coding agents read, such as C
 - Hard style limits ("one idea per sentence, under 20 words") make Fable 5.2 prose choppy.
 - Two contradicting lines, in one file or across files, make Claude pick one arbitrarily. Reconcile them in one place.
 - `CLAUDE.md` arrives as a user message after the system prompt. It is context, not enforcement.
-
-## References
-
-- Read references/claude-code-loading.md when writing or debugging `CLAUDE.md`, `AGENTS.md`, rules files, imports or nested files.
-- Read references/skill-files.md when writing a skill, its description or a subagent definition, or when a skill does not trigger.

@@ -3,13 +3,18 @@ name: codemods
 description: Structural code search and large mechanical code changes, plus framework, library and runtime version upgrades. Use when one change must reach many files or call sites (rename or move a symbol, replace a deprecated API, change a signature or import path, swap a library), when the user says "codemod", "rename it everywhere", "replace all calls to", "migrate from X to Y" or "upgrade to the next major", when writing or running ast-grep (sg, sgconfig.yml, rule YAML), jscodeshift, ts-morph, LibCST, Rector, OpenRewrite or a Codemod registry package, when a sed or regex replace across files is tempting, when an ast-grep pattern matches nothing, or when sequencing a multi-version upgrade.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Open https://ast-grep.github.io/llms.txt (ast-grep docs index, every page also served as `.md`) and compare it with the facts below.
+2. Open https://registry.npmjs.org/@ast-grep/cli/latest (Current ast-grep release) and compare it with the facts below.
+
 ## Check first
 
 - Start from a clean working tree, so `git diff` after a run shows only what the tool wrote.
 - Look for the official migration path before writing a transform: the upgrade guide of every version between the current and the target, and the project's own codemod. `npx codemod search <terms>` searches the Codemod registry, and `npx codemod run <package> --dry-run` previews one. Version facts and official codemods per stack live in concise:typescript-javascript, concise:python, concise:php (Rector) and concise:rust (`cargo fix`).
 - Current releases in 2026-11: ast-grep 0.51.2, jscodeshift 17.4.0, ts-morph 28.0.0, LibCST 1.9.0, Codemod CLI 1.18.7. Run ast-grep without installing it as `npx -p @ast-grep/cli@0.51.2 ast-grep` or `uvx --from ast-grep-cli ast-grep`. Plain `npx @ast-grep/cli` fails with "could not determine executable to run".
-- ast-grep docs index, every page also served as `.md`: https://ast-grep.github.io/llms.txt
-- Current ast-grep release: https://registry.npmjs.org/@ast-grep/cli/latest
 - Facts verified 2026-11.
 
 ## Defaults

@@ -3,6 +3,14 @@ name: react-next
 description: Current React 19.3 and Next.js 16 App Router practice, covering Cache Components and the use cache directive, Server Components and Server Functions, route handlers, proxy.ts, caching and revalidation, Suspense streaming and RSC serialization. Use when writing, reviewing, debugging or upgrading React or Next.js code, including app/ pages and layouts, route.ts, proxy.ts or middleware.ts, next.config.ts, files marked 'use client', 'use server' or 'use cache', hydration mismatches, blocking-prerender or next-request-in-use-cache errors, revalidateTag or updateTag calls, React Compiler setup, View Transitions or Activity, or a quick question about which React or Next.js version or API to use.
 ---
 
+## Read first
+
+Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, and a skipped file or page is the usual cause of a wrong result.
+
+1. Read `references/cache-components.md` in full with the Read tool (Replacing the previous caching model, Adopting in an existing app).
+2. Open https://registry.npmjs.org/next/latest (Current Next.js release) and compare it with the facts below.
+3. Open https://registry.npmjs.org/react/latest (Current React release) and compare it with the facts below.
+
 ## Check first
 
 - Read `package.json` and the lockfile for `next`, `react`, `react-dom`, `babel-plugin-react-compiler` and `eslint-plugin-react-hooks`. Read `next.config.*` for `cacheComponents`, `partialPrefetching`, `reactCompiler` and `experimental` keys.
@@ -10,8 +18,6 @@ description: Current React 19.3 and Next.js 16 App Router practice, covering Cac
 - Error pages under `/docs/messages/` are not bundled. Fetch the link the overlay or build log prints, with `.md` appended. Every nextjs.org docs page has a `.md` version.
 - From 16.3, `next dev` writes a managed block between `nextjs-agent-rules` markers into `AGENTS.md` and restores it when removed. Commit it with the work instead of reverting it.
 - `next dev` records its PID, port and URL in `.next/dev/lock`. Reuse a running dev server instead of starting a second one.
-- Current Next.js release: https://registry.npmjs.org/next/latest
-- Current React release: https://registry.npmjs.org/react/latest
 - Facts verified 2026-11.
 
 ## Defaults
@@ -65,7 +71,3 @@ description: Current React 19.3 and Next.js 16 App Router practice, covering Cac
 - Every parallel route slot needs a `default.js` since 16, or the build fails.
 - Next.js encrypts the values a Server Action closes over, but arguments added with `.bind` reach the client unencrypted and return as client input. Keep secrets out of both, and authorize bound IDs inside the action.
 - Self-hosted apps on several instances need the same `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` everywhere, or Server Action calls can fail when they land on another instance.
-
-## References
-
-- Read [cache-components.md](references/cache-components.md) when enabling Cache Components in an existing app or replacing route segment configs, `fetch` cache options or `unstable_cache`.
