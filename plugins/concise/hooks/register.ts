@@ -6,7 +6,8 @@ const WEB_TOOLS = ['WebSearch', 'WebFetch']
 
 const SOURCES_LIST = 'After answering from results, end with a "Sources:" list of the URLs you used as markdown links.'
 
-const SOURCES_INLINE = 'Cite each source as a markdown link right after the claim it supports, with no separate list of sources.'
+const WEB_RESULTS_RULE =
+  'These results are leads, not answers: open each page you rely on and read it in full before you use it. Cite each source as a markdown link right after the claim it supports, with no separate list of sources.'
 
 const SKILL_TRIGGER = [
   'When the task at hand is one a listed skill covers, call this tool first',
@@ -21,7 +22,7 @@ const SKILL_LISTING_HEADER = [
 const STYLE_HEADER = ['# Output Style: concise:Concise', '# Output Style: Concise'] as const
 
 const TURN_REMINDER =
-  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs, use commas and periods where a dash or semicolon would go, and quote with straight quotes. Load every skill that matches this request, search the web before you work on it, and cite sources inline.'
+  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs, use commas and periods where a dash or semicolon would go, and quote with straight quotes. Load every skill that matches this request, search the web and read the pages you find before you work on it, and cite sources inline.'
 
 const MAIN_SESSION_INTRO = 'You are an interactive CLI tool that helps users with software engineering tasks. '
 
@@ -54,7 +55,7 @@ export const register: Register = on => {
 
   on('tool.describe', { tool: WEB_TOOLS }, async ($, e, next) => {
     const described = await next(e)
-    return { ...described, isDeferred: false, description: described.description.replace(SOURCES_LIST, SOURCES_INLINE) }
+    return { ...described, isDeferred: false, description: described.description.replace(SOURCES_LIST, WEB_RESULTS_RULE) }
   })
 
   on('tool.describe', { tool: 'Skill' }, async ($, e, next) => {
@@ -68,7 +69,7 @@ export const register: Register = on => {
 
   on('tool.call', { tool: 'WebSearch' }, async ($, e, next) => {
     const result = await next(e)
-    return result.deny === undefined ? { ...result, context: [...(result.context ?? []), SOURCES_INLINE] } : result
+    return result.deny === undefined ? { ...result, context: [...(result.context ?? []), WEB_RESULTS_RULE] } : result
   })
 
   on('prompt.attachment', { type: 'deferred_tools_delta' }, async ($, e, next) => {
