@@ -5,13 +5,13 @@ description: Current PostgreSQL 18 and 19, MySQL 8.4, 9.7 and 26.x, PgBouncer, P
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/orms.md` in full with the Read tool (Prisma versions, Prisma 7, Prisma 8, Drizzle).
-2. Read `references/upgrades.md` in full with the Read tool (PostgreSQL minor releases of 2026-11-12, PostgreSQL 17 to 18, PostgreSQL 18 to 19, MySQL release lines).
-3. Fetch https://www.postgresql.org/versions.json (PostgreSQL majors, latest minors and end-of-life dates) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-4. Fetch https://github.com/mysql/mysql-server/tags.atom (Current MySQL releases (`mysql-*` tags)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-5. Fetch https://www.prisma.io/docs/orm/release-status.md (Prisma release lines) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/orms.md` when the project uses Prisma or Drizzle, or when choosing an ORM version.
+2. Read `references/upgrades.md` when upgrading or patching a PostgreSQL or MySQL server, or when choosing a MySQL release line.
+3. Fetch https://www.postgresql.org/versions.json (PostgreSQL majors, latest minors and end-of-life dates) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+4. Fetch https://github.com/mysql/mysql-server/tags.atom (Current MySQL releases (`mysql-*` tags)) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+5. Fetch https://www.prisma.io/docs/orm/release-status.md (Prisma release lines) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

@@ -5,12 +5,12 @@ description: Writing and auditing the instructions coding agents read, such as C
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/claude-code-loading.md` in full with the Read tool (`AGENTS.md` in Claude Code, Load order and size, Imports and comments, Rules files).
-2. Read `references/skill-files.md` in full with the Read tool (Frontmatter, Description, Body, Testing).
-3. Fetch https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release (the facts here match 2.1.323)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-4. Fetch https://agentskills.io/specification.md (Portable skill format) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/claude-code-loading.md` when writing or debugging `CLAUDE.md`, `AGENTS.md`, rules files, imports or nested files.
+2. Read `references/skill-files.md` when writing a skill, its description or a subagent definition, or when a skill does not trigger.
+3. Fetch https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release (the facts here match 2.1.323)) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+4. Fetch https://agentskills.io/specification.md (Portable skill format) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

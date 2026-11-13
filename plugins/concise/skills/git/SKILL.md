@@ -5,14 +5,14 @@ description: Current Git 2.56 and GitHub practice for commits, history rewriting
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/stacked-prs.md` in full with the Read tool (Facts, Commands safe without a TTY, Editing a stack, Exit codes).
-2. Read `references/github-rules.md` in full with the Read tool (Rulesets and branch protection, Required signed commits, Merge queues, CODEOWNERS).
-3. Read `references/secrets.md` in full with the Read tool (First move, Push protection blocked a push, Purging history, Scanners).
-4. Fetch https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN (Current Git release (`DEF_VER`)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-5. Fetch https://github.com/cli/cli/tags.atom (Current gh release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-6. Fetch https://docs.github.com/api/article/body?pathname=/en/pull-requests/reference/stacked-pull-requests (Stacked PR rules) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/stacked-prs.md` when creating, updating, syncing, restructuring or merging stacked PRs, or when a `gh stack` command fails.
+2. Read `references/github-rules.md` when a merge or push is blocked, or when setting up or debugging rulesets, merge queues, required checks, required signatures or CODEOWNERS.
+3. Read `references/secrets.md` when push protection blocks a push, a secret was committed or pushed, history must be purged, or a secret scanner must be chosen or run.
+4. Fetch https://raw.githubusercontent.com/git/git/maint/GIT-VERSION-GEN (Current Git release (`DEF_VER`)) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+5. Fetch https://github.com/cli/cli/tags.atom (Current gh release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+6. Fetch https://docs.github.com/api/article/body?pathname=/en/pull-requests/reference/stacked-pull-requests (Stacked PR rules) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

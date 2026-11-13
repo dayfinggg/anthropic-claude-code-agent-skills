@@ -5,14 +5,14 @@ description: Current practice for Dockerfiles and BuildKit, Docker Compose, Kube
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/kubernetes.md` in full with the Read tool (Kubernetes defaults, Kubernetes gotchas).
-2. Read `references/terraform-opentofu.md` in full with the Read tool (Terraform and OpenTofu defaults, Terraform and OpenTofu gotchas).
-3. Read `references/opentelemetry.md` in full with the Read tool (OpenTelemetry defaults, OpenTelemetry gotchas).
-4. Fetch https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml (Kubernetes minors and end-of-life dates) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-5. Fetch https://checkpoint-api.hashicorp.com/v1/check/terraform (Current Terraform release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-6. Fetch https://github.com/open-telemetry/semantic-conventions/tags.atom (Current semantic conventions release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/kubernetes.md` when writing or reviewing Kubernetes manifests, Helm or Kustomize output, or planning a cluster upgrade.
+2. Read `references/terraform-opentofu.md` when working on Terraform or OpenTofu configuration, state, modules, imports or tests.
+3. Read `references/opentelemetry.md` when adding OpenTelemetry instrumentation, setting `OTEL_*` variables, or configuring a Collector.
+4. Fetch https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml (Kubernetes minors and end-of-life dates) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+5. Fetch https://checkpoint-api.hashicorp.com/v1/check/terraform (Current Terraform release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+6. Fetch https://github.com/open-telemetry/semantic-conventions/tags.atom (Current semantic conventions release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

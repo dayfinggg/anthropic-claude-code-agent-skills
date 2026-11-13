@@ -5,12 +5,12 @@ description: Current practice for project structure, file and folder naming, mod
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/boundary-tools.md` in full with the Read tool (Pick the tool, dependency-cruiser, eslint-plugin-boundaries, Nx and Turborepo, deptrac, import-linter, ArchUnit, Rust).
-2. Read `references/spec-formats.md` in full with the Read tool (Detect the format, Spec Kit, Kiro, OpenSpec).
-3. Fetch https://github.com/github/spec-kit/tags.atom (Current Spec Kit release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-4. Fetch https://registry.npmjs.org/@fission-ai/openspec/latest (Current OpenSpec release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/boundary-tools.md` when adding, configuring, upgrading or debugging a dependency-boundary or cycle check.
+2. Read `references/spec-formats.md` when the repo has `.specify/`, `.kiro/` or `openspec/`, or the user asks for spec-driven development.
+3. Fetch https://github.com/github/spec-kit/tags.atom (Current Spec Kit release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+4. Fetch https://registry.npmjs.org/@fission-ai/openspec/latest (Current OpenSpec release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

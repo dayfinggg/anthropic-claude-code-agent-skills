@@ -5,11 +5,11 @@ description: Finding exploitable vulnerabilities in web application and API code
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/access-control.md` in full with the Read tool (The question to answer, Where object checks go missing, Tenant isolation, Framework traps).
-2. Read `references/defaults-and-sinks.md` in full with the Read tool (Fail-open defaults, Credentials in serialization sinks).
-3. Fetch https://github.com/OWASP/ASVS/tags.atom (Current ASVS release (5.0.0)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/access-control.md` when reviewing authorization, IDOR or BOLA, tenant isolation, roles, or any endpoint that takes an object ID.
+2. Read `references/defaults-and-sinks.md` when reviewing configuration, error handling around security checks, logging, tracing, error reporting, caching, or how objects holding credentials are serialized.
+3. Fetch https://github.com/OWASP/ASVS/tags.atom (Current ASVS release (5.0.0)) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

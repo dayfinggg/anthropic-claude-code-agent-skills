@@ -5,11 +5,11 @@ description: Current Rust practice (stable 1.100, edition 2024) for writing, rev
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/edition-2024.md` in full with the Read tool (Migration, Language, Standard library, Cargo, Rustdoc, Rustfmt).
-2. Read `references/std-apis.md` in full with the Read tool (Stable std APIs by version).
-3. Fetch https://blog.rust-lang.org/releases/latest/ (Current stable (the page redirects to its release post)) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/edition-2024.md` when migrating a crate to edition 2024 or fixing errors that appear after an edition change.
+2. Read `references/std-apis.md` when writing or reviewing code against a specific `rust-version`, or before adding a crate for something std may already provide.
+3. Fetch https://blog.rust-lang.org/releases/latest/ (Current stable (the page redirects to its release post)) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

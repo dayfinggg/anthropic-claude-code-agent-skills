@@ -5,9 +5,9 @@ description: Writing and running shell commands and scripts in Bash, zsh, sh and
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Fetch https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json (Current PowerShell stable and LTS tags) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Fetch https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json (Current PowerShell stable and LTS tags) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 
