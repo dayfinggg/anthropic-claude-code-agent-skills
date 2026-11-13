@@ -5,14 +5,14 @@ description: Test design that catches real bugs, proof that a change works, and 
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/verification.md` in full with the Read tool (Proving a change, Gate integrity).
-2. Read `references/property-and-mutation.md` in full with the Read tool (Property-based testing, Mutation testing, Mutation testing gotchas).
-3. Read `references/playwright.md` in full with the Read tool (Playwright defaults, Debugging from an agent, Playwright gotchas).
-4. Fetch https://registry.npmjs.org/@playwright/test/latest (Current Playwright release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-5. Fetch https://github.com/HypothesisWorks/hypothesis/tags.atom (Current Hypothesis release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-6. Fetch https://registry.npmjs.org/@stryker-mutator/core/latest (Current StrykerJS release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/verification.md` before claiming a change works end to end, and before accepting a green run or a diff that touches tests, CI or quality gates, yours or another agent's.
+2. Read `references/property-and-mutation.md` before writing or reviewing property-based tests, when a property test fails, and before setting up, scoping or reading a mutation testing run.
+3. Read `references/playwright.md` before writing, running, debugging or fixing Playwright tests.
+4. Fetch https://registry.npmjs.org/@playwright/test/latest (Current Playwright release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+5. Fetch https://github.com/HypothesisWorks/hypothesis/tags.atom (Current Hypothesis release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+6. Fetch https://registry.npmjs.org/@stryker-mutator/core/latest (Current StrykerJS release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

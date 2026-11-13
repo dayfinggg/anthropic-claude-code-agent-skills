@@ -5,9 +5,9 @@ description: Reviewing code changes and pull requests, and acting on review feed
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/review-threads.md` in full with the Read tool (Read every thread with its state, Reply in a thread, Resolve a thread, Post one review with inline comments).
+1. Read `references/review-threads.md` before fetching review threads, replying to or resolving a thread, or posting a review with inline comments through `gh api`.
 
 ## Check first
 

@@ -5,13 +5,13 @@ description: Current JavaScript and TypeScript practice, covering ES2025 to ES20
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/ecmascript.md` in full with the Read tool (Where ES2025 to ES2027 features run, TypeScript types for them, Traps).
-2. Read `references/typescript.md` in full with the Read tool (Compiler and tsconfig, Errors after an upgrade, Types that models get wrong).
-3. Read `references/node-and-packages.md` in full with the Read tool (Node.js runtime, Package managers).
-4. Fetch https://registry.npmjs.org/typescript/latest (Current TypeScript release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-5. Fetch https://raw.githubusercontent.com/nodejs/Release/main/schedule.json (Node.js release lines and dates) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/ecmascript.md` before using a built-in or syntax added after ES2024, or when choosing `target`, `lib` or a polyfill.
+2. Read `references/typescript.md` when editing tsconfig, upgrading TypeScript, fixing compiler errors or writing non-trivial types.
+3. Read `references/node-and-packages.md` when running TypeScript with Node.js, choosing a Node.js version, writing `node:test` suites, or installing dependencies with npm, pnpm, Bun or Deno.
+4. Fetch https://registry.npmjs.org/typescript/latest (Current TypeScript release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+5. Fetch https://raw.githubusercontent.com/nodejs/Release/main/schedule.json (Node.js release lines and dates) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

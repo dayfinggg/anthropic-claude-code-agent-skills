@@ -5,13 +5,13 @@ description: Current GitHub Actions practice on github.com for workflow security
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/untrusted-triggers.md` in full with the Read tool (Attacker-controlled data, pull_request_target, workflow_run, Comment and label gates, Platform controls, Reporting a finding).
-2. Read `references/ai-agents.md` in full with the Read tool (Where attacker text reaches the agent, Containment, claude-code-action, Other agent actions, gh aw agentic workflows).
-3. Read `references/ci-failures.md` in full with the Read tool (Reading the failure, Whose failure it is, Reruns).
-4. Fetch https://github.com/actions/runner/tags.atom (Current runner release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-5. Fetch https://github.com/actions/checkout/tags.atom (Current `actions/checkout` release) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/untrusted-triggers.md` when a workflow uses `pull_request_target`, `workflow_run` or `issue_comment`, gates fork code on a label or comment, checks out or downloads PR content, or when auditing workflow security.
+2. Read `references/ai-agents.md` when a workflow runs claude-code-action, codex-action, run-gemini-cli, actions/ai-inference or a gh aw agentic workflow.
+3. Read `references/ci-failures.md` when a check fails on a pull request, before rerunning a run, or when deciding whether a change caused a failure.
+4. Fetch https://github.com/actions/runner/tags.atom (Current runner release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+5. Fetch https://github.com/actions/checkout/tags.atom (Current `actions/checkout` release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 

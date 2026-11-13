@@ -5,13 +5,13 @@ description: Current PHP 8.4 to 8.6 practice for the language, Composer, PHPStan
 
 ## Read first
 
-Do these steps now, in order, before anything else and whatever the task. The files hold the traps this skill depends on, the pages tell you whether its versions are still current, and a skipped file or page is the usual cause of a wrong result.
+Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
 
-1. Read `references/php-language.md` in full with the Read tool (PHP 8.4 idioms, PHP 8.5 features, PHP 8.5 deprecations and breaks, PHP 8.6 features (GA planned 2026-11-19), PHP 8.6 breaks, PHP 8.6 deprecations).
-2. Read `references/symfony-doctrine.md` in full with the Read tool (Symfony versions, Removed in Symfony 8.0, Current Symfony idioms, Doctrine DBAL 4 (4.5 is current), Doctrine ORM 3 (3.7 is current)).
-3. Fetch https://www.php.net/releases/active.php (Current PHP patch releases) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-4. Fetch https://github.com/sebastianbergmann/phpunit/tags.atom (Current PHPUnit releases) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
-5. Fetch https://symfony.com/releases.json (Symfony versions and PHP floors) with `curl -sL` or WebFetch and compare it with the facts below. Where the page shows a newer version than this skill names, follow the page.
+1. Read `references/php-language.md` when code may use or must avoid PHP 8.5 or 8.6 syntax, functions or deprecations, or when upgrading PHP.
+2. Read `references/symfony-doctrine.md` when the project requires `symfony/*` or `doctrine/*` packages.
+3. Fetch https://www.php.net/releases/active.php (Current PHP patch releases) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+4. Fetch https://github.com/sebastianbergmann/phpunit/tags.atom (Current PHPUnit releases) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+5. Fetch https://symfony.com/releases.json (Symfony versions and PHP floors) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
 
 ## Check first
 
