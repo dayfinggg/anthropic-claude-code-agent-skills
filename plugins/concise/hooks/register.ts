@@ -17,7 +17,24 @@ const SKILL_LISTING_HEADER = [
 const STYLE_HEADER = ['# Output Style: concise:Concise', '# Output Style: Concise'] as const
 
 const TURN_REMINDER =
-  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs. In every message, progress messages included, use commas and periods where a dash or semicolon would go, the hyphen-minus in ranges and dates, and straight quotes. Between tool calls, write only when a stage is finished, you hit a blocker, or you find something the user must know now, and never to announce your next step or the skills you load. Load every skill that matches this request now and again at each new stage of the work, search the web and read the pages you find before you work on it, and cite sources inline.'
+  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs. In every message, progress messages included, use commas and periods where a dash or semicolon would go, the hyphen-minus in ranges and dates, and straight quotes. Between tool calls, write only when a stage is finished, you hit a blocker, or you find something the user must know now, always in the same message as your next tool call, and never to announce your next step or the skills you load. Load every skill that matches this request now and again at each new stage of the work, search the web and read the pages you find before you work on it, and cite sources inline.'
+
+const LONG_CONTEXT_STEP = 100_000
+
+const LONG_CONTEXT_REMINDER =
+  'This conversation is long now, and instructions from its start lose weight as it grows. Before your next message or step, go back over the Output Style section and the rest of your system prompt, and the skills you have loaded. They are still in your context, so recall them there without reading any file, and follow them from here on as closely as at the start of the session.'
+
+const COMPACTED_REMINDER =
+  "The conversation was just compacted, so earlier messages are now a summary and loaded skills may be cut short. Before your next step, check the summary for the user's requests and every constraint they gave, load the skills the current stage needs again, and read the reference files that fit the task again."
+
+const COMPACT_INSTRUCTIONS =
+  'Keep, stated exactly: everything the user asked for, decided, agreed, ruled out, or set as a preference, constraint or boundary. Keep exactly where the work stands: what is done and verified, what is done but not verified, and what is still open, promised or expected next, with the files, commits, hosts and commands involved.'
+
+const PLUGIN_CONTEXT = [TURN_REMINDER, WEB_RESULTS_RULE, LONG_CONTEXT_REMINDER, COMPACTED_REMINDER]
+
+let nextLongContextReminder = LONG_CONTEXT_STEP
+
+let lastContextTokens = 0
 
 const MAIN_SESSION_INTRO = 'You are an interactive CLI tool that helps users with software engineering tasks. '
 
@@ -64,6 +81,31 @@ export const register: Register = on => {
     return result.deny === undefined ? { ...result, context: [...(result.context ?? []), WEB_RESULTS_RULE] } : result
   })
 
+  on('tool.call', async ($, e, next) => {
+    const result = await next(e)
+    if (result.deny !== undefined || e.agentId !== undefined) return result
+    const tokens = (await $.session.usage()).context.tokens ?? 0
+    const nextStep = (Math.floor(tokens / LONG_CONTEXT_STEP) + 1) * LONG_CONTEXT_STEP
+    const wasCompacted = tokens > 0 && tokens < lastContextTokens / 2
+    lastContextTokens = tokens
+    if (wasCompacted) {
+      nextLongContextReminder = nextStep
+      return { ...result, context: [...(result.context ?? []), COMPACTED_REMINDER] }
+    }
+    if (tokens < nextLongContextReminder) {
+      nextLongContextReminder = Math.min(nextLongContextReminder, nextStep)
+      return result
+    }
+    nextLongContextReminder = nextStep
+    return { ...result, context: [...(result.context ?? []), LONG_CONTEXT_REMINDER] }
+  })
+
+  on('session.compact', ($, e, next) =>
+    e.agentId === undefined
+      ? next({ ...e, instructions: [e.instructions, COMPACT_INSTRUCTIONS].filter(text => text !== undefined && text !== '').join('\n\n') })
+      : next(e),
+  )
+
   on('prompt.attachment', { type: 'deferred_tools_delta' }, async ($, e, next) => {
     const lines = e.text.split('\n')
     const listed = new Set(lines.map(line => line.trim()))
@@ -94,7 +136,8 @@ export const register: Register = on => {
 
   on('prompt.submit', ($, e, next) => next({ ...e, context: [...(e.context ?? []), TURN_REMINDER] }))
 
-  on('prompt.attachment', { type: 'hook_additional_context' }, ($, e, next) =>
-    e.origin.kind === 'plugin' && e.text.endsWith(TURN_REMINDER) ? next({ ...e, text: TURN_REMINDER }) : next(e),
-  )
+  on('prompt.attachment', { type: 'hook_additional_context' }, ($, e, next) => {
+    const own = e.origin.kind === 'plugin' ? PLUGIN_CONTEXT.find(text => e.text.endsWith(text)) : undefined
+    return next(own === undefined ? e : { ...e, text: own })
+  })
 }
