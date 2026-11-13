@@ -6,7 +6,7 @@ Install the plugin with Claude Code's plugin manager.
 claude plugin install concise --marketplace dayfinggg/anthropic-claude-code-agent-skills
 ```
 
-Restart Claude Code after installation. Update the marketplace and plugin with these commands.
+Restart Claude Code after installation. The marketplace entry in `settings.example.json` has `autoUpdate` turned on, so interactive sessions update the plugin in the background and the next launch loads the new version. To update by hand, run these commands.
 
 ```sh
 claude plugin marketplace update concise
