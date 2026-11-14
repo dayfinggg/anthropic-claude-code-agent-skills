@@ -39,6 +39,8 @@ const SILENCE_REMINDER = `The user has seen no text from you for ${SILENCE_LIMIT
 
 const PLUGIN_CONTEXT = [TURN_REMINDER, WEB_RESULTS_RULE, LONG_CONTEXT_REMINDER, COMPACTED_REMINDER, NOTE_LANGUAGE_REMINDER, SILENCE_REMINDER]
 
+const HOOK_CONTEXT_PREFIX = /^[\w.]+ hook additional context: /
+
 const USER_ORIGINS = ['composer', 'bridge', 'sdk']
 
 const NON_PROSE = /```[\s\S]*?```|`[^`\n]*`|\S*(?::\/\/|[\\/])\S*/g
@@ -211,7 +213,7 @@ export const register: Register = on => {
 
   on('prompt.attachment', { type: 'hook_additional_context' }, async ($, e, next) => {
     if (e.origin.kind !== 'plugin') return next(e)
-    const own = PLUGIN_CONTEXT.map(await localizer($)).find(text => e.text.endsWith(text))
-    return next(own === undefined ? e : { ...e, text: own })
+    const isOwn = PLUGIN_CONTEXT.map(await localizer($)).some(text => e.text.includes(text))
+    return next(isOwn ? { ...e, text: e.text.replace(HOOK_CONTEXT_PREFIX, '') } : e)
   })
 }
