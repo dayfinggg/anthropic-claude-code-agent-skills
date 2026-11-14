@@ -13,14 +13,14 @@ description: Carrying a long task from start to finish without the user watching
 
 - Before the first change, write the exit condition as a check you can run, such as "the stand check passes on all 22 hosts" or "the 45 journal entries no longer recur". Work until it holds, and do not loosen it to finish.
 - Decide reversible work yourself and log the decision: edits in your branch or scratch copy, local builds and tests, reads, and temporary files you remove later. A question about these stops the run for nothing.
-- Pause before each action the rules for shared systems and irreversible actions reserve for the user, and before each one the written rules reserve. Prepare it fully first: the exact command or SQL, the snapshot that restores the current state, and the check that proves it worked. A request to fix or finish the task does not cover these actions.
+- Pause before each action the live-systems and obstacles rules reserve for the user, and before each one the project's written rules reserve. Prepare it fully first: the exact command or SQL, the snapshot that restores the current state, and the check that proves it worked. A request to fix or finish the task does not cover these actions.
 - Ask with AskUserQuestion and put all the context in the question, because a question in an ordinary message stays unseen until someone opens the run. Keep working on everything the answer does not block. When no question tool exists, as in a headless or scheduled run, leave the action undone, finish the rest, and open the final report with the question.
 - Work in units that each end in a check: one change, then its check, then the next change. A failure then points to one change.
 - Keep only changes the evidence supports. Revert a change that did not move the check, including guards, retries and fallbacks added because they "might help".
 - Keep a decision log in the scratchpad, or in a git-ignored file when the run spans sessions. One line per decision: time, what, why, evidence (a commit, a command with its exit code, `file:line`) and result. Log forks, finished units with their check, reverts, pauses and blockers, not every step. Append only, and record a wrong call as a new line that supersedes it.
 - Send bulk material to a subagent: large logs, data dumps and wide searches come back as the lines that matter with their location. Read the rules and the code you change yourself.
 - Stay in the run until the exit condition holds or only a real blocker remains. A slow job is a reason to wait on its completion notice, and a plateau is a reason to change the approach. Neither is a reason to end the turn, because nobody restarts a run that stopped.
-- The final report gives the exit condition and its state, each check as its command and exit code, what landed, what was reverted, every decision the run made for the user, and each paused action with what it needs.
+- The final reply follows the output style: the exit condition and its state, the check that proves it, each paused action with what it needs, and the path of the decision log. The log holds the rest for the user to read on request: each check with its command and exit code, what landed, what was reverted and every decision the run made for the user. Keep the log file after the run ends.
 
 ## Gotchas
 

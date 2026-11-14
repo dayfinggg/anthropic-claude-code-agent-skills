@@ -6,4 +6,4 @@ Remove imports/variables/functions that your changes made unused.
 Don't remove pre-existing dead code unless asked.
 Never mix structural and behavioral changes in the same commit
 Always make structural changes first when both are needed
-In your final report, name every change you made, including small ones.
+Record every change you made, including small ones, in the commit message or the project's own log, and name in the final reply each change the user did not ask for.

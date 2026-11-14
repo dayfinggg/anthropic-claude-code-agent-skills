@@ -1,4 +1,4 @@
-import type { Register } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
 
 const DEFERRED_TOOLS = ['Artifact', 'Workflow', 'ScheduleWakeup', 'ReportFindings', 'ListAgents']
 
@@ -16,16 +16,17 @@ const SKILL_LISTING_HEADER = [
 
 const STYLE_HEADER = ['# Output Style: concise:Concise', '# Output Style: Concise'] as const
 
-const TURN_REMINDER =
-  'Concise output style is active. Be concise: lead with the result, skip preamble and narration, keep only what the user needs. Write paragraphs. In every message, progress messages included, use commas and periods where a dash or semicolon would go, the hyphen-minus in ranges and dates, and straight quotes. Between tool calls, write only when a stage is finished, you hit a blocker, or you find something the user must know now, always in the same message as your next tool call, and never to announce your next step or the skills you load. Every message the user reads is in the language of your replies, and English is only for text someone other than the user reads, such as subagent briefs, code, commits and saved files. Load every skill that matches this request now and again at each new stage of the work, search the web and read the pages you find before you work on it, and cite sources inline.'
+const LANGUAGE_SETTING = 'language'
+
+const REPLY_LANGUAGE = "in the language of the user's messages"
+
+const TURN_REMINDER = `The Output Style section and the rules blocks of the system prompt apply to this turn. Between tool calls, write only when you hit a blocker, in the same message as your next tool call, and never to announce your next step or the skills you load. Every message the user reads, a short note between tool calls included, is written ${REPLY_LANGUAGE}, and another language is only for text someone other than the user reads, such as subagent briefs, code, commits and saved files. Load every skill that matches this request now and again at each new stage of the work, search the web and read the pages you find before you work on it, and cite sources inline.`
 
 const LONG_CONTEXT_STEP = 100_000
 
-const LONG_CONTEXT_REMINDER =
-  'This conversation is long now, and instructions from its start lose weight as it grows. Before your next message or step, go back over the Output Style section and the rest of your system prompt, and the skills you have loaded. They are still in your context, so recall them there instead of reading them again. Load each listed skill the current stage needs that you have not loaded yet, read the reference files that the Read first steps of your skills name for this stage and that you have not read yet, and follow them from here on as closely as at the start of the session. A note between tool calls reports a finished stage, a blocker or a finding, never the next step, such as "Now the docs.". Every message the user reads is in the language of your replies, and English is only for text someone other than the user reads, such as subagent briefs, code, commits and saved files.'
+const LONG_CONTEXT_REMINDER = `This conversation is long now, and the rules from its start apply to the rest of it as they did to its first message. The Output Style section, the rules blocks and the loaded skills are still in your context, so recall them from there. Each progress message between tool calls and the final reply are written ${REPLY_LANGUAGE}.`
 
-const COMPACTED_REMINDER =
-  "The conversation was just compacted, so earlier messages are now a summary and loaded skills may be cut short. Before your next step, check the summary for the user's requests and every constraint they gave, load the skills the current stage needs again, and read the reference files that fit the task again."
+const COMPACTED_REMINDER = `The conversation was just compacted, so earlier messages are now a summary and loaded skills may be cut short. Before your next step, check the summary for the user's requests and every constraint they gave, load the skills the current stage needs again, and read the reference files that fit the task again. Every text the user reads stays ${REPLY_LANGUAGE}.`
 
 const COMPACT_INSTRUCTIONS =
   'Keep, stated exactly: everything the user asked for, decided, agreed, ruled out, or set as a preference, constraint or boundary. Keep exactly where the work stands: what is done and verified, what is done but not verified, and what is still open, promised or expected next, with the files, commits, hosts and commands involved.'
@@ -36,6 +37,8 @@ let nextLongContextReminder = LONG_CONTEXT_STEP
 
 let lastContextTokens = 0
 
+const briefedAgents = new Set<string>()
+
 const MAIN_SESSION_INTRO = 'You are an interactive CLI tool that helps users with software engineering tasks. '
 
 type PluginFs = {
@@ -45,14 +48,24 @@ type PluginFs = {
 
 const normalize = (text: string) => text.replace(/\r\n/g, '\n').trim()
 
+const localizer = async ($: EngineInterface) => {
+  const value = await $.settings.read({ key: LANGUAGE_SETTING })
+  const language = typeof value === 'string' ? value.trim() : ''
+  const phrase = language === '' ? REPLY_LANGUAGE : `in ${language.charAt(0).toUpperCase()}${language.slice(1)}`
+  return (text: string) => text.replaceAll(REPLY_LANGUAGE, phrase)
+}
+
 const readInstructions = async (fs: PluginFs, root: string) => {
   const dir = `${root}/instructions`
   const names = (await fs.list(dir))
     .filter(entry => entry.kind === 'file' && entry.name.endsWith('.md'))
-    .map(entry => entry.name)
+    .map(entry => entry.name.slice(0, -'.md'.length))
     .sort()
   return Promise.all(
-    names.map(async name => ({ name: name.slice(0, -'.md'.length), text: normalize(await fs.read(`${dir}/${name}`)) })),
+    names.map(async name => ({
+      name,
+      text: `<rules name="${name}">\n${normalize(await fs.read(`${dir}/${name}.md`))}\n</rules>`,
+    })),
   )
 }
 
@@ -90,14 +103,14 @@ export const register: Register = on => {
     lastContextTokens = tokens
     if (wasCompacted) {
       nextLongContextReminder = nextStep
-      return { ...result, context: [...(result.context ?? []), COMPACTED_REMINDER] }
+      return { ...result, context: [...(result.context ?? []), (await localizer($))(COMPACTED_REMINDER)] }
     }
     if (tokens < nextLongContextReminder) {
       nextLongContextReminder = Math.min(nextLongContextReminder, nextStep)
       return result
     }
     nextLongContextReminder = nextStep
-    return { ...result, context: [...(result.context ?? []), LONG_CONTEXT_REMINDER] }
+    return { ...result, context: [...(result.context ?? []), (await localizer($))(LONG_CONTEXT_REMINDER)] }
   })
 
   on('session.compact', ($, e, next) =>
@@ -118,26 +131,34 @@ export const register: Register = on => {
   on('prompt.compose', async ($, e, next) => {
     const result = await next(e)
     const files = { read: (path: string) => $.fs.read(path), list: (path?: string) => $.fs.list(path) }
-    const instructions = await readInstructions(files, $.plugin.root)
-    const added = instructions.map(({ name, text }) => ({ id: `concise:${name}`, text, scope: 'session' as const }))
+    const [instructions, localize] = await Promise.all([readInstructions(files, $.plugin.root), localizer($)])
+    const added = instructions.map(({ name, text }) => ({ id: `concise:${name}`, text: localize(text), scope: 'session' as const }))
     return { sections: [...result.sections, ...added] }
   })
 
   on('prompt.attachment', { type: 'environment' }, async ($, e, next) => {
-    if (e.agentId === undefined) return next(e)
+    if (e.agentId === undefined || briefedAgents.has(e.agentId)) return next(e)
+    briefedAgents.add(e.agentId)
     const files = { read: (path: string) => $.fs.read(path), list: (path?: string) => $.fs.list(path) }
-    const [style, instructions] = await Promise.all([readStyle(files, $.plugin.root), readInstructions(files, $.plugin.root)])
-    return next({ ...e, text: [e.text, style, ...instructions.map(({ text }) => text)].join('\n\n') })
+    const [style, instructions, localize] = await Promise.all([
+      readStyle(files, $.plugin.root),
+      readInstructions(files, $.plugin.root),
+      localizer($),
+    ])
+    return next({ ...e, text: localize([e.text, style, ...instructions.map(({ text }) => text)].join('\n\n')) })
   })
 
-  on('prompt.attachment', { type: 'output_style_instructions' }, ($, e, next) =>
-    next({ ...e, text: e.text.replace(...STYLE_HEADER) }),
+  on('prompt.attachment', { type: 'output_style_instructions' }, async ($, e, next) =>
+    next({ ...e, text: (await localizer($))(e.text.replace(...STYLE_HEADER)) }),
   )
 
-  on('prompt.submit', ($, e, next) => next({ ...e, context: [...(e.context ?? []), TURN_REMINDER] }))
+  on('prompt.submit', async ($, e, next) =>
+    next({ ...e, context: [...(e.context ?? []), (await localizer($))(TURN_REMINDER)] }),
+  )
 
-  on('prompt.attachment', { type: 'hook_additional_context' }, ($, e, next) => {
-    const own = e.origin.kind === 'plugin' ? PLUGIN_CONTEXT.find(text => e.text.endsWith(text)) : undefined
+  on('prompt.attachment', { type: 'hook_additional_context' }, async ($, e, next) => {
+    if (e.origin.kind !== 'plugin') return next(e)
+    const own = PLUGIN_CONTEXT.map(await localizer($)).find(text => e.text.endsWith(text))
     return next(own === undefined ? e : { ...e, text: own })
   })
 }
