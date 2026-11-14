@@ -20,22 +20,46 @@ const LANGUAGE_SETTING = 'language'
 
 const REPLY_LANGUAGE = "in the language of the user's messages"
 
-const TURN_REMINDER = `The Output Style section and the rules blocks of the system prompt apply to this turn. Between tool calls, write only when you hit a blocker, in the same message as your next tool call, and never to announce your next step or the skills you load. Every message the user reads, a short note between tool calls included, is written ${REPLY_LANGUAGE}, and another language is only for text someone other than the user reads, such as subagent briefs, code, commits and saved files. Load every skill that matches this request now and again at each new stage of the work, search the web and read the pages you find before you work on it, and cite sources inline.`
+const TURN_REMINDER = `The Output Style section and the rules blocks of the system prompt apply to this turn. Before the first tool call of this turn, say in one sentence what you will do. After that, write between tool calls only when you hit a blocker, when the user wrote to you during the work, or when a reminder says the user has seen no text for a while, in the same message as your next tool call, and never to announce your next step or the skills you load. Every message the user reads, a short note between tool calls included, is written ${REPLY_LANGUAGE}, and another language is only for text someone other than the user reads, such as subagent briefs, code, commits and saved files. Load every skill that matches this request now and again at each new stage of the work. When the work depends on a library, API, tool or practice you have not checked in this session, search the web and read the pages you find before you rely on it, and cite sources inline.`
 
 const LONG_CONTEXT_STEP = 100_000
 
-const LONG_CONTEXT_REMINDER = `This conversation is long now, and the rules from its start apply to the rest of it as they did to its first message. The Output Style section, the rules blocks and the loaded skills are still in your context, so recall them from there. Each progress message between tool calls and the final reply are written ${REPLY_LANGUAGE}.`
+const LONG_CONTEXT_REMINDER = `This conversation is long now, and the rules from its start apply to the rest of it as they did to its first message. Between tool calls, write only when you hit a blocker, when the user wrote to you during the work, or when a reminder says the user has seen no text for a while, and never a note that only names your next step. The final reply opens with the result and is written as paragraphs of prose, with no label lines, bulleted lists or bold lead phrases. A production target gets a change only after its own pre-production check has passed, and a database write comes after you saved the rows it changes. Each progress message between tool calls and the final reply are written ${REPLY_LANGUAGE}.`
 
 const COMPACTED_REMINDER = `The conversation was just compacted, so earlier messages are now a summary and loaded skills may be cut short. Before your next step, check the summary for the user's requests and every constraint they gave, load the skills the current stage needs again, and read the reference files that fit the task again. Every text the user reads stays ${REPLY_LANGUAGE}.`
 
 const COMPACT_INSTRUCTIONS =
   'Keep, stated exactly: everything the user asked for, decided, agreed, ruled out, or set as a preference, constraint or boundary. Keep exactly where the work stands: what is done and verified, what is done but not verified, and what is still open, promised or expected next, with the files, commits, hosts and commands involved.'
 
-const PLUGIN_CONTEXT = [TURN_REMINDER, WEB_RESULTS_RULE, LONG_CONTEXT_REMINDER, COMPACTED_REMINDER]
+const NOTE_LANGUAGE_REMINDER = `Your last note between tool calls was not written ${REPLY_LANGUAGE}. The user reads every such note, so write each further one ${REPLY_LANGUAGE}.`
 
-let nextLongContextReminder = LONG_CONTEXT_STEP
+const SILENCE_LIMIT_MINUTES = 10
+
+const SILENCE_REMINDER = `The user has seen no text from you for ${SILENCE_LIMIT_MINUTES} minutes. In the message with your next tool call, say in one sentence ${REPLY_LANGUAGE} what is done and what runs now, then continue the work.`
+
+const PLUGIN_CONTEXT = [TURN_REMINDER, WEB_RESULTS_RULE, LONG_CONTEXT_REMINDER, COMPACTED_REMINDER, NOTE_LANGUAGE_REMINDER, SILENCE_REMINDER]
+
+const USER_ORIGINS = ['composer', 'bridge', 'sdk']
+
+const NON_PROSE = /```[\s\S]*?```|`[^`\n]*`|\S*(?::\/\/|[\\/])\S*/g
+
+const NON_LATIN_LETTER = /(?!\p{Script=Latin})\p{L}/gu
+
+const LATIN_LETTER = /\p{Script=Latin}/gu
+
+const DECISIVE_PROMPT_LETTERS = 20
+
+const FOREIGN_NOTE_LETTERS = 6
+
+let nextLongContextReminder = 2 * LONG_CONTEXT_STEP
 
 let lastContextTokens = 0
+
+let userWritesNonLatin = false
+
+let foreignNoteSeen = false
+
+let quietSince: number | undefined
 
 const briefedAgents = new Set<string>()
 
@@ -47,6 +71,18 @@ type PluginFs = {
 }
 
 const normalize = (text: string) => text.replace(/\r\n/g, '\n').trim()
+
+const letterCount = (text: string, letter: RegExp) => text.replace(NON_PROSE, ' ').match(letter)?.length ?? 0
+
+const writesNonLatin = (text: string, current: boolean) => {
+  const nonLatin = letterCount(text, NON_LATIN_LETTER)
+  const latin = letterCount(text, LATIN_LETTER)
+  if (nonLatin > latin) return true
+  return latin >= DECISIVE_PROMPT_LETTERS && nonLatin === 0 ? false : current
+}
+
+const isForeignNote = (note: string) =>
+  userWritesNonLatin && letterCount(note, NON_LATIN_LETTER) === 0 && letterCount(note, LATIN_LETTER) >= FOREIGN_NOTE_LETTERS
 
 const localizer = async ($: EngineInterface) => {
   const value = await $.settings.read({ key: LANGUAGE_SETTING })
@@ -95,8 +131,15 @@ export const register: Register = on => {
   })
 
   on('tool.call', async ($, e, next) => {
-    const result = await next(e)
-    if (result.deny !== undefined || e.agentId !== undefined) return result
+    const answered = await next(e)
+    if (answered.deny !== undefined || e.agentId !== undefined) return answered
+    const now = await $.clock.now()
+    const asksUser = e.tool === 'AskUserQuestion'
+    const isSilent = !asksUser && now - (quietSince ?? now) >= SILENCE_LIMIT_MINUTES * 60_000
+    quietSince = isSilent || asksUser || quietSince === undefined ? now : quietSince
+    const feedback = [...(foreignNoteSeen ? [NOTE_LANGUAGE_REMINDER] : []), ...(isSilent ? [SILENCE_REMINDER] : [])]
+    foreignNoteSeen = false
+    const result = feedback.length === 0 ? answered : { ...answered, context: [...(answered.context ?? []), ...feedback.map(await localizer($))] }
     const tokens = (await $.session.usage()).context.tokens ?? 0
     const nextStep = (Math.floor(tokens / LONG_CONTEXT_STEP) + 1) * LONG_CONTEXT_STEP
     const wasCompacted = tokens > 0 && tokens < lastContextTokens / 2
@@ -111,6 +154,14 @@ export const register: Register = on => {
     }
     nextLongContextReminder = nextStep
     return { ...result, context: [...(result.context ?? []), (await localizer($))(LONG_CONTEXT_REMINDER)] }
+  })
+
+  on('turn.step', async function* ($, e, next) {
+    const step = yield* next(e)
+    if (e.agentId !== undefined || step.answer.trim() === '') return step
+    quietSince = await $.clock.now()
+    if (step.toolUses.length > 0 && isForeignNote(step.answer)) foreignNoteSeen = true
+    return step
   })
 
   on('session.compact', ($, e, next) =>
@@ -152,9 +203,11 @@ export const register: Register = on => {
     next({ ...e, text: (await localizer($))(e.text.replace(...STYLE_HEADER)) }),
   )
 
-  on('prompt.submit', async ($, e, next) =>
-    next({ ...e, context: [...(e.context ?? []), (await localizer($))(TURN_REMINDER)] }),
-  )
+  on('prompt.submit', async ($, e, next) => {
+    quietSince = await $.clock.now()
+    if (USER_ORIGINS.includes(e.origin.kind) && e.command === undefined) userWritesNonLatin = writesNonLatin(e.text, userWritesNonLatin)
+    return next({ ...e, context: [...(e.context ?? []), (await localizer($))(TURN_REMINDER)] })
+  })
 
   on('prompt.attachment', { type: 'hook_additional_context' }, async ($, e, next) => {
     if (e.origin.kind !== 'plugin') return next(e)
