@@ -1,3 +1,5 @@
+# Stacked pull requests with gh stack
+
 ## Facts
 
 - GitHub stacked PRs are GA since 2026-10-06 on all github.com plans and need no enablement. GitHub Enterprise Server gets them in a later release.
@@ -9,7 +11,7 @@
 - Rebase stack on GitHub creates signed commits with the original authors and keeps approvals when the diff is unchanged, even with dismiss-stale-approvals on.
 - Rule bypass works only for the lowest unmerged PR. `gh stack merge` cannot bypass.
 - In a merge queue the stack is queued in order. Removing or ejecting one PR also removes every PR above it.
-- `gh pr merge` cannot merge a stack. Scripts must use the async merge API (see SKILL.md).
+- `gh pr merge` cannot merge a stack. Scripts must use the async merge API described in SKILL.md.
 - A fully merged stack is closed. Running `gh stack submit` with new branches on top starts a new stack.
 
 ## Commands safe without a TTY

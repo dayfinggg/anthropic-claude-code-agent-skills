@@ -1,3 +1,5 @@
+# GitHub rulesets, required checks, merge queues and CODEOWNERS
+
 ## Rulesets and branch protection
 
 - Rulesets and classic branch protection stack. Nothing has priority: every rule from every source applies, and where two define the same rule the most restrictive version wins. `gh ruleset check <branch>` shows the combined result and `gh ruleset view <id>` one ruleset.
@@ -9,6 +11,7 @@
 - Commit metadata rules (Enterprise) apply only to new commits. For squash merges only the squash commit is checked. Committer-email patterns must also allow `noreply@github.com`, or merges made on the website fail.
 - Push rulesets block file paths, extensions, path lengths and file sizes on private and internal repositories and their whole fork network.
 - When a ruleset requires approvals, a pull request that Copilot opens under its own identity needs one more approval than configured (public preview, on by default).
+
 ## Required signed commits
 
 - GitHub cannot sign commits created by Rebase and merge, so that method fails on a branch that requires signatures. Squash and merge commits made on GitHub are signed by GitHub.

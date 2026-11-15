@@ -1,3 +1,5 @@
+# Secrets in a repository: blocked pushes, purging history and scanners
+
 ## First move
 
 - If the secret is real and has left the machine (pushed, shared, in CI logs), the user must revoke or rotate it first. Rewriting history does not un-leak it: clones, forks, PR refs and cached views keep the old commits, and GitHub can still serve them by SHA until Support purges them.
@@ -11,6 +13,7 @@
 - A secret that already has an alert in the repository is not blocked again, so a push that passes is not proof of a clean history.
 - With `push.default` set to `matching`, or a push of several refs, other branches with secrets can block the push.
 - The bypass link in the error works only for the user who pushed and expires after three hours. Bypassing creates an alert and emails the admins.
+
 ## Purging history
 
 - Purge only when rotation is not enough. Everyone else must stop pushing during the cleanup.
