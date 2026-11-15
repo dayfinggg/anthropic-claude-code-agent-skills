@@ -1,3 +1,5 @@
+# Cloudflare in front of a PHP site
+
 ## Caching
 
 - Cloudflare caches by file extension, not by MIME type. CSS, JS, images, fonts, archives and `robots.txt` are cached, HTML and JSON are not, so PHP pages come back `DYNAMIC` unless a Cache Rule makes them eligible.
@@ -36,7 +38,7 @@
 ## Origin behind Cloudflare
 
 - An origin that answers any address lets a client skip Cloudflare's protection and send its own `CF-Connecting-IP`. Allowing only Cloudflare's ranges is rated "moderately secure", because other Cloudflare customers reach the origin from the same ranges. Cloudflare Tunnel and Authenticated Origin Pulls (Full or Full strict SSL) are rated "very secure".
-- Fetch the ranges from https://www.cloudflare.com/ips-v4 and https://www.cloudflare.com/ips-v6 on a schedule and reload nginx or the firewall. The IPv4 list now includes `131.0.72.0/22`, which older copies lack.
+- Cloudflare publishes its address ranges as plain lists at `https://www.cloudflare.com/ips-v4` and `https://www.cloudflare.com/ips-v6`. They change over time, so regenerate the `set_real_ip_from` include and the firewall rules from those lists on a schedule, then test and reload. The IPv4 list includes `131.0.72.0/22`, which older copies lack.
 - `CF-Connecting-IP` holds one address and is preferred over `X-Forwarded-For`, which a client can pre-fill. With Pseudo IPv4 set to overwrite headers, the real IPv6 address is in `CF-Connecting-IPv6`. The "Remove visitor IP headers" Managed Transform removes the header.
 
 ## 52x errors
