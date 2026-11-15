@@ -1,47 +1,67 @@
 ---
 name: agent-docs
-description: Writing and auditing the instructions coding agents read, such as CLAUDE.md, CLAUDE.local.md, AGENTS.md, .claude/rules files, auto memory and MEMORY.md, Claude Code skills (SKILL.md, descriptions, references) and subagent definitions in .claude/agents. Use when creating, editing, trimming or reviewing any of these, when a skill does not trigger or triggers too often, when Claude ignores, forgets or over-applies an instruction, when an AGENTS.md is not picked up, when sharing one instruction file across Claude Code, Codex, Cursor or Copilot, or when the user says "update CLAUDE.md", "add a rule", "write a skill", "why doesn't my skill load" or "clean up our agent docs".
+description: Writing and auditing the instructions coding agents load, such as CLAUDE.md, AGENTS.md, .claude/rules, auto memory, skills, subagent definitions, output styles and plugin instructions. Use when creating, trimming or reviewing these files, when choosing between CLAUDE.md, a rule, a skill, an output style and a hook, when a skill does not trigger, when AGENTS.md is not loaded, or when Claude ignores or over-applies an instruction.
 ---
 
-## Read first
+# Agent instruction files
 
-Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
-
-1. Read `references/claude-code-loading.md` when writing or debugging `CLAUDE.md`, `AGENTS.md`, rules files, imports or nested files.
-2. Read `references/skill-files.md` when writing a skill, its description or a subagent definition, or when a skill does not trigger.
-3. Fetch https://registry.npmjs.org/@anthropic-ai/claude-code/latest (Current Claude Code release (the facts here match 2.1.323)) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
-4. Fetch https://agentskills.io/specification.md (Portable skill format) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+This skill covers the files that steer Claude Code and other coding agents, and how to write them. It matches Claude Code 2.1.325 and the Claude 5 generation of models (Opus 5.5, Fable 5.2). Run `claude --version` first. Where the installed release is newer, its own release notes are right about fields, limits and load rules.
 
 ## Check first
 
-- Run `claude --version`. Reading `AGENTS.md` directly needs v2.1.277 or later, `/doctor prompt-audit` v2.1.283 or later.
-- List every instruction file in play: `CLAUDE.md`, `.claude/CLAUDE.md`, `CLAUDE.local.md` and `AGENTS.md` in the working directory and above, nested ones below, `.claude/rules/`, `~/.claude/CLAUDE.md`, `~/.claude/rules/`, `.claude/skills/`, `.claude/agents/`, and other tools' files (`.cursor/rules/`, `.github/copilot-instructions.md`).
-- `/context all` lists the memory files loaded at launch. `/doctor prompt-audit [path]` flags outdated, broken and conflicting instructions. `claude plugin validate <dir>` finds frontmatter that does not parse. `/skill-doctor` shows each skill's context cost and use.
-- Facts verified 2026-11.
+- Version gates: reading `AGENTS.md` directly needs v2.1.277, `/doctor prompt-audit` v2.1.283, `claude plugin eval` v2.1.269, and `claude plugin validate` on a plain skills or agents directory v2.1.233.
+- List every instruction file in play: `CLAUDE.md`, `.claude/CLAUDE.md`, `CLAUDE.local.md` and `AGENTS.md` in the working directory and above, nested ones below, `.claude/rules/`, `~/.claude/CLAUDE.md`, `~/.claude/rules/`, `.claude/skills/`, `.claude/agents/`, `.claude/output-styles/`, the auto memory folder, and other tools' files (`.cursor/rules/`, `.github/copilot-instructions.md`).
+- `/context all` lists the memory files loaded at launch, and `/memory` also shows an `AGENTS.md` read directly. Subdirectory files load on demand and are absent from both until Claude touches a file there.
+- `/doctor prompt-audit [path]` reports instructions written for older models, references to missing files or commands, and contradictions, and changes nothing until asked. `/doctor` proposes trims for a checked-in `CLAUDE.md`. `/skill-doctor` shows each skill's context cost and use. `claude plugin validate <dir>` finds frontmatter that does not parse.
 
-## Defaults
+## Choosing the mechanism
 
-- Write down only what the agent cannot get by reading the repo, or would spend minutes rediscovering every session: the exact test, lint and typecheck commands including one for a single test file, misleading code (a legacy pattern not to copy, a live directory that looks dead), decisions made outside the repo, and a mistake you saw the agent repeat.
-- A correction is not automatically a rule. The strongest signal is one the agent conceded ("You're right") and then repeated, which means a rule is missing or not loaded. A one-off preference stays unsaved, and a behavior that must not regress gets a test instead of a line.
-- Leave out architecture overviews, directory layouts, dependency lists and rules a linter or formatter enforces. Status and progress notes go in the plan or tracker.
-- Keep each `CLAUDE.md` under 200 lines. A nested file holds only what differs from the root.
-- Choose the mechanism by when the content applies: every session in `CLAUDE.md` or `AGENTS.md`, one part of the tree in `.claude/rules/*.md` with `paths:`, a procedure or long reference in a skill, and a rule that must hold every time in a hook or a permission deny rule.
-- Knowledge that most tasks need goes into `CLAUDE.md` or `AGENTS.md` as a short index of files to read. A skill loads only when the model decides it applies.
-- A pointer line names the material and the condition for reading it ("Read docs/billing.md before changing invoices"). Its wording, not the target, decides whether the agent goes there.
+- Every session, true of the project in any mode: `CLAUDE.md` or `AGENTS.md`. Only one part of the tree: `.claude/rules/*.md` with `paths:`. Personal and uncommitted: `CLAUDE.local.md`.
+- A procedure, a long reference or team knowledge needed only for some tasks: a skill. A skill with side effects (release, deploy, send a message) gets `disable-model-invocation: true`, so only the user can start it.
+- The voice, length or format of every response, or a role other than software engineer: an output style, not `CLAUDE.md`. Only one style is active at a time.
+- A rule that must hold every time: a hook or a permission deny rule. Text in any instruction file is a request. When emphasis keeps getting added to a line that is still missed, the line belongs in a hook. A hook that only encodes a preference can go back to text.
+- A focused helper with its own tools, model or context: a subagent definition in `.claude/agents/`.
+- Inside a plugin: no `CLAUDE.md` is loaded, so instructions go in skills and must-hold rules in plugin hooks. See [references/plugins-and-output-styles.md](references/plugins-and-output-styles.md).
+- Knowledge most tasks need belongs in `CLAUDE.md` as a short index of files to read. A pointer line names the material and the condition ("Read docs/billing.md before changing invoices"). Its wording, not the target, decides whether the agent goes there.
+
+## Writing CLAUDE.md and rules
+
+- Write down only what the agent cannot get by reading the repo, or would spend minutes rediscovering every session: exact test, lint and typecheck commands including one for a single test file, misleading code (a legacy pattern not to copy, a live directory that looks dead), decisions made outside the repo, and a mistake seen twice.
+- A correction is not automatically a rule. The strongest signal is a mistake the agent conceded and then repeated. A one-off preference stays unsaved, and a behavior that must not regress gets a test.
+- Leave out architecture overviews, directory layouts, dependency lists and what a linter enforces. Status and progress notes go in the plan or tracker. Where auto memory is on, it holds user preferences and corrections, so they stay out of `CLAUDE.md`.
+- Keep each `CLAUDE.md` under 200 lines. A nested file holds only what differs from the root. `@path` imports organize a file but cost the same context as pasting it.
+- State the behavior with its scope and reason: "ask before deleting files under data/, they are the only copy". A bare prohibition spreads to cases it was not meant for.
 - To share one file across tools, keep `AGENTS.md` as the source and add a `CLAUDE.md` whose first line is `@AGENTS.md`, followed by Claude-only lines.
-- State the behavior you want, with its scope and its reason: "ask before deleting files under data/, they are the only copy". A bare prohibition spreads to cases it was not meant for.
-- Reserve "never" for rules with no exceptions. Fable 5.2 treats an instruction containing "never" as absolute.
-- Write at normal volume. Capitals, "IMPORTANT" and "MUST" make current models over-apply a rule. When a plainly worded line is still missed, the file is too long or the rule belongs in a hook.
-- Hunt no-ops sentence by sentence: would the model act differently without this line? If not, delete the whole sentence. A line that only makes the model slower, longer or more hedged is worse than none. Settle disputes by running a fresh session with and without it.
-- Write the file in the style you want back. The layout of an instruction file carries into the output.
-- Give a template for an output format. Avoid worked examples of tool use, which narrow the model to the example.
+- When `CLAUDE.md` sets commit or pull request rules, set `includeGitInstructions` to `false` and the `attribution` setting, or the built-in git instructions compete with them.
+- Write the file in the style you want back, since its layout carries into the output. Give a template for an output format rather than worked examples, which narrow the model to the example.
+- Hunt no-ops sentence by sentence: would the model act differently without this line? If not, delete the sentence. Settle disputes with fresh sessions run with and without the line.
+
+## Writing skills and subagents
+
+- A skill description is third person: what the skill covers, then "Use when" with the situations, file names, commands and error strings that identify the area. Put the most common use first, because Claude Code cuts `description` plus `when_to_use` at 1,536 characters and drops whole descriptions of the least-used skills when the listing overflows.
+- `when_to_use` is a Claude Code field appended to the description. claude.ai uploads and the Skills API reject it, so a portable skill keeps triggers in `description`.
+- The body holds what the model does not know: version facts, exact commands, limits and a Gotchas section. Link each reference from `SKILL.md`, one level deep, with the condition for reading it.
+- Skill content stays in context and is not re-read, so write standing instructions ("after every edit"). After compaction only the first 5,000 tokens of each invoked skill come back, so put critical rules near the top.
+- A subagent's body replaces the Claude Code system prompt. Write it as a full prompt for one job, and put a rule the main conversation follows into the body or the brief, since Explore, Plan and `omitClaudeMd` agents skip `CLAUDE.md`.
+- Test against a baseline in fresh sessions: set a personal or project skill to `"off"` in `skillOverrides`, and use `claude plugin eval` for a plugin skill or agent, because `skillOverrides` does not affect plugins.
 
 ## Gotchas
 
-- Generic pushes ("think step by step", "be thorough", "keep going", "don't be lazy") are no-ops or cause over-work. Effort controls thinking. If runs stop early, name the specific stops to avoid and the ones you want.
+- Capitals, "IMPORTANT" and "MUST" make current models over-apply a rule. Fable 5.2 treats any instruction containing "never" as absolute, so write "ask before deleting files" where exceptions exist.
+- Generic pushes ("think step by step", "be thorough", "keep going", "don't be lazy") are no-ops or cause over-work. Effort is the control for thinking. On Fable 5.2 a line such as "answer directly without deliberating" no longer reduces thinking at `medium` and above: lower the effort instead.
 - An instruction to write out reasoning in the reply can be refused on Opus 5.5 and Fable 5.2 with the `reasoning_extraction` category. Ask for a short explanation of the choice instead.
-- Cautions pile up in instruction files, notes and memory ("never retry", "stop at the first error"), and the model keeps obeying them. Delete each one whose reason has passed, or rewrite it with its scope.
-- Standing "delegate this" lines make Fable 5.2 start more subagents than the task needs. "You own this codebase" makes it refactor beyond scope, and a scope rule elsewhere does not cancel it.
+- Cautions pile up in instruction files, notes and memory ("never retry", "stop at the first error"), and the model keeps obeying them. Delete each one whose reason has passed, list the routine steps that need no approval, and keep approval rules narrow: a broad one such as "messages to people outside this conversation" held back about half of routine requests in Anthropic's testing.
+- Standing "delegate this" lines in prompts, skills and agent files make Fable 5.2 start more subagents than the task needs. "You own this codebase" makes it refactor beyond scope, and a scope rule elsewhere does not cancel it.
 - Hard style limits ("one idea per sentence, under 20 words") make Fable 5.2 prose choppy.
 - Two contradicting lines, in one file or across files, make Claude pick one arbitrarily. Reconcile them in one place.
 - `CLAUDE.md` arrives as a user message after the system prompt. It is context, not enforcement.
+- A skill whose YAML does not parse still loads and runs as `/name`, but Claude can no longer match it by its description. A subagent file with bad YAML, no `name` or no `description` is skipped without a notice in the session.
+
+## References
+
+- [references/claude-code-loading.md](references/claude-code-loading.md): read when writing or debugging `CLAUDE.md`, `AGENTS.md`, rules, imports, nested files or auto memory, or when sharing instructions with Codex, Gemini CLI, Cursor or Devin.
+- [references/skill-files.md](references/skill-files.md): read when writing a skill, its frontmatter or description, when a skill does not trigger or triggers too often, or when testing one.
+- [references/subagent-files.md](references/subagent-files.md): read when writing or debugging a subagent definition in `.claude/agents/`, `~/.claude/agents/` or a plugin's `agents/`.
+- [references/plugins-and-output-styles.md](references/plugins-and-output-styles.md): read when writing instructions that ship in a plugin, writing a custom output style, or testing a plugin with `claude plugin eval`.
+
+Related skills: concise:orchestration for delegating work and briefing subagents, concise:architecture for decision records and specs kept in the repo.
