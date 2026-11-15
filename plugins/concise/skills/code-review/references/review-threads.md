@@ -1,3 +1,5 @@
+# GitHub review threads and reviews with gh
+
 ## Read every thread with its state
 
 `gh api` fills `{owner}` and `{repo}` from the current repository. In PowerShell, quote any argument that contains braces.
@@ -62,3 +64,21 @@ gh api repos/{owner}/{repo}/pulls/123/reviews --input review.json
 - `event` is `COMMENT`, `REQUEST_CHANGES` or `APPROVE`. Leaving it out creates a PENDING review that nobody else can see until it is submitted.
 - A stale `commit_id` marks the comments outdated as soon as a later commit touches those lines.
 - `gh pr review` cannot post inline comments. It only sets a review body and state.
+
+## Claude Code Review findings
+
+- Findings arrive as inline comments marked Important, Nit or Pre-existing. The check run never fails, so it does not block a merge on its own.
+- A reply alone does not dismiss a finding and does not start a review. Push a fix, or resolve the thread yourself. The next review reads the replies and can resolve the thread or post one follow-up.
+- Comment `@claude review` as a top-level PR comment to start one review without a push. Drafts and PRs from forks are reviewed only on that command.
+- A push that keeps the same added and removed lines (an empty commit, a clean rebase or base merge) can keep the earlier result. The check title then starts with `Code review skipped` or `Code review not repeated`.
+- Read the severity counts from a script. Take the `id` of the `Claude Code Review` run, then parse the last line of its output text. `normal` is the Important count. A missing line means no verdict, not zero findings. When the title starts with `Code review not repeated`, Important findings are still open and there is no severity line.
+
+```bash
+gh api repos/{owner}/{repo}/commits/<sha>/check-runs --jq '.check_runs[] | {id, name}'
+gh api repos/{owner}/{repo}/check-runs/<id> --jq '
+  (.output.text | split("\n") | last
+    | scan("^<!-- bughunter-severity: (.*) -->$")[0] | fromjson)?
+  // error("no severity line")'
+```
+
+- Rules for this reviewer live in `REVIEW.md`, read from the base or default branch, never from the PR.
