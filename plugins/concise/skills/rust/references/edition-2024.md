@@ -1,3 +1,5 @@
+# Migrating to edition 2024
+
 ## Migration
 
 - Edition 2024 needs Rust 1.85. Run `cargo update`, then `cargo fix --edition --all-features`, once per `--target` that has platform `cfg` code. Then set `edition = "2024"`, build, test, and run `cargo fmt`.
@@ -14,7 +16,10 @@
 - A macro metavariable without a fragment specifier is a hard error.
 - `gen` is a reserved keyword. Write `r#gen` for existing identifiers. Guarded strings like `#"foo"#` and runs of two or more `#` are reserved tokens.
 - `unsafe_op_in_unsafe_fn` warns by default. Wrap each unsafe operation inside an `unsafe fn` body in its own `unsafe {}` block.
-- The never type fallback change is no longer edition-specific since Rust 1.100.
+- `extern` blocks must be written `unsafe extern`, and `no_mangle`, `export_name` and `link_section` must be written `#[unsafe(...)]`. The unsafe and FFI reference listed in `SKILL.md` has the details.
+- References to a `static mut` are denied by default (`static_mut_refs`).
+- `std::env::set_var` and `remove_var` are `unsafe`.
+- The never type fallback change that the edition guide lists for 2024 applies to all editions since Rust 1.100. `SKILL.md` covers the fixes.
 
 ## Standard library
 
