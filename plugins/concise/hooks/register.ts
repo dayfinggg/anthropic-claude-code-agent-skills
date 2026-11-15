@@ -4,14 +4,18 @@ const PROJECT_KINDS: readonly InstructionFile['kind'][] = ['project', 'local', '
 
 const DEFERRED_TOOLS = ['Artifact', 'Workflow', 'ScheduleWakeup', 'ReportFindings', 'ListAgents']
 
-const readRules = async ($: EngineInterface): Promise<InstructionFile[]> => {
-  const folder = `${$.plugin.root}/instructions`
-  const names = (await $.fs.list(folder))
+const WEB_TOOLS = ['WebSearch', 'WebFetch']
+
+const markdownFiles = async ($: EngineInterface, folder: string) =>
+  (await $.fs.list(folder))
     .filter(entry => entry.kind === 'file' && entry.name.endsWith('.md'))
     .map(entry => entry.name)
     .sort()
+
+const readRules = async ($: EngineInterface): Promise<InstructionFile[]> => {
+  const folder = `${$.plugin.root}/instructions`
   return Promise.all(
-    names.map(async name => {
+    (await markdownFiles($, folder)).map(async name => {
       const path = `${folder}/${name}`
       return { path, kind: 'user' as const, content: await $.fs.read(path) }
     }),
@@ -24,11 +28,34 @@ const withRules = (files: readonly InstructionFile[], rules: readonly Instructio
   return [...files.slice(0, at), ...rules, ...files.slice(at)]
 }
 
+const isWrittenFor = (model: string) => (fileName: string) =>
+  fileName
+    .slice(0, -'.md'.length)
+    .split('+')
+    .some(name => model.includes(name))
+
+const readModelNotes = async ($: EngineInterface, model: string) => {
+  const folder = `${$.plugin.root}/models`
+  const name = (await markdownFiles($, folder)).find(isWrittenFor(model))
+  return name === undefined ? undefined : $.fs.read(`${folder}/${name}`)
+}
+
 export const register: Register = on => {
   on('prompt.context', async ($, e, next) => {
     if (e.instructionFiles === undefined) return next(e)
     return next({ ...e, instructionFiles: withRules(e.instructionFiles, await readRules($)) })
   })
 
+  on('prompt.compose', async ($, e, next) => {
+    const composed = await next(e)
+    const notes = await readModelNotes($, e.model)
+    if (notes === undefined) return composed
+    return { sections: [...composed.sections, { id: 'concise:model', text: notes, scope: 'session' as const }] }
+  })
+
   on('tool.describe', { tool: DEFERRED_TOOLS }, async (_, e, next) => ({ ...(await next(e)), isDeferred: true }))
+
+  on('tool.describe', { tool: WEB_TOOLS }, async (_, e, next) => ({ ...(await next(e)), isDeferred: false }))
+
+  on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
 }
