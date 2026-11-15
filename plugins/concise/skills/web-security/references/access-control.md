@@ -1,3 +1,5 @@
+# Access control, object checks and tenant isolation
+
 ## The question to answer
 
 - For every resource: if user A knows the ID of user B's object, or of an object in tenant B, can A read, change, delete, list, export or count it? Trace from where the ID enters (path, query, body, header, job payload) to the query that fetches the data, and list every check in between, including base classes, middleware, managers and decorators.
@@ -12,8 +14,12 @@
 - File downloads by storage key or path, pre-signed URL generation, and predictable object-storage keys.
 - WebSocket and subscription channels named by an ID, checked at connect time or not at all.
 - Background jobs, webhooks and queue consumers that take an ID from the payload and run with system privileges.
-- Writes that take ownership or privilege fields from the request body (mass assignment): Django forms and DRF serializers with `fields = '__all__'`, Rails `permit!`, Laravel `$guarded = []` or `forceFill`, ORM calls with `data: req.body`, `Object.assign(entity, body)`, `Model(**request.json)`. Owner, tenant, role and `is_admin` must come from the session.
 - Unguessable IDs (UUIDs, hashids) are not authorization. They leak through URLs, logs, referrers and exports.
+
+## Property-level checks
+
+- Writes that take ownership or privilege fields from the request body are mass assignment: ORM calls with `data: req.body`, `Object.assign(entity, body)`, `Model(**request.json)`, and framework shortcuts that accept every field, such as DRF `fields = '__all__'`, Rails `permit!` and Laravel `$guarded = []`. Owner, tenant, role and `is_admin` must come from the session.
+- Reads that return whole entities expose fields the caller may not see: password hashes, tokens, internal flags, other tenants' foreign keys. Return an explicit response schema per role.
 
 ## Tenant isolation
 
@@ -24,10 +30,8 @@
 - Caches, search indexes, rate-limit buckets, file prefixes and message topics keyed without the tenant or user leak across tenants. A CDN that caches an authenticated response without `Cache-Control: private` or `no-store` serves it to the next visitor.
 - Globally unique constraints and lookups (email, slug) reveal that a record exists in another tenant.
 
-## Framework traps
+## Gates that do not gate
 
-- Django REST Framework: `has_object_permission` runs only when the view calls `get_object()`. It does not run for list views, for creates, or when the view fetches with `Model.objects.get` itself. Setting `permission_classes` on a view replaces `DEFAULT_PERMISSION_CLASSES` instead of adding to it, and with no default configured the policy is `AllowAny`.
-- A gate counts only if it compares the caller with the owner. Read the body of every helper named owner, guard, policy or permission: `IsAuthenticated`, model-level permissions, an app-token check or a lookup that the record exists do not stop a non-owner.
-- Symfony: `#[IsGranted('ROLE_USER')]` checks a role only. Object checks need a subject (`#[IsGranted('edit', 'post')]`) or `denyAccessUnlessGranted('edit', $post)` with a voter. An `EntityType` field without a user-scoped `query_builder` lists, and accepts, every row.
+- A gate counts only if it compares the caller with the owner. Read the body of every helper named owner, guard, policy or permission: an authentication check, model-level permissions, an app-token check or a lookup that the record exists do not stop a non-owner.
 - Role checks that compare against a deny value pass when the value is missing: `role != 'banned'`, `!user.isBlocked`. Compare against an allow value.
 - Authorization done in the frontend, in a GraphQL directive that some resolvers lack, or in a gateway that another route bypasses, protects nothing on the paths without it. A route guard (TanStack `beforeLoad`, a layout) protects the page, not the server functions it calls, which are endpoints anyone can call directly.
