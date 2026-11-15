@@ -1,71 +1,64 @@
 ---
 name: php
-description: Current PHP 8.4 to 8.6 practice for the language, Composer, PHPStan, PHPUnit, Rector, PHP-CS-Fixer, Symfony and Doctrine DBAL and ORM. Use when writing, reviewing, debugging, testing or upgrading PHP code, when editing .php files or Smarty and other .tpl templates of a custom PHP framework or CMS, composer.json, composer.lock, phpstan.neon, phpunit.xml, rector.php or .php-cs-fixer.dist.php, when working on Symfony controllers, services, console commands, Messenger, security or config, or on Doctrine entities, repositories, DQL or DBAL queries, when Composer refuses an update or PHPStan or PHPUnit report errors or deprecations, when choosing which PHP, Symfony, PHPUnit or PHPStan version to target, and for quick PHP syntax questions.
+description: PHP practice for the language, legacy and custom-CMS code with Smarty templates, Composer, PHPStan, PHPUnit, Rector, PHP-CS-Fixer, Symfony and Doctrine. Use when writing, reviewing, debugging or upgrading PHP code or .tpl templates, editing composer.json, phpstan.neon, phpunit.xml or rector.php, when Composer refuses an update, when PHPStan or PHPUnit report errors or deprecations, or when choosing a PHP version to target.
 ---
 
-## Read first
+# PHP
 
-Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
-
-1. Read `references/php-language.md` when code may use or must avoid PHP 8.5 or 8.6 syntax, functions or deprecations, or when upgrading PHP.
-2. Read `references/symfony-doctrine.md` when the project requires `symfony/*` or `doctrine/*` packages.
-3. Fetch https://www.php.net/releases/active.php (Current PHP patch releases) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
-4. Fetch https://github.com/sebastianbergmann/phpunit/tags.atom (Current PHPUnit releases) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
-5. Fetch https://symfony.com/releases.json (Symfony versions and PHP floors) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+This skill matches PHP 8.5 (8.6.0 is at RC7, general availability planned for 2026-11-19), Composer 2.11, PHPStan 2.3, PHPUnit 13.4, Rector 2.8, PHP-CS-Fixer 3.95, Smarty 5.8, Symfony 8.1 and 7.4 LTS, Doctrine DBAL 4.6 and ORM 3.8. Run `php -v` and `composer show --locked --direct` to see what is installed. Where the installed release is newer, its own `--help`, changelog and `UPGRADING` notes are right.
 
 ## Check first
 
-- Read `require.php` and `config.platform.php` in `composer.json`. Write code that runs on the lowest PHP version they allow.
-- Read installed versions from `composer.lock` or `composer show --locked --direct`. Run `composer outdated --direct` for newer releases.
-- Before raising the PHP floor, run `composer why-not php 8.5` to list the packages that block it.
-- Run tools through the project's own configs and `composer.json` scripts: `phpstan.neon` or `phpstan.dist.neon`, `phpunit.xml` or `phpunit.xml.dist`, `rector.php`, `.php-cs-fixer.dist.php`, `config/bundles.php`.
-- Facts verified 2026-11.
+- Read `require.php` and `config.platform.php` in `composer.json`, and write code that runs on the lowest PHP version they allow. Before raising that floor, `composer why-not php 8.5` lists the packages that block it.
+- In a custom CMS, find the house way before writing new code: its database wrapper (grep for `->query(`, `prepare(`, `mysqli_`, `new PDO`), how the Smarty object is set up (`setEscapeHtml`, `escape_html`, `default_modifiers`), and where request input is read.
+- Run tools through the project's configs and `composer.json` scripts: `phpstan.neon` or `phpstan.dist.neon`, `phpunit.xml` or `phpunit.xml.dist`, `rector.php`, `.php-cs-fixer.dist.php`.
 
-## Defaults
+## Safe and fast code
 
-- PHP 8.5 is the newest stable branch. PHP 8.6.0 is at RC7 with general availability planned for 2026-11-19. Use 8.6-only features only when `require.php` excludes older versions.
-- Security support ends 2026-12-31 for 8.2, 2027-12-31 for 8.3, 2028-12-31 for 8.4 and 2029-12-31 for 8.5. PHP 8.1 and older get no fixes.
-- The minimum safe patch releases are 8.5.12, 8.4.27, 8.3.36 and 8.2.35, from 2026-10-21. Older builds have two critical unauthenticated remote code execution bugs (CVE-2026-109618, CVE-2026-109619). Pin at least these wherever a PHP version is pinned.
-- Symfony 8, PHPUnit 13 and DoctrineBundle 3 need PHP 8.4 or later. Symfony 7.4 LTS needs PHP 8.2.
+- Start every new file with `declare(strict_types=1);`. Do not add it to an existing file you touch for another reason: it changes how every call in that file coerces scalars, and calls that worked start to throw `TypeError`.
+- Compare with `===` and `!==`, and pass `true` as the strict flag to `in_array()`, `array_search()` and `array_keys()`. Loose `==` between numeric strings compares numbers, so `'1e3' == '1000'` is true.
+- Bind every value in SQL: PDO `prepare()` plus `execute([...])`, or mysqli `execute_query($sql, [...])` (8.2+). Table names, column names and sort directions cannot be bound, so map them from an allowlist in code. `addslashes()` and hand-built quoting are not escaping.
+- Never run a query inside a loop over rows. Collect the ids, fetch once with `WHERE id IN (?, ?, ...)` (one placeholder per id), index the result by id, then loop. Read Memcached the same way with `getMulti()`. Smarty plugins or modifiers that query per row are the same N+1 pattern.
+- Escape at output. Smarty does not escape by default: unless the project turns auto-escaping on, write `{$var|escape}` in HTML text and attributes, `{$var|escape:'url'}` inside URLs and `{$var|escape:'javascript'}` inside inline script strings. In plain PHP templates use `htmlspecialchars($s)` (its default flags are `ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401` since 8.1).
+- Cast or validate request input once where it enters, such as `(int) ($_GET['id'] ?? 0)`, and pass the typed value on. Pass shell commands as an array to `proc_open()`, which skips the shell, or wrap each argument in `escapeshellarg()`.
+- Decode outside data with `json_decode($s, true, flags: JSON_THROW_ON_ERROR)`. php.net warns never to pass untrusted input to `unserialize()`, even with `allowed_classes => false`. That includes cookies, form fields and cache entries other code can write.
+- Use `random_bytes()` or `random_int()` for tokens, `password_hash()` and `password_verify()` for passwords, and `hash_equals()` to compare secrets. `rand()`, `mt_rand()` and `uniqid()` are predictable.
+- Large result sets: iterate with `fetch()` or a generator instead of `fetchAll()`. pdo_mysql buffers the whole result in PHP memory by default, so turn off `Pdo\Mysql::ATTR_USE_BUFFERED_QUERY` (`PDO::MYSQL_ATTR_USE_BUFFERED_QUERY` before 8.4) for exports.
+- Look up membership with `isset($map[$key])` on an `array_flip()`ed list, not `in_array()` inside a loop. `array_merge()` inside a loop copies the array each time, so collect parts and merge once with `array_merge(...$parts)`.
+- Legacy code stays in its own style: keep its database wrapper, globals, array syntax and naming in a file you fix, and add no types, namespaces or framework to it. Fix the unsafe line you touch (string-built SQL, unescaped output) and report the other unsafe lines you saw instead of rewriting them.
 
-- Composer 2.11.2 is current. It fixes command execution and credential leaks triggered by a crafted `composer.lock`. Run `composer self-update` before installing a lock file from an untrusted source.
-- Since Composer 2.9, `update`, `require` and `remove` refuse versions with security advisories (`config.policy.advisories.block` defaults to true). Move to a patched version. Ignore an advisory that does not apply by its ID, with a reason, under `config.policy.advisories.ignore-id`.
-- Since Composer 2.10, `config.policy` replaces `config.audit`. The legacy `audit` keys are read only when the matching `policy` section is absent. Versions flagged as malware are also blocked during `install`. A failed dist download no longer falls back to a source checkout.
-- Composer 2.11 adds `config.policy.cooldown.period`, such as `"7 days"`, which withholds fresh releases from updates. `--no-cooldown` skips it for one run. `--no-blocking` replaces the deprecated `--no-security-blocking`.
-- `composer update --minimal-changes` (2.9+) changes only what the edited constraints require.
+## Versions and Composer
 
-- PHPStan 2.3 is current. Level 10 is the top level. It also reports implicit `mixed` that comes from untyped code.
-- PHPStan 2 rejects configs that set `checkMissingIterableValueType`, `checkGenericClassInNonGenericObjectType`, `checkAlwaysTrue*` or `excludes_analyse`. Ignore the identifiers `missingType.iterableValue` or `missingType.generics` instead, and use `excludePaths`. A path that may not exist needs a `(?)` suffix. phpstan-symfony 2 reads `containerXmlPath`, not `container_xml_path`.
-- Suppress one error with `// @phpstan-ignore argument.type (reason)`. The table output prints each identifier. `@phpstan-ignore-next-line` hides every error on the line, and `reportIgnoresWithoutComments: true` (2.1.41+) bans it.
-- PHPStan 2.3.5 adds `phpstan analyse --fix`. It rewrites source files for fixable errors and removes unmatched ignores and baseline entries, so review its diff. Prune a stale baseline with it rather than with `--generate-baseline`, which also absorbs every new error.
-- PHPStan 2.2 adds unsealed array shapes such as `array{id: int, ...<string, mixed>}`. With bleeding edge, plain shapes reject extra keys.
-- The PHPStan 2.3 rules for unused variables and parameters, and closure type inference from later usage, run only with bleeding edge: include `phar://phpstan.phar/conf/bleedingEdge.neon`.
+- Security support ends 2026-12-31 for 8.2, 2027-12-31 for 8.3, 2028-12-31 for 8.4 and 2029-12-31 for 8.5. PHP 8.1 and older get no fixes from php.net.
+- Builds older than 8.5.12, 8.4.27, 8.3.36 and 8.2.35 (2026-10-21) have two critical unauthenticated remote code execution bugs, CVE-2026-109618 and CVE-2026-109619, that reach every PHP-FPM site. Pin at least these patch releases wherever a version is pinned, or check that the distribution package carries the fix.
+- Symfony 8, PHPUnit 13 and DoctrineBundle 3 need PHP 8.4. Symfony 7.4 LTS and PHPUnit 12 need PHP 8.2 and 8.3.
+- Composer 2.11.2 fixes command execution and credential leaks triggered by a crafted `composer.lock` or `vendor/composer/installed.json`. Run `composer self-update` before installing a lock file from an untrusted source.
+- `update`, `require` and `remove` refuse versions with security advisories (`config.policy.advisories.block`, default `true`). Move to a patched version. Ignore an advisory that does not apply by ID, with a reason, under `config.policy.advisories.ignore-id`. Since 2.10 `config.policy` replaces `config.audit`, whose keys are read only when the matching `policy` section is absent.
+- `config.policy.cooldown.period` (2.11), such as `"7 days"`, withholds fresh releases. `--no-cooldown` skips it for one run, and `--no-blocking` replaces the deprecated `--no-security-blocking`.
+- `composer update --minimal-changes` changes only what the edited constraints require. A failed dist download no longer falls back to a source checkout.
 
-- PHPUnit 13.4 is current and needs PHP 8.4. PHPUnit 12 needs PHP 8.3 and gets bug fixes until 2027-02-05. PHPUnit 14 is planned for 2027-02-05.
-- PHPUnit metadata goes in attributes such as `#[Test]`, `#[DataProvider('cases')]` and `#[CoversClass(Foo::class)]`. PHPUnit 12 and later ignore docblock annotations like `@dataProvider`.
-- PHPUnit 12 removed `getMockForAbstractClass()` and `getMockForTrait()`. Test through a concrete class.
-- Use PHPUnit `createStub()` when the test verifies no calls. Since 12.5 a `createMock()` double without `expects()` triggers a notice. In 13, `any()` and `with()` without `expects()` are hard-deprecated. `#[AllowMockObjectsWithoutExpectations]` opts a test out.
-- PHPUnit `withConsecutive()` is gone. Use `withParameterSetsInOrder()` or `withParameterSetsInAnyOrder()` (13.0).
-- PHPUnit `expectExceptionMessage()` matches a substring and is deprecated since 13.2. On 13.2 and later use `expectExceptionMessageIs()` for an exact match or `expectExceptionMessageIsOrContains()`.
-- PHPUnit 13 removed `assertContainsOnly()`, `isType()` and `#[RunClassInSeparateProcess]`. Use typed variants such as `assertContainsOnlyString()` or `assertContainsOnlyInstancesOf()`. It added `assertArraysAreIdenticalIgnoringOrder()`, `assertArraysHaveIdenticalValues()` and their loose `Equal` siblings, and `seal()` for test doubles.
+## PHPStan
 
-- In Rector 2, `->withPhpSets()` without arguments applies every PHP set up to the `composer.json` version in one run. On an existing codebase start with `->withPhpLevel(1)` and raise the level one merged PR at a time, or cap a run with `--max-changes=N`. `->withComposerBased(phpunit: true, symfony: true, doctrine: true)` loads the rules that match installed package versions, and `vendor/bin/rector process --composer-based --dry-run` runs only those after a package upgrade.
-- PHP-CS-Fixer 3.88 renamed versioned sets to the `@PHP8x4Migration` and `@PER-CS3x0` form. The old `@PHP84Migration` and `@PER-CS2.0` names are deprecated. `@auto` applies the newest PER-CS plus the migrations for the `composer.json` PHP version.
-- For locks, indexes and migration safety see concise:database.
+- Level 10 is the top level and also reports implicit `mixed` from untyped code. PHPStan 2 rejects configs that set `checkMissingIterableValueType`, `checkGenericClassInNonGenericObjectType`, `checkAlwaysTrue*` or `excludes_analyse`: ignore the identifiers `missingType.iterableValue` or `missingType.generics` instead, and use `excludePaths`, with a `(?)` suffix for a path that may not exist.
+- Suppress one error with `// @phpstan-ignore argument.type (reason)`, using the identifier the table output prints. `@phpstan-ignore-next-line` hides every error on the line, and `reportIgnoresWithoutComments: true` (2.1.41+) bans ignores without a reason.
+- `phpstan analyse --fix` (2.3.5+) rewrites source files for auto-fixable errors and removes unmatched `ignoreErrors` entries, baseline entries and `@phpstan-ignore` comments, so review its diff. Prune a stale baseline with it, not with `--generate-baseline`, which also absorbs every new error.
+- The unused-variable rules and closure type inference from later use run only with bleeding edge: include `vendor/phpstan/phpstan/conf/bleedingEdge.neon`.
 
 ## Gotchas
 
-- In a pipe chain an arrow function needs parentheses, as in `$s |> (fn($x) => trim($x, '/'))`. Without them PHP 8.5 raises a fatal error. The right side must take exactly one parameter, and not by reference.
+- With pdo_mysql's default emulated prepares, values passed to `execute([...])` are bound as strings, so `LIMIT ?` becomes `LIMIT '10'` and fails. Bind it with `bindValue(1, $n, PDO::PARAM_INT)`.
+- Smarty `escape_html` (`setEscapeHtml(true)` in Smarty 5) is a compile-time setting. After changing it, clear the compiled templates, or old pages keep the old escaping. With it on, `{$var nofilter}` or Smarty 5 `{$var|raw}` prints unescaped and `|escape:'force'` escapes twice.
+- In a pipe chain an arrow function needs parentheses: `$s |> (fn($x) => trim($x, '/'))`. Without them PHP 8.5 raises a fatal error.
 - `clone($obj, ['prop' => $v])` honours visibility. A readonly property is `protected(set)` by default, so the call fails outside the class. Call it inside a `with*()` method. It skips the constructor, so validation must live in property hooks or in that method.
-- `(void) f();` discards a `#[\NoDiscard]` result only as a statement. Inside an expression it is a parse error.
-- `curl_close()`, `curl_share_close()`, `finfo_close()`, `imagedestroy()`, `xml_parser_free()` and every `setAccessible()` reflection call are deprecated no-ops in 8.5. Delete them.
-- `PDO::MYSQL_ATTR_*`, `PDO::PGSQL_*` and `PDO::SQLITE_*` constants are deprecated in 8.5. On 8.4 and later use `Pdo\Mysql::ATTR_SSL_CA` and the other driver subclasses.
-- `array_find()`, `array_find_key()`, `array_any()` and `array_all()` call the callback with `($value, $key)`. A first-class callable of a one-parameter built-in such as `is_numeric(...)` then throws `ArgumentCountError`, and `intval(...)` takes the key as `$base`. Pass `fn($v) => is_numeric($v)`, or on 8.6 `is_numeric(?)`.
+- `array_find()`, `array_any()` and `array_all()` call the callback with `($value, $key)`. `is_numeric(...)` then throws `ArgumentCountError`, and `intval(...)` takes the key as `$base`. Pass `fn($v) => is_numeric($v)`, or on 8.6 `is_numeric(?)`.
 - A parameter like `Foo $x = null` is deprecated since 8.4. Write `?Foo $x = null`.
-- Throwing `RecoverableMessageHandlingException` from a Messenger handler retries regardless of `max_retries`, so a permanent failure loops forever. On Symfony 8.1 pass `forceRetry: false` to keep the limit, or throw another exception.
-- With a Composer cooldown set, a full `composer update` replaces a locked version that is still inside the period with an older release, or fails. Update single packages, or list trusted ones under `config.policy.cooldown.ignore`.
-- Doctrine DBAL 4 `datetime`, `date` and `time` types reject `DateTimeImmutable`. Map such properties to `datetime_immutable`, `date_immutable` or `time_immutable`.
-- Rector resolves types through PHPStan. On a `mixed` value it cannot rename the call, add a return type or remove dead code, and a PHPStan baseline hides those unknown types. Fix the types before expecting Rector to change such code.
-- Many Rector rules change only private members and final classes. Add `->withTreatClassesAsFinal()` when no code outside the project extends its classes.
-- Rector's parallel mode can fail on Windows under PowerShell 7. Run it from cmd or Git Bash there.
-- A Rector rule fixture (`.php.inc`) without a `-----` line asserts that the rule leaves the file unchanged. Name such fixtures `skip_*.php.inc`.
+- With a Composer cooldown, a full `composer update` replaces a locked version still inside the period with an older release, or fails. Update single packages, or list trusted ones under `config.policy.cooldown.ignore`.
+- Rector resolves types through PHPStan. On a `mixed` value it cannot rename a call, add a return type or remove dead code, and a PHPStan baseline hides those unknown types. Fix the types before expecting Rector to change such code.
+
+## References
+
+- [references/php-language.md](references/php-language.md): read when code may use or must avoid PHP 8.4, 8.5 or 8.6 syntax, functions or deprecations, or when upgrading PHP on a site.
+- [references/tooling.md](references/tooling.md): read when writing or migrating PHPUnit tests, configuring Rector or PHP-CS-Fixer, or upgrading these tools.
+- [references/symfony-doctrine.md](references/symfony-doctrine.md): read when the project requires `symfony/*` or `doctrine/*` packages.
+
+Related skills: concise:database for locks, indexes and migrations, concise:server-ops for PHP-FPM, OPcache and deploys, concise:web-security for a security review, concise:codebase-analysis for wide mechanical changes such as a Rector run over many files.
