@@ -1,3 +1,7 @@
+# Untrusted triggers and pwn requests
+
+How outside input reaches privileged workflows through `pull_request_target`, `workflow_run`, comments and labels, and how to report a finding.
+
 ## Attacker-controlled data
 
 - Anyone can open fork PRs, issues, comments, reviews and discussions on a public repository. Without write access they cannot push, run `workflow_dispatch` or change `schedule` workflows.
@@ -8,7 +12,7 @@
 
 ## pull_request_target
 
-- It runs the workflow file and default checkout ref of the default branch, with secrets and a write-capable token. Since 2025-12-08 the PR's base branch no longer matters, so fixing the workflow on the default branch fixes every PR.
+- It runs the workflow file and checkout ref of the default branch, with secrets and a write-capable token. Since 2025-12-08 the PR's base branch no longer matters, so fixing the workflow on the default branch fixes every PR.
 - A pwn request checks out the PR head or merge commit and then runs anything from it: install scripts (npm lifecycle scripts, `setup.py`, Go `init()`), builds, tests, Makefiles, linters that load config, or `uses: ./...` actions from that checkout.
 - `actions/checkout@v7` refuses fork PR heads, `refs/pull/N/head`, `refs/pull/N/merge` and `repository:` set to the fork in `pull_request_target` and in `workflow_run` runs started by a PR. Floating majors `@v2` to `@v6` received the check on 2026-07-20 (v2.8.0 to v6.1.0). `@v1`, SHA pins and older exact versions did not.
 - `allow-unsafe-pr-checkout: true` turns the refusal off. Use it only when the job treats the files as data: check out into `path: pr`, run nothing from it, and keep the token read-only.
@@ -21,6 +25,7 @@
 - It runs on the default branch with secrets and write tokens even when the upstream run had neither. A fork PR can edit or rename its copy of the upstream workflow so that the name matches and its completion fires the privileged workflow.
 - Before privileged steps, check `github.event.workflow_run.event` and `github.event.workflow_run.head_repository.full_name`, and set `branches:` on the trigger.
 - Treat upstream artifacts as hostile. Download them to `${{ runner.temp }}`, not the workspace, parse them as data, validate numbers as numbers, and never source, execute or interpolate them into `run:`. Downloading needs `run-id`, `github-token` and `actions: read`.
+
 ## Comment and label gates
 
 - `issue_comment` runs on the default branch with secrets for any commenter. Require `github.event.comment.author_association` to be `OWNER`, `MEMBER` or `COLLABORATOR` before acting on a command, and never keep a hard-coded list of usernames.
@@ -29,7 +34,7 @@
 
 ## Platform controls
 
-- Workflow execution protections (GA 2026-09-17) are ruleset-based actor and event rules at enterprise, organization or repository level. Use them to restrict `workflow_dispatch` to maintainers or block `pull_request_target`, and run them in evaluate mode first.
+- Workflow execution protections (GA 2026-09-17) are ruleset-based actor and event rules at enterprise, organization or repository level, with workflow file targeting. Use them to restrict `workflow_dispatch` to maintainers or block `pull_request_target`, and run them in evaluate mode first.
 - Require approval for workflow runs from all outside contributors. Runs waiting more than 30 days expire as failed. GitHub also holds runs it flags as potentially malicious in public repositories until a collaborator with write access approves them in the web UI.
 - Self-hosted runners persist between jobs. Untrusted code can leave processes or cron jobs, read credentials from earlier jobs and see other jobs' command-line arguments with `ps`. Use just-in-time runners (`./run.sh --jitconfig`) on clean machines and separate runner groups for trusted workflows.
 - CodeQL default setup scans workflows for these patterns, and `zizmor --persona=auditor .` adds lower-confidence findings to the regular audit.
