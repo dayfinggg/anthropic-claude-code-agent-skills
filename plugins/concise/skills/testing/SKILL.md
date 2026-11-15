@@ -22,6 +22,7 @@ Go through these steps before you act on this skill. Do each step whose conditio
 
 ## Defaults
 
+- Before you change legacy code that has no tests, pin its current behavior first: write characterization tests that assert what the code returns now, odd results included, run them green on the unchanged code, and commit or save them before the change. A pinned behavior changes only in a separate step the user agreed to, because callers may rely on it.
 - Before writing a test, name the production change that should make it fail. If only an intentional decision can fail it (a constant, exact wording, private structure), it is a change detector. Test the behavior that depends on the decision instead.
 - Get red by running the new test against the code with the change reverted, not by editing the assertion. A missing-symbol compile error is not red: stub the API with a no-op or a wrong result first. Drop any new assertion that passes both with and without the change.
 - Expected values are literals or hand-checked fixtures. An expectation computed by the code under test, its helpers or a copy of its logic passes whatever the code does.
