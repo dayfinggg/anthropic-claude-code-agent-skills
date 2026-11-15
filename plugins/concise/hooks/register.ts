@@ -53,9 +53,18 @@ export const register: Register = on => {
     return { sections: [...composed.sections, { id: 'concise:model', text: notes, scope: 'session' as const }] }
   })
 
-  on('tool.describe', { tool: DEFERRED_TOOLS }, async (_, e, next) => ({ ...(await next(e)), isDeferred: true }))
+  on('tool.describe', async (_, e, next) => {
+    const described = await next(e)
+    if (DEFERRED_TOOLS.includes(e.tool)) return { ...described, isDeferred: true }
+    if (WEB_TOOLS.includes(e.tool)) return { ...described, isDeferred: false }
+    return described
+  })
 
-  on('tool.describe', { tool: WEB_TOOLS }, async (_, e, next) => ({ ...(await next(e)), isDeferred: false }))
+  on('prompt.attachment', { type: 'deferred_tools_delta' }, async (_, e, next) => {
+    const sent = await next(e)
+    if (sent.text === null) return sent
+    return { text: sent.text.split('\n').filter(line => !WEB_TOOLS.includes(line)).join('\n') }
+  })
 
   on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
 }
