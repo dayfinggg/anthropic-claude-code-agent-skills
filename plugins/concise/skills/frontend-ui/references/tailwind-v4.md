@@ -1,3 +1,5 @@
+# Tailwind CSS v3 to v4 changes
+
 ## v3 habits and their v4 form
 
 | v3 | v4 |
@@ -25,7 +27,7 @@
 | `start-0`, `end-0` | `inset-s-0`, `inset-e-0` (4.2) |
 | `container` with `center` and `padding` options | `@utility container { margin-inline: auto }` |
 | `prefix: 'tw-'` | `@import "tailwindcss" prefix(tw)` with classes like `tw:flex` |
-| `tailwindcss` as a PostCSS plugin | `@tailwindcss/postcss` without `postcss-import` and `autoprefixer`, or `@tailwindcss/vite`, `@tailwindcss/webpack`, `@tailwindcss/cli` |
+| `tailwindcss` as a PostCSS plugin | `@tailwindcss/postcss` without `postcss-import` and `autoprefixer`, or `@tailwindcss/vite`, `@tailwindcss/webpack` (4.2), `@tailwindcss/turbopack` (4.3.4, set as a loader for `*.css` in `turbopack.rules`), `@tailwindcss/cli`. The Next.js install guide still uses `@tailwindcss/postcss`. |
 
 ## Behavior changes without a rename
 
