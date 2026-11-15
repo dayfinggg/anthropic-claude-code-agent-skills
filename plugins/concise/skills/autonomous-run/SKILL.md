@@ -1,32 +1,48 @@
 ---
 name: autonomous-run
-description: Carrying a long task from start to finish without the user watching, such as work handed off with "do it all", "work until it's done", "I'll check later" or "don't wait for me", a scheduled, looped or headless run, one job across several servers, sites or repositories, or picking up the unfinished work of another session, agent, branch or pull request. Use when the run must decide alone which actions it takes and which wait for the user, when it needs a record the user can check afterwards, when it is tempted to end the turn while work or a job is still open, and when a run started this way resumes after compaction. A short task the user follows in the chat does not need it.
+description: Carrying a long task to its end while the user is not watching. Use when work is handed over with words like "do it all", "work until it's done", "no questions" or "I'll check later", for a scheduled, looped or headless run, for one job across several servers, sites or repositories, when picking up unfinished work of another session or agent, and when such a run resumes after compaction. Not needed for a short task the user follows in the chat.
 ---
 
-## Check first
+# Autonomous run
 
-- Collect the written rules for this run: the task text, `CLAUDE.md`, `AGENTS.md` and the project's safety, deploy or environment docs. Note each action they reserve for the user, with the file that says so.
+The user is not watching and cannot answer during the task. A question such as "Shall I continue?" stops the work until they come back, and a turn that ends with a summary of what comes next leaves that next step undone. This skill covers what to decide alone, what to keep on disk so the run survives compaction, and when stopping is right.
+
+## Before the first change
+
+- Write the finish line as a check you can run, such as "the stand check passes on all 22 hosts" or "the 45 journal entries no longer recur". Work until it holds, and do not loosen it to finish.
+- Collect the written rules that bind the run: the task text, `CLAUDE.md`, `AGENTS.md` and the project's deploy and safety docs. Note each action they reserve for the user, and whether the user's message lifts that. "Do everything, no questions" approves the steps the request covers.
 - List what the run can touch that other people use: shared or production databases (also through a pre-production host that shares them), live sites and servers, queues, caches, other people's branches and working copies.
 - When the run continues earlier work, check its claims against `git log`, `git status`, the diff and the live state before building on them. A summary or a report from another session is a claim, not proof.
 
-## Defaults
+## Deciding alone
 
-- Before the first change, write the exit condition as a check you can run, such as "the stand check passes on all 22 hosts" or "the 45 journal entries no longer recur". Work until it holds, and do not loosen it to finish.
-- Decide reversible work yourself and log the decision: edits in your branch or scratch copy, local builds and tests, reads, and temporary files you remove later. A question about these stops the run for nothing.
-- Pause before each action the live-systems and obstacles rules reserve for the user, and before each one the project's written rules reserve. Prepare it fully first: the exact command or SQL, the snapshot that restores the current state, and the check that proves it worked. A request to fix or finish the task does not cover these actions.
-- Ask with AskUserQuestion and put all the context in the question, because a question in an ordinary message stays unseen until someone opens the run. Keep working on everything the answer does not block. When no question tool exists, as in a headless or scheduled run, leave the action undone, finish the rest, and open the final report with the question.
-- Work in units that each end in a check: one change, then its check, then the next change. A failure then points to one change.
-- Keep only changes the evidence supports. Revert a change that did not move the check, including guards, retries and fallbacks added because they "might help".
-- Keep a decision log in the scratchpad, or in a git-ignored file when the run spans sessions. One line per decision: time, what, why, evidence (a commit, a command with its exit code, `file:line`) and result. Log forks, finished units with their check, reverts, pauses and blockers, not every step. Append only, and record a wrong call as a new line that supersedes it.
-- Keep a progress file beside the log with the task's parts as a counted checklist, the current state and the next step, and update it after each finished unit. Read it and `git log` before you continue after a compaction or in a new session, and before you end a turn, because a run that stops quietly at item 11 of 15 announces no next step.
+- Decide the open points yourself in favor of finishing the request, and write each decision down. Reversible work needs no question: edits in your branch or scratch copy, local builds and tests, reads, and temporary files you remove later.
+- A step that is hard to undo and that the request covers gets prepared in full first: the exact command or SQL, a restore point for the current state, and the check that proves it worked. Then run it and run the check.
+- Wait for the user in two cases only. The step is destructive or lies outside the request, and nothing in the task approved it. Or something is deliberately closed to you, such as a credential that was withheld or a file marked not to be touched. In both cases finish everything else, leave the step prepared, and report it as the open item with what it needs.
+- When the user allowed questions and a question tool exists, put all the context into the question, because nobody reads the chat until they open the run, and keep working on everything the answer does not block.
+
+## Staying on course
+
+- Work in units that each end in a check: one change, its check, then the next change. A failure then points to one change.
+- Keep only changes the evidence supports. Revert a change that did not move the check, including guards, retries and fallbacks added because they might help.
+- Keep a progress file in the scratchpad, or in a git-ignored file when the run spans sessions: the task's parts as a counted checklist, the current state and the next step. Update it after each finished unit.
+- Keep a decision log beside it, one line per decision: time, what, why, evidence (a commit, a command with its exit code, `file:line`) and result. Append only, and record a wrong call as a new line that supersedes the old one.
 - Leave a restore point after each unit that passed its check: a commit on your own branch when the rules allow commits, otherwise a patch or a copy of the changed files in the scratchpad.
-- Send bulk material to a subagent: large logs, data dumps and wide searches come back as the lines that matter with their location. Read the rules and the code you change yourself.
-- Stay in the run until the exit condition holds or only a real blocker remains. A slow job is a reason to wait on its completion notice, and a plateau is a reason to change the approach. Neither is a reason to end the turn, because nobody restarts a run that stopped.
-- The final reply follows the output style: the exit condition and its state, the check that proves it, each paused action with what it needs, and the path of the decision log. The log holds the rest for the user to read on request: each check with its command and exit code, what landed, what was reverted and every decision the run made for the user. Keep the log file after the run ends.
+- Send bulk material such as large logs, data dumps and wide searches to a subagent and take back the lines that matter with their location. Read the rules and the code you change yourself.
+
+## Ending the run
+
+- Stay in the run until the finish line holds or only a real blocker remains. A slow job is a reason to wait for its completion notice, and a plateau is a reason to change the approach. Neither is a reason to end the turn, because nobody restarts a run that stopped.
+- A status note goes in the same message as the next tool call. A message without a tool call ends the turn.
+- Before you end the turn, read the progress file. If items are open and nothing blocks them, continue with them.
+- The final message holds the finish line and its state, the check that proves it, the decisions you made for the user, the open item if there is one with what it needs, and the path of the decision log. Keep the log file after the run ends.
 
 ## Gotchas
 
-- Approval covers the one action it names. A "yes" for a deploy does not cover a database change or the next deploy.
-- After compaction the decision log and `git log` are the record. Read the log's last lines before the next step.
+- An approval covers the action it names. A "yes" for a deploy does not cover a database change or the next deploy.
+- After compaction the progress file, the decision log and `git log` are the record. Read them before the next step.
 - A check that passed before your last edit does not cover that edit.
-- Two fixes that fail the same check usually share a wrong premise. Test the premise, as concise:debugging describes, before a third fix.
+- Two fixes that fail the same check usually share a wrong premise. Test the premise before a third fix.
+- A run that stops quietly at item 11 of 15 announces no next step. The counted checklist is what shows it.
+
+Related skills: concise:orchestration for running parts of the task through other agents, concise:planning for splitting a task that is too large to start, concise:debugging for a failure the error alone does not explain.
