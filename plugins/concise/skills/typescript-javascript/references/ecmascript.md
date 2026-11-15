@@ -1,6 +1,15 @@
+# ECMAScript features, where they run, and Temporal
+
+## Contents
+
+- Where ES2025 to ES2027 features run
+- TypeScript types for them
+- Traps
+- Temporal
+
 ## Where ES2025 to ES2027 features run
 
-Baseline dates are when the last major browser shipped the feature (web-features, November 2026). Vite 8's default target covers only features Baseline before mid-2023, so everything below needs a polyfill or a raised target for browsers.
+The Baseline column is the date the last of the major browsers shipped the feature, from the web-features data (version 3.46). Vite 8's default target is Baseline Widely available as of 2026-01-01 (browsers released in the first half of 2023), so every row needs a polyfill or a raised target for browsers. Safari 27.2 is the shipped release; Safari 27.3 is in beta.
 
 | Feature | Spec | Baseline | Node.js |
 |---|---|---|---|
@@ -18,27 +27,53 @@ Baseline dates are when the last major browser shipped the feature (web-features
 | `Map` and `WeakMap` `getOrInsert`, `getOrInsertComputed` | ES2026 | 2026-02 | 26 |
 | `Iterator.concat` | ES2026 | 2026-03 | 26 |
 | `Math.sumPrecise` | ES2026 | 2026-04 | not in 26 |
-| `Error.isError` | ES2026 | no, missing in Safari | 24.3 |
-| `using`, `await using`, `DisposableStack` | ES2027 | no, missing in Safari | 24 |
-| `Temporal` | ES2027 | no, missing in Safari | 26 |
+| `Error.isError` | ES2026 | no, Safari is partial | 24.3 |
+| `using`, `await using`, `DisposableStack` | ES2027 | no, not in Safari 27.2 | 24 |
+| `Temporal` | ES2027 | no, not in Safari 27.2 | 26 |
 | `Iterator.zip`, `chunks`, `includes`, `join` | ES2027 | no | not in 26 |
 
-Bun 1.4 and Deno 2.7 or later ship `Temporal`, and Bun 1.4 also has `Iterator.zip` and `includes`.
+Bun 1.4 and Deno 2.7 or later ship `Temporal`, and Bun 1.4 also has `Iterator.zip`, `chunks`, `includes` and `join`. `Intl.DurationFormat` is Baseline since 2025-03.
 
 ## TypeScript types for them
 
-- `lib: ["es2025"]` covers the ES2025 rows. TypeScript 6.0 and 7.0 type `Array.fromAsync`, `Error.isError`, `Uint8Array` base64, `getOrInsert`, `using` and `Temporal` only under `esnext`.
-- TypeScript 7.0 has no types for `Math.sumPrecise`, `Iterator.concat` or `JSON.rawJSON` even under `esnext`. They arrive with 7.1 (`es2026`).
+- `lib: ["es2025"]` covers the ES2025 rows. TypeScript 6.0 and 7.0 type `Array.fromAsync`, `Error.isError`, `Uint8Array` base64, `getOrInsert`, `using` and `Temporal` only under `esnext` (Temporal also as `esnext.temporal`).
+- TypeScript 7.0 has no types for `Math.sumPrecise`, `Iterator.concat` or `JSON.rawJSON` even under `esnext`. TypeScript 7.1 moves all ES2026 rows into `lib: ["es2026"]` and adds `Iterator.zip`, `chunks`, `join`, `includes` and `Promise.allKeyed` to `esnext`.
 - TypeScript and Oxc lower `using` for older targets, but the output still needs `Symbol.dispose` at run time, and TypeScript's helper throws "Symbol.dispose is not defined" without it.
 
 ## Traps
 
-- Iterator helpers live on iterators, not arrays. Write `arr.values().map(f).toArray()`. They are lazy and single-use, so iterating the same helper twice yields nothing the second time.
+- Iterator helpers are lazy and single-use, so iterating the same helper twice yields nothing the second time.
 - Set methods take a Set-like argument with `size`, `has` and `keys`. `set.union([1, 2])` throws a `TypeError`, so wrap arrays in `new Set()`.
 - `Array.fromAsync(items, asyncFn)` awaits one element at a time. Use `Promise.all(items.map(asyncFn))` when the calls may run concurrently.
-- Import assertions (`assert { type: 'json' }`) are a syntax error in Node.js 24, and TypeScript 6 rejects them. Write `with { type: 'json' }`.
+- Import assertions (`assert { type: 'json' }`) are a syntax error in Node.js 24, and TypeScript 6 and 7 reject them. Write `with { type: 'json' }`.
 - `Uint8Array.fromBase64` and `toBase64` replace `atob` and `btoa` for binary data without the Latin-1 string detour. Node.js 24 lacks them, so use `Buffer.from(text, 'base64')` there.
-- `Error.isError(value)` detects errors from other realms (iframes, `vm` contexts) where `instanceof Error` fails. Feature-detect it while Safari lacks it.
-- Use `Temporal` through `temporal-polyfill` or `@js-temporal/polyfill` in browsers. Vitest 5 fake timers and `vi.setSystemTime` also mock `Temporal` when it is present.
-- `str.length` and `str.slice()` count UTF-16 units, so truncating user-visible text can split an emoji or a combining mark. Truncate by graphemes from `new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(str)`, Baseline widely available.
-- Standard decorators (stage 3) run natively nowhere. TypeScript compiles them, Vite 8's Oxc does not lower them, and Node.js type stripping rejects them. `experimentalDecorators` stays the legacy form that NestJS, Angular and TypeORM use.
+- `Error.isError(value)` detects errors from other realms (iframes, `vm` contexts) where `instanceof Error` fails. Safari's implementation returns `false` for `DOMException`, so feature-detect it.
+- `str.length` and `str.slice()` count UTF-16 units, so truncating user-visible text can split an emoji or a combining mark. Truncate by graphemes from `new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(str)`.
+
+## Temporal
+
+These rules follow Chrome's Modern Web Guidance Temporal guides.
+
+Loading:
+
+- Feature-detect with `typeof Temporal === 'undefined'` and only then load `temporal-polyfill` (about 15 KB min+gz) with a dynamic `import()`. Importing it does not set the global: assign `globalThis.Temporal = module.Temporal` when code relies on the global. In a bundled app import the npm package, not a CDN URL.
+- Vitest 5 fake timers and `vi.setSystemTime` also mock `Temporal` when it is present.
+
+Choosing a type:
+
+- `Temporal.Instant` for timestamps recorded by a server, database or log, with nanosecond precision. Parse with `Temporal.Instant.from(iso)`, sort with `Temporal.Instant.compare`, test equality with `a.equals(b)`. `new Date(iso)` truncates to milliseconds and makes sub-millisecond events collide.
+- `Temporal.ZonedDateTime` with an IANA zone (`America/New_York`) for an event in a place, such as a meeting or a renewal. Convert with `.withTimeZone()`. Never `PlainDateTime` for these, since it carries no zone and cannot follow DST.
+- `PlainDate` for birthdays and billing dates, `PlainTime` for store hours and alarms, `PlainYearMonth` for card expiry, `PlainMonthDay` for yearly dates. Convert a `PlainMonthDay` to a `PlainDate` with `.toPlainDate({ year })` before doing arithmetic.
+
+Arithmetic and formatting:
+
+- Build values with methods, not interpolated ISO strings: `Temporal.PlainDate.from(date).toPlainDateTime(time).toZonedDateTime(tz)`.
+- `ZonedDateTime` `since()` and `until()` default to `largestUnit: 'hour'`. Pass `largestUnit: 'day'`, `'month'` or `'year'` for a human-scale result, and `smallestUnit` to round away seconds.
+- `Temporal.Duration.compare(a, b, { relativeTo })` needs `relativeTo` when either duration has years, months or weeks, or crosses a DST change. Check expiry with `duration.sign < 0`.
+- `plainDate.add({ months: 1 })` defaults to `overflow: 'constrain'`, which turns Jan 31 into Feb 28 or 29. Pass `{ overflow: 'reject' }` to get a `RangeError` instead.
+- `ZonedDateTime.from()` defaults to `disambiguation: 'compatible'`, which resolves skipped or repeated DST hours silently. Use `'reject'` to detect such a time and warn the user.
+- Format durations for people with `duration.toLocaleString(locale, { style })` (it uses `Intl.DurationFormat`), and use `duration.toString()` only for ISO 8601 output such as `<time datetime>`.
+- `duration.total('nanoseconds')` returns a `Number` and loses precision for spans over about 104 days. Keep intervals as durations.
+- In browsers `Temporal.Now.instant()` is clamped for timing-attack protection. Measure client intervals with `performance.now()`.
+- Temporal objects are immutable: `add`, `subtract`, `round` and `with` return new objects.
+- For non-Gregorian calendars use `withCalendar()`, identify months by `monthCode` in lunisolar calendars (Hebrew, Chinese), read `monthsInYear` and `daysInMonth` instead of assuming 12 and 31, and compare with `Temporal.PlainDate.compare`.
