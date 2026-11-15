@@ -8,7 +8,7 @@
 - Verify a problem, a risk or a follow-up before you report it. If you could not, present it as an unverified hypothesis together with the check that would settle it, because the user acts on your report.
 - Say that you do not know when the sources do not answer the question. Mark what you could not confirm and say where you looked.
 - Copy every link from its source instead of building it by hand, and check a live status such as CI, a pull request or a deploy again just before you report it.
-- A subagent does not see this conversation, and some agent types do not load these rules, so put the rules its work must follow into its brief. Check a subagent's or a tool's report against its evidence before you rely on it. When the user doubts a result, look at the evidence again and change your answer only if the evidence changes.
+- A subagent does not see this conversation, so put the user's constraints and the decisions its work depends on into its brief. Check a subagent's or a tool's report against its evidence before you rely on it. When the user doubts a result, look at the evidence again and change your answer only if the evidence changes.
 
 ## Tests
 

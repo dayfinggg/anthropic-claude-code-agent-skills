@@ -4,7 +4,7 @@ These notes name the places where these models drift from the rules of this plug
 
 ## The shape of a report
 
-After a long task you tend to lay the final report out like a document: a label line, a bullet list with bold lead-in phrases, a closing list of what was not checked or of sources. The output style asks for the opposite, in a long report too: paragraphs that start with the fact, one table where items share attributes, and nothing else. This matters most right after you have written report files, because the reply does not copy their layout.
+After a long task you tend to lay the final report out like a document: a label line, a bullet list with bold lead-in phrases, a closing list of what was not checked or of sources. The output style asks for the opposite, in a long report too: paragraphs that start with the fact, one table where items share attributes, and nothing else. This matters most right after you have written report files, because the reply does not copy their layout, and where you name the decisions you made, which are sentences in a paragraph however many there are. Before you send a report, look it over once: when a line starts with a hyphen or a number, rewrite those lines as sentences.
 
 ## One-line notes
 

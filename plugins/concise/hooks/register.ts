@@ -1,10 +1,15 @@
-import type { EngineInterface, InstructionFile, Register } from 'claude-code'
+import type { AgentSpawnInput, EngineInterface, InstructionFile, Register } from 'claude-code'
 
 const PROJECT_KINDS: readonly InstructionFile['kind'][] = ['project', 'local', 'memory']
 
 const DEFERRED_TOOLS = ['Artifact', 'Workflow', 'ScheduleWakeup', 'ReportFindings', 'ListAgents']
 
 const WEB_TOOLS = ['WebSearch', 'WebFetch']
+
+const AGENTS_WITHOUT_RULES = ['Explore', 'Plan']
+
+const RULES_FOR_AGENT =
+  'The working rules of this session follow. Built-in agents of your type do not load them on their own, so they come with the task. Follow them while you do it.'
 
 const markdownFiles = async ($: EngineInterface, folder: string) =>
   (await $.fs.list(folder))
@@ -28,16 +33,28 @@ const withRules = (files: readonly InstructionFile[], rules: readonly Instructio
   return [...files.slice(0, at), ...rules, ...files.slice(at)]
 }
 
+const isAlias = (model: string) => !model.includes('-')
+
 const isWrittenFor = (model: string) => (fileName: string) =>
   fileName
     .slice(0, -'.md'.length)
     .split('+')
-    .some(name => model.includes(name))
+    .some(name => (isAlias(model) ? name.split('-').includes(model) : model.includes(name)))
 
 const readModelNotes = async ($: EngineInterface, model: string) => {
   const folder = `${$.plugin.root}/models`
   const name = (await markdownFiles($, folder)).find(isWrittenFor(model))
   return name === undefined ? undefined : $.fs.read(`${folder}/${name}`)
+}
+
+const inTags = (tag: string, text: string) => `<${tag}>\n${text.trim()}\n</${tag}>`
+
+const loadsNoInstructionFiles = (agent: AgentSpawnInput) =>
+  agent.provider.plugin === 'engine' && agent.provider.tier === 'core' && AGENTS_WITHOUT_RULES.includes(agent.subagentType)
+
+const rulesForAgent = async ($: EngineInterface) => {
+  const rules = (await readRules($)).map(rule => rule.content.trim()).join('\n\n')
+  return `${RULES_FOR_AGENT}\n\n${inTags('working-rules', rules)}`
 }
 
 export const register: Register = on => {
@@ -51,6 +68,17 @@ export const register: Register = on => {
     const notes = await readModelNotes($, e.model)
     if (notes === undefined) return composed
     return { sections: [...composed.sections, { id: 'concise:model', text: notes, scope: 'session' as const }] }
+  })
+
+  on('agent.spawn', async ($, e, next) => {
+    if (e.fork || e.resume !== undefined) return next(e)
+    const notes = await readModelNotes($, e.model ?? e.parentModel)
+    const additions = [
+      ...(loadsNoInstructionFiles(e) ? [await rulesForAgent($)] : []),
+      ...(notes === undefined ? [] : [inTags('model-notes', notes)]),
+    ]
+    if (additions.length === 0) return next(e)
+    return next({ ...e, prompt: [e.prompt, ...additions].join('\n\n') })
   })
 
   on('tool.describe', async (_, e, next) => {
