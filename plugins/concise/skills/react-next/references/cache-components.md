@@ -1,3 +1,22 @@
+# Cache Components: cache traps and adoption
+
+## Contents
+
+- Cache traps
+- Replacing the previous caching model
+- Adopting in an existing app
+
+## Cache traps
+
+- A promise of request-time or uncached data that reaches a `'use cache'` function through props, a closure or a shared `Map` hangs the build for 50 seconds ("Filling a cache during prerender timed out"). Await it outside and pass the value.
+- The default `use cache` handler is an in-memory LRU per instance. On serverless, runtime entries rarely survive between requests. Self-hosted entries persist across requests (size it with `cacheMaxMemorySize`), but no entry survives a deploy because the key includes the build ID (or `deploymentId`). Use `'use cache: remote'` with a cache handler for shared runtime caching. The `fetch` Data Cache and `unstable_cache` persist across deploys.
+- `React.cache` gets an isolated scope inside each `'use cache'` function, so a value stored outside is invisible inside. Use `'use cache: private'` when request-scoped helpers must share work across cache scopes, or when a cached function must read `cookies()` or `headers()`.
+- Arguments must be serializable, so class instances, `URL` objects and plain functions fail. Pass `children` and Server Actions through without reading them.
+- A file-level `'use cache'` turns every export into a cached async function. Other exports such as constants are dropped for Client Components, and importing one fails the build with "export doesn't exist".
+- `'use cache'` does nothing in `proxy.ts`, and `cacheLife` or `cacheTag` there throw.
+- Calling the same public `'use cache'` function both directly and inside `unstable_cache` leaked entries across root-parameter values (tenants) before 16.4.5 and 15.5.29. Do not mix the two models on one function.
+- A cache entry that `cacheLife` makes too short to prerender (the `seconds` profile) stays out of the App Shell, which carries only content whose `stale` time is at least 5 minutes.
+
 ## Replacing the previous caching model
 
 | Before | With Cache Components |
@@ -24,6 +43,7 @@
 - `npx @next/codemod@latest cache-components-instant-false ./app` adds `export const instant = false` with a `// TODO: Cache Components adoption` comment to every page, layout and default file that is not `'use client'` or `'use server'`. It refuses a dirty working tree unless given `--force`. A wrong path reports `0 ok` and exits 0, so check the file count.
 - The highest `instant = false` decides its whole subtree. Remove opt-outs top-down, root layout first. Removing a leaf's opt-out changes nothing while an ancestor keeps one, and a layout whose descendants keep opt-outs can pass the build while still blocking.
 - A Client Component cannot export `instant`. A file with a top-level `'use cache'` cannot either ("Only async functions are allowed to be exported in a 'use cache' file"), which means the directive was wrong for that route.
-- When the synthetic `/_not-found` route blocks, fix the root layout. It has no file of its own.
+- When the synthetic `/_not-found` route blocks and there is no `not-found.tsx`, the request read is in the root layout. Fix it there instead of adding a `not-found.tsx`.
 - With `generateStaticParams` and Partial Prefetching off, await `params` outside `<Suspense>` to keep ISR for unlisted paths. With Partial Prefetching on, await it inside `<Suspense>` so an unlisted path serves a shell first.
+- Set `partialPrefetching: false` only while migrating an app that adopted Cache Components before Partial Prefetching existed.
 - Keep `instant = false` only on segments that must block. Adoption is done when the dev overlay is clean, `next build` passes, the browser shows the intended static shell on first paint, and `grep -rn "TODO: Cache Components adoption" app` finds nothing.
