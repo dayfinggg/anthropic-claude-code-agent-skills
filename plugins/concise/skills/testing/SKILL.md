@@ -1,42 +1,40 @@
 ---
 name: testing
-description: Test design that catches real bugs, proof that a change works, and quality gates that cannot be gamed, plus property-based testing, mutation testing and Playwright end-to-end tests. Use when writing, reviewing, fixing or deleting tests, choosing what to mock or fake, building fixtures or test data, when tests pass but bugs ship, when asked to prove a fix works or show before and after evidence, when checking whether a green run or another agent's change skipped tests, suppressed checks or loosened thresholds, for snapshot tests, Hypothesis, fast-check, proptest or other property tests, shrunk counterexamples, mutation testing with StrykerJS, mutmut, cargo-mutants, Infection or PIT, surviving mutants, checking a change in a real browser with Playwright, Playwright specs, playwright.config, locators, flaky or slow end-to-end tests, storageState login, traces, or questions like "is this test useful" and "how do I test this".
+description: Test design that catches real bugs, proof that a change works end to end, and spotting a green run that was gamed, plus property-based testing, mutation testing and Playwright. Use when writing, reviewing or fixing tests, choosing what to mock, proving a fix with before and after evidence, reviewing a diff that touches tests or CI gates, or working with Hypothesis, fast-check, StrykerJS, mutmut, cargo-mutants, Infection, PIT or Playwright specs.
 ---
 
-## Read first
+# Testing
 
-Go through these steps before you act on this skill. Do each step whose condition fits the task, and read each such file in full with the Read tool. When you cannot tell whether a step fits, do it. When the work later reaches a step you skipped, do it then.
-
-1. Read `references/verification.md` before claiming a change works end to end, and before accepting a green run or a diff that touches tests, CI or quality gates, yours or another agent's.
-2. Read `references/property-and-mutation.md` before writing or reviewing property-based tests, when a property test fails, and before setting up, scoping or reading a mutation testing run.
-3. Read `references/playwright.md` before writing, running, debugging or fixing Playwright tests.
-4. Fetch https://registry.npmjs.org/@playwright/test/latest (Current Playwright release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
-5. Fetch https://github.com/HypothesisWorks/hypothesis/tags.atom (Current Hypothesis release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
-6. Fetch https://registry.npmjs.org/@stryker-mutator/core/latest (Current StrykerJS release) with `curl -sL` or WebFetch when the task depends on that version or rule, and follow the page where it is newer than this skill.
+This skill covers test design, proof that a change works, and the property, mutation and browser testing tools. It matches Playwright 1.65, Hypothesis 6.170, fast-check 4.10, StrykerJS 10.1, mutmut 3.8, cargo-mutants 27.1, Infection 0.35 and PIT 1.30. Read the installed versions from the lockfile, or run `npx playwright --version`. Where the installed release is newer, its own `--help` and release notes are right about flags and defaults.
 
 ## Check first
 
 - Find the test command CI actually runs (workflow files, package scripts, `pyproject.toml`, `Makefile`) and run that, scoped to the files you touch. Use a mode that exits: `vitest run`, not bare `vitest`, which watches when it misdetects the terminal.
-- Find the tools already in use before proposing one: `rg -l "from hypothesis|fast-check|proptest|pgregory.net/rapid|net.jqwik|@stryker-mutator|mutmut|cargo-mutants|infection/infection|pitest"`, plus `playwright.config.*`, `stryker.config.*`, `infection.json5`, `.cargo/mutants.toml` and the lockfile versions. Adding a property or mutation testing tool to a project without one is the user's decision.
-- Facts verified 2026-11.
+- Find the tools already in use before proposing one: `rg -l "from hypothesis|fast-check|proptest|pgregory.net/rapid|net.jqwik|@stryker-mutator|mutmut|cargo-mutants|infection/infection|pitest"`, plus `playwright.config.*`, `stryker.config.*`, `infection.json5` and `.cargo/mutants.toml`. Adding a property or mutation testing tool to a project without one is the user's decision.
 
-## Defaults
+## Test design
 
-- Before you change legacy code that has no tests, pin its current behavior first: write characterization tests that assert what the code returns now, odd results included, run them green on the unchanged code, and commit or save them before the change. A pinned behavior changes only in a separate step the user agreed to, because callers may rely on it.
+- Before you change legacy code that has no tests, pin its current behavior: characterization tests that assert what the code returns now, odd results included, green on the unchanged code and saved before the change. A pinned behavior changes only in a separate step the user agreed to, because callers may rely on it.
 - Before writing a test, name the production change that should make it fail. If only an intentional decision can fail it (a constant, exact wording, private structure), it is a change detector. Test the behavior that depends on the decision instead.
 - Get red by running the new test against the code with the change reverted, not by editing the assertion. A missing-symbol compile error is not red: stub the API with a no-op or a wrong result first. Drop any new assertion that passes both with and without the change.
 - Expected values are literals or hand-checked fixtures. An expectation computed by the code under test, its helpers or a copy of its logic passes whatever the code does.
 - Assert what a caller can observe: return values, state read back through the public interface, HTTP responses, emitted events, files written. Do not assert calls to internal collaborators.
+- Each test creates its own data. A test that relies on another test running first fails alone and under parallel or shuffled runs.
+
+## Test doubles and real dependencies
+
 - Use test doubles only at boundaries you do not own: third-party HTTP APIs, payment and email providers, the clock, randomness, the OS. Keep your own modules and your database real.
-- Doubles mirror the real thing completely. Build fixtures from a recorded real response, scrubbed of secrets and personal data, or validate them against the provider's published schema in a test, so drift fails a test instead of production.
+- Build fixtures for a double from a recorded real response, scrubbed of secrets and personal data, or validate them against the provider's published schema in a test, so drift fails a test instead of production.
 - Intercept HTTP at the transport (a local stub server or the HTTP client's mock transport) rather than mocking your own client wrapper, so serialization, headers, retries and error mapping stay under test.
 - Inject time, randomness, IDs and environment as parameters or providers, and use the runner's fake clock for timers. Run date and number formatting tests under a non-UTC timezone and a non-English locale at least once.
-- Integration tests use the production database engine and major version in a container, not SQLite or an in-memory fake, because constraints, collations, JSON operators, locking and isolation levels differ. Isolate tests with a rolled-back transaction or a schema per worker. A test that always rolls back never commits, so deferred constraints, commit triggers and after-commit hooks need a test with a real commit.
+- Integration tests use the production database engine and major version in a container, not SQLite or an in-memory fake, because constraints, collations, JSON operators, locking and isolation levels differ. Isolate tests with a rolled-back transaction or a schema per worker.
+- A test that always rolls back never commits, so deferred constraints, commit triggers and after-commit hooks need a test with a real commit.
 - Prove crash and rollback behavior at the real boundary. An injected exception is not a killed process, and a mocked transaction call is not a database rollback.
-- Each test creates its own data. A test that relies on another test running first fails alone and under parallel or shuffled runs.
+
+## Test strength
+
 - Add property-based tests where the code has an algebraic shape: encode and decode, parse and render, a slow reference implementation, normalization, sorting, state invariants.
 - Measure test strength with mutation testing on the changed code, not with line coverage, which a test without assertions also raises.
-- For flaky tests find the cause with concise:debugging. Runner specifics live in concise:python (pytest), concise:typescript-javascript (Vitest, node:test) and concise:php.
 
 ## Gotchas
 
@@ -50,4 +48,12 @@ Go through these steps before you act on this skill. Do each step whose conditio
 - Mocking the module under test, or the function beside it, makes the test pass for any implementation.
 - Methods that only tests call (reset, destroy, setters for private state) do not belong on production classes. Put them in test utilities.
 - Snapshot updates (`-u`, `--update-snapshots`) accept whatever the code now outputs. Read every changed snapshot and justify it, or replace a large snapshot with targeted assertions.
-- Float equality, dict and set iteration order, wall-clock time and unseeded randomness make tests flaky. Use tolerances, sort before comparing, inject the clock, and fix and print the seed. Waiting rules are in concise:debugging.
+- Float equality, dict and set iteration order, wall-clock time and unseeded randomness make tests flaky. Use tolerances, sort before comparing, inject the clock, and fix and print the seed.
+
+## References
+
+- [references/verification.md](references/verification.md): read before saying a change works, when asked for before and after evidence, and before accepting a green run or a diff that touches tests, CI or quality gates, yours or another agent's.
+- [references/property-and-mutation.md](references/property-and-mutation.md): read before writing or reviewing property-based tests, when a property test fails, and before setting up, scoping or reading a mutation testing run.
+- [references/playwright.md](references/playwright.md): read before writing, running, debugging or fixing Playwright tests, or checking a change in a real browser.
+
+Related skills: concise:debugging for flaky tests, waits and failures that only happen in CI, concise:python for pytest, concise:typescript-javascript for Vitest and node:test, concise:php for PHPUnit, concise:frontend-ui for accessibility checks, concise:code-review for reviewing a change as a whole.
