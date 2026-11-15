@@ -1,16 +1,24 @@
 ---
 name: architecture
-description: Project structure, file naming, module boundaries, architecture style and the decision and spec documents in a repo. Use when creating or reorganizing a project or monorepo, deciding where code and tests go, adding dependency rules (dependency-cruiser, eslint-plugin-boundaries, Nx tags, deptrac, import-linter), breaking import cycles, choosing a modular monolith or microservices, writing ADRs or C4 docs, or using Spec Kit, Kiro or OpenSpec.
+description: Project structure, module boundaries, architecture style, system design and the decision and spec documents in a repo. Use when creating or reorganizing a project or monorepo, deciding where code and tests go, splitting a module or a service, designing for reliability, scale or data ownership, adding dependency rules (dependency-cruiser, deptrac, import-linter), breaking import cycles, or writing ADRs, C4 docs or Spec Kit, Kiro or OpenSpec specs.
 ---
 
 # Architecture
 
-This skill covers where code goes, how modules stay apart, which architecture style to pick and how decisions and specs are recorded. It matches dependency-cruiser 18.7, eslint-plugin-boundaries 7.4, Nx 24, Turborepo 2.11, deptrac 4.7, import-linter 2.16, ArchUnit 1.5, cargo-deny 0.20, Composer 2.11, MADR 4.0.0, Spec Kit 1.4.0 and OpenSpec 2.0.0. Check an installed tool with its `--version` flag. Where it is newer, its own release notes are right about options and defaults.
+This skill covers where code goes, how modules stay apart, which architecture style to pick, how a system handles failure and load, and how decisions and specs are recorded. It matches dependency-cruiser 18.7, eslint-plugin-boundaries 7.4, Nx 24, Turborepo 2.11, deptrac 4.7, import-linter 2.16, ArchUnit 1.5, cargo-deny 0.20, Composer 2.11, MADR 4.0.0, Spec Kit 1.4.0 and OpenSpec 2.0.0. Check an installed tool with its `--version` flag. Where it is newer, its own release notes are right about options and defaults.
 
 ## Check first
 
 - Before moving or adding modules, read what the repo already decided: ADRs (`docs/decisions/`, `docs/adr/`, `doc/arch/`), specs (`.specify/`, `.kiro/`, `openspec/`) and boundary configs (`.dependency-cruiser.*`, `boundaries/` settings in `eslint.config.*`, `tags` in `project.json`, `boundaries` in `turbo.json`, `deptrac.php` or `deptrac.yaml`, `[tool.importlinter]`, ArchUnit tests, `deny.toml`).
 - `git config core.ignorecase` prints `true` on a checkout where a wrong-case file name passes locally and fails on Linux.
+
+## Module design
+
+- Information hiding (Parnas): a module hides the design decision most likely to change, such as a storage format, a provider or a pricing rule. Decompose by those decisions, not by the steps of processing (read, parse, save).
+- Cohesion and coupling: concepts that change together share a module, and a module can be understood without reading its neighbours. Test a boundary on a real change: one user story should touch mostly one module.
+- Split a module on a second reason to change, meaning a second person or source that asks for changes (single responsibility, Martin), not on its length. A deep module, with a small interface over much functionality, beats several shallow ones that only pass calls through (Ousterhout).
+- Bounded context (Evans): one model and one vocabulary hold inside an explicit boundary of team, code and schema. Use it when several teams share a large domain. One team with a small model does not need it.
+- Top-level folders name the domain, not the framework, and use cases run in tests without the web server or the database.
 
 ## Layout
 
@@ -24,7 +32,7 @@ This skill covers where code goes, how modules stay apart, which architecture st
 
 ## Boundaries
 
-- Every dependency rule is a check that fails CI. Domain code imports no framework, database or HTTP code, adapters import the domain, and a feature reaches another only through its entry point. Tool choice and syntax are in [references/boundary-tools.md](references/boundary-tools.md).
+- Every dependency rule is a check that fails CI, an architectural fitness function: an automated test that a characteristic you chose still holds. Domain code imports no framework, database or HTTP code, adapters import the domain, and a feature reaches another only through its entry point. Tool choice and syntax are in [references/boundary-tools.md](references/boundary-tools.md).
 - Write the fix into the rule's message, since the agent that breaks a rule reads only the error: dependency-cruiser `comment` (shown with `--output-type err-long`), import-linter `broken_contract_guidance` (2.14+), eslint-plugin-boundaries `message`. Name the ADR behind the rule.
 - Adding a rule to existing code: baseline today's violations and fail only on new ones. Shrinking the baseline is routine, growing it is the user's call.
 - `disallowWorkspaceCycles: true` in `pnpm-workspace.yaml` turns a package cycle into an install failure. Cargo rejects crate cycles itself.
@@ -77,5 +85,6 @@ This skill covers where code goes, how modules stay apart, which architecture st
 
 - [references/boundary-tools.md](references/boundary-tools.md): read when adding, configuring, upgrading or debugging a dependency-boundary or cycle check.
 - [references/spec-formats.md](references/spec-formats.md): read when the repo has `.specify/`, `.kiro/` or `openspec/`, or the user asks for spec-driven development.
+- [references/system-design.md](references/system-design.md): read when designing or reviewing how a service handles failure, load, data ownership, interface changes or operation, when splitting a service out, or when replacing a legacy system.
 
 Related skills: concise:planning for plans and tickets, concise:typescript-javascript, concise:python, concise:rust and concise:php for each ecosystem's tooling, concise:backend-api for queues and the outbox, concise:orchestration for parallel agents.
