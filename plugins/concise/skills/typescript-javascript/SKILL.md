@@ -7,6 +7,15 @@ description: JavaScript and TypeScript practice covering ECMAScript features and
 
 This skill matches ECMAScript 2026 plus the ES2027 features already at stage 4, TypeScript 7.0 (and 6.0 for tools that need the compiler API), Node.js 26 LTS, npm 12, pnpm 11 and 12, Bun 1.4, Deno 2.9, Vite 8, Vitest 5, ESLint 10, Biome 2.6 and jQuery 4.0. Run `node -v`, `npx tsc -v` and `npm ls typescript vite vitest eslint @biomejs/biome --depth=0` (or the same through the project's package manager) to see what is installed. Where the installed release is newer, its own release notes and `--help` are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/ecmascript.md](references/ecmascript.md): read before using a built-in or syntax added after ES2024, when choosing `target`, `lib` or a polyfill, and before writing date or time code with Temporal.
+- [references/typescript.md](references/typescript.md): read when editing tsconfig, upgrading TypeScript, fixing compiler errors after an upgrade, or writing non-trivial types.
+- [references/node-and-packages.md](references/node-and-packages.md): read when choosing a Node.js version, running TypeScript with Node.js, writing `node:test` suites, or installing with npm, pnpm, Bun or Deno.
+- [references/build-test-lint.md](references/build-test-lint.md): read when configuring or upgrading Vite, Vitest, ESLint, typescript-eslint, Biome or Prettier, or when one of them fails.
+
 ## Check first
 
 - Read the TypeScript version from `node_modules/typescript/package.json` and the lockfile, and every tsconfig in the `extends` chain. TypeScript 7 provides `tsc`, `@typescript/typescript6` provides `tsc6`.
@@ -68,12 +77,5 @@ This skill matches ECMAScript 2026 plus the ES2027 features already at stage 4, 
 - Node.js type stripping throws `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` for `enum`, parameter properties and namespaces with values, ignores tsconfig `paths`, and needs the `.ts` extension in relative imports.
 - On Node.js 26, reading `localStorage` without `--localstorage-file` throws a `DOMException`.
 - Iterator helpers live on iterators, not arrays: write `arr.values().map(f).toArray()`. A helper iterator is single-use.
-
-## References
-
-- [references/ecmascript.md](references/ecmascript.md): read before using a built-in or syntax added after ES2024, when choosing `target`, `lib` or a polyfill, and before writing date or time code with Temporal.
-- [references/typescript.md](references/typescript.md): read when editing tsconfig, upgrading TypeScript, fixing compiler errors after an upgrade, or writing non-trivial types.
-- [references/node-and-packages.md](references/node-and-packages.md): read when choosing a Node.js version, running TypeScript with Node.js, writing `node:test` suites, or installing with npm, pnpm, Bun or Deno.
-- [references/build-test-lint.md](references/build-test-lint.md): read when configuring or upgrading Vite, Vitest, ESLint, typescript-eslint, Biome or Prettier, or when one of them fails.
 
 Related skills: concise:react-next for React and Next.js, concise:frontend-ui for CSS, Tailwind, accessibility and Web Vitals, concise:testing for test design and Playwright, concise:codebase-analysis for one change across many files or a version upgrade, concise:php for the PHP side of the CMS admin, concise:web-security for an XSS or injection review.

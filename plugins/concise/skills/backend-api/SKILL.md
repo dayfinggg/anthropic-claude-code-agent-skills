@@ -7,6 +7,13 @@ description: HTTP API design and reliability rules for RFC 9457 error bodies, Id
 
 This skill covers the contract and failure handling of HTTP APIs and the jobs behind them. It matches RFC 9457 (problem details), RFC 10008 (QUERY), RFC 9745 and RFC 8594 (deprecation and sunset), OpenAPI 3.2.1, draft-ietf-httpapi-idempotency-key-header-08, draft-ietf-httpapi-ratelimit-headers-11, Standard Webhooks 1.0.0 and Stripe API `2026-10-28.endive`. The two IETF drafts are not RFCs yet. Where a newer draft revision or a provider's own API reference says otherwise, that document is right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/webhooks.md](references/webhooks.md): read when building a webhook sender, a webhook receiver, signature verification, or delivery retries for customer URLs.
+- [references/stripe.md](references/stripe.md): read when integrating Stripe Checkout, PaymentIntents, subscriptions, Stripe webhooks or event destinations, Stripe idempotency or rate limits, or upgrading a Stripe SDK or API version.
+
 ## Check first
 
 - Read the existing contract before adding to it: the OpenAPI document (`openapi.yaml` or `openapi.json` and its `openapi` version), the error body shape, the pagination style, auth, and any idempotency table or middleware. Match them.
@@ -59,10 +66,5 @@ RateLimit: "default";r=50;t=30
 - A response type can list a field that the query projection, the serializer or DTO, or the OpenAPI schema drops, and the type check still passes. When adding or renaming a field, assert on a real serialized response.
 - Retrying at two layers multiplies attempts: three SDK retries inside three job retries is nine calls per message, and more under a queue redelivery.
 - A client that retries a POST without an idempotency key after a timeout creates a duplicate whenever the first request succeeded.
-
-## References
-
-- [references/webhooks.md](references/webhooks.md): read when building a webhook sender, a webhook receiver, signature verification, or delivery retries for customer URLs.
-- [references/stripe.md](references/stripe.md): read when integrating Stripe Checkout, PaymentIntents, subscriptions, Stripe webhooks or event destinations, Stripe idempotency or rate limits, or upgrading a Stripe SDK or API version.
 
 Related skills: concise:database for transactions, locks and migrations, concise:web-security for SSRF and access control on endpoints, concise:testing for proving retry and idempotency behavior, concise:typescript-javascript and concise:python for runtime specifics.

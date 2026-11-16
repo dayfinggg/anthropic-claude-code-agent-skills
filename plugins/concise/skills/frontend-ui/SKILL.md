@@ -7,6 +7,16 @@ description: Web UI practice for Tailwind CSS v4, shadcn/ui, native HTML and CSS
 
 This skill matches Tailwind CSS 4.3, the shadcn CLI 4.23 with Base UI as the default base, WCAG 2.2, the Core Web Vitals thresholds with `web-vitals` 6, and Chrome's Modern Web Guidance 1.0. Run `npm ls tailwindcss shadcn web-vitals` (or the project's package manager) and, in a shadcn/ui project, `npx shadcn@latest info --json`. Where the installed release is newer, its own docs and changelog are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/modern-web-platform.md](references/modern-web-platform.md): read before writing JavaScript for UI behavior, when building dialogs, popovers, tooltips, menus, accordions, forms or animations, when a feature's browser support or fallback is in question, and when modernizing legacy front-end code.
+- [references/tailwind-v4.md](references/tailwind-v4.md): read when writing Tailwind classes or CSS config, reviewing class names, or migrating from v3.
+- [references/accessibility.md](references/accessibility.md): read when fixing or reviewing focus, keyboard, contrast, forced colors, labels, live regions or zoom issues, or running an accessibility audit.
+- [references/web-vitals.md](references/web-vitals.md): read when LCP, INP or CLS fail, when setting up field measurement, or when a Lighthouse or PageSpeed score is low.
+- [references/visual-design.md](references/visual-design.md): read when designing a new page or component, restyling an existing one, or writing UI copy.
+
 ## Check first
 
 - Read `package.json` for the Tailwind major and integration (`tailwindcss`, `@tailwindcss/postcss`, `@tailwindcss/vite`, `@tailwindcss/webpack`, `@tailwindcss/turbopack`, `@tailwindcss/cli`). A v4 project imports Tailwind in CSS with `@import "tailwindcss"`, and a `tailwind.config.*` there loads only through `@config`.
@@ -69,13 +79,5 @@ This skill matches Tailwind CSS 4.3, the shadcn CLI 4.23 with Base UI as the def
 - Enter-to-submit handlers need `if (e.isComposing || e.keyCode === 229) return;`, or Japanese, Chinese and Korean IME users send half-typed text.
 - `loading="lazy"` on `<video>` and `<audio>` works only in Chromium (150). Pair it with `preload="none"` and a `poster`, give the video `width` and `height`, and the audio `controls`.
 - `content-visibility: auto` needs `contain-intrinsic-size: auto <size>` with a realistic size, or the scrollbar jumps. Leave it off above-the-fold content and small pages.
-
-## References
-
-- [references/modern-web-platform.md](references/modern-web-platform.md): read before writing JavaScript for UI behavior, when building dialogs, popovers, tooltips, menus, accordions, forms or animations, when a feature's browser support or fallback is in question, and when modernizing legacy front-end code.
-- [references/tailwind-v4.md](references/tailwind-v4.md): read when writing Tailwind classes or CSS config, reviewing class names, or migrating from v3.
-- [references/accessibility.md](references/accessibility.md): read when fixing or reviewing focus, keyboard, contrast, forced colors, labels, live regions or zoom issues, or running an accessibility audit.
-- [references/web-vitals.md](references/web-vitals.md): read when LCP, INP or CLS fail, when setting up field measurement, or when a Lighthouse or PageSpeed score is low.
-- [references/visual-design.md](references/visual-design.md): read when designing a new page or component, restyling an existing one, or writing UI copy.
 
 Related skills: concise:react-next for Next.js, `next/image` and React components, concise:typescript-javascript for JavaScript, jQuery and Temporal, concise:testing for Playwright checks in a real browser, concise:web-security for XSS and CSP review.

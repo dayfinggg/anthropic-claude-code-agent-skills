@@ -7,6 +7,15 @@ description: Stable Rust, edition 2024 and Cargo, covering Rust code, Cargo.toml
 
 This skill covers Rust code and Cargo projects. It matches Rust 1.100 (released 2026-11-12), edition 2024 and Cargo 1.100. See what is installed with `rustc -V` and `cargo -V`. Where the installed release is newer, its release notes and the std docs are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/std-apis.md](references/std-apis.md): read before adding a crate that std may replace, and when writing or reviewing code against a specific `rust-version`.
+- [references/edition-2024.md](references/edition-2024.md): read when migrating a crate to edition 2024 or fixing errors that appear after an edition change.
+- [references/async.md](references/async.md): read when writing or reviewing async code, tokio `select!`, spawned tasks, async traits or async closures.
+- [references/unsafe-ffi.md](references/unsafe-ffi.md): read when writing or reviewing `unsafe` code, FFI, `static mut`, raw pointers or unions, or running Miri.
+
 ## Check first
 
 - Read `edition`, `rust-version`, `resolver` and `[lints]` in `Cargo.toml` and in the workspace root manifest, and `rust-toolchain.toml`, `.cargo/config.toml`, `clippy.toml` and `rustfmt.toml` if present.
@@ -59,12 +68,5 @@ This skill covers Rust code and Cargo projects. It matches Rust 1.100 (released 
 - `pin!(x)` with `x: &mut T` yields `Pin<&mut &mut T>` since 1.97. Use `Pin::new(x)` when the target is `Unpin`.
 - Adding any field, even a private one, to a public struct whose fields are all public breaks callers, and so does a new variant of a public enum. Adding `#[non_exhaustive]` later breaks callers too. `cargo semver-checks` reports these changes before a publish.
 - rand 0.9 renamed `thread_rng()` to `rng()`, `gen` to `random` and `gen_range` to `random_range`. rand 0.10 (MSRV 1.85) renamed the `Rng` trait to `RngExt` and `OsRng` to `SysRng`.
-
-## References
-
-- [references/std-apis.md](references/std-apis.md): read before adding a crate that std may replace, and when writing or reviewing code against a specific `rust-version`.
-- [references/edition-2024.md](references/edition-2024.md): read when migrating a crate to edition 2024 or fixing errors that appear after an edition change.
-- [references/async.md](references/async.md): read when writing or reviewing async code, tokio `select!`, spawned tasks, async traits or async closures.
-- [references/unsafe-ffi.md](references/unsafe-ffi.md): read when writing or reviewing `unsafe` code, FFI, `static mut`, raw pointers or unions, or running Miri.
 
 Related skills: concise:testing for proptest and cargo-mutants, concise:debugging for crashes and failing tests, concise:codebase-analysis for `cargo tree` and wide mechanical changes, concise:github-actions for CI wiring.

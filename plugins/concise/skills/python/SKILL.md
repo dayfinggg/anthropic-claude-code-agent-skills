@@ -7,6 +7,14 @@ description: Python code and projects with uv, ruff, ty, mypy and pytest, coveri
 
 This skill covers Python code and the uv, ruff, ty, mypy and pytest tool chain. It matches Python 3.15, uv 0.13, ruff 0.17, ty 0.0.104, mypy 2.4 and pytest 9.2. See what a project uses with `uv --version`, `uv run python -VV`, `uv run ruff --version`, `uv run ty --version` and `uv tree --depth 1`. Where the installed release is newer, its own `--help` and changelog are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/uv-packaging.md](references/uv-packaging.md): read when setting up or changing a uv project, dependency groups, scripts with inline metadata, the build backend, publishing, `uv venv` or interpreter selection, or when a uv command behaves differently after an upgrade.
+- [references/lint-types.md](references/lint-types.md): read when configuring or upgrading ruff, ty or mypy, suppressing a diagnostic, adopting ty on an existing codebase, or when a lint or type error appears after an upgrade.
+- [references/pytest-language.md](references/pytest-language.md): read when configuring pytest or pytest-asyncio, fixing pytest deprecation warnings, or writing code that uses typing or syntax from Python 3.12 to 3.15 against a given `requires-python` floor.
+
 ## Check first
 
 - Read `requires-python`, `.python-version` and the lockfile before choosing syntax or commands. `uv.lock` means uv, `poetry.lock` Poetry, `pdm.lock` PDM, and bare `requirements*.txt` pip or `uv pip`. Keep the project's tool. The uv defaults below apply to uv projects and new projects.
@@ -59,11 +67,5 @@ This skill covers Python code and the uv, ruff, ty, mypy and pytest tool chain. 
 - `frozendict` (3.15) is not a `dict` subclass, so `isinstance(x, dict)` rejects it. Check `collections.abc.Mapping`.
 - Ruff 0.16 and later also format Python code blocks in `*.md` files, so `ruff format .` edits docs. Pass explicit paths, or wrap blocks in `<!-- fmt:off -->` and `<!-- fmt:on -->`.
 - ty exits 1 on warnings by default. Set `[tool.ty.terminal] error-on-warning = false` or pass `--exit-zero-on-warning` only when warnings should pass.
-
-## References
-
-- [references/uv-packaging.md](references/uv-packaging.md): read when setting up or changing a uv project, dependency groups, scripts with inline metadata, the build backend, publishing, `uv venv` or interpreter selection, or when a uv command behaves differently after an upgrade.
-- [references/lint-types.md](references/lint-types.md): read when configuring or upgrading ruff, ty or mypy, suppressing a diagnostic, adopting ty on an existing codebase, or when a lint or type error appears after an upgrade.
-- [references/pytest-language.md](references/pytest-language.md): read when configuring pytest or pytest-asyncio, fixing pytest deprecation warnings, or writing code that uses typing or syntax from Python 3.12 to 3.15 against a given `requires-python` floor.
 
 Related skills: concise:testing for test design and property tests, concise:debugging for failing tests and crashes, concise:architecture for src layout and import rules, concise:codebase-analysis for wide mechanical changes such as replacing a deprecated API.

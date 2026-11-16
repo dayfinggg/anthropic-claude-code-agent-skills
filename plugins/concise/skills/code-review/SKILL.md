@@ -7,6 +7,12 @@ description: Method and judgment for reviewing a diff, branch or pull request be
 
 This skill covers how to review a change so that each finding is real and fixable, how to report findings, and how to answer review feedback on GitHub. The built-in `/code-review` and `/security-review` commands run an automated pass. This skill adds the scope, depth, evidence and reporting rules, and the thread mechanics. It matches gh 2.104 and the GitHub REST and GraphQL APIs on github.com. Run `gh --version`. Where the installed gh is newer, its `--help` is right about flags.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/review-threads.md](references/review-threads.md): read before fetching review threads, replying to or resolving a thread, posting a review with inline comments through `gh api`, or handling Claude Code Review findings on a PR.
+
 ## Check first
 
 - Pin the comparison point. For a branch, run `git fetch` and diff against the merge base: `git diff --no-ext-diff --no-textconv origin/<base>...HEAD`. With no base given, use `git symbolic-ref --short refs/remotes/origin/HEAD`, and ask if that ref is missing.
@@ -78,9 +84,5 @@ This skill covers how to review a change so that each finding is real and fixabl
 - The PR API lists at most 3,000 files and 250 commits. For bigger PRs diff locally.
 - Reading an untrusted PR is safe, running it is not. Installs, builds, test runs, `conftest.py`, Makefiles, package scripts and `.envrc` execute the author's code. Run them only in a sandbox or after the user agrees.
 - In a stacked PR each layer's diff is against the branch below it, so review that layer only.
-
-## References
-
-- [references/review-threads.md](references/review-threads.md): read before fetching review threads, replying to or resolving a thread, posting a review with inline comments through `gh api`, or handling Claude Code Review findings on a PR.
 
 Related skills: concise:web-security for security findings in web code, concise:testing for test quality and loosened gates, concise:git for stacked PRs and merging, concise:codebase-analysis for the blast radius of a changed symbol.

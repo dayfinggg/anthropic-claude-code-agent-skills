@@ -7,6 +7,13 @@ description: React and Next.js App Router practice covering Server and Client Co
 
 This skill matches React 19.3 and Next.js 16.4. The 16.x line is Active LTS, and 15.x is Maintenance LTS with security releases through 2027-01-31. Run `npm ls next react react-dom` (or the project's package manager) to see what is installed. Where the installed release is newer, the docs bundled in `node_modules/next/dist/docs/` and the release notes are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/cache-components.md](references/cache-components.md): read when using `'use cache'`, `cacheLife` or `cacheTag`, choosing a cache handler, enabling Cache Components in an existing app, or replacing route segment configs, `fetch` cache options or `unstable_cache`.
+- [references/react-client.md](references/react-client.md): read when writing Client Components with Transitions, `useActionState`, `useEffectEvent`, `<Activity>`, `use(browser())` or `next/dynamic`, when adding view transitions, or when `after()` or Server Action arguments are involved.
+
 ## Check first
 
 - Read `package.json` and the lockfile for `next`, `react`, `react-dom`, `babel-plugin-react-compiler` and `eslint-plugin-react-hooks`, and `next.config.*` for `cacheComponents`, `partialPrefetching`, `reactCompiler` and `experimental` keys.
@@ -64,10 +71,5 @@ This skill matches React 19.3 and Next.js 16.4. The 16.x line is Active LTS, and
 - Every parallel route slot needs a `default.js` since 16, or the build fails.
 - A Proxy without a `matcher` also runs for `_next/static`, `_next/image` and `public/` files, so an auth redirect can block CSS and images.
 - `next build --debug-prerender` adds source maps and keeps checking other routes after a failure. Never deploy such a build. `--debug-build-paths` takes file paths and globs such as `"app/admin/**/page.tsx"`, with `!` to exclude.
-
-## References
-
-- [references/cache-components.md](references/cache-components.md): read when using `'use cache'`, `cacheLife` or `cacheTag`, choosing a cache handler, enabling Cache Components in an existing app, or replacing route segment configs, `fetch` cache options or `unstable_cache`.
-- [references/react-client.md](references/react-client.md): read when writing Client Components with Transitions, `useActionState`, `useEffectEvent`, `<Activity>`, `use(browser())` or `next/dynamic`, when adding view transitions, or when `after()` or Server Action arguments are involved.
 
 Related skills: concise:typescript-javascript for TypeScript, tsconfig and the build and test tools, concise:frontend-ui for Tailwind, shadcn/ui, accessibility, Web Vitals and images, concise:web-security for authorization and data exposure review, concise:containers-iac for the Docker image and Compose setup, concise:testing for Playwright tests.

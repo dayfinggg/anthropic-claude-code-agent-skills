@@ -7,6 +7,14 @@ description: Project structure, module boundaries, architecture style, system de
 
 This skill covers where code goes, how modules stay apart, which architecture style to pick, how a system handles failure and load, and how decisions and specs are recorded. It matches dependency-cruiser 18.7, eslint-plugin-boundaries 7.4, Nx 24, Turborepo 2.11, deptrac 4.7, import-linter 2.16, ArchUnit 1.5, cargo-deny 0.20, Composer 2.11, MADR 4.0.0, Spec Kit 1.4.0 and OpenSpec 2.0.0. Check an installed tool with its `--version` flag. Where it is newer, its own release notes are right about options and defaults.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/boundary-tools.md](references/boundary-tools.md): read when adding, configuring, upgrading or debugging a dependency-boundary or cycle check.
+- [references/spec-formats.md](references/spec-formats.md): read when the repo has `.specify/`, `.kiro/` or `openspec/`, or the user asks for spec-driven development.
+- [references/system-design.md](references/system-design.md): read when designing or reviewing how a service handles failure, load, data ownership, interface changes or operation, when splitting a service out, or when replacing a legacy system.
+
 ## Check first
 
 - Before moving or adding modules, read what the repo already decided: ADRs (`docs/decisions/`, `docs/adr/`, `doc/arch/`), specs (`.specify/`, `.kiro/`, `openspec/`) and boundary configs (`.dependency-cruiser.*`, `boundaries/` settings in `eslint.config.*`, `tags` in `project.json`, `boundaries` in `turbo.json`, `deptrac.php` or `deptrac.yaml`, `[tool.importlinter]`, ArchUnit tests, `deny.toml`).
@@ -80,11 +88,5 @@ This skill covers where code goes, how modules stay apart, which architecture st
 - Each `tests/*.rs` file is its own crate in Rust. Shared helpers go in `tests/common/mod.rs`, not `tests/common.rs`.
 - Turborepo errors on nested packages such as `apps/a` and `apps/a/b`. Group with a `packages/group/*` glob and no `package.json` in `packages/group/`.
 - pnpm's `linkWorkspacePackages` defaults to false, so a plain version range for a workspace package can install a same-named package from the registry. Use `workspace:*`.
-
-## References
-
-- [references/boundary-tools.md](references/boundary-tools.md): read when adding, configuring, upgrading or debugging a dependency-boundary or cycle check.
-- [references/spec-formats.md](references/spec-formats.md): read when the repo has `.specify/`, `.kiro/` or `openspec/`, or the user asks for spec-driven development.
-- [references/system-design.md](references/system-design.md): read when designing or reviewing how a service handles failure, load, data ownership, interface changes or operation, when splitting a service out, or when replacing a legacy system.
 
 Related skills: concise:planning for plans and tickets, concise:typescript-javascript, concise:python, concise:rust and concise:php for each ecosystem's tooling, concise:backend-api for queues and the outbox, concise:orchestration for parallel agents.

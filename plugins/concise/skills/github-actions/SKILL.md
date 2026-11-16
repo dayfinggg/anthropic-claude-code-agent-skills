@@ -7,6 +7,14 @@ description: GitHub Actions workflow security, correctness and failing checks. U
 
 This skill covers workflow security, correctness and failing checks for GitHub Actions on github.com. It matches runner 2.338, `actions/checkout` v7, gh 2.104, gh-actions-lock 0.4, actionlint 1.7.12 and zizmor 1.32. Run `gh --version` and `gh extension list` to see the local tools, and read the "Current runner version" line at the top of a job log for the runner. Where an installed release is newer, its own `--help` and release notes are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/ci-failures.md](references/ci-failures.md): read when a check fails on a pull request, before rerunning a run, when deciding whether a change caused a failure, or when a workflow or job did not run.
+- [references/untrusted-triggers.md](references/untrusted-triggers.md): read when a workflow uses `pull_request_target`, `workflow_run` or `issue_comment`, gates fork code on a label or comment, checks out or downloads PR content, or when auditing workflow security.
+- [references/ai-agents.md](references/ai-agents.md): read when a workflow runs claude-code-action, codex-action, run-gemini-cli, actions/ai-inference or a gh aw agentic workflow.
+
 ## Check first
 
 - Inventory `.github/workflows/*.yml` and `*.yaml`, every `action.yml` (often under `.github/actions/`), `.github/workflows/actions.lock`, gh aw sources (`.github/workflows/*.md` next to `*.lock.yml`), `.github/dependabot.yml` and the `CODEOWNERS` lines for `.github/`.
@@ -93,11 +101,5 @@ concurrency:
 - Environment branch rules match `refs/pull/N/merge` for `pull_request` events and the default branch for `pull_request_target` (since 2025-12-08). Old patterns that matched the head branch no longer unlock the environment.
 - `upload-artifact` skips files and folders starting with `.` unless `include-hidden-files: true`, and a second upload with the same name in one run fails without `overwrite: true`. `download-artifact@v8` fails on a digest mismatch.
 - actionlint 1.7.12 (2026-03-30) predates `$/`, `cache-mode`, `background`, `parallel`, `wait` and `queue`, so it can report them as errors. Check the workflow syntax docs before rewriting valid YAML. zizmor 1.32 parses them.
-
-## References
-
-- [references/ci-failures.md](references/ci-failures.md): read when a check fails on a pull request, before rerunning a run, when deciding whether a change caused a failure, or when a workflow or job did not run.
-- [references/untrusted-triggers.md](references/untrusted-triggers.md): read when a workflow uses `pull_request_target`, `workflow_run` or `issue_comment`, gates fork code on a label or comment, checks out or downloads PR content, or when auditing workflow security.
-- [references/ai-agents.md](references/ai-agents.md): read when a workflow runs claude-code-action, codex-action, run-gemini-cli, actions/ai-inference or a gh aw agentic workflow.
 
 Related skills: concise:git for merging PRs, merge queues and rulesets, concise:containers-iac for Docker builds and build cache, concise:debugging for failures that reproduce only in CI, concise:codebase-analysis for one mechanical change across many workflow files.

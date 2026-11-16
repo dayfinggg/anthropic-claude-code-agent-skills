@@ -7,6 +7,15 @@ description: Writing and auditing the instructions coding agents load, such as C
 
 This skill covers the files that steer Claude Code and other coding agents, and how to write them. It matches Claude Code 2.1.325 and the Claude 5 generation of models (Opus 5.5, Fable 5.2). Run `claude --version` first. Where the installed release is newer, its own release notes are right about fields, limits and load rules.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/claude-code-loading.md](references/claude-code-loading.md): read when writing or debugging `CLAUDE.md`, `AGENTS.md`, rules, imports, nested files or auto memory, or when sharing instructions with Codex, Gemini CLI, Cursor or Devin.
+- [references/skill-files.md](references/skill-files.md): read when writing a skill, its frontmatter or description, when a skill does not trigger or triggers too often, or when testing one.
+- [references/subagent-files.md](references/subagent-files.md): read when writing or debugging a subagent definition in `.claude/agents/`, `~/.claude/agents/` or a plugin's `agents/`.
+- [references/plugins-and-output-styles.md](references/plugins-and-output-styles.md): read when writing instructions that ship in a plugin, writing a custom output style, or testing a plugin with `claude plugin eval`.
+
 ## Check first
 
 - Version gates: reading `AGENTS.md` directly needs v2.1.277, `/doctor prompt-audit` v2.1.283, `claude plugin eval` v2.1.269, and `claude plugin validate` on a plain skills or agents directory v2.1.233.
@@ -56,12 +65,5 @@ This skill covers the files that steer Claude Code and other coding agents, and 
 - Two contradicting lines, in one file or across files, make Claude pick one arbitrarily. Reconcile them in one place.
 - `CLAUDE.md` arrives as a user message after the system prompt. It is context, not enforcement.
 - A skill whose YAML does not parse still loads and runs as `/name`, but Claude can no longer match it by its description. A subagent file with bad YAML, no `name` or no `description` is skipped without a notice in the session.
-
-## References
-
-- [references/claude-code-loading.md](references/claude-code-loading.md): read when writing or debugging `CLAUDE.md`, `AGENTS.md`, rules, imports, nested files or auto memory, or when sharing instructions with Codex, Gemini CLI, Cursor or Devin.
-- [references/skill-files.md](references/skill-files.md): read when writing a skill, its frontmatter or description, when a skill does not trigger or triggers too often, or when testing one.
-- [references/subagent-files.md](references/subagent-files.md): read when writing or debugging a subagent definition in `.claude/agents/`, `~/.claude/agents/` or a plugin's `agents/`.
-- [references/plugins-and-output-styles.md](references/plugins-and-output-styles.md): read when writing instructions that ship in a plugin, writing a custom output style, or testing a plugin with `claude plugin eval`.
 
 Related skills: concise:orchestration for delegating work and briefing subagents, concise:architecture for decision records and specs kept in the repo.

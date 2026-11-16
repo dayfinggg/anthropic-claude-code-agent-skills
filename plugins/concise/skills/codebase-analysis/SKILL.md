@@ -7,6 +7,13 @@ description: Mapping unfamiliar code, finding everything a change can break, and
 
 This skill covers reading code you have not seen, finding every reader of what a change touches, and applying one change across many files. It matches ast-grep 0.51, dependency-cruiser 18.7, madge 8.0, knip 6.45, grimp 3.20, deptrac 4.7 and Git 2.56. Check what is installed with `ast-grep --version`, `npx <tool> --version` and `git version`. Where the installed release is newer, its own `--help` and release notes are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/graph-tools.md](references/graph-tools.md): read before running a dependency graph, reverse dependency or unused-code tool (dependency-cruiser, madge, knip, pnpm filters, pydeps, grimp, cargo tree, go list, deptrac, jdeps).
+- [references/codemods.md](references/codemods.md): read before renaming, moving or replacing something across many files, writing or running an ast-grep, jscodeshift, ts-morph, LibCST, Rector, OpenRewrite or Codemod registry transform, or planning a framework, library or runtime upgrade.
+
 ## Check first
 
 - Read how the code is built, run and deployed before any source: manifests, lockfiles and workspace files, Dockerfile and Compose, CI workflows, Procfile, Helm or Kubernetes manifests, serverless, cron and queue definitions, `.env.example`. Entry points usually live in deployment config, and without it most top-level modules look unreachable.
@@ -62,10 +69,5 @@ This skill covers reading code you have not seen, finding every reader of what a
 - `--follow` works for one file only, and `git log -- <dir>` stops at the commit that moved the directory. Pass the old path as a second pathspec.
 - `git blame` applies `.git-blame-ignore-revs` only when `blame.ignoreRevsFile` is set. Pass `--ignore-revs-file .git-blame-ignore-revs` so reformatting commits do not hide a line's author.
 - `vitest related --run <files>` runs only tests that import those files statically, so a test that reaches them through a dynamic `import(path)` is left out.
-
-## References
-
-- [references/graph-tools.md](references/graph-tools.md): read before running a dependency graph, reverse dependency or unused-code tool (dependency-cruiser, madge, knip, pnpm filters, pydeps, grimp, cargo tree, go list, deptrac, jdeps).
-- [references/codemods.md](references/codemods.md): read before renaming, moving or replacing something across many files, writing or running an ast-grep, jscodeshift, ts-morph, LibCST, Rector, OpenRewrite or Codemod registry transform, or planning a framework, library or runtime upgrade.
 
 Related skills: concise:planning for expand-contract ticket order, concise:database for schema changes, concise:php for Rector configuration, concise:typescript-javascript, concise:python and concise:rust for each stack's upgrade facts and official codemods.

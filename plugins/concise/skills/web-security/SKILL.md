@@ -7,6 +7,15 @@ description: Method and framework knowledge for finding exploitable vulnerabilit
 
 This skill covers how to find vulnerabilities in web application and API code that an attacker can actually reach, and the framework behavior that hides them. Its vulnerability classes follow the OWASP Top 10:2025 and the OWASP API Security Top 10:2023, and it cites requirements from OWASP ASVS 5.0.0. Read the framework versions from the lockfile. Where a framework's installed release is newer, its own security documentation is right about defaults.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/access-control.md](references/access-control.md): read when reviewing authorization, IDOR or BOLA, tenant isolation, roles, mass assignment, or any endpoint that takes an object ID.
+- [references/frameworks.md](references/frameworks.md): read when the code uses Django, DRF, FastAPI, Flask or Jinja, Express, Next.js, Rails, Laravel, Symfony, Spring or Go templates, before judging whether the framework already blocks a suspected bug.
+- [references/browser-defenses.md](references/browser-defenses.md): read when a fix or a mitigation involves CSP, Trusted Types, HTML sanitizing, Subresource Integrity, cookie attributes, origin checks, cross-origin headers or passkeys, or when judging whether such a defense actually blocks a finding.
+- [references/defaults-and-sinks.md](references/defaults-and-sinks.md): read when reviewing configuration, error handling around security checks, logging, tracing, error reporting, caching, or how objects holding credentials are serialized.
+
 ## Check first
 
 - Establish exposure before judging severity: who can reach the code (internet, other internal services, customer SDKs, a local operator). Look in ingress, gateway and deployment config, and ask if it is unclear.
@@ -60,12 +69,5 @@ This skill covers how to find vulnerabilities in web application and API code th
 - Secrets compared with `==` leak timing. Use `hmac.compare_digest` or `crypto.timingSafeEqual`, which throws on inputs of different byte length, so compare fixed-length digests.
 - Limits enforced by read-then-write (single-use codes, balances, quotas, invitations) race under parallel requests. Require an atomic conditional update or a unique constraint.
 - LLM features: prompt-injection filters (regex blocklists, delimiters, "ignore instructions in the document") are not controls. Treat model output as attacker-controlled: limit tools to the requesting user's permissions, escape rendered output, and block auto-loaded markdown images and links that can carry data out.
-
-## References
-
-- [references/access-control.md](references/access-control.md): read when reviewing authorization, IDOR or BOLA, tenant isolation, roles, mass assignment, or any endpoint that takes an object ID.
-- [references/frameworks.md](references/frameworks.md): read when the code uses Django, DRF, FastAPI, Flask or Jinja, Express, Next.js, Rails, Laravel, Symfony, Spring or Go templates, before judging whether the framework already blocks a suspected bug.
-- [references/browser-defenses.md](references/browser-defenses.md): read when a fix or a mitigation involves CSP, Trusted Types, HTML sanitizing, Subresource Integrity, cookie attributes, origin checks, cross-origin headers or passkeys, or when judging whether such a defense actually blocks a finding.
-- [references/defaults-and-sinks.md](references/defaults-and-sinks.md): read when reviewing configuration, error handling around security checks, logging, tracing, error reporting, caching, or how objects holding credentials are serialized.
 
 Related skills: concise:security-audit for auditing a whole codebase with a threat model, triage of many findings and verified fixes, concise:github-actions for CI workflows, concise:containers-iac for images and manifests, concise:git for secrets committed to history, concise:react-next for Server Component props, concise:backend-api for webhook signatures, concise:database for row-level security, concise:code-review for the review process around a PR.

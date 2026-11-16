@@ -7,6 +7,14 @@ description: Test design that catches real bugs, proof that a change works end t
 
 This skill covers test design, proof that a change works, and the property, mutation and browser testing tools. It matches Playwright 1.65, Hypothesis 6.170, fast-check 4.10, StrykerJS 10.1, mutmut 3.8, cargo-mutants 27.1, Infection 0.35 and PIT 1.30. Read the installed versions from the lockfile, or run `npx playwright --version`. Where the installed release is newer, its own `--help` and release notes are right about flags and defaults.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/verification.md](references/verification.md): read before saying a change works, when asked for before and after evidence, and before accepting a green run or a diff that touches tests, CI or quality gates, yours or another agent's.
+- [references/property-and-mutation.md](references/property-and-mutation.md): read before writing or reviewing property-based tests, when a property test fails, and before setting up, scoping or reading a mutation testing run.
+- [references/playwright.md](references/playwright.md): read before writing, running, debugging or fixing Playwright tests, or checking a change in a real browser.
+
 ## Check first
 
 - Find the test command CI actually runs (workflow files, package scripts, `pyproject.toml`, `Makefile`) and run that, scoped to the files you touch. Use a mode that exits: `vitest run`, not bare `vitest`, which watches when it misdetects the terminal.
@@ -49,11 +57,5 @@ This skill covers test design, proof that a change works, and the property, muta
 - Methods that only tests call (reset, destroy, setters for private state) do not belong on production classes. Put them in test utilities.
 - Snapshot updates (`-u`, `--update-snapshots`) accept whatever the code now outputs. Read every changed snapshot and justify it, or replace a large snapshot with targeted assertions.
 - Float equality, dict and set iteration order, wall-clock time and unseeded randomness make tests flaky. Use tolerances, sort before comparing, inject the clock, and fix and print the seed.
-
-## References
-
-- [references/verification.md](references/verification.md): read before saying a change works, when asked for before and after evidence, and before accepting a green run or a diff that touches tests, CI or quality gates, yours or another agent's.
-- [references/property-and-mutation.md](references/property-and-mutation.md): read before writing or reviewing property-based tests, when a property test fails, and before setting up, scoping or reading a mutation testing run.
-- [references/playwright.md](references/playwright.md): read before writing, running, debugging or fixing Playwright tests, or checking a change in a real browser.
 
 Related skills: concise:debugging for flaky tests, waits and failures that only happen in CI, concise:python for pytest, concise:typescript-javascript for Vitest and node:test, concise:php for PHPUnit, concise:frontend-ui for accessibility checks, concise:code-review for reviewing a change as a whole.

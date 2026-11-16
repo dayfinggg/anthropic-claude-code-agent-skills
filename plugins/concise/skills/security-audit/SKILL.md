@@ -7,6 +7,17 @@ description: Auditing a codebase or service for vulnerabilities as a find-and-fi
 
 This skill covers a security audit of a whole codebase or service as a loop: scope it with a threat model, scan the source, triage what the scan returns, patch what triage confirms, then scan again. A second track covers an attacker who may already be in the logs. The method and its file formats follow Anthropic's Defending Code Reference Harness at commit `d3bea6b` (2026-08-06), so files written with this skill can be fed to that repository's skills and pipeline. Where a newer clone differs, its own `docs/` are right about its commands.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/threat-model.md](references/threat-model.md): read before building or updating `THREAT_MODEL.md`, when interviewing an owner about a system, or when a scan needs focus areas and trust boundaries.
+- [references/static-scan.md](references/static-scan.md): read before scanning source for vulnerabilities, for the review brief, the do-not-report list, the `VULN-FINDINGS.json` shape and the handling of a large codebase.
+- [references/triage.md](references/triage.md): read before verifying, deduplicating or ranking findings from any scanner or agent, for the verifier brief, the 16 exclusion rules and the `TRIAGE.json` shape.
+- [references/patching.md](references/patching.md): read before writing, reviewing or verifying a security fix, for the patch and review briefs, the verification ladder and the `PATCHES/` shape.
+- [references/incident-hunt.md](references/incident-hunt.md): read when logs may hold an attack: hunting without an alert, working an alert or an indicator, judging whether an attack succeeded, or writing a response plan.
+- [references/reference-harness.md](references/reference-harness.md): read before cloning, running or porting upstream's pipeline, when a subagent or a tool call misbehaves during an audit, and before reporting a finding to an open-source project.
+
 ## Check first
 
 - Confirm that the user owns the target or is authorized to test it, and write down the scope: which repository, hosts and environments are in, and which are out. A brief for a subagent states the same authorization and scope, as upstream's briefs do.
@@ -58,14 +69,5 @@ This skill covers a security audit of a whole codebase or service as a loop: sco
 - Code in tests, fixtures, examples and dead paths is out of scope unless it ships. Check that a flagged route is registered and enabled.
 - Hard-coded credentials are a common finding. Mask values in every command that prints target code or configuration, and report the file and the key, not the value.
 - A finding in someone else's open-source project is a lead, not a report. A human reproduces it and sends it through the project's private channel, saying that AI was involved.
-
-## References
-
-- [references/threat-model.md](references/threat-model.md): read before building or updating `THREAT_MODEL.md`, when interviewing an owner about a system, or when a scan needs focus areas and trust boundaries.
-- [references/static-scan.md](references/static-scan.md): read before scanning source for vulnerabilities, for the review brief, the do-not-report list, the `VULN-FINDINGS.json` shape and the handling of a large codebase.
-- [references/triage.md](references/triage.md): read before verifying, deduplicating or ranking findings from any scanner or agent, for the verifier brief, the 16 exclusion rules and the `TRIAGE.json` shape.
-- [references/patching.md](references/patching.md): read before writing, reviewing or verifying a security fix, for the patch and review briefs, the verification ladder and the `PATCHES/` shape.
-- [references/incident-hunt.md](references/incident-hunt.md): read when logs may hold an attack: hunting without an alert, working an alert or an indicator, judging whether an attack succeeded, or writing a response plan.
-- [references/reference-harness.md](references/reference-harness.md): read before cloning, running or porting upstream's pipeline, when a subagent or a tool call misbehaves during an audit, and before reporting a finding to an open-source project.
 
 Related skills: concise:web-security for the vulnerability classes and framework traps of web applications, concise:code-review for one diff or pull request, concise:orchestration for running passes through subagents, concise:autonomous-run for an audit that runs unattended, concise:server-ops and concise:database for the servers and databases an audit reads.

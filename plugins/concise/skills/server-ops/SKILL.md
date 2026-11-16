@@ -7,6 +7,14 @@ description: Running PHP sites on Linux servers over SSH, covering deploys and r
 
 This skill matches nginx 1.30 stable and 1.31 mainline, PHP-FPM 8.2 to 8.5, Memcached 1.6.45, OpenSSH 10.6p2, rsync 3.5.2, Debian cron 3.0pl1 and systemd timers. On each host run `nginx -v`, `ls /etc/php/` and `ssh -V` to see what is installed. Where the installed release is newer, its own man pages and changelog are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/nginx-php-fpm.md](references/nginx-php-fpm.md): read when writing or debugging an nginx server block for PHP, FastCGI caching, headers, "Primary script unknown", "File not found.", 502 or 504 errors, or PHP-FPM pool settings.
+- [references/cron-systemd.md](references/cron-systemd.md): read when adding, changing or debugging a crontab, an `/etc/cron.d` file or a systemd timer.
+- [references/cloudflare.md](references/cloudflare.md): read when restoring visitor IPs, restricting the origin to Cloudflare, changing cache rules or cache headers, purging, reading `cf-cache-status`, or debugging 520 to 526 errors.
+
 ## Check first
 
 - Read what runs on each host before writing config: `nginx -V 2>&1 | grep -o realip`, `systemctl list-units 'php*-fpm*'`, the pool that serves the site (`grep -rn '^listen' /etc/php/*/fpm/pool.d/`), the server block (`nginx -T 2>/dev/null | grep -n server_name`) and `dpkg -l cron cronie`. The PHP that serves the site is the pool's `php-fpm8.x`, which can differ from the `php` CLI on `PATH`.
@@ -44,11 +52,5 @@ This skill matches nginx 1.30 stable and 1.31 mainline, PHP-FPM 8.2 to 8.5, Memc
 - Cloudflare answers 524 when the origin sends no response within 125 seconds, while PHP-FPM keeps running the request. Run long jobs from the CLI or cron, not in a web request.
 - OpenSSH 10.1 broke sessions with `ControlPersist` (fixed in 10.2) and warns on stderr when the connection uses a key exchange that is not post-quantum (`WarnWeakCrypto`). Since 10.0 `scp` and `sftp` pass `ControlMaster no`, so they reuse an existing master but never start one.
 - Behind Cloudflare, `$_SERVER['HTTP_CF_CONNECTING_IP']` in PHP skips nginx's trusted-proxy check, so any client that reaches the origin directly can set it. Read `REMOTE_ADDR` after nginx's realip module has restored it.
-
-## References
-
-- [references/nginx-php-fpm.md](references/nginx-php-fpm.md): read when writing or debugging an nginx server block for PHP, FastCGI caching, headers, "Primary script unknown", "File not found.", 502 or 504 errors, or PHP-FPM pool settings.
-- [references/cron-systemd.md](references/cron-systemd.md): read when adding, changing or debugging a crontab, an `/etc/cron.d` file or a systemd timer.
-- [references/cloudflare.md](references/cloudflare.md): read when restoring visitor IPs, restricting the origin to Cloudflare, changing cache rules or cache headers, purging, reading `cf-cache-status`, or debugging 520 to 526 errors.
 
 Related skills: concise:shell for quoting commands run over ssh, concise:php for PHP code and OPcache-sensitive upgrades, concise:database for writes to a database that production uses, concise:debugging for an error whose cause the log does not show.

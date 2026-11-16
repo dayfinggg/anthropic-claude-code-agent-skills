@@ -7,6 +7,15 @@ description: Dockerfiles and BuildKit, Docker Compose, Kubernetes manifests, Ter
 
 This skill covers Dockerfiles and BuildKit, Docker Compose, Kubernetes, Terraform and OpenTofu, and OpenTelemetry. It matches Docker Engine 29.9, Buildx 0.39, Compose 5.7, Dockerfile frontend 1.29, Kubernetes 1.37, Terraform 1.17, OpenTofu 1.13, semantic conventions 1.45 and Collector 0.165. Run `docker version`, `docker buildx version`, `docker compose version`, `kubectl version` and `terraform version` or `tofu version` to see what is installed. Where the installed release is newer, its own `--help` and release notes are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/docker-details.md](references/docker-details.md): read when using Compose watch, cache mounts for apt or other package managers, the `gha` cache backend, Dockerfile flags such as `COPY --link`, `COPY --exclude`, `ADD --checksum` or `ADD --unpack`, or `healthcheck.start_interval`.
+- [references/kubernetes.md](references/kubernetes.md): read when writing or reviewing Kubernetes manifests, Helm or Kustomize output, probes, Pod Security, or planning a cluster upgrade.
+- [references/terraform-opentofu.md](references/terraform-opentofu.md): read when working on Terraform or OpenTofu configuration, state, modules, imports or tests.
+- [references/opentelemetry.md](references/opentelemetry.md): read when adding OpenTelemetry instrumentation, setting `OTEL_*` variables or configuring a Collector.
+
 ## Check first
 
 - Read what the project pins before writing syntax: the `# syntax=` line and `FROM` tags, `.dockerignore`, `compose.yaml` with its override files, and the Engine and Compose versions on the host that deploys, which can differ from the local ones.
@@ -79,12 +88,5 @@ depends_on:
 - Docker CLI 29 `docker image ls` prints a collapsed tree view and hides untagged images unless `--all` is set. Parse `docker image ls --format json` in scripts.
 - The default `docker` build driver exports `registry`, `local` and `gha` caches only with the containerd image store. Fresh Engine 29 installs use it, upgraded daemons usually keep the classic store. Use `docker buildx create --driver docker-container --use` when the export fails.
 - From Git Bash on Windows, `docker -v` and `docker exec` path arguments get rewritten, and CRLF scripts fail inside Linux containers. Apply concise:shell before running them.
-
-## References
-
-- [references/docker-details.md](references/docker-details.md): read when using Compose watch, cache mounts for apt or other package managers, the `gha` cache backend, Dockerfile flags such as `COPY --link`, `COPY --exclude`, `ADD --checksum` or `ADD --unpack`, or `healthcheck.start_interval`.
-- [references/kubernetes.md](references/kubernetes.md): read when writing or reviewing Kubernetes manifests, Helm or Kustomize output, probes, Pod Security, or planning a cluster upgrade.
-- [references/terraform-opentofu.md](references/terraform-opentofu.md): read when working on Terraform or OpenTofu configuration, state, modules, imports or tests.
-- [references/opentelemetry.md](references/opentelemetry.md): read when adding OpenTelemetry instrumentation, setting `OTEL_*` variables or configuring a Collector.
 
 Related skills: concise:github-actions for CI workflows that build images and for cloud OIDC, concise:react-next for Next.js configuration such as the Server Actions key and `deploymentId` across instances, concise:server-ops for nginx and host-level deploys, concise:database for migrations, concise:shell for Git Bash and CRLF problems.

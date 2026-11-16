@@ -7,6 +7,15 @@ description: PostgreSQL, MySQL, PgBouncer, Prisma and Drizzle practice for SQL, 
 
 This skill matches PostgreSQL 18 (19 is at RC 2, general availability planned for 2026-11-19), MySQL 8.4 and 9.7 LTS and the 26.x Innovation releases, PgBouncer 1.26, Prisma ORM 7 with Prisma ORM 8 at release candidate, and Drizzle 0.45 with 1.0 at release candidate. Ask the server for its version with `SELECT version();`. Where the installed release is newer, its own release notes and `--help` are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/upgrades.md](references/upgrades.md): read when upgrading or patching a PostgreSQL, MySQL or PgBouncer server, or when choosing a MySQL release line.
+- [references/postgresql-features.md](references/postgresql-features.md): read when code may use PostgreSQL 18 or 19 syntax such as `RETURNING old.*`, temporal keys, `ON CONFLICT DO SELECT`, `REPACK` or `WAIT FOR LSN`.
+- [references/row-level-security.md](references/row-level-security.md): read when writing or debugging RLS policies, tenant isolation, `SECURITY DEFINER` functions or views over RLS tables.
+- [references/orms.md](references/orms.md): read when the project uses Prisma or Drizzle, or when choosing an ORM version.
+
 ## Check first
 
 - Find which environments share the database before any write: compare host, port, database name and user in the pre-production and production configs of the site. When pre-production points at the production database, every write from it, a test or a one-off script changes production.
@@ -62,12 +71,5 @@ This skill matches PostgreSQL 18 (19 is at RC 2, general availability planned fo
 - MySQL `ON DUPLICATE KEY UPDATE` fires on whichever unique index collides, not only the one you meant. Avoid it on tables with more than one unique index.
 - MySQL INSTANT add or drop column fails with `ERROR 4092` once a table has 64 row versions on 8.4 (255 since 9.1). A rebuild with `ALGORITHM=INPLACE` or `OPTIMIZE TABLE` resets the count.
 - MySQL 8.4 disables `mysql_native_password` and 9.0 removed it, so old clients and accounts created with it cannot log in. 8.4 also rejects foreign keys to non-unique or partial keys while `restrict_fk_on_non_standard_key` is ON, its default.
-
-## References
-
-- [references/upgrades.md](references/upgrades.md): read when upgrading or patching a PostgreSQL, MySQL or PgBouncer server, or when choosing a MySQL release line.
-- [references/postgresql-features.md](references/postgresql-features.md): read when code may use PostgreSQL 18 or 19 syntax such as `RETURNING old.*`, temporal keys, `ON CONFLICT DO SELECT`, `REPACK` or `WAIT FOR LSN`.
-- [references/row-level-security.md](references/row-level-security.md): read when writing or debugging RLS policies, tenant isolation, `SECURITY DEFINER` functions or views over RLS tables.
-- [references/orms.md](references/orms.md): read when the project uses Prisma or Drizzle, or when choosing an ORM version.
 
 Related skills: concise:php for PDO, mysqli and Doctrine code, concise:server-ops for running commands on the database host, concise:shell for quoting SQL inside ssh commands.

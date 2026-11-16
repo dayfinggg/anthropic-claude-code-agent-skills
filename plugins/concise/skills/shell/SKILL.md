@@ -7,6 +7,13 @@ description: Shell commands and scripts in Bash, zsh, sh and PowerShell 7 on Lin
 
 This skill covers Bash, zsh, POSIX sh and PowerShell commands and scripts, run locally or over ssh. It matches Bash 5.x, PowerShell 7.7 and 7.6 LTS, ShellCheck 0.11.0 and PSScriptAnalyzer 1.25. See the versions with `bash --version`, `$PSVersionTable.PSVersion` and `shellcheck --version`. Where the installed release is newer, its own `--help` and release notes are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/powershell.md](references/powershell.md): read when writing, running or debugging PowerShell (`.ps1`, `pwsh -Command`, the PowerShell tool), on a ParserError, cut-off `ConvertTo-Json` output, a lost exit code, or when choosing a PowerShell version.
+- [references/gnu-bsd.md](references/gnu-bsd.md): read when a command must work on both Linux and macOS, when it fails on macOS only (`sed -i`, `grep -P`, `date -d`, `stat`, `xargs`), or when a script must run on macOS `/bin/bash` 3.2.
+
 ## Check first
 
 - Find the shell that runs the command. Claude Code's Bash tool runs `$SHELL` when it is bash or zsh (zsh on macOS 10.15 and later), Git Bash on Windows, and `CLAUDE_CODE_SHELL` overrides it. Its PowerShell tool runs `pwsh` 7, or Windows PowerShell 5.1 when `pwsh` is missing. Check with `echo "$BASH_VERSION$ZSH_VERSION $OSTYPE"` or `$PSVersionTable.PSVersion`.
@@ -56,10 +63,5 @@ This skill covers Bash, zsh, POSIX sh and PowerShell commands and scripts, run l
 - `set -e; i=0; (( i++ ))` exits, because the expression evaluates to 0. Write `i=$((i + 1))`.
 - With `pipefail`, `producer | head -n1` fails with status 141 while the producer still writes, so the outcome depends on output size. Write `head -n1 < <(producer)`.
 - zsh reports an error for a glob that matches nothing and skips the command, so quote `pip install 'pkg[extra]'`, and `rm -f *.tmp` fails when no file matches. zsh does not split an unquoted `$var` into words, and its arrays start at 1.
-
-## References
-
-- [references/powershell.md](references/powershell.md): read when writing, running or debugging PowerShell (`.ps1`, `pwsh -Command`, the PowerShell tool), on a ParserError, cut-off `ConvertTo-Json` output, a lost exit code, or when choosing a PowerShell version.
-- [references/gnu-bsd.md](references/gnu-bsd.md): read when a command must work on both Linux and macOS, when it fails on macOS only (`sed -i`, `grep -P`, `date -d`, `stat`, `xargs`), or when a script must run on macOS `/bin/bash` 3.2.
 
 Related skills: concise:server-ops for deploys, nginx and cron on Linux servers, concise:git for `.gitattributes` and line endings, concise:github-actions for shells inside CI steps, concise:containers-iac for Dockerfile `RUN` steps and entrypoints.

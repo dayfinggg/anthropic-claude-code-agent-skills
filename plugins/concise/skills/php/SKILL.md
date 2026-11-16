@@ -7,6 +7,14 @@ description: PHP practice for the language, legacy and custom-CMS code with Smar
 
 This skill matches PHP 8.5 (8.6.0 is at RC7, general availability planned for 2026-11-19), Composer 2.11, PHPStan 2.3, PHPUnit 13.4, Rector 2.8, PHP-CS-Fixer 3.95, Smarty 5.8, Symfony 8.1 and 7.4 LTS, Doctrine DBAL 4.6 and ORM 3.8. Run `php -v` and `composer show --locked --direct` to see what is installed. Where the installed release is newer, its own `--help`, changelog and `UPGRADING` notes are right.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/php-language.md](references/php-language.md): read when code may use or must avoid PHP 8.4, 8.5 or 8.6 syntax, functions or deprecations, or when upgrading PHP on a site.
+- [references/tooling.md](references/tooling.md): read when writing or migrating PHPUnit tests, configuring Rector or PHP-CS-Fixer, or upgrading these tools.
+- [references/symfony-doctrine.md](references/symfony-doctrine.md): read when the project requires `symfony/*` or `doctrine/*` packages.
+
 ## Check first
 
 - Read `require.php` and `config.platform.php` in `composer.json`, and write code that runs on the lowest PHP version they allow. Before raising that floor, `composer why-not php 8.5` lists the packages that block it.
@@ -54,11 +62,5 @@ This skill matches PHP 8.5 (8.6.0 is at RC7, general availability planned for 20
 - A parameter like `Foo $x = null` is deprecated since 8.4. Write `?Foo $x = null`.
 - With a Composer cooldown, a full `composer update` replaces a locked version still inside the period with an older release, or fails. Update single packages, or list trusted ones under `config.policy.cooldown.ignore`.
 - Rector resolves types through PHPStan. On a `mixed` value it cannot rename a call, add a return type or remove dead code, and a PHPStan baseline hides those unknown types. Fix the types before expecting Rector to change such code.
-
-## References
-
-- [references/php-language.md](references/php-language.md): read when code may use or must avoid PHP 8.4, 8.5 or 8.6 syntax, functions or deprecations, or when upgrading PHP on a site.
-- [references/tooling.md](references/tooling.md): read when writing or migrating PHPUnit tests, configuring Rector or PHP-CS-Fixer, or upgrading these tools.
-- [references/symfony-doctrine.md](references/symfony-doctrine.md): read when the project requires `symfony/*` or `doctrine/*` packages.
 
 Related skills: concise:database for locks, indexes and migrations, concise:server-ops for PHP-FPM, OPcache and deploys, concise:web-security for a security review, concise:codebase-analysis for wide mechanical changes such as a Rector run over many files.

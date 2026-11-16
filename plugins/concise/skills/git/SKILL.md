@@ -7,6 +7,14 @@ description: Git and GitHub practice for commits and commit messages, history re
 
 This skill matches Git 2.56, gh 2.104 and gh-stack 0.3. Run `git version` and `gh --version` first. Where the installed release is newer, its own `--help` and release notes are right about commands and flags.
 
+## References
+
+Each file below holds what this page only names. Read it in full with the Read tool before the first step its condition describes, also when that step comes late in a long task or after a compaction.
+
+- [references/stacked-prs.md](references/stacked-prs.md): read when creating, updating, syncing, restructuring or merging stacked PRs, or when a `gh stack` command fails.
+- [references/github-rules.md](references/github-rules.md): read when a merge or push is blocked, or when setting up or debugging rulesets, merge queues, required checks, required signatures or CODEOWNERS.
+- [references/secrets.md](references/secrets.md): read when push protection blocks a push, a secret was committed or pushed, history must be purged, or a secret scanner must be chosen or run.
+
 ## Check first
 
 - Git older than 2.56.1 (or 2.55.1, 2.54.1, 2.53.1, 2.52.1, 2.51.3, 2.50.2 on older lines) is open to CVE-2026-111760, a remote code execution on recursive clone, and five other CVEs. Tell the user before cloning anything untrusted.
@@ -67,11 +75,5 @@ This skill matches Git 2.56, gh 2.104 and gh-stack 0.3. Run `git version` and `g
 - `gh pr merge --admin` merges around the merge queue and the rules. It is a bypass, not a fix for a blocked merge.
 - Branch names from other people are shell input. Git allows `$(...)`, backticks and `|` in them, so single-quote them in every command.
 - An untrusted clone can contain an embedded bare repository whose hooks fire when a shell prompt runs `git status` in it. Set `git config --global safe.bareRepository explicit` and avoid `--recurse-submodules` on unpatched Git.
-
-## References
-
-- [references/stacked-prs.md](references/stacked-prs.md): read when creating, updating, syncing, restructuring or merging stacked PRs, or when a `gh stack` command fails.
-- [references/github-rules.md](references/github-rules.md): read when a merge or push is blocked, or when setting up or debugging rulesets, merge queues, required checks, required signatures or CODEOWNERS.
-- [references/secrets.md](references/secrets.md): read when push protection blocks a push, a secret was committed or pushed, history must be purged, or a secret scanner must be chosen or run.
 
 Related skills: concise:github-actions for CI triggers, workflow security and failed checks, concise:debugging for `git bisect`, concise:code-review for reviewing a diff or answering review threads.
