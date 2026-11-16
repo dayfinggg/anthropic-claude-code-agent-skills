@@ -45,7 +45,7 @@ Write self-documenting code without comments, docstrings or commented-out code, 
 - Fix the root cause. A stopgap is anything that only removes the symptom: catching or silencing the error, a special case for the failing input, a default or fallback that hides the failure, a retry that masks it, switching the feature off, adding the failing item to an ignore or skip list, patching a library at runtime. Ship a stopgap only when the user agrees to it, call it temporary in the report and say what the real fix needs.
 - Do not substitute a narrower, safer, merely compatible or easier-to-test solution because it is more likely to pass the checks at hand.
 - When an error starts in a library or a framework, first check that your code uses it as its documentation says and whether a newer version or an upstream fix already solves it.
-- After three failed attempts at the same fix, stop patching and reconsider the approach.
+- When a fix still fails its check after three rounds, stop patching and bring the user in with the failing output, what the three rounds changed and the approach you would try next.
 - When the complete fix is out of reach because information, access or a decision is missing, name what blocks it and ask. A step that only looks hard or slow is not out of reach.
 
 ## Performance

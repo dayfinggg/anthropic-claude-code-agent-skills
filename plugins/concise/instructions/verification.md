@@ -18,11 +18,20 @@
 - For a bug fix or new behavior in code that has tests, use test-driven development: write the test, see it fail for the right reason, then write the code that makes it pass.
 - Write each test as straight-line code that checks one behavior through the public interface, with the expected value written as a literal and not computed by the code under test.
 - Never delete, skip or weaken a test, a check or a threshold to get a green run. If a test is flawed or contradicts the documented behavior, say why and let the user decide.
+- A test that fails and then passes when rerun is flaky. Find and fix its cause instead of rerunning it until it passes, and never skip it, retry it or pad it with a sleep. When you cannot find the cause, delete the test and write down why in the commit message.
 
 ## Definition of done
 
-- When you change code that can be run, built or type-checked, run a real check that exercises the change before you report it done: the project's tests, type checker, linter and build, and the changed program, page or command itself.
+- When the changed code can be run, run it end to end before you call it done, the way its user or a QA engineer would: open the page in a browser, the mobile app in a simulator, the desktop app through computer use, call the service with real requests, run the command with real input. Unit tests, a type check and a build can all pass while the feature is broken, so they come in addition to this run, never instead of it.
+- Use the project's `verify` skill for that run when it has one (`verify` or `verify-<area>` in `.claude/skills/`, the one nearest the changed code first), and Claude Code's `run` skill when it has none. When the project has no verify skill yet, write the steps that worked for you to `.claude/skills/verify/SKILL.md` (in the changed package of a monorepo), without secrets, and name the file in your report. Change an existing verify skill only where it steered a run wrong.
+- Commit only after that end-to-end check has passed on your last edit, unless the commit touches only docs or tests. Run the fast checks after every edit and the slow suites before the commit.
+- When you change code that can be built or type-checked, also run the project's tests, type checker, linter and build. Run them before you push or open a pull request, because a failure CI or a reviewer finds costs more than one you find first.
 - A check has not passed when it failed, did not start, only checked syntax, ran before your last edit to the code it covers, or showed you only part of its output. Do not redefine what passing means.
 - If all that is missing is the project's declared dependencies, install them with its own package manager and lockfile. If no real check can run here, say which one you did not run and why instead of reporting the work as done.
 - Before the final reply, go through the request point by point and check each requirement against evidence from this session. Do the ones that are not met, or name them in the reply.
+- End every commit message with a `Verified:` trailer that names the check and what it showed, or `Verified: none` with the reason, so commits nobody verified can be found later. The concise:git skill has the format.
 - In the final reply name the check that proves the result and what it showed in plain words, such as "the new test failed before the fix, and all 48 tests pass after it".
+
+## Learning from misses
+
+- When the same mistake turns up a second time and a diff can show it, in a review finding, a revert or a correction from the user, propose a rule that catches it: a test, a lint rule, a hook, or a line in `REVIEW.md` or `CLAUDE.md`, written as its trigger, its check and the cases behind it. Ask before you add it, and name any older rule it makes redundant so the set stays small.

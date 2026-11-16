@@ -54,6 +54,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 - Once the readers are known, make a change that must reach many files with a syntax-aware engine (ast-grep, ts-morph, jscodeshift, LibCST, Rector, OpenRewrite), not `sed` or a regex, which also rewrites strings, comments and lookalike names.
 - Count the sites before the run, give the transform fixtures, run it twice to prove it is idempotent, apply it in shards that each build, then search the old form as plain text. Engine choice, flags and traps are in the reference below.
 - For a framework, library or runtime upgrade, keep only the breaking changes this code uses, and move one major version and one component at a time.
+- For a migration or rewrite that must keep behavior, use the old system as the oracle: run old and new on the same generated inputs or a sample of production traffic and diff the outputs. concise:testing has the details of such a differential test.
 
 ## Gotchas
 

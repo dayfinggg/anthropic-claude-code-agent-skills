@@ -30,6 +30,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 - The voice, length or format of every response, or a role other than software engineer: an output style, not `CLAUDE.md`. Only one style is active at a time.
 - A rule that must hold every time: a hook or a permission deny rule. Text in any instruction file is a request. When emphasis keeps getting added to a line that is still missed, the line belongs in a hook. A hook that only encodes a preference can go back to text.
 - A focused helper with its own tools, model or context: a subagent definition in `.claude/agents/`.
+- How to build, start and drive the app to check a change: a project skill named `verify` in `.claude/skills/`, which Claude Code's commit instructions run before each commit. concise:testing covers it in `references/building-checks.md`.
 - Inside a plugin: no `CLAUDE.md` is loaded, so instructions go in skills and must-hold rules in plugin hooks. See [references/plugins-and-output-styles.md](references/plugins-and-output-styles.md).
 - Knowledge most tasks need belongs in `CLAUDE.md` as a short index of files to read. A pointer line names the material and the condition ("Read docs/billing.md before changing invoices"). Its wording, not the target, decides whether the agent goes there.
 
@@ -37,13 +38,15 @@ Each file below holds what this page only names. Read it in full with the Read t
 
 - Write down only what the agent cannot get by reading the repo, or would spend minutes rediscovering every session: exact test, lint and typecheck commands including one for a single test file, misleading code (a legacy pattern not to copy, a live directory that looks dead), decisions made outside the repo, and a mistake seen twice.
 - A correction is not automatically a rule. The strongest signal is a mistake the agent conceded and then repeated. A one-off preference stays unsaved, and a behavior that must not regress gets a test.
+- Turn a miss into a rule when it occurred in at least two changes and a diff can show it. Write it as a trigger, a check and the cases behind it, test it against past diffs for false alarms, and let a person approve it.
 - Leave out architecture overviews, directory layouts, dependency lists and what a linter enforces. Status and progress notes go in the plan or tracker. Where auto memory is on, it holds user preferences and corrections, so they stay out of `CLAUDE.md`.
 - Keep each `CLAUDE.md` under 200 lines. A nested file holds only what differs from the root. `@path` imports organize a file but cost the same context as pasting it.
 - State the behavior with its scope and reason: "ask before deleting files under data/, they are the only copy". A bare prohibition spreads to cases it was not meant for.
 - To share one file across tools, keep `AGENTS.md` as the source and add a `CLAUDE.md` whose first line is `@AGENTS.md`, followed by Claude-only lines.
-- When `CLAUDE.md` sets commit or pull request rules, set `includeGitInstructions` to `false` and the `attribution` setting, or the built-in git instructions compete with them.
+- When `CLAUDE.md` sets commit or pull request rules, set `includeGitInstructions` to `false` and the `attribution` setting, or the built-in git instructions compete with them. That also drops Claude Code's instruction to run the project's `verify` skill before each commit, so state it in your own rules.
 - Write the file in the style you want back, since its layout carries into the output. Give a template for an output format rather than worked examples, which narrow the model to the example.
 - Hunt no-ops sentence by sentence: would the model act differently without this line? If not, delete the sentence. Settle disputes with fresh sessions run with and without the line.
+- Prune on a routine, because rule files, test suites and verification steps only grow. When you add a rule, remove the ones that no longer fire, that another rule covers or whose reason has passed.
 
 ## Writing skills and subagents
 

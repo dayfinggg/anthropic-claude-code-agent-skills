@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Test design that catches real bugs, proof that a change works end to end, and spotting a green run that was gamed, plus property-based testing, mutation testing and Playwright. Use when writing, reviewing or fixing tests, choosing what to mock, proving a fix with before and after evidence, reviewing a diff that touches tests or CI gates, or working with Hypothesis, fast-check, StrykerJS, mutmut, cargo-mutants, Infection, PIT or Playwright specs.
+description: Test design that catches real bugs, proof that a change works end to end, and spotting a green run that was gamed, plus end-to-end, property-based, differential and mutation testing, Playwright, and checks such as verify skills, commit gates and review rules. Use when writing, reviewing or fixing tests, choosing what kind of test to write or what to mock, proving a fix with before and after evidence, reviewing a diff that touches tests or CI gates, writing a verify skill, a commit gate, a REVIEW.md rule or a reliability checklist, judging how well a check or reviewer catches bugs, or working with Hypothesis, fast-check, StrykerJS, mutmut, cargo-mutants, Infection, PIT or Playwright specs.
 ---
 
 # Testing
@@ -14,11 +14,19 @@ Each file below holds what this page only names. Read it in full with the Read t
 - [references/verification.md](references/verification.md): read before saying a change works, when asked for before and after evidence, and before accepting a green run or a diff that touches tests, CI or quality gates, yours or another agent's.
 - [references/property-and-mutation.md](references/property-and-mutation.md): read before writing or reviewing property-based tests, when a property test fails, and before setting up, scoping or reading a mutation testing run.
 - [references/playwright.md](references/playwright.md): read before writing, running, debugging or fixing Playwright tests, or checking a change in a real browser.
+- [references/building-checks.md](references/building-checks.md): read before writing or changing a verify skill, a hook or CI gate, a commit gate, a `REVIEW.md` rule or a reliability checklist, before turning a repeated miss into a rule, and when judging how well a check or a reviewer catches bugs.
 
 ## Check first
 
 - Find the test command CI actually runs (workflow files, package scripts, `pyproject.toml`, `Makefile`) and run that, scoped to the files you touch. Use a mode that exits: `vitest run`, not bare `vitest`, which watches when it misdetects the terminal.
 - Find the tools already in use before proposing one: `rg -l "from hypothesis|fast-check|proptest|pgregory.net/rapid|net.jqwik|@stryker-mutator|mutmut|cargo-mutants|infection/infection|pitest"`, plus `playwright.config.*`, `stryker.config.*`, `infection.json5` and `.cargo/mutants.toml`. Adding a property or mutation testing tool to a project without one is the user's decision.
+
+## Choosing the test
+
+- An end-to-end test of a real user flow (add an item to the cart, check out, reach the confirmation page) is the one to write first. It is hard to fool, has a clear done state, and its trace and screenshot name the step that broke, while a unit test can pass with the feature broken. When the project keeps a feature map (features from the user's side with paths, shortcuts, selectors and expected results), drive the flows it lists and grade the run against it.
+- Add property tests for code you wrote yourself. Your example cases share the blind spots of your code, while generated inputs do not. Look for round-trip (decode of encode returns the input), invariants (a balance never goes negative), idempotency (running a migration, normalization or retry twice equals once) and equivalence (optimized code matches a slow, plainly correct version). They also hold a rewrite to the real behavior where the spec has drifted from production.
+- For a migration or rewrite meant to keep behavior, write a differential test with the old system as the oracle: run old and new on the same generated inputs or a sample of production traffic, normalize differences that do not matter (whitespace, key order, timestamps, generated IDs), and keep a list of the differences the user approved. Every other difference is a bug or a breaking change.
+- A flaky suite teaches the agent to rerun instead of fix, and a slow one gets run less often. Fix flakes at the cause, run the fast tests after every edit, and run the heavy end-to-end suite before the commit.
 
 ## Test design
 
@@ -41,7 +49,6 @@ Each file below holds what this page only names. Read it in full with the Read t
 
 ## Test strength
 
-- Add property-based tests where the code has an algebraic shape: encode and decode, parse and render, a slow reference implementation, normalization, sorting, state invariants.
 - Measure test strength with mutation testing on the changed code, not with line coverage, which a test without assertions also raises.
 
 ## Gotchas
