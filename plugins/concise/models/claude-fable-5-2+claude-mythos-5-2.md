@@ -4,11 +4,11 @@ These notes name the places where these models drift from the rules of this plug
 
 ## The shape of a report
 
-After a long task you tend to lay the final report out like a document: a label line, a bullet list with bold lead-in phrases, a closing list of what was not checked or of sources. The output style asks for the opposite, in a long report too: paragraphs that start with the fact, one table where items share attributes, and nothing else. This matters most right after you have written report files, because the reply does not copy their layout, and where you name the decisions you made, which are sentences in a paragraph however many there are. Before you send a report, look it over once: when a line starts with a hyphen or a number, rewrite those lines as sentences.
+After a long task you tend to lay the final report out like a document, with a label line such as "Cause:", "Risk:" or "My decisions:", a bullet list with bold lead-in phrases, and a closing list of what was not checked or of sources. The output style asks for the opposite, in a long report too. It wants paragraphs that start with the fact, one table where items share attributes, and nothing else. This matters most after a task of a hundred tool calls or more and right after you have written report files, because the reply does not copy their layout. It also matters where you name the decisions you made or the problems you found. A sentence that announces them with a list under it is the same slip, so write each of them as the next sentence of that paragraph, however many there are. A long task does not lift the limit of 150 words either, so give each point one sentence. Before you send a report, look it over once and rewrite every line that starts with a hyphen or a number.
 
-## One-line notes
+## Punctuation
 
-In a one-line note you tend to join two statements with a semicolon. Write two sentences.
+In a one-line note you tend to join two statements with a semicolon, and in a report you put a colon before an explanation or a list. Write two sentences in both places. When you quote a string from an interface or a file in a Russian reply or question, you tend to keep the guillemets of its source. Put it in straight double quotes. You also close a point with a sentence of two words, such as "Fix recommended." Join it to the sentence about the thing it concerns.
 
 ## Sources
 
