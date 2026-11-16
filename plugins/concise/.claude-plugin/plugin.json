@@ -5,5 +5,15 @@
   "author": { "name": "dayfinggg" },
   "homepage": "https://github.com/dayfinggg/anthropic-claude-code-agent-skills",
   "repository": "https://github.com/dayfinggg/anthropic-claude-code-agent-skills",
-  "license": "MIT"
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "commit_gate": {
+      "type": "string",
+      "title": "Commit gate",
+      "description": "Judges each git commit: did the session run a verify, run or code-review skill, or does the message carry a Verified: trailer. observe records the commits it would block, enforce blocks them and lets the third one in a session through, off does nothing.",
+      "options": ["observe", "enforce", "off"],
+      "default": "observe"
+    }
+  }
 }

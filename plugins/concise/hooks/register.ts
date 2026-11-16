@@ -1,4 +1,5 @@
 import type { AgentSpawnInput, EngineInterface, InstructionFile, Register } from 'claude-code'
+import { commitGateMode, registerCommitGate } from './commit-gate'
 
 const PROJECT_KINDS: readonly InstructionFile['kind'][] = ['project', 'local', 'memory']
 
@@ -57,7 +58,7 @@ const rulesForAgent = async ($: EngineInterface) => {
   return `${RULES_FOR_AGENT}\n\n${inTags('working-rules', rules)}`
 }
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
   on('prompt.context', async ($, e, next) => {
     if (e.instructionFiles === undefined) return next(e)
     return next({ ...e, instructionFiles: withRules(e.instructionFiles, await readRules($)) })
@@ -95,4 +96,6 @@ export const register: Register = on => {
   })
 
   on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
+
+  registerCommitGate(on, commitGateMode(options))
 }

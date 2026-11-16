@@ -10,7 +10,7 @@ A Claude Code plugin with an output style for short replies in plain language, a
 | `plugins/concise/instructions/` | Nine rule files, loaded the way a personal `CLAUDE.md` is |
 | `plugins/concise/models/` | Notes for Opus 5.5, Fable 5.2 and Mythos 5.2, Sonnet 5.5 and Haiku 5.5 |
 | `plugins/concise/skills/` | 24 skills that load when a task reaches their area |
-| `plugins/concise/hooks/register.ts` | The hooks module that delivers the rules and the notes, to subagents too, and sets which tools load up front |
+| `plugins/concise/hooks/register.ts` | The hooks module that delivers the rules and the notes, to subagents too, sets which tools load up front and runs the commit gate |
 | `settings.example.json` | The author's Claude Code settings. They turn permission prompts off, so copy only the keys you want |
 
 ## Install
@@ -31,6 +31,18 @@ claude plugin update concise@concise
 ```
 
 Start a new session afterwards, or run `/reload-plugins` in an open one.
+
+## Commit gate
+
+The plugin judges every `git commit` Claude runs. A commit passes when the session ran a `verify`, `run` or `code-review` skill, or when its message carries a `Verified:` trailer that says how the change was checked or why it was not. The `commit_gate` option sets what happens to the other commits:
+
+| Value | Effect |
+| --- | --- |
+| `observe` (default) | The commit goes through and is recorded in the plugin's store under `plugins/store/` in the Claude Code configuration folder |
+| `enforce` | The commit is blocked with the reason, and after two blocks in a session the next commit goes through |
+| `off` | Nothing is judged |
+
+Change it in `/config`, or in `settings.json` under `pluginConfigs`. Review the records of `observe` for false alarms before you switch to `enforce`.
 
 ## Check
 
