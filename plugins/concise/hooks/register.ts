@@ -4,7 +4,7 @@ const PROJECT_KINDS: readonly InstructionFile['kind'][] = ['project', 'local', '
 
 const DEFERRED_TOOLS = ['Artifact', 'Workflow', 'ScheduleWakeup', 'ReportFindings', 'ListAgents']
 
-const WEB_TOOLS = ['WebSearch', 'WebFetch']
+const UPFRONT_TOOLS = ['WebSearch', 'WebFetch', 'Monitor', 'TaskStop']
 
 const AGENTS_WITHOUT_RULES = ['Explore', 'Plan']
 
@@ -84,14 +84,14 @@ export const register: Register = on => {
   on('tool.describe', async (_, e, next) => {
     const described = await next(e)
     if (DEFERRED_TOOLS.includes(e.tool)) return { ...described, isDeferred: true }
-    if (WEB_TOOLS.includes(e.tool)) return { ...described, isDeferred: false }
+    if (UPFRONT_TOOLS.includes(e.tool)) return { ...described, isDeferred: false }
     return described
   })
 
   on('prompt.attachment', { type: 'deferred_tools_delta' }, async (_, e, next) => {
     const sent = await next(e)
     if (sent.text === null) return sent
-    return { text: sent.text.split('\n').filter(line => !WEB_TOOLS.includes(line)).join('\n') }
+    return { text: sent.text.split('\n').filter(line => !UPFRONT_TOOLS.includes(line)).join('\n') }
   })
 
   on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))

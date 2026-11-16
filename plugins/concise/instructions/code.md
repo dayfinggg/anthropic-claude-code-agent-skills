@@ -25,7 +25,7 @@ Write self-documenting code without comments, docstrings or commented-out code, 
 - Before you write a script, load the skill for its language and for what it drives, such as concise:shell, concise:python or concise:database.
 - Pass every value that varies, such as a host, a path, an id or a date, as an argument. Hard-code none of them, and read secrets from the environment.
 - Make the script stop at the first error with a non-zero exit code and a message that names what failed. Do not silence errors or throw away output you will need to diagnose a failure.
-- Wait for a condition, such as an element, a response or a file, with a timeout. Do not sleep for a fixed time.
+- Wait for a condition, such as an element, a response or a file, with a timeout. Do not sleep for a fixed time. In a session, keep a wait longer than a few seconds out of the foreground: watch the condition with the Monitor tool, or start the command in the background and carry on until its completion notice arrives.
 - A script that is meant to read must not be able to write: use a read-only account or transaction, a `SELECT`, a dry-run flag. A script that changes data has a dry-run mode that prints what it would change, and you run that mode first.
 - Keep scratch scripts and their output outside the repository, in the session's scratch directory. Delete the temporary files, helper scripts and test data you created when the work is done, unless they are part of the deliverable.
 
