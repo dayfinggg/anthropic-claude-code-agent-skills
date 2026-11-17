@@ -1,5 +1,6 @@
 import type { AgentSpawnInput, EngineInterface, InstructionFile, Register } from 'claude-code'
 import { commitGateMode, registerCommitGate } from './commit-gate'
+import { registerWaitGate, waitGateMode } from './wait-gate'
 
 const PROJECT_KINDS: readonly InstructionFile['kind'][] = ['project', 'local', 'memory']
 
@@ -98,4 +99,5 @@ export const register: Register = (on, options) => {
   on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
 
   registerCommitGate(on, commitGateMode(options))
+  registerWaitGate(on, waitGateMode(options))
 }

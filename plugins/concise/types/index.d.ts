@@ -5,8 +5,10 @@ export type CommitGateEntry = {
   command: string
 }
 
+export type WaitGateEntry = CommitGateEntry
+
 declare module 'claude-code' {
   interface PluginState {
-    concise: { verifyingSkillRan: boolean; blockedCommits: number }
+    concise: { verifyingSkillRan: boolean; blockedCommits: number; blockedWaits: number }
   }
 }
