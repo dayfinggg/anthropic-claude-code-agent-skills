@@ -24,7 +24,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 
 ## Deploys and SSH
 
-- Run scripted SSH with `ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ControlMaster=auto -o ControlPath=~/.ssh/cm-%C -o ControlPersist=60 host cmd`. `BatchMode` turns a password prompt or an unknown host key into an error instead of a hang, and the control socket reuses one connection per host.
+- Scripted SSH needs `BatchMode`, which turns a password prompt or an unknown host key into an error instead of a hang, a connect timeout, and one shared connection per host (`ControlMaster auto`, `ControlPath ~/.ssh/cm-%C`, `ControlPersist 10m`), which saves the handshake of every call. See what `~/.ssh/config` already sets with `ssh -G host | grep -i -E 'batchmode|connecttimeout|controlmaster|controlpersist'`, and pass with `-o` only what is missing, so that most calls read `ssh -o BatchMode=yes host cmd`.
 - Roll one change out host by host, one loop iteration each: pre-production step, its check, production step, its check. Stop the loop at the first failed check, and test the exit status of every `ssh` call.
 - Before editing a config file or running `sed -i` on a host, copy the files to your machine (`scp host:/etc/nginx/sites-available/site.conf backup/`), so the old version can be restored.
 - Switch a release by building it in a new directory and replacing the `current` symlink: `ln -s NEW current.tmp && mv -T current.tmp current` is atomic everywhere, and GNU `ln -sfn` (coreutils 8.27+) is too. Without `-n` or `-T` the new link lands inside the old release directory. BusyBox `ln -f` deletes the link first.
@@ -50,7 +50,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 - `php -r 'opcache_reset();'` runs in the CLI, whose OPcache is off by default (`opcache.enable_cli=0`), and leaves PHP-FPM's cache untouched.
 - Since nginx package 1.26.3-3+deb13u4 on Debian 13 and 1.22.1-9+deb12u6 on Debian 12, `fastcgi_params` sets `HTTP_HOST` to `$host`, which drops the port the client sent. A CMS that builds absolute URLs from it behaves differently on hosts with older packages.
 - Cloudflare answers 524 when the origin sends no response within 125 seconds, while PHP-FPM keeps running the request. Run long jobs from the CLI or cron, not in a web request.
-- OpenSSH 10.1 broke sessions with `ControlPersist` (fixed in 10.2) and warns on stderr when the connection uses a key exchange that is not post-quantum (`WarnWeakCrypto`). Since 10.0 `scp` and `sftp` pass `ControlMaster no`, so they reuse an existing master but never start one.
+- OpenSSH 10.1 broke sessions with `ControlPersist` (fixed in 10.2) and warns on stderr when the connection uses a key exchange that is not post-quantum. Silence that warning with `WarnWeakCrypto no-pq-kex` in `~/.ssh/config` or `-o WarnWeakCrypto=no-pq-kex`, not with `2>/dev/null`, which hides real errors too. Since 10.0 `scp` and `sftp` pass `ControlMaster no`, so they reuse an existing master but never start one.
 - Behind Cloudflare, `$_SERVER['HTTP_CF_CONNECTING_IP']` in PHP skips nginx's trusted-proxy check, so any client that reaches the origin directly can set it. Read `REMOTE_ADDR` after nginx's realip module has restored it.
 
 Related skills: concise:shell for quoting commands run over ssh, concise:php for PHP code and OPcache-sensitive upgrades, concise:database for writes to a database that production uses, concise:debugging for an error whose cause the log does not show.
