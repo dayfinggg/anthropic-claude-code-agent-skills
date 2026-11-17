@@ -32,6 +32,8 @@ Each file below holds what this page only names. Read it in full with the Read t
 
 - Make prompts fail at once instead of waiting for input that never comes: `GIT_TERMINAL_PROMPT=0` for git credential prompts, `GCM_INTERACTIVE=0` for the Git Credential Manager window on Windows, `ssh -o BatchMode=yes` for passwords and host keys, `sudo -n`, and `apt-get -y` with `DEBIAN_FRONTEND=noninteractive`.
 - Start a command that never exits (dev server, `--watch`, `tail -f`) in the background and read its output file. In the foreground it blocks until the tool timeout and then moves to the background anyway.
+- Start a long job on a remote host detached, as in `setsid nohup cmd > job.log 2>&1 < /dev/null &`, have it write a marker file when it ends, and return at once. Check it later with one short command, or watch the marker with the Monitor tool. An `ssh` call that sleeps or polls on the remote side holds the session just the same.
+- `until ! pgrep -f pattern; do sleep 5; done` never ends when it runs through `bash -c` or `ssh`, because `pgrep -f` matches the shell that runs the loop, whose command line holds the pattern. Wait on a process id (`tail --pid="$pid" -f /dev/null`) or on a marker file.
 - Do not pipe a build, test or lint run into `head`, `tail` or `grep`. The pipeline returns the filter's status and drops the lines that explain the failure. Write the full output to a file outside the repository (`cmd > "$log" 2>&1`), keep `$?`, then search the file. Claude Code shows a failing command's output only as a head and tail excerpt of about 10,000 characters.
 
 ## Remote commands over ssh

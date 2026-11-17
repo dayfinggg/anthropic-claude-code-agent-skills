@@ -1,6 +1,6 @@
 ---
 name: autonomous-run
-description: Carrying a long task to its end while the user is not watching. Use when work is handed over with words like "do it all", "work until it's done", "no questions" or "I'll check later", for a scheduled, looped or headless run, for one job across several servers, sites or repositories, when picking up unfinished work of another session or agent, and when such a run resumes after compaction. Not needed for a short task the user follows in the chat.
+description: Carrying a long task to its end while nobody is there to answer. Use when work is handed over with words like "work until it's done", "no questions" or "I'll check later", for a scheduled, looped or headless run, and when such a run resumes after compaction. Not for a task the user follows and answers in the chat, however long it is and however many servers, sites or repositories it touches.
 ---
 
 # Autonomous run
