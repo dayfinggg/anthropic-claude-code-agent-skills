@@ -10,7 +10,7 @@ A Claude Code plugin with an output style for short replies in plain language, a
 | `plugins/concise/instructions/` | Nine rule files, loaded the way a personal `CLAUDE.md` is |
 | `plugins/concise/models/` | Notes for Opus 5.5, Fable 5.2 and Mythos 5.2, Sonnet 5.5 and Haiku 5.5 |
 | `plugins/concise/skills/` | 24 skills that load when a task reaches their area |
-| `plugins/concise/hooks/register.ts` | The hooks module that delivers the rules and the notes, to subagents too, sets which tools load up front and runs the commit gate and the wait gate |
+| `plugins/concise/hooks/register.ts` | The hooks module that delivers the rules and the notes, to subagents too, sets which tools load up front and runs the commit, wait and privacy gates |
 | `plugins/concise/evals/` | Eval cases for `claude plugin eval` |
 | `settings.example.json` | The author's Claude Code settings. They turn permission prompts off, so copy only the keys you want |
 
@@ -48,6 +48,10 @@ Change it in `/config`, or in `settings.json` under `pluginConfigs`. Review the 
 ## Wait gate
 
 The plugin also judges every foreground shell command, in Bash and in PowerShell. A command fails the check when it can sleep or poll for longer than a minute, also inside `ssh`: an `until` or `while` loop around a `sleep`, a counted loop whose rounds add up to more than a minute, or sleeps chained between commands. A command started with `run_in_background` is not judged. The `wait_gate` option takes the same three values as `commit_gate` and records under the key `wait-gate` in the same store.
+
+## Privacy gate
+
+The plugin checks every `git push` and every `gh pr`, `gh issue` or `gh release` text Claude sends, in Bash and in PowerShell. For a push it reads the commits that no remote has yet, and for `gh` the command and its body file. It blocks the step when the text holds a path under this computer's home folder, such as `C:\Users\<account>`, `/c/Users/<account>`, `/home/<account>` or `/Users/<account>`, and names the path it found. The `privacy_gate` option is `enforce` by default, because a pushed path cannot be taken back, and takes `observe` and `off` as well. It records under the key `privacy-gate` in the same store. Names of other projects, folders and hosts cannot be told apart from ordinary words, so the rule file `security.md` covers them.
 
 ## Check
 

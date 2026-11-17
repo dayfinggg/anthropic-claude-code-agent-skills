@@ -21,6 +21,13 @@
       "description": "Judges each foreground shell command: can it sleep or poll for longer than a minute, also inside ssh. observe records the commands it would block, enforce blocks them and lets the third one in a session through, off does nothing.",
       "options": ["observe", "enforce", "off"],
       "default": "observe"
+    },
+    "privacy_gate": {
+      "type": "string",
+      "title": "Privacy gate",
+      "description": "Judges each git push and each gh pull request, issue or release text: does it carry a path under this computer's home folder, such as C:\\Users\\<account> or /home/<account>. enforce blocks it, observe records it, off does nothing.",
+      "options": ["enforce", "observe", "off"],
+      "default": "enforce"
     }
   }
 }
