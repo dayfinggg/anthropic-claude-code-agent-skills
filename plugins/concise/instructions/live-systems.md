@@ -31,4 +31,4 @@ Commit, merge, rebase, push or edit in a working copy, a branch or a stand that 
 
 ## When the work is done
 
-Leave a shared system as you found it. Keep scratch files, clones and scripts in your local scratch directory where you can, remove what you created on the system, and name in the report anything you leave there.
+Leave a shared system as you found it. Keep scratch files, clones and scripts in your local scratch directory where you can, remove the files and processes you created on the system, and name in the report anything you leave there. Logs, journals and history that recorded your work stay as they are, because editing them to remove your traces changes a record other people rely on.

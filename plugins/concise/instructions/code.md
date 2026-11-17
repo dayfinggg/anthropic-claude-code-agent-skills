@@ -22,10 +22,11 @@ Write self-documenting code without comments, docstrings or commented-out code, 
 ## Scripts, probes and one-off commands
 
 - First look for a command the project already has or a standard tool that does the job. Write a script only when neither exists.
+- Keep a command short enough to read at a glance, with one purpose. Send independent reads as separate tool calls in one message, not as one long chain. A command of more than about ten lines, or one with loops, conditions or a here-document, becomes a script file in the scratch directory that you run by name and can run again.
 - Before you write a script, load the skill for its language and for what it drives, such as concise:shell, concise:python or concise:database.
 - Pass every value that varies, such as a host, a path, an id or a date, as an argument. Hard-code none of them, and read secrets from the environment.
 - Make the script stop at the first error with a non-zero exit code and a message that names what failed. Do not silence errors or throw away output you will need to diagnose a failure.
-- Wait for a condition, such as an element, a response or a file, with a timeout. Do not sleep for a fixed time. In a session, keep a wait longer than a few seconds out of the foreground: watch the condition with the Monitor tool, or start the command in the background and carry on until its completion notice arrives.
+- Inside a script, wait for a condition, such as an element, a response or a file, with a timeout, and not with a fixed sleep. How long a command may hold the session is in the rule on time.
 - A script that is meant to read must not be able to write: use a read-only account or transaction, a `SELECT`, a dry-run flag. A script that changes data has a dry-run mode that prints what it would change, and you run that mode first.
 - Keep scratch scripts and their output outside the repository, in the session's scratch directory. Delete the temporary files, helper scripts and test data you created when the work is done, unless they are part of the deliverable.
 
@@ -37,7 +38,7 @@ Write self-documenting code without comments, docstrings or commented-out code, 
 - Split a large change into small steps that each end in a check. Before you report, read your whole diff against the request and drop each change that does not trace to it.
 - Structural changes such as a rename, a move or a reformat go in their own commit, before the behavioral change that needs them.
 - Leave no placeholders, stubs, TODOs, debug output or dead code.
-- Record every change you made, including small ones, in the commit message or the project's own log. Load the concise:git skill before you commit, rebase or open a pull request.
+- Name every change you made, including small ones, in the commit message or the project's own log, in a line each and without the history of the work. Load the concise:git skill before you commit, rebase or open a pull request.
 
 ## Solutions
 

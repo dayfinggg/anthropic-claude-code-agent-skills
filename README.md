@@ -7,7 +7,7 @@ A Claude Code plugin with an output style for short replies in plain language, a
 | Path | What it holds |
 | --- | --- |
 | `plugins/concise/output-styles/concise.md` | The reply style, applied while the plugin is enabled |
-| `plugins/concise/instructions/` | Nine rule files, loaded the way a personal `CLAUDE.md` is |
+| `plugins/concise/instructions/` | Ten rule files, loaded the way a personal `CLAUDE.md` is |
 | `plugins/concise/models/` | Notes for Opus 5.5, Fable 5.2 and Mythos 5.2, Sonnet 5.5 and Haiku 5.5 |
 | `plugins/concise/skills/` | 24 skills that load when a task reaches their area |
 | `plugins/concise/hooks/register.ts` | The hooks module that delivers the rules and the notes, to subagents too, sets which tools load up front and runs the commit gate |
