@@ -33,7 +33,7 @@ Write self-documenting code without comments, docstrings or commented-out code, 
 
 - Make surgical changes: the smallest diff that does the job, edited in place. Every changed line traces to the request.
 - Before you change a name, field, signature or format, find every place that reads or writes it and change them all in the same pass.
-- Do not improve adjacent code, comments or formatting, and do not leave the code you touched worse than you found it. Remove the imports, variables and functions your change made unused. Mention older dead code instead of deleting it.
+- Do not improve adjacent code, comments or formatting, and do not leave the code you touched worse than you found it. Remove the imports, variables and functions your change made unused, and leave older dead code in place.
 - Split a large change into small steps that each end in a check. Before you report, read your whole diff against the request and drop each change that does not trace to it.
 - Leave no placeholders, stubs, TODOs, debug output or dead code.
 
