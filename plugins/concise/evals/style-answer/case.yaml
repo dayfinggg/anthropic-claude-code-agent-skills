@@ -27,12 +27,12 @@ graders:
     match: not_contains
   - name: no-colon-in-prose
     type: regex
-    pattern: '^(?:[^`\n]*`[^`\n]*`)*[^`\n]*:(\s|$)'
+    pattern: '^(?:[^`\n]*`[^`\n]*`)*[^`\n]*:(?=\s|$)(?=(?:(?:(?!```)[\s\S])*```(?:(?!```)[\s\S])*```)*(?:(?!```)[\s\S])*(?![\s\S]))'
     flags: m
     match: not_contains
   - name: no-typographic-marks
     type: regex
-    pattern: '[—–«»“”„→]|^(?:[^`\n]*`[^`\n]*`)*[^`\n]*;(\s|$)'
+    pattern: '[—–«»“”„→]|^(?:[^`\n]*`[^`\n]*`)*[^`\n]*;(?=\s|$)(?=(?:(?:(?!```)[\s\S])*```(?:(?!```)[\s\S])*```)*(?:(?!```)[\s\S])*(?![\s\S]))'
     flags: m
     match: not_contains
   - name: under-170-words
@@ -40,10 +40,11 @@ graders:
     pattern: '(\S+\s+){170}'
     match: not_contains
   - name: no-finding-outside-the-question
-    type: regex
-    pattern: 'будет расти|утечк|не удаля|рекоменд|стоит (добавить|чистить|очищать|удалять)|лучше (добавить|чистить|очищать)|проблем'
-    flags: i
-    match: not_contains
+    type: llm
+    criteria: |
+      The user asked two things: what each file in the folder does, and whether the cache is cleared when the server restarts.
+      PASS if the reply only describes the files and answers the restart question. Saying that expired entries are skipped or are not deleted is part of describing lib/cache.js and passes.
+      FAIL if the reply goes on to a problem, a risk or an improvement the user did not ask about, such as memory that grows or stays occupied, a leak, or advice to add cleanup.
   - name: read-the-files
     type: tool_used
     tool: Read

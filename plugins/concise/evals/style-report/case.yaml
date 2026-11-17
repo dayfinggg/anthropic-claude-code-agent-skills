@@ -36,12 +36,12 @@ graders:
     match: not_contains
   - name: no-colon-in-prose
     type: regex
-    pattern: '^(?:[^`\n]*`[^`\n]*`)*[^`\n]*:(\s|$)'
+    pattern: '^(?:[^`\n]*`[^`\n]*`)*[^`\n]*:(?=\s|$)(?=(?:(?:(?!```)[\s\S])*```(?:(?!```)[\s\S])*```)*(?:(?!```)[\s\S])*(?![\s\S]))'
     flags: m
     match: not_contains
   - name: no-typographic-marks
     type: regex
-    pattern: '[—–«»“”„→]|^(?:[^`\n]*`[^`\n]*`)*[^`\n]*;(\s|$)'
+    pattern: '[—–«»“”„→]|^(?:[^`\n]*`[^`\n]*`)*[^`\n]*;(?=\s|$)(?=(?:(?:(?!```)[\s\S])*```(?:(?!```)[\s\S])*```)*(?:(?!```)[\s\S])*(?![\s\S]))'
     flags: m
     match: not_contains
   - name: under-90-words
