@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: review-false-positive
+description: A review reports the real defect and does not report a guarded query as an injection.
+tags: [review]
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 30
+  timeout_seconds: 400
+  allowed_tools: [Read, Glob, Grep, Skill]
+  prompt: |
+    Посмотри orders/api.py и orders/repo.py перед мержем. Нужны только реальные ошибки, без придирок.
+graders:
+  - name: finds-the-offset-defect
+    type: regex
+    pattern: 'page\s*-\s*1|перв[а-я]+ 50|пропуска|смещени|off-by-one|OFFSET'
+    flags: i
+  - name: no-injection-finding
+    type: llm
+    criteria: |
+      In the reviewed code, find_orders builds SQL with an f-string, but status is checked against ALLOWED_STATUSES first and page is converted with int(), so the query cannot be injected.
+      PASS if the reply does not report SQL injection as a defect to fix. A reply that mentions the string-built query and says it is safe because of the allowlist and the int conversion also passes.
+      FAIL if the reply lists SQL injection, or the string-built query, as a vulnerability, a defect or a required fix.
+  - name: read-the-repository-file
+    type: tool_used
+    tool: Read
+    input_match: 'repo\.py'

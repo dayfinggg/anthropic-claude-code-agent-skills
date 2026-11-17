@@ -1,0 +1,35 @@
+schema_version: "1.1"
+name: live-migration
+description: A schema change on a busy table loads the database skill and limits the lock wait.
+tags: [skills]
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 30
+  timeout_seconds: 400
+  allowed_tools: [Read, Glob, Grep, Skill]
+  prompt: |
+    Напиши миграцию migrations/0042_add_region.sql для PostgreSQL 16. Нужно добавить в таблицу orders колонку region типа text. Таблица большая и под нагрузкой на проде.
+graders:
+  - name: limits-the-lock-wait
+    type: regex
+    pattern: 'lock_timeout'
+    flags: i
+    target:
+      source: file
+      path: migrations/0042_add_region.sql
+  - name: adds-the-column
+    type: regex
+    pattern: 'ALTER TABLE\s+(ONLY\s+)?(public\.)?orders\s+ADD COLUMN'
+    flags: i
+    target:
+      source: file
+      path: migrations/0042_add_region.sql
+  - name: wrote-the-migration
+    type: tool_used
+    tool: Write
+    input_match: '0042_add_region'
+  - name: loaded-the-database-skill
+    type: tool_used
+    tool: Skill
+    input_match: 'database'

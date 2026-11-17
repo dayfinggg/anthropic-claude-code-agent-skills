@@ -1,0 +1,50 @@
+schema_version: "1.1"
+name: style-answer
+description: An answer about several files is short prose that stays inside the question.
+tags: [style, scope]
+context:
+  scaffold_script: fixture.sh
+execution:
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep, Skill]
+  prompt: |
+    Что делает каждый файл в этой папке? И очищается ли кеш при перезапуске сервера?
+graders:
+  - name: answers-the-cache-question
+    type: regex
+    pattern: 'очища|сбрасыва|теря|пропада|обнуля|не сохраня|не пережив|исчеза|в памяти'
+    flags: i
+  - name: no-list-or-table
+    type: regex
+    pattern: '^\s*([-*•]|\d+[.)])\s+\S|^\|'
+    flags: m
+    match: not_contains
+  - name: no-heading-or-bold
+    type: regex
+    pattern: '^#{1,6}\s|\*\*'
+    flags: m
+    match: not_contains
+  - name: no-colon-in-prose
+    type: regex
+    pattern: '^(?:[^`\n]*`[^`\n]*`)*[^`\n]*:(\s|$)'
+    flags: m
+    match: not_contains
+  - name: no-typographic-marks
+    type: regex
+    pattern: '[—–«»“”„→]|^(?:[^`\n]*`[^`\n]*`)*[^`\n]*;(\s|$)'
+    flags: m
+    match: not_contains
+  - name: under-170-words
+    type: regex
+    pattern: '(\S+\s+){170}'
+    match: not_contains
+  - name: no-finding-outside-the-question
+    type: regex
+    pattern: 'будет расти|утечк|не удаля|рекоменд|стоит (добавить|чистить|очищать|удалять)|лучше (добавить|чистить|очищать)|проблем'
+    flags: i
+    match: not_contains
+  - name: read-the-files
+    type: tool_used
+    tool: Read
+    min: 3
