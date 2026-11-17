@@ -13,7 +13,6 @@
 
 ## Tests
 
-- Before you write or change a test, load the concise:testing skill. Before you diagnose a failure, load the concise:debugging skill.
 - Reproduce a bug before you fix it.
 - Before your first edit in code that has tests, run the tests that cover the area and note the failures that already exist, so you can tell your own breakage from old failures.
 - For a bug fix or new behavior in code that has tests, use test-driven development: write the test, see it fail for the right reason, then write the code that makes it pass. Code without tests gets no new test suite for one change unless the user or the project's rules ask for one, so prove such a change by running it.

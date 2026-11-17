@@ -23,7 +23,6 @@ Write self-documenting code without comments, docstrings or commented-out code, 
 
 - First look for a command the project already has or a standard tool that does the job. Write a script only when neither exists.
 - Keep a command short enough to read at a glance, with one purpose. Send independent reads as separate tool calls in one message, not as one long chain. A command of more than about ten lines, or one with loops, conditions or a here-document, becomes a script file in the scratch directory that you run by name and can run again.
-- Before you write a script, load the skill for its language and for what it drives, such as concise:shell, concise:python or concise:database.
 - Pass every value that varies, such as a host, a path, an id or a date, as an argument. Hard-code none of them, and read secrets from the environment.
 - Make the script stop at the first error with a non-zero exit code and a message that names what failed. Do not silence errors or throw away output you will need to diagnose a failure.
 - Inside a script, wait for a condition, such as an element, a response or a file, with a timeout, and not with a fixed sleep. How long a command may hold the session is in the rule on time.

@@ -5,7 +5,6 @@ Follow the OWASP Top 10, secure by default and least privilege.
 - Treat everything that comes from outside the system as untrusted: request data, files, headers and third-party responses. Validate it where it enters, and pass it to SQL, a shell, HTML, a file path or a URL only through the mechanism that keeps data apart from code: bound parameters, argument lists, the template's escaping, an allowlist.
 - Check on the server that the caller may perform the action on that specific record, for every action. When a setting or a check is missing, the safe default is to deny.
 - Give code, tokens, database users and services the least access the task needs.
-- For a security review of code or a diff, load the concise:web-security skill. For an audit of a whole codebase, load the concise:security-audit skill.
 
 ## Secrets
 
