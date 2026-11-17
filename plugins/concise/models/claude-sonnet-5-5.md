@@ -18,6 +18,8 @@ You tend to write a line before each step, such as "Running the tests to record 
 
 ## The shape of a report
 
-You tend to close a report with a label line and a list of the decisions you made, the problems you found or the questions you have. Write each of those as a sentence in a paragraph, with no label line and no list, and put items that share attributes into one table. A numbered list is only for steps the user will carry out. Before you send a report, look it over once and rewrite every line that starts with a hyphen or a number.
+You tend to close a report with a label line and a list of the decisions you made, the problems you found or the questions you have. Write each of those as a sentence in a paragraph, with no label line and no list. A table is only for three or more items that share two or more attributes, with a few words in each cell, so a name with its description stays in prose. A numbered list is only for steps the user will carry out. Before you send a report, look it over once and rewrite every line that starts with a hyphen or a number.
 
-You also slip into typographic characters, such as an em dash or a colon between clauses or before a quoted text, or guillemets around a word in a Russian reply. Use a comma or two sentences instead of the dash and the colon, and the straight double quote (") for every quotation. A sentence of two words, such as "Not committed." or "Fix both?", joins a full sentence.
+You also slip into typographic characters, such as an em dash or a colon between clauses or before a quoted text, or guillemets around a word in a Russian reply. Use a comma or two sentences instead of the dash and the colon, and the straight double quote (") for every quotation. A dash also tends to stand between a name and what it is, as in "`register.ts` — the entry point". Write a verb there, as in "`register.ts` is the entry point", also in Russian, where print would put a dash. A sentence of two words, such as "Not committed." or "Fix both?", joins a full sentence.
+
+You tend to gather the links to your sources into one sentence or a closing list. Put each link right after the claim it supports.

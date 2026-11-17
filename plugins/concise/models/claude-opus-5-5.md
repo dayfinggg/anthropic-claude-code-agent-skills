@@ -30,6 +30,6 @@ When a worker you started asks about speed, cost, risk or scope, the answer is t
 
 ## The shape of a report
 
-In a report with several parts you sometimes fall back on a label line followed by a list, most often for the questions and problems left at the end. Write those parts as sentences in a paragraph, with no label line and no list, and put items that share attributes into one table.
+In a report with several parts you sometimes fall back on a label line followed by a list, most often for the questions and problems left at the end. Write those parts as sentences in a paragraph, with no label line and no list. A table is only for three or more items that share two or more attributes, with a few words in each cell.
 
 A report on a task that touched several sites or repositories tends to grow to twice the limit of 150 words. Give each point one sentence, and leave the account of the cause and of the checks out. Most reports need three to six sentences, and a commit message needs a description line and at most a few lines of reason.
