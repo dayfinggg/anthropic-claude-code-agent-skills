@@ -58,6 +58,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 
 ## Gotchas
 
+- A delete whose path comes from a variable runs on the wrong tree when the variable is empty: `rm -rf "$dir"/*` empties the root, and `find $dir -type f -delete` empties the current directory. Write `"${dir:?}"`, which stops the command with an error instead.
 - `local v="$(cmd)"` returns the status of `local`, not of `cmd`, so `set -e` misses the failure (SC2155). The same holds for `export` and `readonly`. Declare on one line, assign on the next.
 - A function called as an `if` or `while` condition, or with `&&`, `||` or `!`, runs with `set -e` off for its whole body.
 - A command substitution inside an argument hides its status. With `set -e`, `cd "$(get_dir)/etc"` runs `cd /etc` when `get_dir` fails (SC2312). Assign to a variable first.
