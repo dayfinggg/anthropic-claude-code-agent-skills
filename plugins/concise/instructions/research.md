@@ -16,4 +16,3 @@ Your training data ends well before today's date. Versions, APIs, options, confi
 - A search result is a list of pages to read, not an answer. Open every page you rely on and read the part that supports the claim, in the page's `.md` or `llms.txt` version where one exists. A summary written by a tool can drop or change the detail you need, so when a fetch returns a summary or stops before the part you need, fetch again with a narrower question or read the raw page with `curl`.
 - Base every claim on a page you read, and check an important one against a second source.
 - Cite each source as a Markdown link right after the claim it supports.
-- Put no personal data, secret or private project detail into a search query or a request.
