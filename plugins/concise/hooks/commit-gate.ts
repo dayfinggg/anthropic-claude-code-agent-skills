@@ -1,5 +1,6 @@
 import type { EngineInterface, On, PluginOptions } from 'claude-code'
 import type { CommitGateEntry } from '../types'
+import { withoutHereDocumentBodies } from './shell-text'
 
 export type CommitGateMode = 'off' | 'observe' | 'enforce'
 
@@ -14,6 +15,14 @@ const REUSED_MESSAGE = /\s(?:--no-edit\b|--fixup[=\s]|--squash[=\s]|--reuse-mess
 const VERIFIED_TRAILER = /(?:^|-m[ \t]*\$?["'])[ \t]*Verified:[ \t]*\S/m
 
 const MESSAGE_FILE = /\s(?:-F[ \t]*|--file[=\s])("[^"]+"|'[^']+'|[^\s;&|]+)/
+
+const SHELL_ASSIGNMENT = /(?:^|[\s;&|(])([A-Za-z_]\w*)=("[^"]*"|'[^']*'|[^\s;&|)]*)/g
+
+const SHELL_VARIABLE = /\$(?:\{(\w+)\}|(\w+))/g
+
+const LEFT_FOR_THE_SHELL = /[$`]/
+
+const GIT_BASH_DRIVE = /^\/([A-Za-z])\//
 
 const BLOCKS_BEFORE_LETTING_THROUGH = 2
 
@@ -37,15 +46,31 @@ export const commitGateMode = (options: PluginOptions): CommitGateMode =>
 const unquoted = (path: string) => path.replace(/^(["'])(.*)\1$/, '$2')
 
 const commitArguments = (command: string) => {
-  const found = GIT_COMMIT.exec(command)
-  return found === null ? undefined : command.slice(found.index + found[0].length)
+  const typed = withoutHereDocumentBodies(command)
+  const found = GIT_COMMIT.exec(typed)
+  return found === null ? undefined : typed.slice(found.index + found[0].length)
 }
 
-const messageFileHasTrailer = async ($: EngineInterface, args: string) => {
+const withShellVariables = (path: string, command: string) => {
+  const assigned = new Map([...command.matchAll(SHELL_ASSIGNMENT)].map(found => [found[1], unquoted(found[2] ?? '')]))
+  return path.replace(SHELL_VARIABLE, (reference, braced?: string, bare?: string) => assigned.get(braced ?? bare) ?? reference)
+}
+
+const firstReadable = async ($: EngineInterface, paths: readonly string[]) => {
+  for (const path of paths) {
+    const text = await $.fs.read(path).catch(() => undefined)
+    if (typeof text === 'string') return text
+  }
+  return ''
+}
+
+const messageFileLacksTrailer = async ($: EngineInterface, command: string, args: string) => {
   const named = MESSAGE_FILE.exec(args)?.[1]
-  if (named === undefined || unquoted(named) === '-') return false
-  const text = await $.fs.read(unquoted(named)).catch(() => '')
-  return typeof text === 'string' && VERIFIED_TRAILER.test(text)
+  if (named === undefined || unquoted(named) === '-') return true
+  const path = withShellVariables(unquoted(named), command)
+  if (LEFT_FOR_THE_SHELL.test(path)) return false
+  const onWindowsDrive = GIT_BASH_DRIVE.test(path) ? [path.replace(GIT_BASH_DRIVE, '$1:/')] : []
+  return !VERIFIED_TRAILER.test(await firstReadable($, [path, ...onWindowsDrive]))
 }
 
 const isUnverifiedCommit = async ($: EngineInterface, command: string) => {
@@ -53,7 +78,7 @@ const isUnverifiedCommit = async ($: EngineInterface, command: string) => {
   if (args === undefined || REUSED_MESSAGE.test(args)) return false
   if ((await $.state.get(verifyingSkillRan)).value === true) return false
   if (VERIFIED_TRAILER.test(command)) return false
-  return !(await messageFileHasTrailer($, args))
+  return messageFileLacksTrailer($, command, args)
 }
 
 const record = async ($: EngineInterface, outcome: CommitGateEntry['outcome'], command: string) => {
