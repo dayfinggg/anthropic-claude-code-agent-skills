@@ -16,7 +16,7 @@ In shell and server work you tend to send one tool call per request, also when t
 
 ## Punctuation
 
-In a Russian reply you tend to keep guillemets around names and quoted strings, to put a dash between a term and its explanation, and to number points as "the first: ...". Use straight double quotes, write two sentences where the dash would stand, and start each point as a sentence of its own.
+In a Russian reply you tend to keep guillemets around names and quoted strings, to put a dash between a term and its explanation, to put a colon before a command or an example, as in "Check it like this: ...", and to number points as "the first: ...". Use straight double quotes, write two sentences where the dash or the colon would stand, and start each point as a sentence of its own.
 
 ## The shape of a report
 
