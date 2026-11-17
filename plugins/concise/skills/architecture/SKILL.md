@@ -27,9 +27,11 @@ Each file below holds what this page only names. Read it in full with the Read t
 - Split a module on a second reason to change, meaning a second person or source that asks for changes (single responsibility, Martin), not on its length. A deep module, with a small interface over much functionality, beats several shallow ones that only pass calls through (Ousterhout).
 - Bounded context (Evans): one model and one vocabulary hold inside an explicit boundary of team, code and schema. Use it when several teams share a large domain. One team with a small model does not need it.
 - Top-level folders name the domain, not the framework, and use cases run in tests without the web server or the database.
+- Share code between modules only for one concept with one owner, because a wrong shared abstraction costs more than duplication.
 
 ## Layout
 
+- Follow the layout the project already has. In a new project use the standard layout of its ecosystem, not one folder for every file or one file for all code.
 - In new code, put business capabilities at the top level (`billing/`, `catalog/`) and technical roles inside each. Top-level `controllers/`, `services/` and `utils/` folders spread every change across the tree.
 - Give each module one public entry point and import only that from outside: its `index.ts`, a package's `exports` map, a Python package's `__init__.py` with `__all__`, a Rust crate root with internals at `pub(crate)`. Add no re-export `index` files in subfolders.
 - JS and TS workspaces: deployables in `apps/*`, libraries and shared configs in `packages/*`, one level deep. Depend on a sibling with `"workspace:*"` and import it by name, not by a `../` path. Packages extend a shared tsconfig package, so the root needs no `tsconfig.json`.
