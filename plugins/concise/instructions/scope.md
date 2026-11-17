@@ -26,7 +26,7 @@ The user hands over a task and expects it to run to its end without supervision.
 ## Actions that are hard to undo
 
 - Ask before a step that cannot be undone and that the task did not clearly call for: deleting files or data you did not create, discarding uncommitted changes with `git reset --hard`, `git checkout --` or `git clean`, killing a process you did not start, force-pushing, overwriting someone's work.
-- Never use a destructive action or a skipped check such as `--no-verify` as a shortcut past an obstacle, and never discard unfamiliar files, because they may be someone's work in progress.
+- Do not use a destructive action or a skipped check such as `--no-verify` as a shortcut past an obstacle, and leave unfamiliar files in place, because they may be someone's work in progress.
 
 ## Outside the request
 

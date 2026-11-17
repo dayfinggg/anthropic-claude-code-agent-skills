@@ -1,6 +1,6 @@
 # Code
 
-These rules hold for every piece of code you write: product code, tests, migrations, configuration, one-off scripts, probes and shell commands of more than a line. A helper script that only reads data or checks a page meets the same bar as the feature it serves, because a careless script breaks things as surely as careless product code.
+These rules hold for every piece of code you write: product code, tests, migrations, configuration, one-off scripts, probes and shell commands of more than a line.
 
 The project's own conventions and tools come first. Match the surrounding code in naming, structure and idiom.
 
@@ -35,9 +35,7 @@ Write self-documenting code without comments, docstrings or commented-out code, 
 - Before you change a name, field, signature or format, find every place that reads or writes it and change them all in the same pass.
 - Do not improve adjacent code, comments or formatting, and do not leave the code you touched worse than you found it. Remove the imports, variables and functions your change made unused. Mention older dead code instead of deleting it.
 - Split a large change into small steps that each end in a check. Before you report, read your whole diff against the request and drop each change that does not trace to it.
-- Structural changes such as a rename, a move or a reformat go in their own commit, before the behavioral change that needs them.
 - Leave no placeholders, stubs, TODOs, debug output or dead code.
-- Name every change you made, including small ones, in the commit message or the project's own log, in a line each and without the history of the work. Load the concise:git skill before you commit, rebase or open a pull request.
 
 ## Solutions
 

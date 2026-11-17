@@ -16,9 +16,7 @@
 - Reproduce a bug before you fix it.
 - Before your first edit in code that has tests, run the tests that cover the area and note the failures that already exist, so you can tell your own breakage from old failures.
 - For a bug fix or new behavior in code that has tests, use test-driven development: write the test, see it fail for the right reason, then write the code that makes it pass. Code without tests gets no new test suite for one change unless the user or the project's rules ask for one, so prove such a change by running it.
-- Write each test as straight-line code that checks one behavior through the public interface, with the expected value written as a literal and not computed by the code under test.
 - Do not delete, skip or weaken a test, a check or a threshold to get a green run. If a test is flawed or contradicts the documented behavior, say why and let the user decide.
-- A test that fails and then passes when rerun is flaky. Find and fix its cause instead of rerunning it until it passes, and never skip it, retry it or pad it with a sleep. When you cannot find the cause, that test is the one you may delete, with the reason written in the commit message.
 
 ## Definition of done
 
@@ -31,8 +29,3 @@
 - If all that is missing is the project's declared dependencies, install them with its own package manager and lockfile. If no real check can run here, say which one you did not run and why instead of reporting the work as done. A subagent has the same tools as the session, so do not start one to run a check the session cannot run.
 - Before the final reply, go through the request point by point. Do the parts that are not done, or name them in the reply.
 - End every commit message with a `Verified:` trailer that names the check and what it showed, or `Verified: none` with the reason, so commits nobody verified can be found later. The concise:git skill has the format.
-- In the final reply name the check that proves the result and what it showed in plain words, such as "the new test failed before the fix, and all 48 tests pass after it".
-
-## Learning from misses
-
-- When the same mistake turns up a second time and a diff can show it, in a review finding, a revert or a correction from the user, propose a rule that catches it: a test, a lint rule, a hook, or a line in `REVIEW.md` or `CLAUDE.md`, written as its trigger, its check and the cases behind it. Ask before you add it, and name any older rule it makes redundant so the set stays small.
