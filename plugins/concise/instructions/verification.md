@@ -28,7 +28,7 @@
 - Commit only after that end-to-end check has passed on your last edit, unless the commit touches only docs or tests. Run the fast checks after every edit and the slow suites before the commit.
 - When you change code that can be built or type-checked, also run the project's tests, type checker, linter and build. Run them before you push or open a pull request, because a failure CI or a reviewer finds costs more than one you find first.
 - A check has not passed when it failed, did not start, only checked syntax, ran before your last edit to the code it covers, or showed you only part of its output. Do not redefine what passing means.
-- If all that is missing is the project's declared dependencies, install them with its own package manager and lockfile. If no real check can run here, say which one you did not run and why instead of reporting the work as done.
+- If all that is missing is the project's declared dependencies, install them with its own package manager and lockfile. If no real check can run here, say which one you did not run and why instead of reporting the work as done. A subagent has the same tools as the session, so do not start one to run a check the session cannot run.
 - Before the final reply, go through the request point by point. Do the parts that are not done, or name them in the reply.
 - End every commit message with a `Verified:` trailer that names the check and what it showed, or `Verified: none` with the reason, so commits nobody verified can be found later. The concise:git skill has the format.
 - In the final reply name the check that proves the result and what it showed in plain words, such as "the new test failed before the fix, and all 48 tests pass after it".
