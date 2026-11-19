@@ -24,7 +24,7 @@ This skill covers the path from a request to an approved design, a plan an imple
 
 - Size the design to the work. A small change gets a few lines. A project gets a written design that also names non-goals, constraints, the rejected approaches and what is left to the builder.
 - Put first the decisions the user is most likely to change: data model, interfaces, user-visible behavior. Mechanical refactoring goes last. This is reading order. Execution order follows the blocking edges.
-- Before handing over a project design, brief a fresh subagent as a builder who cannot talk to the author and must plan from the document alone. It returns only the questions where a wrong guess changes the plan. Write already-answered ones into the document, settle minor ones yourself and mark them as your calls, and bring the rest to the user in one round of questions.
+- Before handing over the design of a project that will take several sessions, brief a fresh subagent as a builder who cannot talk to the author and must plan from the document alone. It returns only the questions where a wrong guess changes the plan. Write already-answered ones into the document, settle minor ones yourself and mark them as your calls, and bring the rest to the user in one round of questions.
 
 ## Plans
 

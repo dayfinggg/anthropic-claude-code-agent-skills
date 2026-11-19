@@ -20,7 +20,7 @@
 
 ## Body
 
-- Gotchas, concrete corrections to mistakes the model makes, carry the most value. Keep them in `SKILL.md` and add one each time the agent is corrected.
+- Gotchas, concrete corrections to mistakes the model makes, carry the most value. Keep them in `SKILL.md`, and add one when the agent repeats a mistake after it was corrected.
 - State the goal and the constraints rather than every step, and give one default with an escape hatch instead of a menu of options.
 - Keep `SKILL.md` under 500 lines. Link every reference from it, one level deep, with the condition for reading it, because files linked from other references get partial reads. Start any reference over 100 lines with a contents list.
 - Invoked skill content stays in context as one message and is not re-read on later turns, so write standing instructions such as "after every edit" rather than one-time steps.

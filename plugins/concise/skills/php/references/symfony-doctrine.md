@@ -10,7 +10,7 @@
 
 ## Symfony versions
 
-- On 2026-11-19 symfony.com listed 8.1.11 as the latest stable release, 7.4.23 as the LTS and 8.2.0-BETA2 as the next release.
+- Read the current stable, LTS and next versions from `https://symfony.com/releases.json` (`symfony_versions`). On 2026-11-19 they were 8.1.11, 7.4.23 and 8.2.0-BETA2.
 - 7.4 is the LTS, with bug fixes until 2028-11 and security fixes until 2029-11. 6.4 gets security fixes until 2027-11, after its bug fixes end in 2026-11.
 - 8.0 reached end of life in 2026-07, and 8.1 is maintained until 2027-01. 8.2, planned for release in 2026-11, is maintained until 2027-07.
 - 7.4 and 8.0 have the same features, and 8.0 only drops what 7.4 deprecates, so clear every 7.4 deprecation before the major upgrade.

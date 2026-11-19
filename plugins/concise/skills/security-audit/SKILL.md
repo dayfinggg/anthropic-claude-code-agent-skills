@@ -37,7 +37,7 @@ This skill runs a security audit of a whole codebase or service as a loop that s
 
 - Every brief in the references runs as a fresh subagent or as a separate step you run yourself. Upstream gives each focus area, each verification vote, each ranking and each patch and review pass to a fresh subagent. For focus areas that only splits the work. For verification, ranking and patch review it is the point, because a pass that has seen the finder's reasoning tends to agree with it.
 - A subagent for such a pass starts from an empty context and not as a fork of your session, because a fork carries the finder's reasoning and every other finding's prose into the pass.
-- Use subagents when the user asked for depth or for delegation and the project's rules allow them. Set `model` on each dispatch as concise:orchestration describes.
+- Use subagents when the user asked for depth or for delegation and the project's rules allow them, because the full loop starts one per focus area, three per finding for verification and more for ranking and patches. Set `model` on each dispatch as concise:orchestration describes.
 - Otherwise run each pass yourself as a separate step that starts from the code, not from the finding's text. Such a verification counts as one vote however often it is repeated, and a patch review by the patch's author is weaker than upstream's. Record both facts in the output files.
 
 ## Execution

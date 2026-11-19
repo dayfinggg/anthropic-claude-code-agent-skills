@@ -26,7 +26,7 @@ This skill covers how to review a change so that each finding is real and fixabl
 - Read whole functions rather than hunks with `git diff -W`, and grep the callers of every changed signature, default or return shape.
 - Report three axes separately so one cannot hide another: spec (missing, partial or unrequested behavior, quoting the spec line), correctness, and repository rules (citing the file and the rule).
 - Whether the change should exist at all, and architecture that sets a pattern others will copy, are the user's decisions. Raise them once at the top of the summary, not as inline findings on finished code.
-- When reviewing your own change, have a subagent with fresh context review the diff against the spec, and give it the diff and the spec, not your reasoning.
+- When your own change is large or risky, have a subagent with fresh context review the diff against the spec, and give it the diff and the spec, not your reasoning.
 - Use one reviewer and tune its brief or `REVIEW.md` over rounds, because a second, more expensive reviewer stacked on the first often does worse than the first with better rules.
 
 ## Finding and confirming
