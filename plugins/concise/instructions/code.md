@@ -1,51 +1,39 @@
 # Code
 
-These rules hold for every piece of code you write: product code, tests, migrations, configuration, one-off scripts, probes and shell commands of more than a line.
-
-The project's own conventions and tools come first. Match the surrounding code in naming, structure and idiom.
+These rules cover every piece of code you write, including tests, migrations, configuration and scripts. The project's own conventions come first, so match the surrounding code in naming, structure and idiom.
 
 ## Design
 
-- KISS: build the simplest thing that solves the stated problem well.
-- YAGNI: add no feature, option, layer or setting for a need nobody has stated. The right amount of complexity is the minimum the task needs.
-- DRY: each piece of knowledge, such as a rule, a constant or a format, has one source of truth. DRY is about knowledge, not about text that looks alike, so two fragments that change for different reasons stay separate. Before you write something new, search the codebase for a function, component or pattern that already does the job. Search the framework and the installed packages the same way, for example with `grep -rn` over `vendor/` or `node_modules/<package>`, because they often already provide what you were about to write.
-- Rule of Three: live with two similar cases and extract a shared helper when the third real one appears.
-- SOLID and separation of concerns: give each function, class and module one reason to change, pass dependencies in instead of creating them inside, and keep interfaces small. Keep side effects such as database, network, file and clock access at the edges, with plain, testable logic between them (a functional core in an imperative shell). None of this justifies an interface with a single implementation or a layer that only passes calls through.
-- Prefer composition to inheritance, pure functions to shared state, and immutable data.
-- Parse, don't validate: at a system boundary turn input from users, files and external APIs into a typed value once, and pass that value inward. Fail fast: when something is broken, stop with a clear error instead of continuing on a default. Make illegal states unrepresentable where the language has types. Inside the system trust your own code and the framework, and add no error handling, fallback or validation for a case that cannot happen.
-- Clean Code naming: a name says what the thing holds or does, so the code reads without explanation. Prefer early returns to deep nesting.
+- Build the simplest thing that solves the stated problem well, with no feature, option, layer or setting for a need nobody stated.
+- Before you write something new, search the codebase, the framework and the installed packages for code that already does the job.
+- Turn input from users, files and external APIs into a checked value once, where it enters, and trust your own code and the framework inside. Add no error handling, fallback or validation for a case that cannot happen, and stop with a clear error when something is broken instead of carrying on with a default.
 
 ## Comments
 
-Write self-documenting code without comments, docstrings or commented-out code, in scripts, tests, SQL and configuration too, even where the older code of the file has them. Put the meaning into names and structure, and the reason for a choice that looks odd into the commit message. Leave existing comments as they are, unless your change makes one wrong: then correct or remove it. Add a comment only when the user asks for one or the project's written rules require it. A line the toolchain reads, such as a shebang or a lint directive, is not a comment.
-
-## Scripts, probes and one-off commands
-
-- First look for a command the project already has or a standard tool that does the job. Write a script only when neither exists.
-- Keep a command short enough to read at a glance, with one purpose. Send independent reads as separate tool calls in one message, not as one long chain. A command of more than about ten lines, or one with loops, conditions or a here-document, becomes a script file in the scratch directory that you run by name and can run again.
-- Pass every value that varies, such as a host, a path, an id or a date, as an argument. Hard-code none of them, and read secrets from the environment.
-- Make the script stop at the first error with a non-zero exit code and a message that names what failed. Do not silence errors or throw away output you will need to diagnose a failure.
-- Inside a script, wait for a condition, such as an element, a response or a file, with a timeout, and not with a fixed sleep. How long a command may hold the session is in the rule on time.
-- A script that is meant to read must not be able to write: use a read-only account or transaction, a `SELECT`, a dry-run flag. A script that changes data has a dry-run mode that prints what it would change, and you run that mode first.
-- Keep scratch scripts and their output outside the repository, in the session's scratch directory. Delete the temporary files, helper scripts and test data you created when the work is done, unless they are part of the deliverable.
+Write code that explains itself through names and structure, with no comments, docstrings or commented-out code, in tests, SQL and configuration too. The reason for a choice that looks odd goes into the commit message. Keep existing comments, and correct or remove one only when your change makes it wrong. Add a comment when the user asks for one or the project's written rules require it. A shebang or a lint directive is not a comment.
 
 ## Changing existing code
 
-- Make surgical changes: the smallest diff that does the job, edited in place. Every changed line traces to the request.
+- Make the smallest change that does the job, so every changed line traces to the request.
 - Before you change a name, field, signature or format, find every place that reads or writes it and change them all in the same pass.
-- Do not improve adjacent code, comments or formatting, and do not leave the code you touched worse than you found it. Remove the imports, variables and functions your change made unused, and leave older dead code in place.
-- Split a large change into small steps that each end in a check. Before you report, read your whole diff against the request and drop each change that does not trace to it.
-- Leave no placeholders, stubs, TODOs, debug output or dead code.
+- Remove the imports, variables and functions your change made unused, and leave older dead code in place.
+- Leave no placeholders, stubs, TODOs or debug output.
 
 ## Solutions
 
-- Write a general solution that is correct for every valid input, not only for the cases a test checks. Never hard-code an expected result or add a special case for a test.
-- Fix the root cause. A stopgap is anything that only removes the symptom: catching or silencing the error, a special case for the failing input, a default or fallback that hides the failure, a retry that masks it, switching the feature off, adding the failing item to an ignore or skip list, patching a library at runtime. Ship a stopgap only when the user agrees to it, call it temporary in the report and say what the real fix needs.
-- Do not substitute a narrower, safer, merely compatible or easier-to-test solution because it is more likely to pass the checks at hand.
-- When an error starts in a library or a framework, first check that your code uses it as its documentation says and whether a newer version or an upstream fix already solves it.
-- When a fix still fails its check after three rounds, stop patching and bring the user in with the failing output, what the three rounds changed and the approach you would try next.
-- When the complete fix is out of reach because information, access or a decision is missing, name what blocks it and ask. A step that only looks hard or slow is not out of reach.
+- Write a general solution that is correct for every valid input, and never hard-code an expected result or special-case a test.
+- Fix the root cause. Catching or silencing the error, a special case for the failing input, a default that hides the failure, a retry that masks it, switching the feature off or adding it to an ignore list only removes the symptom. Ship such a stopgap only when the user agrees to it, and call it temporary in the report.
+- When an error starts in a library or a framework, check that your code uses it as its documentation says, and whether a newer version or an upstream fix already solves it.
+- When a fix still fails its check after three rounds, stop patching and test the premise the fixes share. Bring the user in with the failing output and your next approach only when that test leaves no new approach.
+
+## Scripts and commands
+
+- Use a command the project already has or a standard tool before you write a script.
+- Pass every value that varies, such as a host, a path, an id or a date, as an argument, and read secrets from the environment.
+- A script stops at the first error with a non-zero exit code and a message that names what failed.
+- A script meant to read must not be able to write, so it uses a read-only account, a `SELECT` or a dry-run flag. A script that changes data has a dry-run mode, and you run that mode first.
+- Keep scratch scripts and their output in the session's scratch directory, outside the repository, and delete them when the work is done unless they are part of the deliverable.
 
 ## Performance
 
-Know the cost of code on a hot path: no query or network call inside a loop over rows, no whole table or file loaded where a page or a stream will do, and an index behind every new filter or join on a large table. For anything subtler, measure before you optimize.
+On a hot path, put no query or network call inside a loop over rows, read a page or a stream rather than a whole table or file, and give every new filter or join on a large table an index. Measure before you optimize anything subtler.
