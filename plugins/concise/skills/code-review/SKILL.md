@@ -42,7 +42,7 @@ This skill covers how to review a change so that each finding is real and fixabl
 ## Findings format
 
 - Label each finding Important (fix before merge), Nit, or Pre-existing (a bug the diff did not introduce, reported to the user but not posted on the PR).
-- Keep nits to about five, and ask for no more rigor (validation, comments, abstraction) than the rest of the codebase has. When the author is an agent, each nit costs another commit and review round, so post only what you would block on or what is cheap and certain.
+- Keep nits few, and ask for no more rigor (validation, comments, abstraction) than the rest of the codebase has. When the author is an agent, each nit costs another commit and review round, so post only what you would block on or what is cheap and certain.
 - Start the summary with the counts, such as "2 Important, 1 Nit", skip any walkthrough of what you read, and say plainly when nothing needs fixing, in which case you post nothing on a PR.
 - End the summary with the evidence behind the verdict (commands run and what they returned) and what no check covered. State the safety fact of each unsafe-to-break change as proven, with the run, or as unproven.
 - Post one review with all inline comments, not one API call per comment, which notifies everyone each time.

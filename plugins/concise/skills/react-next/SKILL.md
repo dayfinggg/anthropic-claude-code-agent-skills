@@ -16,7 +16,7 @@ This skill matches React 19.3 and Next.js 16.4. The 16.x line is Active LTS, and
 
 - Read `package.json` and the lockfile for `next`, `react`, `react-dom`, `babel-plugin-react-compiler` and `eslint-plugin-react-hooks`, and `next.config.*` for `cacheComponents`, `partialPrefetching`, `reactCompiler` and `experimental` keys.
 - Next.js 16.2 and later ship docs that match the installed version in `node_modules/next/dist/docs/`, so read the matching guide there before writing Next.js code. In a monorepo resolve `node_modules/next` from the app folder, and find a page with `find node_modules/next/dist/docs -name '<slug>.md'`. Error pages under `/docs/messages/` are not bundled, and every nextjs.org docs page has a Markdown version at its `.md` URL.
-- `next dev` (16.3+) writes a managed block between `nextjs-agent-rules` markers into `AGENTS.md` when it detects a coding agent, and writes it again after it is removed. Commit it with the work or set `agentRules: false` in `next.config`, because reverting it only recreates the change.
+- `next dev` (16.3+) writes a managed block between `nextjs-agent-rules` markers into `AGENTS.md` when it detects a coding agent, and writes it again after it is removed. Keep the block out of your commits and name it in the report as a change the user did not ask for, with `agentRules: false` in `next.config` as the setting that stops it.
 - `next dev` records its PID, port and URL in `.next/dev/lock` and prints the running server when started twice, so reuse that server. Its MCP endpoint at `/_next/mcp` reports routes, logs and compilation issues (`get_compilation_issues`, `compile_route`) without a full `next build`.
 
 ## Versions and upgrades

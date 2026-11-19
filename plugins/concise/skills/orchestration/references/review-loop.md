@@ -18,7 +18,7 @@ Keep one ledger file per plan, in the session scratchpad or, when the run may co
 ```text
 # ledger: plan docs/plans/2026-11-12-auth.md
 Task 3: complete (codex exec, commits a1b2c3d..e4f5a6b, tests: pnpm vitest run src/auth -> 42/42)
-Task 4: fix round 2/5 (1 addressed, 1 open: token not rotated)
+Task 4: fix round 2/3 (1 addressed, 1 open: token not rotated)
 Task 4: Ruling: kept the sync API | why: spec section 2 requires it | cost if wrong: one adapter later
 Task 4: minor (deferred): duplicate date helper in report.ts
 ```
@@ -27,9 +27,9 @@ After compaction, trust the ledger and `git log` over memory, and re-dispatch no
 
 ## Fix rounds
 
-- Run at most 5 rounds per task, each a fix plus a re-review scoped to the fix diff.
-- Rounds 1 to 3 resume the same implementer (`SendMessage`, or the CLI's resume command), which keeps its context. Rounds 4 and 5 go to a fresh implementer on a stronger model, with the report file as its memory.
-- At the cap, rule on each open finding and record the ruling in the ledger. Minor findings go to the ledger, not into the loop.
+- Run at most three rounds per task, the same limit the working rules set for failed fixes, each a fix plus a re-review scoped to the fix diff.
+- Rounds 1 and 2 resume the same implementer (`SendMessage`, or the CLI's resume command), which keeps its context. Round 3 goes to a fresh implementer on a stronger model, with the report file as its memory.
+- After round 3, bring the open findings to the user with the question tool. In a run with nobody to answer, rule on each of them and record the ruling in the ledger. Minor findings go to the ledger, not into the loop.
 - Final whole-branch review findings go to one fixer with the complete list, then to one scoped re-review, with no second fix wave.
 
 ## Closing

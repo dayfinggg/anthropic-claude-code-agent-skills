@@ -16,7 +16,7 @@ This skill matches ECMAScript 2026 plus the ES2027 features already at stage 4, 
 
 ## Check first
 
-- Read the TypeScript version from `node_modules/typescript/package.json` and the lockfile, and every tsconfig in the `extends` chain. TypeScript 7 provides `tsc`, and `@typescript/typescript6` provides `tsc6`.
+- Read the TypeScript version from `node_modules/typescript/package.json` and the lockfile, plus `node_modules/@typescript/native/package.json` in a project that keeps both compilers, and every tsconfig in the `extends` chain. TypeScript 7 provides `tsc`, and `@typescript/typescript6` provides `tsc6`.
 - Find the lowest runtime the code must support in `engines`, `.nvmrc`, `.node-version`, `devEngines.runtime`, CI and Docker images, `browserslist` and Vite `build.target`. An admin-panel script without a build step runs exactly as written in the browsers the admins use.
 - Take the package manager from the lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock`, `deno.lock`) and from `packageManager` or `devEngines.packageManager`, and run only that one.
 - Type-check the whole project with its script or `tsc --noEmit`, because Vite, Vitest, tsx, Bun, Deno and Node.js type stripping run TypeScript without checking types.

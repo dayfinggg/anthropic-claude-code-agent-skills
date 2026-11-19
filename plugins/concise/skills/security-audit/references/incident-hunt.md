@@ -62,7 +62,7 @@
   - Quiet hours are the lowest-traffic hours, because low-and-slow campaigns hide in volume but stand out at 3am.
 - Pivot from the entities of a hit, meaning everything else that IP did, everything that session touched, every other IP that hit the same route the same way, and what happened to the data that moved. Campaigns are chains, so one confirmed link is hunted in both directions, how they got here and where they went next.
 - Stop after two consecutive rounds that surface no new entities, and note the stop in the ledger. A hypothesis that comes back `supported` but only confirms benign behavior counts as no new entities, so record it and route it to `ruled_out`.
-- Probes are not incidents. Most attack traffic in a real corpus is failed noise from scanners hitting routes that hold. Upstream's grader penalizes calling that noise an incident exactly as hard as missing the campaign, because that confusion is where alert fatigue comes from. Give it a written verdict with the evidence.
+- Probes are not incidents. Most attack traffic in a real corpus is failed noise from scanners hitting routes that hold. Calling that noise an incident costs as much as missing the campaign, because that confusion is where alert fatigue comes from. Give it a written verdict with the evidence.
 
 ## Source confirmation and proof of concept
 

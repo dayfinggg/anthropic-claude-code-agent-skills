@@ -52,5 +52,5 @@ gh run view <run-id> --json jobs --jq '.jobs[] | select(.conclusion == "failure"
 - A rerun uses the original `GITHUB_SHA` and `GITHUB_REF`, so the original workflow file, and the privileges of the actor who triggered the first run, so it cannot pick up a fix. A new commit starts fresh runs, so do not also rerun the old SHA.
 - A run can be rerun up to 30 days after it started and at most 50 times, counting full and partial reruns.
 - `gh run rerun <run-id> --debug` turns on runner diagnostic and step debug logging for that attempt. Debug logs print more of the environment, and some actions, such as claude-code-action, then print their full output, so check first what a public log will expose.
-- Watch a run until it ends with `gh run watch <run-id> --exit-status`, or the PR's checks with `gh pr checks <pr> --watch --fail-fast`.
+- Watch a run until it ends with `gh run watch <run-id> --exit-status`, or the PR's checks with `gh pr checks <pr> --watch --fail-fast`, and start either with `run_in_background`.
 - A run that stays queued or in progress after cancellation may need `POST /repos/{owner}/{repo}/actions/runs/<run-id>/force-cancel`, and a stuck run in a concurrency group blocks later runs in that group until it clears.

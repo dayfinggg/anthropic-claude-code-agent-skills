@@ -22,7 +22,7 @@ This skill covers finding the cause of a failure before changing code. It matche
 
 ## Hypotheses and probes
 
-- Write 3 to 5 ranked hypotheses before testing any, each with a prediction of the form "if X is the cause, changing Y makes the failure disappear". The prediction names something you have not looked at yet, or it cannot fail.
+- When the cause is not obvious, rank a few competing hypotheses before testing any, each with a prediction of the form "if X is the cause, changing Y makes the failure disappear". The prediction names something you have not looked at yet, or it cannot fail.
 - Probe one variable at a time. The shell tools have no interactive input, so drive a debugger with a command file (`gdb -batch -x cmds`) or evaluate one REPL expression per call. Otherwise log at the boundaries that separate the hypotheses, tag every line with a unique marker such as `[DEBUG-a4f2]`, and remove the lines by grepping the marker at the end.
 - In a chain of components (CI to build to deploy, API to service to database), log what enters and leaves each boundary in one run to find the failing layer before reading any layer's code.
 - Put the regression test at a seam that reproduces the bug as it occurs at the call site. When the fix has several parts, revert one and confirm the test fails, and after the fix rerun the original, unminimized loop.

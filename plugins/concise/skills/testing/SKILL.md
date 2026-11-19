@@ -24,7 +24,7 @@ This skill matches Playwright 1.65, Hypothesis 6.170, fast-check 4.10, StrykerJS
 - When a change a user can see gets tests, the end-to-end test of the user's flow comes first, such as adding an item to the cart and reaching the confirmation page. It is hard to fool and has a clear done state, and its trace names the step that broke, while a unit test can pass with the feature broken. When the project keeps a feature map that lists user-facing features with paths, selectors and expected results, drive the flows it lists and grade the run against it.
 - When the change gets tests, include property tests for code you wrote, because generated inputs do not share the blind spots of your own examples. Round-trips, invariants, idempotency and equivalence with a slow, plainly correct version are the usual properties.
 - For a migration or rewrite meant to keep behavior, write a differential test with the old system as the oracle. Run old and new on the same generated inputs or a sample of production traffic, normalize differences that do not matter (whitespace, key order, timestamps, generated IDs), and keep a list of the differences the user approved, because every other difference is a bug or a breaking change.
-- Measure test strength with mutation testing on the changed code rather than with line coverage, which a test without assertions also raises.
+- Where the project has a mutation testing tool, measure test strength with it on the changed code rather than with line coverage, which a test without assertions also raises.
 
 ## Test design
 
