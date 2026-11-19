@@ -1,33 +1,9 @@
 {
   "name": "concise",
-  "version": "2.5.1",
-  "description": "Concise output style, working rules, model notes and 24 engineering skills",
+  "version": "3.0.0",
+  "description": "Concise output style, working rules, model notes and 25 engineering skills",
   "author": { "name": "dayfinggg" },
   "homepage": "https://github.com/dayfinggg/anthropic-claude-code-agent-skills",
   "repository": "https://github.com/dayfinggg/anthropic-claude-code-agent-skills",
-  "license": "MIT",
-  "types": "./types/index.d.ts",
-  "userConfig": {
-    "commit_gate": {
-      "type": "string",
-      "title": "Commit gate",
-      "description": "Judges each git commit: did the session run a verify, run or code-review skill, or does the message carry a Verified: trailer. observe records the commits it would block, enforce blocks them and lets the third one in a session through, off does nothing.",
-      "options": ["observe", "enforce", "off"],
-      "default": "observe"
-    },
-    "wait_gate": {
-      "type": "string",
-      "title": "Wait gate",
-      "description": "Judges each foreground shell command: can it sleep or poll for longer than a minute, also inside ssh. observe records the commands it would block, enforce blocks them and lets the third one in a session through, off does nothing.",
-      "options": ["observe", "enforce", "off"],
-      "default": "observe"
-    },
-    "privacy_gate": {
-      "type": "string",
-      "title": "Privacy gate",
-      "description": "Judges each git push and each gh pull request, issue or release text: does it carry a path under this computer's home folder, such as C:\\Users\\<account> or /home/<account>. enforce blocks it, observe records it, off does nothing.",
-      "options": ["enforce", "observe", "off"],
-      "default": "enforce"
-    }
-  }
+  "license": "MIT"
 }

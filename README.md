@@ -1,18 +1,30 @@
 # Concise for Claude Code
 
-A Claude Code plugin with an output style for short replies in plain language, always-on working rules, notes for the model in use and 24 engineering skills. Tested on Claude Code 2.1.326.
+A Claude Code plugin with an output style for short replies in plain language, always-on working rules, notes for the model in use and 25 engineering skills. Tested on Claude Code 2.1.326.
 
 ## Contents
 
 | Path | What it holds |
 | --- | --- |
 | `plugins/concise/output-styles/concise.md` | The reply style, applied while the plugin is enabled |
-| `plugins/concise/instructions/` | Nine rule files, loaded the way a personal `CLAUDE.md` is |
+| `plugins/concise/instructions/` | Seven rule files, loaded the way a personal `CLAUDE.md` is |
 | `plugins/concise/models/` | Notes for Opus 5.5, Fable 5.2 and Mythos 5.2, Sonnet 5.5 and Haiku 5.5 |
-| `plugins/concise/skills/` | 24 skills that load when a task reaches their area |
-| `plugins/concise/hooks/register.ts` | The hooks module that delivers the rules and the notes, to subagents too, sets which tools load up front and runs the commit, wait and privacy gates |
-| `plugins/concise/evals/` | Eval cases for `claude plugin eval` |
+| `plugins/concise/skills/` | 25 skills that load when a task reaches their area |
+| `plugins/concise/hooks/register.ts` | The hooks module that delivers the rules and the model notes, to subagents too, and sets which tools load up front |
 | `settings.example.json` | The author's Claude Code settings. They turn permission prompts off, so copy only the keys you want |
+
+## How the parts reach the model
+
+| Part | Where it lands | When |
+| --- | --- | --- |
+| Output style | Instructions sent with every request of the main conversation and its forks | Always |
+| Rule files | User instruction files, like `~/.claude/CLAUDE.md`, and the task of built-in Explore and Plan agents | Always |
+| Model note | The end of the system prompt, and the task of each subagent, for the model it runs on | Always |
+| Skills | The skill listing, and the full text when the model or the user invokes one | On demand |
+
+The rule files cover scope and autonomy, tools and waiting, code, evidence and verification, current sources, shared systems and security, and what a compaction keeps. Each file holds one topic, so a rule lives in one place.
+
+On a machine with managed settings, or in a session signed in to a Team or Enterprise plan, Claude Code loads its built-in guard, which skips the prompt hooks of user-installed mods. There the rule files and the model notes do not reach the model, while the output style and the skills still load.
 
 ## Install
 
@@ -33,34 +45,11 @@ claude plugin update concise@concise
 
 Start a new session afterwards, or run `/reload-plugins` in an open one.
 
-## Commit gate
-
-The plugin judges every `git commit` Claude runs. A commit passes when the session ran a `verify`, `run` or `code-review` skill, or when its message carries a `Verified:` trailer that says how the change was checked or why it was not. The `commit_gate` option sets what happens to the other commits:
-
-| Value | Effect |
-| --- | --- |
-| `observe` (default) | The commit goes through and is recorded in the plugin's store under `plugins/store/` in the Claude Code configuration folder |
-| `enforce` | The commit is blocked with the reason, and after two blocks in a session the next commit goes through |
-| `off` | Nothing is judged |
-
-Change it in `/config`, or in `settings.json` under `pluginConfigs`. Review the records of `observe` for false alarms before you switch to `enforce`.
-
-## Wait gate
-
-The plugin also judges every foreground shell command, in Bash and in PowerShell. A command fails the check when it can sleep or poll for longer than a minute, also inside `ssh`: an `until` or `while` loop around a `sleep`, a counted loop whose rounds add up to more than a minute, or sleeps chained between commands. A command started with `run_in_background` is not judged. The `wait_gate` option takes the same three values as `commit_gate` and records under the key `wait-gate` in the same store.
-
-## Privacy gate
-
-The plugin checks every `git push` and every `gh pr`, `gh issue` or `gh release` text Claude sends, in Bash and in PowerShell. For a push it reads the commits that no remote has yet, and for `gh` the command and its body file. It blocks the step when the text holds a path under this computer's home folder, such as `C:\Users\<account>`, `/c/Users/<account>`, `/home/<account>` or `/Users/<account>`, and names the path it found. The `privacy_gate` option is `enforce` by default, because a pushed path cannot be taken back, and takes `observe` and `off` as well. It records under the key `privacy-gate` in the same store. Names of other projects, folders and hosts cannot be told apart from ordinary words, so the rule file `security.md` covers them.
-
 ## Check
 
 ```sh
 claude plugin validate plugins/concise
-claude plugin eval plugins/concise --scaffold --allow-tools Edit Write
 ```
-
-The eval cases in `plugins/concise/evals/` come from failures seen in real sessions. They use no shell tool, so they also run where Claude Code has no sandbox.
 
 ## License and credits
 
