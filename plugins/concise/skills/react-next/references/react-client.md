@@ -20,7 +20,7 @@
 - A shared-element morph needs the same `name` on the old and new element. Two mounted elements with the same name break the transition, so add an ID to each name in lists. Set `default="none"` on named elements so they do not crossfade on every unrelated transition.
 - The morph plays when the destination renders in the same commit as the navigation, as with prefetched pages. If the destination suspends into a fallback first, the content gets its enter animation instead.
 - Tag directional navigations with `<Link transitionTypes={['nav-forward']}>` and map types to animations in the `enter` and `exit` props. Browser back and swipe gestures carry no type, so only the shared-element morph plays for them.
-- Put the enter and exit wrapper in each `page.tsx`, not in a layout: layouts persist across navigations, so enter and exit never fire there.
+- Put the enter and exit wrapper in each `page.tsx`, not in a layout, because layouts persist across navigations and enter and exit never fire there.
 - Named elements are skipped by hit-testing while a transition runs, so keep transitions short and do not name controls users click rapidly.
 - Under `prefers-reduced-motion: reduce`, keep crossfades and drop positional movement instead of removing every animation.
 - Transition types and `view-transition-class` need Chromium 125 or a recent Safari or Firefox. Without support the navigation still works, unanimated.

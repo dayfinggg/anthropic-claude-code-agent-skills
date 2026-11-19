@@ -4,8 +4,7 @@
 
 - Debian's `fastcgi.conf` sets `SCRIPT_FILENAME` and `fastcgi_params` does not. A location that includes only `fastcgi_params` without its own `fastcgi_param SCRIPT_FILENAME ...;` line gives "Primary script unknown" in the log and "File not found." in the browser.
 - Check that the script exists before passing it on, with `try_files $uri =404;` or Debian's `snippets/fastcgi-php.conf` (which runs `try_files $fastcgi_script_name =404;` and includes `fastcgi.conf`). Without it, any path ending in `.php`, uploaded files included, reaches PHP-FPM.
-- Behind a release symlink, use `$realpath_root` instead of `$document_root` in `SCRIPT_FILENAME` and `DOCUMENT_ROOT`, so PHP sees the resolved release path.
-- 502 means nginx could not talk to PHP-FPM: the socket path in `fastcgi_pass` differs from the pool's `listen`, the socket's `listen.owner` or `listen.mode` keeps nginx out, or the pool hit `pm.max_children` (the PHP-FPM log says "server reached pm.max_children setting"). 504 means PHP-FPM accepted the request and did not answer within `fastcgi_read_timeout` (60 seconds by default).
+- 502 means nginx could not talk to PHP-FPM. The usual causes are a socket path in `fastcgi_pass` that differs from the pool's `listen`, a `listen.owner` or `listen.mode` that keeps nginx out, and a pool at `pm.max_children` (the PHP-FPM log says "server reached pm.max_children setting"). 504 means PHP-FPM accepted the request and did not answer within `fastcgi_read_timeout` (60 seconds by default).
 
 ## Headers and conditions
 
@@ -17,11 +16,6 @@
 
 - `fastcgi_cache_key` has no default. Set it to `$scheme$host$request_uri` or more, and bypass the cache for logged-in cookies and POST with both `fastcgi_cache_bypass` and `fastcgi_no_cache`, or one user's page is served to everyone.
 - nginx does not cache a response that carries `Set-Cookie`. Adding `Set-Cookie` to `fastcgi_ignore_headers` caches it, and the cached copy then hands one visitor's session cookie to everyone.
-
-## Visitor addresses behind Cloudflare
-
-- Restore the visitor address with `real_ip_header CF-Connecting-IP;` and one `set_real_ip_from` line per Cloudflare range. The ranges are published as plain lists at `https://www.cloudflare.com/ips-v4` and `https://www.cloudflare.com/ips-v6`. Read both lists when writing these lines or firewall rules.
-- Generate the include file from both lists in one step and write it only after both downloads succeeded and each line parsed as an address range. An empty file trusts no proxy, and every visitor then appears with a Cloudflare address.
 
 ## PHP-FPM pools
 

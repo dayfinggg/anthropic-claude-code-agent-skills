@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Turning a software request into an approved design, an implementation plan and tracker tickets with blocking edges. Use when asked to plan, design, spec, scope or break down a feature, to interview the user before building, to split a PRD, spec or epic into GitHub issues, to sequence a wide refactor or migration across PRs, or when work will span several sessions. Covers gh issue create --blocked-by and --parent.
+description: Turning a software request into an approved design, an implementation plan and tracker tickets with blocking edges. Use when asked to plan, design, spec, scope or break down a feature, to interview the user before building, to split a PRD, spec or epic into GitHub issues, to sequence a wide refactor or migration across PRs, or when work will span several sessions. Covers gh issue create --blocked-by and --parent. ADRs and spec formats belong to architecture, and running plan tasks through subagents to orchestration.
 ---
 
 # Planning
@@ -15,7 +15,6 @@ This skill covers the path from a request to an approved design, a plan an imple
 ## Approval and questions
 
 - When the user asked for a plan or design, stop at the approved document. When they asked for the work itself, the plan is a step of that work: write it and continue, stopping only for decisions that change what gets built.
-- Look facts up yourself and ask the user only for decisions. State each call you make yourself, with its reason, so the user can correct it.
 - When the goal behind the request is unclear and would change the design, ask about it first, as one open question in the reply text with no options, in place of the AskUserQuestion format. Options steer the answer away from the user's own intent.
 - After that, ask in rounds through AskUserQuestion. A round holds every open decision whose prerequisites are settled, each with your recommended option first. A question that depends on another open one waits for the next round. An unanswered question takes your recommendation, recorded as an assumption in the plan.
 - For a design beyond a few lines, show 2 or 3 real approaches with their trade-offs and your pick, and wait for the choice. Drop options the existing code or the user's goal rules out. When only one approach fits, say why in one line and continue.
@@ -25,7 +24,7 @@ This skill covers the path from a request to an approved design, a plan an imple
 
 - Size the design to the work. A small change gets a few lines. A project gets a written design that also names non-goals, constraints, the rejected approaches and what is left to the builder.
 - Put first the decisions the user is most likely to change: data model, interfaces, user-visible behavior. Mechanical refactoring goes last. This is reading order. Execution order follows the blocking edges.
-- Before handing over a project design, brief a fresh subagent as a builder who cannot talk to the author and must plan from the document alone. It returns only the questions where a wrong guess changes the plan. Write already-answered ones into the document, settle minor ones yourself and mark them as your calls, and bring the rest to the user in one message.
+- Before handing over a project design, brief a fresh subagent as a builder who cannot talk to the author and must plan from the document alone. It returns only the questions where a wrong guess changes the plan. Write already-answered ones into the document, settle minor ones yourself and mark them as your calls, and bring the rest to the user in one round of questions.
 
 ## Plans
 
@@ -54,8 +53,8 @@ This skill covers the path from a request to an approved design, a plan an imple
 ## Gotchas
 
 - "Sounds good" to an idea is not approval of a design you have not shown. Approval covers only what the user saw.
-- A plan longer than the code it describes has written the code. Replace bodies with signatures, test names and assertions. A line that decides nothing ("TBD", "handle edge cases", "add validation", a type no task defines) is a gap, not a step.
-- Names drift between tasks, such as `clearLayers()` in task 3 and `clearFullLayers()` in task 7. Check every consumed name and type against the task that produces it, and every spec requirement against a task that implements it.
+- A plan longer than the code it describes has written the code. Replace bodies with signatures, test names and assertions. A line that decides nothing, such as a placeholder, a vague instruction or a type no task defines, is a gap, not a step.
+- Names drift between tasks. Check every consumed name and type against the task that produces it, and every spec requirement against a task that implements it.
 - A spike is throwaway. Keeping its code is a new request that goes back through design.
 - A request that turns out to be several independent projects gets split. Agree on an order and plan one project at a time.
 - In GitHub text, `#3` links to issue 3 of the repository. Call draft tickets T1, T2 until they exist, then write the cross-references in a second pass with the real numbers.

@@ -37,8 +37,8 @@
 - A variant that overrides one gradient stop keeps the others. Add `via-none` to drop a middle stop in that state.
 - `transition` and `transition-colors` include `outline-color`, so set the outline color unconditionally to avoid a color animation on focus.
 - Sass, Less and Stylus do not work with Tailwind v4 stylesheets or style blocks.
-- Container queries are built in: `@container` on the parent, `@sm:` or `@max-md:` on children, and `@container-size` (4.3) when children need block-size units.
-- Useful v4 variants: `starting:` with `transition-discrete` for enter transitions, `not-*`, `in-*`, `nth-*`, `*:` for children, `**:` for descendants, `inert:`, `user-valid:`, `user-invalid:`, `pointer-coarse:`, `pointer-fine:`, `noscript:`.
-- Useful v4 utilities: `field-sizing-content` for auto-growing textareas, `wrap-break-word` and `wrap-anywhere` for long words in flex children, `items-center-safe` and `justify-center-safe`, `text-shadow-*`, `mask-*`, `scheme-dark`.
+- Container queries are built in, with `@container` on the parent, `@sm:` or `@max-md:` on children, and `@container-size` (4.3) when children need block-size units.
+- v4 has the variants `starting:` with `transition-discrete` for enter transitions, `not-*`, `in-*`, `nth-*`, `*:` for children, `**:` for descendants, `inert:`, `user-valid:`, `user-invalid:`, `pointer-coarse:`, `pointer-fine:` and `noscript:`.
+- v4 has the utilities `field-sizing-content` for auto-growing textareas, `wrap-break-word` and `wrap-anywhere` for long words in flex children, `items-center-safe` and `justify-center-safe`, `text-shadow-*`, `mask-*` and `scheme-dark`.
 - Reusable animations are `--animate-*` tokens with their `@keyframes` inside `@theme`. Gate decorative motion with `motion-safe:` and `motion-reduce:`.
-- `npx @tailwindcss/upgrade` (Node 20 or later) migrates dependencies, config and templates. Review its diff and check the result in a browser.
+- `npx @tailwindcss/upgrade` (Node 20 or later) migrates dependencies, config and templates. Review its diff before keeping it.

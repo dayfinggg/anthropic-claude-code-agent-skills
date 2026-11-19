@@ -47,14 +47,14 @@
 
 ## PHP 8.6 features
 
-- Partial function application: `str_replace('a', 'b', ?)` or `foo(1, ...)` returns a closure. `?` stands for one argument and `...` for the rest. The supplied arguments are evaluated when the closure is created, not when it is called. `new Foo(?)` is not supported. A partial without `...` ignores extra arguments, so it suits callbacks.
+- Partial function application, as in `str_replace('a', 'b', ?)` or `foo(1, ...)`, returns a closure. `?` stands for one argument and `...` for the rest. The supplied arguments are evaluated when the closure is created, not when it is called. `new Foo(?)` is not supported. A partial without `...` ignores extra arguments, so it suits callbacks.
 - `clamp($value, $min, $max)` returns the nearest bound. It throws `ValueError` when `$min > $max` or a bound is `NAN`.
 - Readonly properties may declare default values. The default counts as initialisation, so the constructor can no longer assign that property.
 - `#[\Override]` works on class constants and enum cases, and enums may define `__debugInfo()`.
 - The global `enum SortDirection { case Ascending; case Descending; }` exists. `symfony/polyfill-php86` provides it on older PHP, and Doctrine ORM 3.7+ requires that polyfill.
 - An object stored in a constant can be changed through `CONST->prop = $v`.
 - `mysqli::quote_string()` and `mysqli_quote_string()` return a quoted SQL string literal. Bound parameters stay the default for values.
-- New APIs: `Time\Duration`, the `Io\Poll` polling API, `Uri\Rfc3986\UriBuilder` and `Uri\WhatWg\UrlBuilder`, and the stream error API (`stream_last_errors()`).
+- 8.6 adds `Time\Duration`, the `Io\Poll` polling API, `Uri\Rfc3986\UriBuilder` and `Uri\WhatWg\UrlBuilder`, and the stream error API (`stream_last_errors()`).
 
 ## PHP 8.6 breaks
 
@@ -67,13 +67,15 @@
 
 ## PHP 8.6 deprecations
 
+PHP 8.6 deprecates the items below, with the replacement in parentheses where one exists.
+
 - `return` inside a `finally` block.
 - Returning a value from `__construct()` or `__destruct()`, or making either a generator.
 - `is_a()` and `is_subclass_of()` with a string first argument while `$allow_string` is `false`.
-- `spl_object_hash()`: use `spl_object_id()`. `is_double()`, `is_long()`, `is_integer()` and `doubleval()`: use `is_float()`, `is_int()` and `floatval()`.
-- `strcoll()` and `SORT_LOCALE_STRING`: use `Collator`. Also `metaphone()`, the mbregex `mb_ereg*` functions, and the third argument of `define()`.
-- `SplFileObject::fgetcsv()`, `fputcsv()`, `setCsvControl()` and `getCsvControl()`. The global `fgetcsv()` and `fputcsv()` functions stay.
+- `spl_object_hash()` (use `spl_object_id()`), and `is_double()`, `is_long()`, `is_integer()` and `doubleval()` (use `is_float()`, `is_int()` and `floatval()`).
+- `strcoll()` and `SORT_LOCALE_STRING` (use `Collator`), `metaphone()`, the mbregex `mb_ereg*` functions, and the third argument of `define()`.
+- `SplFileObject::fgetcsv()`, `fputcsv()`, `setCsvControl()` and `getCsvControl()` (the global `fgetcsv()` and `fputcsv()` functions stay).
 - `mysqli_stmt_init()`, `mysqli::stmt_init()` and `mysqli_get_charset()`.
-- Passing an object to `array_walk()` or `http_build_query()`. Convert it with `get_object_vars()`.
+- Passing an object to `array_walk()` or `http_build_query()` (convert it with `get_object_vars()`).
 - `ReflectionProperty::setValue()` with an object of another class, and `ReflectionMethod::invoke()` with an object for a static method.
 - `let` or `is` as a class, function or constant name, `_` as a constant name, `readonly` as a function name, and `namespace` as a class constant name.

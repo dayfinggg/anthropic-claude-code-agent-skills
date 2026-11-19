@@ -12,7 +12,7 @@
 
 ## How to use this list
 
-- Without design direction a model falls back on a few default looks, and a general instruction such as "avoid a generic AI look" only swaps one default for another. Naming the specific patterns works. Anthropic's own example: "Do not use a cream or off-white background, italic accent words in headlines, numbered 01/02/03 section labels, monospace labels, or pill-shaped buttons."
+- Without design direction a model falls back on a few default looks. A general instruction to avoid them only swaps one default for another, while naming the specific patterns works.
 - Treat every pattern below as off unless the brief or the project's existing design asks for it. The brief's explicit direction and the project's design system win over this list.
 - After the first render, name what the page used instead of the banned patterns. If that is another stock choice, add it to the list for this task and revise.
 
@@ -41,7 +41,7 @@
 ## Before building
 
 - Name the subject, the audience and the page's primary job. Take them from the brief and the project, and ask only when neither gives them. Distinctive choices come from the subject's own world, its materials and vocabulary. Build with real content, not lorem ipsum.
-- Write a short plan first: four to six named colors with hex or `oklch` values, the typefaces and their roles, a layout idea with its alignment grid, and the two or three principles that make this page specific. Check each choice against the table above and any pattern added for this task, and replace the ones that match.
+- Write a short plan first, with four to six named colors in hex or `oklch` values, the typefaces and their roles, a layout idea with its alignment grid, and the two or three principles that make this page specific. Check each choice against the table above and any pattern added for this task, and replace the ones that match.
 
 ## shadcn/ui without the stock look
 
@@ -53,15 +53,15 @@
 
 - One or two typefaces with a deliberate scale, weights and spacing. Body lines under about 80 characters (`max-w-[60ch]`), unitless line height around 1.5, and a little more for serif body text. `text-wrap: balance` on headings.
 - Color from a small token set in `oklch`, with contrast checked for every text and control pair in both themes.
-- Structure carries information: borders, numbering, dividers and labels appear only where they encode something about the content.
+- Borders, numbering, dividers and labels appear only where they encode something about the content.
 - Spend boldness on one element per view and keep the rest quiet. Remove one decoration before calling it done.
 - Layer shadows (ambient plus direct light) where something floats, and keep nested radii concentric, with the inner radius equal to the outer radius minus the padding.
-- `tabular-nums` for numbers that are compared, and `font-size` in `rem`, never `px`.
+- `tabular-nums` for numbers that are compared, and `font-size` in `rem` so the user's browser setting applies.
 
 ## Copy
 
-- Name things the way users think of them ("notifications", not "webhook config"), in plain words rather than sales language.
-- A button says what happens ("Save changes", not "Submit"), and the action keeps its name through the flow: "Publish" leads to a "Published" message.
+- Name things in the words users think in, such as "notifications", in plain language rather than sales language.
+- A button says what happens, such as "Save changes", and the action keeps its name through the flow, so "Publish" leads to a "Published" message.
 - Error messages state what happened and how to fix it, without apologizing. Empty states invite the next action.
 - Use sentence case, active voice and plain verbs, and give each piece of text one job.
 

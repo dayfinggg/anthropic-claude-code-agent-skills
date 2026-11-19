@@ -10,21 +10,22 @@
 
 ## Symfony versions
 
-- Symfony 7.4 is the LTS. It gets bug fixes until 2028-11 and security fixes until 2029-11. Symfony 6.4 is still maintained.
-- Symfony 8.0 reached end of life in 2026-07. Symfony 8.1 is the stable line, maintained until 2027-01. Symfony 8.2 is in beta, ships in 2026-11 and is maintained until 2027-07.
-- 7.4 and 8.0 have the same features. 8.0 only drops what 7.4 deprecates, so clear every 7.4 deprecation before the major upgrade.
+- On 2026-11-19 symfony.com listed 8.1.11 as the latest stable release, 7.4.23 as the LTS and 8.2.0-BETA2 as the next release.
+- 7.4 is the LTS, with bug fixes until 2028-11 and security fixes until 2029-11. 6.4 gets security fixes until 2027-11, after its bug fixes end in 2026-11.
+- 8.0 reached end of life in 2026-07, and 8.1 is maintained until 2027-01. 8.2, planned for release in 2026-11, is maintained until 2027-07.
+- 7.4 and 8.0 have the same features, and 8.0 only drops what 7.4 deprecates, so clear every 7.4 deprecation before the major upgrade.
 
 ## Removed in Symfony 8.0
 
-- XML configuration for services and routes. Use YAML, attributes or PHP that returns `App::config([...])`.
-- Fluent config-builder closures such as `return function (AcmeConfig $config) { ... }`. Return an array instead.
-- `Request::get()`. Read `$request->attributes`, `$request->query` or `$request->request`.
-- `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`. Do not add the method to user classes. Strip secrets in `__serialize()` when the session must not hold them.
-- `#[TaggedIterator]` and `#[TaggedLocator]`. Use `#[AutowireIterator]` and `#[AutowireLocator]`, and `!tagged_iterator` instead of `!tagged`.
-- `Application::add()` and `Command::getDefaultName()`. Use `addCommand()` and `#[AsCommand]`.
-- Option arrays in constraint constructors such as `new Assert\Length(['min' => 3])`. Pass named arguments, as in `new Assert\Length(min: 3)`.
-- Automatic lookup of an entity from every matching route wildcard. `{id}` still resolves. For another field write `#[Route('/product/{slug:product}')]` or use `#[MapEntity]`.
-- HTTP method override for `GET` and `HEAD` requests is ignored.
+- Replace XML configuration for services and routes with YAML, attributes or PHP that returns `App::config([...])`.
+- Replace fluent config-builder closures such as `return function (AcmeConfig $config) { ... }` with a returned array.
+- Replace `Request::get()` with `$request->attributes`, `$request->query` or `$request->request`.
+- `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()` are gone, so do not add the method to user classes. Strip secrets in `__serialize()` when the session must not hold them.
+- Replace `#[TaggedIterator]` and `#[TaggedLocator]` with `#[AutowireIterator]` and `#[AutowireLocator]`, and `!tagged` with `!tagged_iterator`.
+- Replace `Application::add()` and `Command::getDefaultName()` with `addCommand()` and `#[AsCommand]`.
+- Replace option arrays in constraint constructors, such as `new Assert\Length(['min' => 3])`, with named arguments, as in `new Assert\Length(min: 3)`.
+- Only `{id}` still resolves an entity automatically. For another field write `#[Route('/product/{slug:product}')]` or use `#[MapEntity]`.
+- The HTTP method override is ignored for `GET` and `HEAD` requests.
 
 ## Symfony 8.1 changes and idioms
 

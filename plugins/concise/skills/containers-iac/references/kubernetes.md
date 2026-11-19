@@ -1,6 +1,6 @@
 # Kubernetes manifests and upgrades
 
-Kubernetes 1.37 was released on 2026-08-26. The project maintains 1.37, 1.36 and 1.35. 1.35 reaches end of life on 2027-02-28, 1.36 on 2027-06-28 and 1.37 on 2027-10-28. Managed clusters often run older minors, so target the server version, not the newest release.
+Kubernetes 1.37 was released on 2026-08-26. In November 2026 the project maintained 1.37, 1.36 and 1.35, with end of life planned for 1.35 on 2027-02-28, for 1.36 on 2027-06-28 and for 1.37 on 2027-10-28.
 
 ## Workloads
 
@@ -13,28 +13,28 @@ Kubernetes 1.37 was released on 2026-08-26. The project maintains 1.37, 1.36 and
 
 ## Probes
 
-- A liveness probe that checks databases or downstream services restarts healthy pods under load and spreads the outage. Probe only the process itself. Cover slow starts with a `startupProbe` whose `failureThreshold * periodSeconds` exceeds the worst-case startup, and remember that `timeoutSeconds` defaults to 1.
+- A liveness probe that checks databases or downstream services restarts healthy pods under load and spreads the outage. Probe only the process itself. Cover slow starts with a `startupProbe` whose `failureThreshold * periodSeconds` exceeds the worst-case startup, and note that `timeoutSeconds` defaults to 1.
 - Exec probes fork a process every period and cost node CPU at high pod density. Prefer `httpGet`, `tcpSocket` or `grpc`.
 - gRPC probes reject named ports and connect in plaintext. `grpc.mode: TLS` is alpha in 1.37 behind the `GRPCContainerProbeTLS` feature gate and skips certificate verification.
 
 ## Traffic
 
-- Route new HTTP traffic with Gateway API (`gateway.networking.k8s.io/v1`, project release v1.7.0). The Ingress API is frozen. Gateway API types are CRDs, so install them or confirm that the cluster's implementation ships them.
-- Ingress NGINX was retired in March 2026 and its repository is archived, so it gets no security fixes. Do not pick it for new clusters, and move existing ones to a Gateway API implementation or another Ingress controller. `ingress2gateway` 1.x converts manifests.
-- Read EndpointSlices (`discovery.k8s.io/v1`) in tools and controllers. The core `v1` Endpoints API is deprecated since 1.33.
+- Route new HTTP traffic with Gateway API (`gateway.networking.k8s.io/v1`, project release v1.7.0), since the Ingress API is frozen. Gateway API types are CRDs, so install them or confirm that the cluster's implementation ships them.
+- Ingress NGINX was retired in March 2026 and its repository is archived, so it gets no security fixes. Pick another controller for new clusters, and move existing ones to a Gateway API implementation or another Ingress controller. `ingress2gateway` 1.x converts manifests.
+- Read EndpointSlices (`discovery.k8s.io/v1`) in tools and controllers, because the core `v1` Endpoints API is deprecated since 1.33.
 
 ## Pod Security
 
-- The `restricted` Pod Security Standard rejects pods that omit `seccompProfile.type` (`RuntimeDefault` or `Localhost`), `allowPrivilegeEscalation: false`, `capabilities.drop: ["ALL"]` or `runAsNonRoot: true`. Enforce it with the namespace label `pod-security.kubernetes.io/enforce: restricted` and pin `pod-security.kubernetes.io/enforce-version` to a minor so upgrades do not change the rules.
-- Enforce mode checks Pods, not their controllers. A violating Deployment is accepted and its ReplicaSet then fails to create pods. Add the `warn` and `audit` labels too, because those modes also report on workload objects.
+- The `restricted` Pod Security Standard rejects pods that omit `seccompProfile.type` (`RuntimeDefault` or `Localhost`), `allowPrivilegeEscalation: false`, `capabilities.drop: ["ALL"]` or `runAsNonRoot: true`. Enforce it with the namespace label `pod-security.kubernetes.io/enforce: restricted`, and pin `pod-security.kubernetes.io/enforce-version` to a minor so upgrades do not change the rules.
+- Enforce mode checks Pods, not their controllers, so a violating Deployment is accepted and its ReplicaSet then fails to create pods. Add the `warn` and `audit` labels too, because those modes also report on workload objects.
 
 ## Upgrades and removals
 
-- No built-in API version was removed after 1.32. An apiVersion error such as "no matches for kind" on a current cluster means an old beta that an earlier release stopped serving (such as `extensions/v1beta1`, `policy/v1beta1`, `batch/v1beta1`, `autoscaling/v2beta2` or `flowcontrol.apiserver.k8s.io/v1beta3`) or a CRD that is not installed.
+- No built-in API version was removed from 1.33 through 1.37. An apiVersion error such as "no matches for kind" on a current cluster means an old beta that an earlier release stopped serving (such as `extensions/v1beta1`, `policy/v1beta1`, `batch/v1beta1`, `autoscaling/v2beta2` or `flowcontrol.apiserver.k8s.io/v1beta3`) or a CRD that is not installed.
 - Since 1.35 the kubelet refuses to start on cgroup v1 nodes unless `failCgroupV1: false` is set. 1.35 is the last minor that supports containerd 1.x, so move nodes to containerd 2.0+ before upgrading past it.
-- kube-proxy `ipvs` mode is deprecated since 1.35. It is expected to be off by default by 1.40 and removed by 1.43. Use `nftables`. Check the current mode with `kubectl -n kube-system get configmap kube-proxy -o jsonpath='{.data.config\.conf}' | grep 'mode:'`.
+- kube-proxy `ipvs` mode is deprecated since 1.35, with the plan to turn it off by default by 1.40 and remove it by 1.43. Use `nftables`, and check the current mode with `kubectl -n kube-system get configmap kube-proxy -o jsonpath='{.data.config\.conf}' | grep 'mode:'`.
 - `gitRepo` volumes are permanently disabled in 1.36. Use an init container or git-sync.
 - `Service.spec.externalIPs` is deprecated in 1.36 with removal planned for 1.43. Use a LoadBalancer Service, NodePort or Gateway API.
-- kube-dns is deprecated in 1.37 and no packages are expected after 1.40. Use CoreDNS.
+- kube-dns is deprecated in 1.37, with no packages planned after 1.40. Use CoreDNS.
 - Static pods can no longer reference Secrets or ConfigMaps in 1.37, and the opt-out feature gate is gone.
-- On SELinux-enforcing nodes, `SELinuxMount` is on by default in 1.37 for CSI drivers that opt in. Pods with different SELinux labels that share a volume on one node can then fail to start. Set `securityContext.seLinuxChangePolicy: Recursive` on those pods.
+- On SELinux-enforcing nodes, `SELinuxMount` is on by default in 1.37 for CSI drivers that opt in, so pods with different SELinux labels that share a volume on one node can fail to start. Set `securityContext.seLinuxChangePolicy: Recursive` on those pods.

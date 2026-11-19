@@ -10,11 +10,11 @@
 
 ## Prisma versions
 
-- `npm install prisma` and `npx prisma` now install the Prisma ORM 8 CLI, because npm `latest` for `prisma` is an 8.0.0 release candidate while `@prisma/client` stays at 7.10.1. The v8 CLI does not read `schema.prisma` and has no `generate`, `migrate dev` or `db push`.
+- On 2026-11-19 npm `latest` was 8.0.0-rc.34 for `prisma` and 7.10.1 for `@prisma/client`, so `npm install prisma` and `npx prisma` install the Prisma ORM 8 CLI. The v8 CLI does not read `schema.prisma` and has no `generate`, `migrate dev` or `db push`.
 - In a Prisma 7 project, pin `"prisma": "^7"` and `"@prisma/client": "^7"` in `package.json`, install with `npm install --save-dev prisma@7`, and run `npx prisma@7` in CI and one-off commands. `npm ls prisma @prisma/client` shows what is installed.
 - Unversioned pages on prisma.io describe Prisma 8. Prisma 7 docs live under `/docs/orm/v7` and its CLI reference under `/docs/cli/v7`.
-- Prisma 8 has no general availability date yet. Prisma 7 gets bug and security fixes for 18 months after Prisma 8 GA. Prisma 6 gets security patches only, until 2026-11-19.
-- Prisma Accelerate retires on 2026-12-01. Replace its pooling with the provider's pooler or the Prisma Postgres pooled URL. Its query cache (`cacheStrategy`) has no replacement.
+- Prisma 7 gets bug and security fixes for 18 months after Prisma 8 general availability. Prisma 6 got security patches only, until 2026-11-19.
+- Prisma Accelerate is scheduled to retire on 2026-12-01. Replace its pooling with the provider's pooler or the Prisma Postgres pooled URL. Its query cache (`cacheStrategy`) has no replacement.
 
 ## Prisma 7
 
@@ -27,18 +27,18 @@
 
 ## Prisma 8
 
-- Prisma 8 is the `prisma` CLI plus one library per database, such as `@prisma/orm-postgres` (release candidate) and `@prisma/orm-mongo`. MariaDB, SQL Server and CockroachDB stay on Prisma 7.
+- Prisma 8 is the `prisma` CLI plus one library per database, such as `@prisma/orm-postgres` and `@prisma/orm-mongo`. MariaDB, SQL Server and CockroachDB stay on Prisma 7.
 - CLI and library versions differ by design. Install both at `latest` and keep exactly one copy of the `@prisma/orm-*` libraries, checked with `npm ls @prisma/orm-framework`. `@prisma/orm-postgres` needs the `temporal-polyfill` peer dependency, which Yarn does not install by itself.
 - Needs Node.js 22.18+, 24.11+ or 26+, and TypeScript 5.9+.
 - The schema file is `contract.prisma`. `prisma generate` becomes `prisma contract emit` (commit `contract.json` and `contract.d.ts`). `migrate dev` becomes `prisma db update`, or `prisma migration plan` then `prisma db migrate`. `migrate deploy` becomes `prisma db migrate`, `db pull` becomes `prisma contract infer`, and `db push` becomes `prisma db init` on an empty database and `prisma db update` after that. There is no `db seed`.
 - `prisma db update` changes whatever database `DATABASE_URL` names. Check that value before running any `db` command in a project that sits next to a Prisma 7 app.
-- A Prisma 8 `.prisma` contract file must start with the line `// use prisma-8`. `prisma contract emit` silently skips a file without it. `prisma orm init` writes the line, so add it only to files created by hand.
-- Missing in Prisma 8: `$extends`, atomic `increment`, filters inside JSON, most nested writes, transaction isolation levels, and `P2002`-style codes. Detect a unique violation with `error.sqlState === "23505"`.
+- A Prisma 8 `.prisma` contract file starts with the line `// use prisma-8`, and `prisma contract emit` skips a file without it and gives no warning. `prisma orm init` writes the line, so add it only to files created by hand.
+- Prisma 8 lacks `$extends`, atomic `increment`, filters inside JSON, most nested writes, transaction isolation levels and `P2002`-style codes. Detect a unique violation with `error.sqlState === "23505"`.
 - Move a running Prisma 7 app with `npx prisma@latest orm init --from-prisma7-schema prisma/schema.prisma` and the incremental migration guide, rather than with a new-project install.
 
 ## Drizzle
 
-- npm `latest` is drizzle-orm 0.45.4 with drizzle-kit 0.31, and 1.0.0-rc.5 is on the `rc` tag. orm.drizzle.team documents the 1.0 RC API. On 0.45 the names differ: `relations()` per table instead of `defineRelations()`, `.enableRLS()` instead of `pgTable.withRLS()`, `drizzle({ casing })` instead of `snakeCase.table()`, `getTableColumns()` instead of `getColumns()`, and `drizzle-zod` instead of `drizzle-orm/zod`.
+- On 2026-11-19 npm `latest` was drizzle-orm 0.45.4 with drizzle-kit 0.31.11, and both had 1.0.0-rc.5 on the `rc` tag. orm.drizzle.team documents the 1.0 RC API, and 0.45 uses other names, with `relations()` per table instead of `defineRelations()`, `.enableRLS()` instead of `pgTable.withRLS()`, `drizzle({ casing })` instead of `snakeCase.table()`, `getTableColumns()` instead of `getColumns()`, and `drizzle-zod` instead of `drizzle-orm/zod`.
 - `withReplicas()` on 0.x sends reads to a replica automatically, so a read right after a write can miss it. 1.0 sends everything to the primary unless the query goes through `db.$replica`.
 - Upgrade to 1.0 with `drizzle-orm@rc` and `drizzle-kit@rc`, then run `drizzle-kit up` to convert the migrations folder (no `journal.json`, one folder per migration). Relational Queries v1 is removed, so move relations to `defineRelations()` and pass them as `drizzle(url, { relations })`. `drizzle-kit drop` is gone.
 - In 1.0, relational query filters throw on an explicit `undefined` value. Omit the key instead.

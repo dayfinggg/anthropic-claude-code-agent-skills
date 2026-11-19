@@ -3,7 +3,7 @@
 ## PostgreSQL 18
 
 - `RETURNING old.price, new.price` in `INSERT`, `UPDATE`, `DELETE` and `MERGE` returns values from before and after the change in one statement. Rename the aliases with `RETURNING WITH (OLD AS o, NEW AS n)` when a table has columns named `old` or `new`.
-- Temporal keys: `PRIMARY KEY (room_id, during WITHOUT OVERLAPS)` and `UNIQUE (..., during WITHOUT OVERLAPS)` reject overlapping ranges, and `FOREIGN KEY (room_id, PERIOD during) REFERENCES rooms (id, PERIOD valid)` checks range coverage. They replace an exclusion constraint built with btree_gist.
+- Temporal keys replace an exclusion constraint built with btree_gist. `PRIMARY KEY (room_id, during WITHOUT OVERLAPS)` and `UNIQUE (..., during WITHOUT OVERLAPS)` reject overlapping ranges, and `FOREIGN KEY (room_id, PERIOD during) REFERENCES rooms (id, PERIOD valid)` checks range coverage.
 - `CHECK (...) NOT ENFORCED` and `FOREIGN KEY ... NOT ENFORCED` record a constraint without checking it.
 - `uuidv7()` generates time-ordered UUIDs, and `uuidv4()` is an alias of `gen_random_uuid()`.
 - NOT NULL constraints are stored in `pg_constraint`, can be named, and accept `NOT VALID` plus a later `VALIDATE CONSTRAINT`.

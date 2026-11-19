@@ -31,14 +31,13 @@ addopts = ["-ra"]
 
 ## Typing by floor
 
-- 3.12: `def first[T](xs: list[T]) -> T`, `class Box[T]:`, `type Pair = tuple[int, int]` and `@typing.override` replace `TypeVar` and `TypeAlias` boilerplate.
-- 3.13: type parameter defaults such as `class Box[T = int]:`, `typing.TypeIs`, `typing.ReadOnly` and `warnings.deprecated`.
-- 3.14: annotations are evaluated lazily (PEP 649), so forward references need no quotes. `from __future__ import annotations` is deprecated. Read annotations with `annotationlib.get_annotations(obj, format=Format.FORWARDREF)` when names may be undefined.
-- 3.15: `typing.TypeForm[T]` for values that are type expressions, `TypedDict` with `closed=True` or `extra_items=T` (PEP 728), and `@typing.disjoint_base` (PEP 800).
+- A 3.12 floor allows `def first[T](xs: list[T]) -> T`, `class Box[T]:`, `type Pair = tuple[int, int]` and `@typing.override`, which replace `TypeVar` and `TypeAlias` boilerplate.
+- A 3.13 floor adds type parameter defaults such as `class Box[T = int]:`, `typing.TypeIs`, `typing.ReadOnly` and `warnings.deprecated`.
+- From 3.14 annotations are evaluated lazily (PEP 649), so forward references need no quotes, and `from __future__ import annotations` is deprecated. Read annotations with `annotationlib.get_annotations(obj, format=Format.FORWARDREF)` when names may be undefined.
+- A 3.15 floor adds `typing.TypeForm[T]` for values that are type expressions, `TypedDict` with `closed=True` or `extra_items=T` (PEP 728), and `@typing.disjoint_base` (PEP 800).
 
 ## Syntax and built-ins
 
-- 3.14: `t"..."` template strings return `string.templatelib.Template`, for libraries that escape interpolations in SQL, HTML or shell text. `except A, B:` needs no parentheses when there is no `as`.
-- 3.15: `lazy import json` and `lazy from pathlib import Path` defer loading until first use. They are allowed only at module level, not in a function, class body or `try` block, and star and `__future__` imports cannot be lazy. `__lazy_modules__ = ["json"]` gives the same effect on 3.15 and stays eager on older versions.
-- 3.15: built-in `frozendict(...)` (hashable when its contents are), `MISSING = sentinel("MISSING")`, unpacking in comprehensions as in `[*xs for xs in lists]` and `{**d for d in dicts}`, and `re.prefixmatch()` as the preferred name for `re.match()`.
-- 3.15: `python -m profiling.sampling run script.py`, `run -m pkg.mod`, `attach <pid>` or `dump <pid>` (stack of every thread, `--async-aware` for tasks) profiles without code changes. `--mode wall` is the default.
+- 3.14 adds `t"..."` template strings, which return `string.templatelib.Template` for libraries that escape interpolations in SQL, HTML or shell text, and allows `except A, B:` without parentheses when there is no `as`.
+- 3.15 adds `lazy import json` and `lazy from pathlib import Path`, which defer loading until first use. They are allowed only at module level, not in a function, class body or `try` block, and star and `__future__` imports cannot be lazy. `__lazy_modules__ = ["json"]` gives the same effect on 3.15 and stays eager on older versions.
+- 3.15 also adds built-in `frozendict(...)` (hashable when its contents are), `MISSING = sentinel("MISSING")`, unpacking in comprehensions as in `[*xs for xs in lists]` and `{**d for d in dicts}`, and `re.prefixmatch()` as the preferred name for `re.match()`.

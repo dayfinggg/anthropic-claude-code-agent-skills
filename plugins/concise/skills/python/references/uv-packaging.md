@@ -1,10 +1,10 @@
 # uv projects, scripts and packaging
 
-Detail for uv 0.13 projects. The everyday commands are in `SKILL.md`.
+Detail for uv 0.13 projects.
 
 ## Projects and groups
 
-- `uv init` creates a packaged application since uv 0.12: `src/<name>/`, the `uv_build` backend and a `[project.scripts]` entry run as `uv run <name>`. `uv init --lib` adds `py.typed`, and `uv init --no-package` gives the old unpackaged layout with `main.py`.
+- `uv init` creates a packaged application since uv 0.12, with `src/<name>/`, the `uv_build` backend and a `[project.scripts]` entry run as `uv run <name>`. `uv init --lib` adds `py.typed`, and `uv init --no-package` gives the old unpackaged layout with `main.py`.
 - uv syncs the `dev` group by default. Change the set with `[tool.uv] default-groups = ["dev", "test"]` or `"all"`, and leave groups out of production installs with `uv sync --no-dev` or `--no-default-groups`.
 - A group includes another with `{include-group = "lint"}` inside its list.
 - A legacy `[tool.uv] dev-dependencies` list merges into the `dev` group, and `uv add --dev` keeps writing to it while it exists. Move its entries into `[dependency-groups]`.
@@ -14,7 +14,7 @@ Detail for uv 0.13 projects. The everyday commands are in `SKILL.md`.
 
 ## Scripts with inline metadata
 
-- A script's metadata block needs a `dependencies` key even when the list is empty:
+- A script's metadata block needs a `dependencies` key even when the list is empty.
 
 ```python
 #!/usr/bin/env -S uv run --script

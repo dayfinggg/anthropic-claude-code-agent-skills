@@ -1,6 +1,6 @@
 # Ruff, ty and mypy
 
-Detail for ruff 0.17, ty 0.0.104 and mypy 2.4. The main defaults are in `SKILL.md`.
+Detail for ruff 0.17, ty 0.0.104 and mypy 2.4.
 
 ## Ruff
 
@@ -18,12 +18,11 @@ Detail for ruff 0.17, ty 0.0.104 and mypy 2.4. The main defaults are in `SKILL.m
 - 0.0.97 renamed `unresolved-import` to `import-not-found`. The old name stays as an alias, and when one table sets both, the current name wins.
 - Configure with `[tool.ty.environment] python-version = "3.14"` and `[tool.ty.rules]`, where each rule is `"error"`, `"warn"` or `"ignore"` and the key `all` sets every rule. Without `python-version` ty uses the `requires-python` floor.
 - A `ty.toml` file wins over `pyproject.toml`, and the `[tool.ty]` table next to it is then ignored entirely.
-- Suppress with `# ty: ignore[rule]`. In a `# type: ignore[...]` comment ty reads only codes with a `ty:` prefix, so one comment serves mypy and ty: `# type: ignore[arg-type, ty:invalid-argument-type]`. A bare `# type: ignore` silences every rule on the line.
-- Adopt ty on an existing codebase with `ty check --add-ignore`, which writes `ty: ignore` comments, or with a baseline (preview since 0.0.93): set `[tool.ty] baseline = "ty-baseline.json"` and run `ty check --update-baseline`. The baseline format may change between releases.
+- Suppress with `# ty: ignore[rule]`. In a `# type: ignore[...]` comment ty reads only codes with a `ty:` prefix, so one comment such as `# type: ignore[arg-type, ty:invalid-argument-type]` serves mypy and ty. A bare `# type: ignore` silences every rule on the line.
+- Adopt ty on an existing codebase with `ty check --add-ignore`, which writes `ty: ignore` comments, or with a baseline (preview since 0.0.93) by setting `[tool.ty] baseline = "ty-baseline.json"` and running `ty check --update-baseline`. The baseline format may change between releases.
 - ty has no plugin system but built-in support for Django, Pydantic and pytest.
 
 ## mypy
 
 - mypy 2.0 gave `--allow-redefinition` the behavior of 1.x `--allow-redefinition-new`. `--allow-redefinition-old` keeps the old behavior.
 - mypy 2.0 respects `--ignore-missing-imports` for every package, including those whose stubs mypy 0.812 and earlier bundled, so missing `types-*` stubs for them no longer show up when that flag is set.
-- Run mypy inside the project environment (`uv run mypy`), never through `uvx`, or it cannot see installed packages.

@@ -37,7 +37,7 @@
 
 ## Adopting in an existing app
 
-- Find the config first: `grep -rnE "^export const (dynamic|revalidate|fetchCache)" app`. Each match errors once the flag is on.
+- Find the old config first with `grep -rnE "^export const (dynamic|revalidate|fetchCache)" app`, because each match errors once the flag is on.
 - If the app already uses `'use cache'`, the build fails until the flag is on, so there is no passing baseline before enabling it.
 - When both `app/` and `src/app/` exist, Next.js builds only `app/`. Ask which tree to migrate.
 - `npx @next/codemod@latest cache-components-instant-false ./app` adds `export const instant = false` with a `// TODO: Cache Components adoption` comment to every page, layout and default file that is not `'use client'` or `'use server'`. It refuses a dirty working tree unless given `--force`. A wrong path reports `0 ok` and exits 0, so check the file count.

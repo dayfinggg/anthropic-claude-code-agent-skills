@@ -4,7 +4,7 @@
 
 - Edition 2024 needs Rust 1.85. Run `cargo update`, then `cargo fix --edition --all-features`, once per `--target` that has platform `cfg` code. Then set `edition = "2024"`, build, test, and run `cargo fmt`.
 - `cargo fix --edition` does not touch code behind inactive `cfg`s, doctests, `macro_rules!` bodies that the crate never invokes, or proc-macro output. Fix those by hand.
-- Its rewrites preserve 2021 behavior: `if let` becomes `match`, `impl Trait` gains `use<>`, `$e:expr` becomes `$e:expr_2021`. Review each one and revert it where the 2024 behavior is what you want.
+- Its rewrites preserve 2021 behavior, so `if let` becomes `match`, `impl Trait` gains `use<>` and `$e:expr` becomes `$e:expr_2021`. Review each one and revert it where the 2024 behavior is what you want.
 
 ## Language
 
@@ -16,10 +16,10 @@
 - A macro metavariable without a fragment specifier is a hard error.
 - `gen` is a reserved keyword. Write `r#gen` for existing identifiers. Guarded strings like `#"foo"#` and runs of two or more `#` are reserved tokens.
 - `unsafe_op_in_unsafe_fn` warns by default. Wrap each unsafe operation inside an `unsafe fn` body in its own `unsafe {}` block.
-- `extern` blocks must be written `unsafe extern`, and `no_mangle`, `export_name` and `link_section` must be written `#[unsafe(...)]`. The unsafe and FFI reference listed in `SKILL.md` has the details.
+- `extern` blocks must be written `unsafe extern`, and `no_mangle`, `export_name` and `link_section` must be written `#[unsafe(...)]`.
 - References to a `static mut` are denied by default (`static_mut_refs`).
 - `std::env::set_var` and `remove_var` are `unsafe`.
-- The never type fallback change that the edition guide lists for 2024 applies to all editions since Rust 1.100. `SKILL.md` covers the fixes.
+- The never type fallback change that the edition guide lists for 2024 applies to all editions since Rust 1.100.
 
 ## Standard library
 

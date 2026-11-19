@@ -10,7 +10,7 @@
 
 ## PostgreSQL minor releases of 2026-11-12
 
-- 18.7, 17.12, 16.16, 15.20 and 14.25 fix 52 CVEs, many of them arbitrary code execution by an authenticated user, and over 140 bugs. 14.25 is the last PostgreSQL 14 release: 14 is end of life since 2026-11-12. Minor updates need no dump or `pg_upgrade`, only new binaries and a restart.
+- 18.7, 17.12, 16.16, 15.20 and 14.25 fix 52 CVEs, many of them arbitrary code execution by an authenticated user, and over 140 bugs. 14.25 is the last PostgreSQL 14 release, because 14 reached end of life on 2026-11-12. Minor updates need no dump or `pg_upgrade`, only new binaries and a restart.
 - After the update, reindex GIN indexes suspected of corruption, every GiST index that uses `gist_trgm_ops`, and B-tree indexes on `bpchar` columns declared without a length (`char(n)` is not affected).
 - Run `REINDEX TABLE` on any table that reports `missing chunk number`, and take a new full backup if you use incremental backups.
 - Find `NOT NULL NO INHERIT` constraints on partitioned tables with `SELECT conrelid::regclass, conname FROM pg_constraint WHERE contype = 'n' AND connoinherit AND conrelid IN (SELECT oid FROM pg_class WHERE relkind = 'p');`. Drop them or run `ALTER TABLE ... ALTER CONSTRAINT ... INHERIT`, which fails while a partition holds NULLs in that column.
@@ -54,5 +54,5 @@
 ## PgBouncer
 
 - 1.26.1 fixes CVE-2026-107350 (a client could log in as another SCRAM user, including admins), CVE-2026-107349 (a startup `options` value such as `-c=` spins a CPU core forever when `ignore_startup_parameters` is non-empty) and CVE-2026-107348.
-- Since 1.26.0 `search_path` is tracked by default on PostgreSQL 18+, and `default_transaction_read_only` on 14+, so `SET search_path` in transaction pooling no longer leaks to other clients. In 1.26.1 listing `search_path` in `ignore_startup_parameters` restores the 1.25 behaviour.
+- Since 1.26.0 `search_path` is tracked by default on PostgreSQL 18+, and `default_transaction_read_only` on 14+, so `SET search_path` in transaction pooling no longer leaks to other clients. In 1.26.1 listing `search_path` in `ignore_startup_parameters` restores the 1.25 behavior.
 - 1.26 sends `pgbouncer.version`, `pgbouncer.pool_mode` and `pgbouncer.max_prepared_statements` as `ParameterStatus` on login, so drivers can detect the pooler.

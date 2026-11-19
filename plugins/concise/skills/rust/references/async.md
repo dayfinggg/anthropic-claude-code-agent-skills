@@ -6,7 +6,7 @@ Rules for async code on Rust 1.85 and later with tokio 1.x.
 
 - `async fn` in a public trait gives callers no way to require a `Send` future (`async_fn_in_trait` lint). Declare `fn run(&self) -> impl Future<Output = T> + Send` instead of allowing the lint or adding `#[async_trait]`. Implementations may still write `async fn run(&self) -> T`. The `trait-variant` crate generates a `Send` and a local variant.
 - Traits with `async fn` or `-> impl Trait` methods are not dyn compatible. For `dyn` dispatch keep `async-trait` or return `Pin<Box<dyn Future<Output = T> + Send + '_>>`.
-- `AsyncFn*` bounds (1.85) cannot require a `Send` future, because return type notation is still unstable, and `AsyncFn*` traits are not dyn compatible. For spawned callbacks use `F: Fn(X) -> Fut, Fut: Future<Output = T> + Send + 'static`.
+- `AsyncFn*` bounds (1.85) cannot require a `Send` future, because return type notation is unstable in 1.100, and `AsyncFn*` traits are not dyn compatible. For spawned callbacks use `F: Fn(X) -> Fut, Fut: Future<Output = T> + Send + 'static`.
 
 ## Locks and blocking
 

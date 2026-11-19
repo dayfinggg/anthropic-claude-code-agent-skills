@@ -1,7 +1,5 @@
 # GNU and BSD tools, macOS bash
 
-Linux and Git Bash ship GNU tools. macOS ships BSD tools and bash 3.2.57 as `/bin/bash`. `sed --version` succeeds only on GNU.
-
 ## Commands that differ
 
 | Task | GNU (Linux, Git Bash) | BSD (macOS) | Works on both |
@@ -16,5 +14,5 @@ Linux and Git Bash ship GNU tools. macOS ships BSD tools and bash 3.2.57 as `/bi
 ## macOS /bin/bash 3.2
 
 - It lacks `readarray` and `mapfile`, associative arrays and `${v,,}` (all bash 4.0) and `inherit_errexit` (4.4).
-- Before 4.4, `"${arr[@]}"` of an empty array fails as unbound under `set -u`. Guard with `${arr[@]+"${arr[@]}"}`.
-- Use `#!/usr/bin/env bash` so a Homebrew bash on PATH runs the script, and keep scripts meant for stock macOS within 3.2.
+- Before 4.4, `"${arr[@]}"` of an empty array fails as unbound under `set -u`, so guard it with `${arr[@]+"${arr[@]}"}`.
+- Keep scripts meant for stock macOS within 3.2. `#!/usr/bin/env bash` lets a Homebrew bash on `PATH` run them.

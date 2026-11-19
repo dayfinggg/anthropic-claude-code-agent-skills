@@ -12,15 +12,15 @@
 
 ## Scope and focus areas
 
-- When `<target-dir>/THREAT_MODEL.md` exists it is the preferred scoping input: take the focus areas and threat classes from its section 3 "Entry points & trust boundaries" table and its section 4 "Threats" table.
-- Without it, do a quick recon: list the source tree, read the entry points and dispatch code (format magic-byte checks, switch statements on input types, parser registration tables) and propose 3 to 10 focus areas. When the user names the focus areas, use exactly those and skip the recon.
+- When `<target-dir>/THREAT_MODEL.md` exists it is the preferred scoping input, so take the focus areas and threat classes from its section 3 "Entry points & trust boundaries" table and its section 4 "Threats" table.
+- Without it, do a quick recon. List the source tree, read the entry points and dispatch code (format magic-byte checks, switch statements on input types, parser registration tables) and propose 3 to 10 focus areas. When the user names the focus areas, use exactly those and skip the recon.
 - Write each area as `<subsystem> (<function/file>) - <key operations>`, for example `Bravo parser (parse_bravo) - fixed stack buffer, unbounded copy`. The line is handed verbatim to a reviewer, so it has to be self-contained. The key operations (decompression, table lookups, length-prefixed parsing) steer the reviewer toward likely bug patterns.
-- Areas must be independent enough that parallel reviewers do not converge on the same bugs. Good partitions are different parsers, formats or protocol stages. Bad ones are too narrow ("line 47"), too broad ("all of parsing") or overlapping (two areas that funnel into the same code path).
+- Areas must be independent enough that parallel reviewers do not converge on the same bugs. Good partitions are different parsers, formats or protocol stages, and bad ones are too narrow (a single line), too broad (all of parsing) or overlapping (two areas that funnel into the same code path).
 
 ## Review brief
 
-- Make one pass per focus area with the brief below. Upstream (the Defending Code Reference Harness) gives each area to its own subagent, at most 10 at a time, and makes one sequential pass without fan-out when the target has fewer than 15 source files. The areas are split to avoid duplicate work, not to keep judgments apart, so without subagents take them in turn with the same brief. `SKILL.md` has the rule for choosing.
-- The reporting bar is low on purpose: the scan never drops a finding, the confidence pass only ranks, and false positives are removed in triage, which does the rigorous N-vote verification. The category groups are a menu, not the limit of the search, because the bar is any plausible exploit path and the `category` vocabulary is open-ended.
+- Make one pass per focus area with the brief below. Upstream gives each area to its own subagent, at most 10 at a time, and makes one sequential pass without fan-out when the target has fewer than 15 source files.
+- The scan drops no finding, the confidence pass only ranks, and triage removes false positives. The category groups in the brief are a menu, not the limit of the search, because the bar is any plausible exploit path and the `category` vocabulary is open-ended.
 - Organization-specific vulnerability classes (for example GraphQL depth attacks, PCI retention, a custom auth layer), compliance checks and stack-specific patterns go into a plain-text file in the same shape as the category groups. Append its contents verbatim at the marked place, and keep the file in version control with the code.
 
 ```
@@ -63,9 +63,9 @@ If you find nothing reportable in your area after a thorough read, emit a single
 
 ## Collation and confidence pass
 
-- Collect the `<finding>` blocks from all areas and drop the `category=none` placeholders. Dedupe lightly: when two findings cite the same `file:line` with the same category, keep the one with the longer description and note the duplicate's id. Heavy dedupe is the job of triage. Then assign the ids `F-001`, `F-002`, ... by severity descending, then file, then line.
-- The confidence pass is a cheap second opinion that ranks findings by signal quality, so that people and triage see the high-signal ones first. Nothing is dropped. It is shallow: re-read and score, not a full reachability trace.
-- Upstream runs it as one fresh subagent per finding, given only the finding block and the target, which is what makes the score an independent second opinion. Without subagents, run it as a separate step after collation and re-read the cited code for every finding. Skipping the pass saves a round of subagents, and findings then keep only the reviewer's self-reported confidence.
+- Collect the `<finding>` blocks from all areas and drop the `category=none` placeholders. Dedupe lightly, so when two findings cite the same `file:line` with the same category, keep the one with the longer description and note the duplicate's id. Heavy dedupe is the job of triage. Then assign the ids `F-001`, `F-002`, ... by severity descending, then file, then line.
+- The confidence pass is a cheap second opinion that ranks findings by signal quality, so that people and triage see the high-signal ones first. Nothing is dropped. It is shallow, a re-read and a score rather than a full reachability trace.
+- Upstream runs it as one fresh subagent per finding, given only the finding block and the target. When you run it yourself, it is a separate step after collation that re-reads the cited code for every finding. Skipping the pass saves a round of subagents, and findings then keep only the reviewer's self-reported confidence.
 - After scoring, overwrite each finding's `confidence` with the score normalized to 0.0-1.0 and attach the reason as `confidence_reason`. Re-sort by `confidence` descending, then `severity` descending, `file`, `line`, and reassign the ids `F-001`, `F-002`, ... in that order.
 
 ```
@@ -88,7 +88,7 @@ Output (exactly this, nothing else):
 
 - Write both files into the target directory. `VULN-FINDINGS.json` has the shape below, which is what triage ingests.
 - `findings` is sorted by `confidence` descending, then severity, file and line, so the top of the file is the highest-signal material. `summary.low_confidence` counts the findings with confidence below 0.4.
-- `VULN-FINDINGS.md` is the human-readable companion: a summary table (id, severity, category, `file:line`, title), then one `### F-NNN` section per finding with the full description.
+- `VULN-FINDINGS.md` is the human-readable companion, with a summary table (id, severity, category, `file:line`, title) followed by one `### F-NNN` section per finding with the full description.
 
 ```json
 {
@@ -103,28 +103,27 @@ Output (exactly this, nothing else):
 
 ## Constraints
 
-- The scan never executes target code: no builds, no `docker`, no network. It needs no sandbox only because it reads and writes files and runs nothing. Reproducing a finding with a PoC is a separate step under the Execution rules of `SKILL.md`, and upstream's sandboxed `vuln-pipeline` is the tool for execution-verified results.
-- The shell is only a fallback for missing Glob and Grep tools, with read-only commands: `rg --files` or `ls -R` to enumerate, `rg -n` or `grep -rn` to search, `wc`, `head` and `file` to sniff. Write no helper scripts and pipe no target content into a shell interpreter.
-- Do not fabricate line numbers. Every `file:line` in a finding is something that was read or grepped. When the exact line is unsure, cite the function and say so in the description.
+- The scan needs no sandbox only because it reads and writes files and runs nothing, with no build, no `docker` and no network. Upstream's sandboxed `vuln-pipeline` is the tool for execution-verified results.
+- The shell is only a fallback for missing Glob and Grep tools, with read-only commands such as `rg --files` or `ls -R` to enumerate, `rg -n` or `grep -rn` to search, `wc`, `head` and `file` to sniff. Write no helper scripts and pipe no target content into a shell interpreter.
+- Every `file:line` in a finding is something that was read or grepped. When the exact line is unsure, cite the function and say so in the description.
 - Stay inside the target directory. Do not follow symlinks or `..` out of it.
 
 ## Large codebases
 
-- Map first: build the threat model, use it to pick which components to scan first, scan component by component, then make a final pass for bugs that only appear when components chain.
-- Summarize per component before hunting: one Markdown file per component that says, from an attacker's perspective, which of its surfaces are most likely to lead to a breach of the system as a whole. Then clear context, load all the summaries together and run the whole-system pass.
+- Map first. Build the threat model, use it to pick which components to scan first, scan component by component, then make a final pass for bugs that only appear when components chain.
+- Summarize per component before hunting, in one Markdown file per component that says, from an attacker's perspective, which of its surfaces are most likely to lead to a breach of the system as a whole. Then clear context, load all the summaries together and run the whole-system pass.
 - Rank files by vulnerability probability in a cheap pass and scan in descending order. Tests, headers and generated code sink to the bottom. Entry points, parsers, auth and anything touching untrusted input rise to the top.
-- Partition into a handful of meaningful units and run one reviewer per unit. One reviewer per file is excessive, because reviewers reason across files and tiny scopes waste the fixed per-agent overhead on shallow context.
+- Partition into a handful of meaningful units and run one reviewer per unit. One reviewer per file is too fine, because reviewers reason across files and tiny scopes waste the fixed per-agent overhead on shallow context.
 - Scale by re-partitioning, not by adding reviewers. When a first scan touched only a small fraction of the surface (one team found about 3% of its API endpoints covered), raise the focus-area count or feed the recon an endpoint inventory. More reviewers on the same partition converge on the same shallow bugs.
-- Track coverage: the lines of code the reviewers touched, and test coverage as a proxy, because surfaces with no tests are often the ones the scan missed. Turn missing code paths into focus areas of the next run.
-- Fix the first batch of findings, or hand them to the next scan as already known, before scanning again. A second run on an unpatched tree spends most of its budget re-converging on bugs that are already known.
+- Track coverage through the lines of code the reviewers touched, and test coverage as a proxy, because surfaces with no tests are often the ones the scan missed. Turn missing code paths into focus areas of the next run.
 
 ## Prompting for discovery
 
-- Give the model room: state the target, the goal and the tools, and leave the path to the model. Long instructions, staged checklists and piles of reference material backfire, because the model pattern-matches the scaffolding instead of reasoning about the code.
-- Describe vulnerability shapes, not checklists: the structural property that makes something exploitable, not a list of APIs. The model knows f-strings are dangerous. What it does not know is that a dynamic table name in an otherwise parameterized ORM is the same bug. Enumerating the wanted bug types ("look for SQLi, XSS, and CSRF") worsens recall, because the model overfocuses on the named classes and walks past everything else.
-- State scope: tell each reviewer precisely which part of the codebase to search and what to look for, and name the classes of findings nobody cares about, because the model tends to search exhaustively.
+- Give the model room. State the target, the goal and the tools, and leave the path to the model. Long instructions, staged checklists and piles of reference material backfire, because the model pattern-matches the scaffolding instead of reasoning about the code.
+- Describe vulnerability shapes, meaning the structural property that makes something exploitable, not a list of APIs. The model knows f-strings are dangerous. What it does not know is that a dynamic table name in an otherwise parameterized ORM is the same bug.
+- Tell each reviewer precisely which part of the codebase to search and what to look for, and name the classes of findings nobody cares about, because the model tends to search exhaustively.
 - State existing mitigations that the source does not show, and pitfalls specific to the environment. A frequent false positive is a real code path made unreachable by validation in a calling service or a shared sanitizer. Ask the reviewer which surrounding context it wants (calling services, configs, middleware), provide it and rerun.
-- State that vulnerabilities exist. "Assume there are vulnerabilities, and keep going until you've covered the surface" is strong, "act like a pentester" is weak.
-- Tune precision before recall: get the false-positive rate down to where the output is trusted, then widen the net. Teams that worked in this order roughly doubled recall once precision was solid.
+- State that vulnerabilities exist, as in "Assume there are vulnerabilities, and keep going until you've covered the surface", which works better than casting the model as a pentester.
+- Tune precision before recall. Get the false-positive rate down to where the output is trusted, then widen the net. Teams that worked in this order roughly doubled recall once precision was solid.
 
 Source: adapted from .claude/skills/vuln-scan/SKILL.md, harness/prompts/recon_prompt.py, harness/prompts/find_prompt.py, docs/prompting.md, docs/best-practices.md, docs/blog-post.md, docs/troubleshooting.md and docs/customizing.md of anthropics/defending-code-reference-harness (commit d3bea6b, Apache-2.0).

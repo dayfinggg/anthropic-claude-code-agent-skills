@@ -27,7 +27,7 @@
 ## dependency-cruiser
 
 - `npx depcruise --init` writes `.dependency-cruiser.js` with rules against cycles, orphans and undeclared dependencies.
-- Rule paths are regular expressions over forward-slash paths, not globs: `^src/` rather than `src/**`.
+- Rule paths are regular expressions over forward-slash paths, not globs, so write `^src/` rather than `src/**`.
 - Set `options.tsPreCompilationDeps: true`. Without it, imports that vanish after compilation, such as `import type` or an import whose names are unused, are invisible to every rule.
 - Keep features apart with group matching, where `$1` is the folder the `from` path captured:
 
@@ -44,44 +44,44 @@
 }
 ```
 
-- Baseline (18.3+): `depcruise src --baseline` writes `.dependency-cruiser-known-violations.json`, `--ignore-known` applies it, and `--baseline-mode shrink-only` removes fixed entries without adding new ones. The separate `depcruise-baseline` script is deprecated.
+- Since 18.3, `depcruise src --baseline` writes `.dependency-cruiser-known-violations.json`, `--ignore-known` applies it, and `--baseline-mode shrink-only` removes fixed entries without adding new ones. The separate `depcruise-baseline` script is deprecated.
 - `to: { circular: true, viaOnly: { dependencyTypesNot: ["type-only"] } }` reports only cycles that exist at run time.
 
 ## eslint-plugin-boundaries
 
-- v6 (2026-03) renamed the rule `boundaries/element-types` to `boundaries/dependencies`. v7 (2026-07) renamed its `rules` option to `policies`, `no-unknown` to `no-unknown-dependencies` and `no-ignored` to `no-ignored-dependencies`. Old names still run with a deprecation warning. Under the `strict` preset, `eslint-disable` comments that name `boundaries/no-unknown` or `boundaries/no-ignored` stop suppressing anything. Rename them, or use the `strict-legacy` preset while migrating.
-- `boundaries/entry-point` and `boundaries/external` are deprecated. Express both as policies of `boundaries/dependencies`.
+- v6 (2026-03) renamed the rule `boundaries/element-types` to `boundaries/dependencies`. v7 (2026-07) renamed its `rules` option to `policies`, `no-unknown` to `no-unknown-dependencies` and `no-ignored` to `no-ignored-dependencies`. Old names still run with a deprecation warning, but under the `strict` preset `eslint-disable` comments that name `boundaries/no-unknown` or `boundaries/no-ignored` stop suppressing anything. Rename them, or use the `strict-legacy` preset while migrating.
+- `boundaries/entry-point` and `boundaries/external` are deprecated, so express both as policies of `boundaries/dependencies`.
 - The `recommended` preset allows files outside every element, which suits existing code. `strict` requires every file to belong to a known element, which suits new projects.
-- Classify folders in `settings["boundaries/elements"]` as `{ type, pattern }`, then write `default: "disallow"` and `policies` with object selectors such as `{ from: { element: { type: "feature" } }, allow: { to: { element: { types: ["shared"] } } } }`. The last matching policy wins, and `disallow` beats `allow` within one policy. A policy's `message` is the error text.
+- Classify folders in `settings["boundaries/elements"]` as `{ type, pattern }`, then write `default: "disallow"` and `policies` with object selectors such as `{ from: { element: { type: "feature" } }, allow: { to: { element: { types: ["shared"] } } } }`. The last matching policy wins, `disallow` beats `allow` within one policy, and a policy's `message` is the error text.
 - Since v6 the plugin also checks `export`, `require` and dynamic `import()` by default, not only `import`.
 
 ## Nx and Turborepo
 
-- Once `depConstraints` exist, a project without tags can depend on nothing. Tag every project when you create it, for example `scope:billing` and `type:feature`.
+- Once `depConstraints` exist, a project without tags can depend on nothing, so tag every project when you create it, for example `scope:billing` and `type:feature`.
 - The Oxlint form (`@nx/oxlint`) is experimental because Oxlint's JavaScript plugin API sits outside its semantic versioning. `nx conformance:check`, which works for any language, needs the Nx Enterprise plan.
 - `turbo boundaries` flags imports of files outside the package and of packages missing from its `package.json`. Put `tags` in each package's `turbo.json` and the rules in the root `turbo.json` (`boundaries.tags.<tag>.dependencies.deny` or `.allow`, and `.dependents`). Tag rules also apply through transitive dependencies.
 
 ## deptrac
 
-- `qossmic/deptrac` and `qossmic/deptrac-shim` are abandoned. Install `composer require --dev deptrac/deptrac`. `vendor/bin/deptrac init` writes `deptrac.php` (`Layer::withName()`, `ClassLikeConfig::create()`, `Ruleset::forLayer()->accesses()`). A `deptrac.yaml` keeps working with `--config-file`.
-- Classes outside every layer are "uncovered" and never violate. Run with `--fail-on-uncovered` so new code cannot slip past the layers.
+- `qossmic/deptrac` and `qossmic/deptrac-shim` are abandoned, so install `composer require --dev deptrac/deptrac`. `vendor/bin/deptrac init` writes `deptrac.php` (`Layer::withName()`, `ClassLikeConfig::create()`, `Ruleset::forLayer()->accesses()`), and a `deptrac.yaml` keeps working with `--config-file`.
+- Classes outside every layer are "uncovered" and never violate, so run with `--fail-on-uncovered` to stop new code slipping past the layers.
 - `@deptrac-internal` on a class forbids its use outside its layer. Plain `@internal` does the same only after `analyser.internal_tag: '@internal'` is set.
-- Baseline: `vendor/bin/deptrac analyse --formatter=baseline` writes `deptrac.baseline.yaml`, which the config then lists under `imports`.
+- `vendor/bin/deptrac analyse --formatter=baseline` writes the baseline `deptrac.baseline.yaml`, which the config then lists under `imports`.
 
 ## import-linter
 
 - The root package must be importable, so run it in the project environment (`uv run lint-imports`), not through `uvx`.
 - Configure under `[tool.importlinter]` with `root_package`, and one `[[tool.importlinter.contracts]]` table per contract with `name`, `type` and its options.
-- Contract types: `layers` (highest first, `a | b` on one line forbids the siblings importing each other, `a : b` allows it), `independence`, `forbidden`, `protected` (2.5+, only listed modules may import) and `acyclic_siblings` (2.6+). On a layers contract with `containers`, set `exhaustive = true` so a new subpackage has to be placed in a layer.
+- The contract types are `layers` (highest first, where `a | b` on one line forbids the siblings importing each other and `a : b` allows it), `independence`, `forbidden`, `protected` (2.5+, only listed modules may import) and `acyclic_siblings` (2.6+). On a layers contract with `containers`, set `exhaustive = true` so a new subpackage has to be placed in a layer.
 - Since 2.16 a config without contracts fails instead of passing, an unknown or misspelled contract option is an error, and a module listed twice in a layers contract is rejected.
 - `exclude_type_checking_imports = true` ignores imports under `if TYPE_CHECKING:`. `ignore_imports` is the baseline, and an entry that no longer matches is an error by default.
 
 ## ArchUnit
 
 - Write `layeredArchitecture().consideringAllDependencies()` followed by `.layer(...)` and `.whereLayer(...)` rules, and check cycles with `slices().matching("com.example.(*)..").should().beFreeOfCycles()`.
-- Baseline: `FreezingArchRule.freeze(rule)` records current violations in a text store and reports only new ones. Commit the store. A new store needs `freeze.store.default.allowStoreCreation=true` in `archunit.properties`, so CI with the default fails instead of silently creating one.
+- `FreezingArchRule.freeze(rule)` records current violations in a text store as the baseline and reports only new ones, so commit the store. A new store needs `freeze.store.default.allowStoreCreation=true` in `archunit.properties`, so CI with the default fails instead of silently creating one.
 
 ## Rust
 
 - The crate is the boundary. A crate uses only crates in its `Cargo.toml`, Cargo rejects cycles between normal dependencies, and `pub(crate)` keeps items inside the crate.
-- To confine a third-party crate to one adapter crate, add `deny = [{ crate = "sqlx", wrappers = ["app-db"] }]` under `[bans]` in `deny.toml`. Only `app-db` may then depend on `sqlx` directly.
+- To confine a third-party crate to one adapter crate, add `deny = [{ crate = "sqlx", wrappers = ["app-db"] }]` under `[bans]` in `deny.toml`, so only `app-db` may depend on `sqlx` directly.

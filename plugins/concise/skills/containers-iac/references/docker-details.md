@@ -1,7 +1,5 @@
 # Dockerfile and Compose details
 
-Material needed less often than what `SKILL.md` holds: frontend flag versions, cache mounts, CI cache backends, Compose watch and healthcheck timing.
-
 ## Dockerfile flags by frontend version
 
 With `# syntax=docker/dockerfile:1` every flag below is available. A pinned older frontend needs at least the version shown.
@@ -27,7 +25,7 @@ With `# syntax=docker/dockerfile:1` every flag below is available. A pinned olde
 
 ## Cache mounts
 
-- Debian and Ubuntu images delete downloaded packages through `/etc/apt/apt.conf.d/docker-clean`, which makes an apt cache mount useless. Remove that file, tell apt to keep packages, and lock both directories, because apt needs exclusive access:
+- Debian and Ubuntu images delete downloaded packages through `/etc/apt/apt.conf.d/docker-clean`, which makes an apt cache mount useless. Remove that file, tell apt to keep packages, and lock both directories, because apt needs exclusive access.
 
 ```dockerfile
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache

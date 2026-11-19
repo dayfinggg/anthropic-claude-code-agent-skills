@@ -4,10 +4,10 @@
 
 - Cloudflare caches by file extension, not by MIME type. CSS, JS, images, fonts, archives and `robots.txt` are cached, HTML and JSON are not, so PHP pages come back `DYNAMIC` unless a Cache Rule makes them eligible.
 - With no `Cache-Control` or `Expires` from the origin, a cacheable file is kept 120 minutes for 200, 206 and 301, 20 minutes for 302 and 303, 3 minutes for 404 and 410. Other status codes are not cached.
-- On Free, Pro and Business, Origin Cache Control is always on: `no-cache`, `max-age=0` and `s-maxage=0` mean "cache and revalidate every time", not "do not cache". Only `no-store` and `private` keep a response out of the cache. A `Set-Cookie` header, a method other than GET and `Vary: *` also prevent caching. Fractional TTLs such as `max-age=2.5` are ignored.
+- On Free, Pro and Business, Origin Cache Control is always on, so `no-cache`, `max-age=0` and `s-maxage=0` mean "cache and revalidate every time", not "do not cache". Only `no-store` and `private` keep a response out of the cache. A `Set-Cookie` header, a method other than GET and `Vary: *` also prevent caching. Fractional TTLs such as `max-age=2.5` are ignored.
 - `Cloudflare-CDN-Cache-Control` beats `CDN-Cache-Control`, which beats `Cache-Control`, for the edge. `s-maxage` turns off `stale-while-revalidate`.
 - A Cache Rule with "Eligible for cache" turns on Cache Everything, so a rule on `/` caches HTML for every visitor, logged-in pages included, unless the origin sends `private`, `no-store` or `Set-Cookie`. With such a rule an origin `no-store` gives `BYPASS`. An Edge TTL rule set to ignore the origin's headers overrides even `no-store`.
-- Page Rules are deprecated but still run. Cache Rules override them for the same path, and the automatic migration has no fixed date.
+- Page Rules are deprecated but still run, and Cache Rules override them for the same path. Cloudflare's migration guide, updated 2026-10-30, gives no fixed date for the automatic migration and promises advance notice.
 - The default cache key holds the scheme, host, path and full query string, so `?a=1&b=2` and `?b=2&a=1` are two entries unless Sort Query String is on. Ignore Query String makes `?v=1` and `?v=2` share one entry and breaks `?v=` cache busting. Changing the SSL mode between Off or Flexible and Full busts the cache.
 - Development Mode bypasses the edge cache for three hours, does not purge anything and does not touch browser caches. Use a Bypass Cache Rule for longer.
 - The Browser Cache TTL defaults to 4 hours and replaces a shorter origin value. A purge never clears what browsers already hold.
@@ -31,14 +31,15 @@
 - Purge after the origin serves the new content, because the next request otherwise caches the old version again.
 - `POST https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache` with a token that has the Cache Purge permission and exactly one of `{"files":[...]}`, `{"prefixes":[...]}`, `{"tags":[...]}`, `{"hosts":[...]}` or `{"purge_everything":true}`. All plans have every type.
 - A 200 with `success: true` means the request was accepted, not that anything was removed. Request the URL afterwards and check `cf-cache-status`. With Tiered Cache the first request after a purge can show `EXPIRED` instead of `MISS`.
-- A URL purge must match the cached key exactly: scheme, host, case-sensitive path and every query string variant. Wildcards do not work. A prefix purge (`www.example.com/blog/`, no scheme, no `?`) covers every query string under the path. Purging a redirect purges only the redirect, not its target.
-- Limits are per account: at most 100 URLs or prefixes per request on Free, Pro and Business. Prefix, host, tag and purge-everything calls are limited to 5 per minute on Free, 5 per second on Pro, 10 per second on Business.
+- A URL purge must match the cached key exactly in scheme, host, case-sensitive path and every query string variant. Wildcards do not work. A prefix purge (`www.example.com/blog/`, no scheme, no `?`) covers every query string under the path. Purging a redirect purges only the redirect, not its target.
+- Limits are per account, with at most 100 URLs or prefixes per request on Free, Pro and Business. Prefix, host, tag and purge-everything calls are limited to 5 per minute on Free, 5 per second on Pro, 10 per second on Business.
 - Purge by tag needs the origin to send a `Cache-Tag` header, which Cloudflare strips before the visitor sees it.
 
 ## Origin behind Cloudflare
 
 - An origin that answers any address lets a client skip Cloudflare's protection and send its own `CF-Connecting-IP`. Allowing only Cloudflare's ranges is rated "moderately secure", because other Cloudflare customers reach the origin from the same ranges. Cloudflare Tunnel and Authenticated Origin Pulls (Full or Full strict SSL) are rated "very secure".
-- Cloudflare publishes its address ranges as plain lists at `https://www.cloudflare.com/ips-v4` and `https://www.cloudflare.com/ips-v6`. They change over time, so regenerate the `set_real_ip_from` include and the firewall rules from those lists on a schedule, then test and reload. The IPv4 list includes `131.0.72.0/22`, which older copies lack.
+- Restore the visitor address in nginx with `real_ip_header CF-Connecting-IP;` and one `set_real_ip_from` line per Cloudflare range, taken from the plain lists at `https://www.cloudflare.com/ips-v4` and `https://www.cloudflare.com/ips-v6` rather than from memory. The IPv4 list includes `131.0.72.0/22`, which older copies lack.
+- The ranges change over time, so regenerate the include file and the firewall rules from both lists on a schedule, then test and reload. Write the file only after both downloads succeeded and each line parsed as an address range, because an empty file trusts no proxy and every visitor then appears with a Cloudflare address.
 - `CF-Connecting-IP` holds one address and is preferred over `X-Forwarded-For`, which a client can pre-fill. With Pseudo IPv4 set to overwrite headers, the real IPv6 address is in `CF-Connecting-IPv6`. The "Remove visitor IP headers" Managed Transform removes the header.
 
 ## 52x errors
