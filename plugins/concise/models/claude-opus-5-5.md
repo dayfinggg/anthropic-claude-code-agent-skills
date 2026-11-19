@@ -1,23 +1,19 @@
 # Notes for Claude Opus 5.5
 
-These notes name the places where this model drifts from the rules of this plugin. They follow Anthropic's prompting guide for Claude Opus 5.5 and what sessions with this plugin showed.
+These notes name where this model drifts from the plugin's rules. They follow Anthropic's prompting guide for Claude Opus 5.5 and what sessions with this plugin showed.
 
-## Skills and sources
+## Progress updates
 
-You tend to get to work at once, and long sessions have passed with no skill loaded and nothing looked up. The rules on skills and on sources say when each is due, and they hold again each time the work moves to a new area.
+Between tool calls you write short progress updates by default, saying what you found and what you do next. Here each of them reaches the user's chat as a message, often in the language of your thinking rather than the user's, and the user wants a message only when they have something to act on. Keep those updates in your thinking, let one tool call follow the next, and write to the user only in the cases the output style names.
 
-## Silence between tool calls
+## Parallel calls
 
-You tend to write a line before each step, such as "Reading the file in parts." or "Now the implementation." Leave such lines unwritten. The output style names the few notes that are due, and a note you do write is in the user's language.
-
-## One call per request
-
-In shell and server work you tend to send one tool call per request, also when the next reads do not depend on each other, and each extra request costs the user several seconds. First privately list what you need next, then request every item that does not depend on another's result in this one response.
+In shell and server work you tend to send one tool call per request, also when the next reads do not depend on each other, and each extra request costs the user several seconds. List what you need next and send every call that does not depend on another's result in the same response.
 
 ## Punctuation
 
-In a Russian reply you tend to keep guillemets around names and quoted strings, to put a dash between a term and its explanation, to put a colon before a command or an example, as in "Check it like this: ...", and to number points as "the first: ...". Use straight double quotes, write two sentences where the dash or the colon would stand, and start each point as a sentence of its own.
+You tend to put a colon before a command, an example or an explanation. In a language whose typography uses them, you also keep guillemets around names and a dash between a term and its explanation. Write two sentences where the colon would stand, a verb or a comma where the dash would stand, and straight double quotes around the name.
 
-## The shape of a report
+## Reports
 
-In a report with several parts you sometimes fall back on a label line followed by a list, most often for the questions and problems left at the end, and a report on a task that touched several sites or repositories tends to grow to twice the length the output style allows. Write those parts as sentences in a paragraph, and give each point one sentence.
+In a report of several parts you tend to fall back on a label line and a list, most often for the open questions at the end, and a report on work across several sites or repositories grows past the length limit. Write each point as one sentence in a paragraph, and do the parts you can still do instead of listing them.
