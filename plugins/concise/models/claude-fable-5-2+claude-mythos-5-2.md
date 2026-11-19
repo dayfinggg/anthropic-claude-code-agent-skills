@@ -8,7 +8,7 @@ After a long task you tend to lay the final report out like a document, with lab
 
 ## Punctuation
 
-In a one-line message you tend to join two statements with a semicolon, and in a report you put a colon before an explanation or a list. Write two sentences in both places. When you quote a string from an interface or a file, you tend to keep the quotation marks of its source, so put it in straight double quotes. You also close a point with a sentence of two words, so join it to the sentence about the thing it concerns.
+In a one-line message you tend to join two statements with a semicolon, and in a report you put a colon before an explanation or a list. In both places write two sentences, or join the parts with a comma or a word such as "because". When you quote a string from an interface or a file, you tend to keep the quotation marks of its source, so put it in straight double quotes. You also close a point with a sentence of two words, so join it to the sentence about the thing it concerns.
 
 ## Progress updates
 
