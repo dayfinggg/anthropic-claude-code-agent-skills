@@ -15,14 +15,14 @@
 
 | Stack | Tool and version this file matches | Run |
 |---|---|---|
-| JS or TS, folder and file rules | dependency-cruiser 18.7 (Node 22, 24 or 26+) | `npx depcruise src --output-type err-long` |
+| JS or TS, folder and file rules | dependency-cruiser 18.8 (Node 22, 24 or 26+) | `npx depcruise src --output-type err-long` |
 | JS or TS, rules in the editor | eslint-plugin-boundaries 7.4 | ESLint rule `boundaries/dependencies` |
 | Nx workspace | `@nx/enforce-module-boundaries` (Nx 24) | ESLint rule with project tags |
 | Turborepo workspace | `turbo boundaries` (Turborepo 2.11, experimental) | `turbo boundaries` |
 | PHP | deptrac 4.7 (`deptrac/deptrac`, PHP 8.2+) | `vendor/bin/deptrac analyse` |
-| Python | import-linter 2.16 (Python 3.11+) | `lint-imports` |
+| Python | import-linter 2.17 (Python 3.11+) | `lint-imports` |
 | Java, Kotlin | ArchUnit 1.5.1 (`archunit-junit5` or `archunit-junit6`) | rules as tests |
-| Rust | the crate graph, plus cargo-deny 0.20 | `cargo deny check bans` |
+| Rust | the crate graph, plus cargo-deny 0.21 | `cargo deny check bans` |
 
 ## dependency-cruiser
 
@@ -72,7 +72,7 @@
 
 - The root package must be importable, so run it in the project environment (`uv run lint-imports`), not through `uvx`.
 - Configure under `[tool.importlinter]` with `root_package`, and one `[[tool.importlinter.contracts]]` table per contract with `name`, `type` and its options.
-- The contract types are `layers` (highest first, where `a | b` on one line forbids the siblings importing each other and `a : b` allows it), `independence`, `forbidden`, `protected` (2.5+, only listed modules may import) and `acyclic_siblings` (2.6+). On a layers contract with `containers`, set `exhaustive = true` so a new subpackage has to be placed in a layer.
+- The contract types are `layers` (highest first, where `a | b` on one line forbids the siblings importing each other and `a : b` allows it), `independence`, `forbidden`, `protected` (2.5+, only listed modules may import), `acyclic_siblings` (2.6+) and `private_modules` (2.17+, a module whose name starts with an underscore may be imported only from inside its parent package). On a layers contract with `containers`, set `exhaustive = true` so a new subpackage has to be placed in a layer.
 - Since 2.16 a config without contracts fails instead of passing, an unknown or misspelled contract option is an error, and a module listed twice in a layers contract is rejected.
 - `exclude_type_checking_imports = true` ignores imports under `if TYPE_CHECKING:`. `ignore_imports` is the baseline, and an entry that no longer matches is an error by default.
 

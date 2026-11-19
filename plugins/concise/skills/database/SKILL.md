@@ -51,7 +51,7 @@ This skill matches PostgreSQL 18, MySQL 8.4 and 9.7 LTS and the 26.x Innovation 
 - Send application traffic through the transaction pooler. Run migrations, `pg_dump`, logical replication, `LISTEN`, session advisory locks and anything that relies on `SET` over the direct connection.
 - In transaction pooling, scope settings with `SET LOCAL` or `set_config(name, value, true)` and use `pg_advisory_xact_lock` instead of `pg_advisory_lock`. SQL-level `PREPARE`, `LISTEN`, `WITH HOLD` cursors and temp tables that outlive a transaction do not work there.
 - Protocol-level prepared statements work through PgBouncer 1.21 and later when `max_prepared_statements` is above 0, which is the default (200) since 1.24. Drop Prisma's `pgbouncer=true` URL flag on those versions.
-- PgBouncer older than 1.26.1 has CVE-2026-107350, which lets a user with a SCRAM password log in as another SCRAM user, admins included. Upgrade a pooler that uses SCRAM authentication.
+- PgBouncer 1.17.0 through 1.26.0 has CVE-2026-107350, which lets a user with a SCRAM password log in as another SCRAM user, admins included. Upgrade a pooler that uses SCRAM authentication.
 - libpq's default `sslmode=prefer` and `sslmode=require` encrypt without checking the server certificate. For a remote server use `sslmode=verify-full` with `sslrootcert`, or `sslrootcert=system` (PostgreSQL 16+ libpq), which loads the system CAs and enforces `verify-full`.
 
 ## Gotchas
@@ -62,7 +62,7 @@ This skill matches PostgreSQL 18, MySQL 8.4 and 9.7 LTS and the 26.x Innovation 
 - `ON CONFLICT (email)` matches a partial unique index only when the statement repeats its predicate, as in `ON CONFLICT (email) WHERE deleted_at IS NULL`.
 - `ALTER TYPE ... ADD VALUE` inside a transaction leaves the new enum value unusable until commit, so a migration that adds a value and uses it fails. Split it into two migrations.
 - After a migration changes a table, PgBouncer clients that prepared statements against it fail with `cached plan must not change result type`. Run `RECONNECT` on the PgBouncer admin console or recycle the application pool.
-- Migration tools behind a transaction pooler fail with errors that do not mention pooling, such as Prisma Migrate's `prepared statement "s0" already exists` or a `SET search_path` that is gone by the next statement. Point the migration at the direct connection.
+- Migration tools behind a transaction pooler fail with errors that do not mention pooling, such as Prisma Migrate's `prepared statement "s0" already exists`, or a `SET search_path` that is gone by the next statement on poolers that do not track it (PgBouncer tracks it from 1.26 on PostgreSQL 18). Point the migration at the direct connection.
 - MySQL `UUID()` returns version 1, not version 4, and `UUID_TO_BIN(UUID(), 1)` reorders it for index locality. Store an app-generated UUIDv7 with `UUID_TO_BIN(?)` and no swap flag, because the swap scrambles its time order.
 - MySQL `ON DUPLICATE KEY UPDATE` fires on whichever unique index collides, not only the one you meant. Avoid it on tables with more than one unique index.
 - MySQL INSTANT add or drop column fails with `ERROR 4092` once a table has 64 row versions on 8.4 (255 since 9.1). A rebuild with `ALGORITHM=INPLACE` or `OPTIMIZE TABLE` resets the count.

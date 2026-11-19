@@ -70,6 +70,6 @@ This skill matches Git 2.56, gh 2.104 and gh-stack 0.3. Run `git version` and `g
 - Closing keywords such as `Fixes #12` act only in PRs that target the default branch or in commits that land on it, and are ignored while a PR targets another branch, such as a mid-stack PR or a release branch.
 - `gh pr merge --admin` merges around the merge queue and the rules, so use it only when the user asks for that bypass.
 - Git allows `$(...)`, backticks and `|` in branch names, so single-quote another person's branch name in every command.
-- An untrusted clone can contain an embedded bare repository whose hooks fire when a shell prompt runs `git status` in it. Set `git config --global safe.bareRepository explicit` before you work in one.
+- An untrusted clone can contain an embedded bare repository whose `core.fsmonitor` setting runs a command when a shell prompt runs `git status` in it. Set `git config --global safe.bareRepository explicit` before you work in one.
 
 Related skills: concise:github-actions for CI triggers, workflow security and failed checks, concise:debugging for `git bisect`, concise:code-review for reviewing a diff or answering review threads.

@@ -19,7 +19,7 @@ This skill covers GitHub Actions on github.com. It matches runner 2.338, `action
 - Confirm the host. Lockfiles exist on github.com and GHE.com but not on GitHub Enterprise Server, and `$/` references, immutable OIDC subjects and the default `pull_request_target` block are github.com features.
 - On self-hosted runners, `$/` needs runner 2.336.0 or later and Node 24 actions need 2.327.1 or later.
 - Resolve a tag to its commit before pinning, with `gh api repos/OWNER/REPO/commits/v7.0.1 --jq .sha` rather than from memory. In `git ls-remote --tags` output take the `^{}` line, not the annotated tag object, and confirm the commit belongs to the action's own repository, not a fork.
-- Lint with `zizmor .` for security audits, which knows lockfiles and the 2026 syntax, and with `actionlint` for expressions and types.
+- Lint with `zizmor .` for security audits, which parses `actions.lock` and the keys added in 2026 such as `$/` and `cache-mode`, and with `actionlint` for expressions and types.
 
 ## Pinning and action versions
 
@@ -90,6 +90,6 @@ This skill covers GitHub Actions on github.com. It matches runner 2.338, `action
 - In `dependabot.yml`, use `directories` for globs such as `/packages/*`, because `directory` does not accept them.
 - Environment branch rules match `refs/pull/N/merge` for `pull_request` events and the default branch for `pull_request_target` (since 2025-12-08), so old patterns that matched the head branch no longer unlock the environment.
 - `upload-artifact` skips files and folders starting with `.` unless `include-hidden-files: true`, and a second upload with the same name in one run fails without `overwrite: true`. `download-artifact@v8` fails on a digest mismatch.
-- actionlint 1.7.12 (2026-03-30), still the latest release on 2026-11-19, predates `$/`, `cache-mode`, `background`, `parallel`, `wait` and `queue`, so it can report them as errors. Check the workflow syntax docs before rewriting valid YAML, since zizmor 1.32 parses them.
+- actionlint 1.7.12 (2026-03-30) predates `$/`, `cache-mode`, `background`, `parallel`, `wait` and `queue`, so it can report them as errors unless a newer release lists them. Check the workflow syntax docs before rewriting valid YAML, since zizmor 1.32 parses them.
 
 Related skills: concise:git for merging PRs, merge queues and rulesets, concise:containers-iac for Docker builds and build cache, concise:debugging for failures that reproduce only in CI, concise:codebase-analysis for one mechanical change across many workflow files.

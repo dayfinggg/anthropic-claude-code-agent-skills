@@ -67,5 +67,5 @@
 
 ## Checking the result
 
-- Take screenshots and critique them against the list above when the environment allows it. Capture the viewport or one element, not a full long page: Claude downscales images past 2,576 px on the long edge, and once a request holds more than 20 images a stricter size limit applies to every image in it.
+- Take screenshots and critique them against the list above when the environment allows it. Capture the viewport or one element, not a full long page: Claude downscales images past 2,576 px on the long edge (1,568 px on models before Claude 4.7), and once a request holds more than 20 images a stricter size limit applies to every image in it.
 - Check light and dark themes, a 320 px wide viewport, 200% zoom and keyboard focus in the same pass.

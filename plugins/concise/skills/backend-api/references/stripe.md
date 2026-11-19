@@ -28,7 +28,7 @@ This file matches Stripe API version `2026-10-28.endive`. The current version is
 
 ## Webhooks and event destinations
 
-- Event destinations deliver thin events (recommended for new integrations, unversioned, typed in the SDKs, fetched in full with `fetchRelatedObject()`) or snapshot events (the full Event object for one API version). The format is chosen per destination, so thin events need their own destination, and an account can have at most 16 destinations per mode.
+- Event destinations deliver thin events (recommended for new integrations, unversioned, typed in the SDKs, fetched in full with `fetchRelatedObject()`) or snapshot events (the full Event object for one API version). The format is chosen per destination, so thin events need their own destination, and a live-mode or sandbox account can have at most 16 destinations.
 - Verify the `Stripe-Signature` header over the raw body. During a secret roll, kept for up to 7 days, the header carries one `v1` signature per active secret, so accept a match on any of them.
 - The libraries reject timestamps older than 5 minutes by default, and a tolerance of 0 disables the replay check rather than tightening it.
 - A snapshot event is shaped by the account's API version when it was created, or by the destination's version. Create the destination with the SDK's pinned version and upgrade both together.

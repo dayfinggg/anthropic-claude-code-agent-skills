@@ -5,7 +5,7 @@ description: Mapping unfamiliar code, finding everything a change can break, and
 
 # Codebase analysis
 
-This skill covers reading code you have not seen, finding every reader of what a change touches, and applying one change across many files. It matches ast-grep 0.51, dependency-cruiser 18.7, madge 8.0, knip 6.45, grimp 3.20, deptrac 4.7 and Git 2.56. Check what is installed with `ast-grep --version`, `npx <tool> --version` and `git version`. Where the installed release is newer, its own `--help` and release notes are right.
+This skill covers reading code you have not seen, finding every reader of what a change touches, and applying one change across many files. It matches ast-grep 0.51, dependency-cruiser 18.8, madge 8.0, knip 6.45, grimp 3.20, deptrac 4.7 and Git 2.56. Check what is installed with `ast-grep --version`, `npx <tool> --version` and `git version`. Where the installed release is newer, its own `--help` and release notes are right.
 
 ## References
 

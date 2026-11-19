@@ -5,7 +5,7 @@ description: Project structure, module boundaries, architecture style, system de
 
 # Architecture
 
-This skill covers where code goes, how modules stay apart, which architecture style to pick, how a system handles failure and load, and how decisions and specs are recorded. It matches dependency-cruiser 18.7, eslint-plugin-boundaries 7.4, Nx 24, Turborepo 2.11, deptrac 4.7, import-linter 2.16, ArchUnit 1.5, cargo-deny 0.20, Composer 2.11, MADR 4.0.0, Spec Kit 1.4.0 and OpenSpec 2.0.0. Check an installed tool with its `--version` flag, and where it is newer, its release notes are right about options and defaults.
+This skill covers where code goes, how modules stay apart, which architecture style to pick, how a system handles failure and load, and how decisions and specs are recorded. It matches dependency-cruiser 18.8, eslint-plugin-boundaries 7.4, Nx 24, Turborepo 2.11, deptrac 4.7, import-linter 2.17, ArchUnit 1.5, cargo-deny 0.21, Composer 2.11, MADR 4.0.0, Spec Kit 1.4.2 and OpenSpec 2.1.0. Check an installed tool with its `--version` flag, and where it is newer, its release notes are right about options and defaults.
 
 ## References
 

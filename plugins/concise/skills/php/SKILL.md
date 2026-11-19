@@ -5,7 +5,7 @@ description: PHP practice for the language, legacy and custom-CMS code with Smar
 
 # PHP
 
-This skill matches PHP 8.5, Composer 2.11, PHPStan 2.3, PHPUnit 13.4, Rector 2.8, PHP-CS-Fixer 3.95, Smarty 5.8, Symfony 8.1 and 7.4 LTS, Doctrine DBAL 4.6 and ORM 3.8. PHP 8.6.0 was at RC7 on 2026-11-19, with general availability planned for that day. Run `php -v` and `composer show --locked --direct` to see what is installed. Where the installed release is newer, its own `--help`, changelog and `UPGRADING` notes are right.
+This skill matches PHP 8.5, Composer 2.11, PHPStan 2.3, PHPUnit 13.4, Rector 2.8, PHP-CS-Fixer 3.95, Smarty 5.8, Symfony 8.1 and 7.4 LTS, Doctrine DBAL 4.6 and ORM 3.8. PHP 8.6.0 was scheduled for general availability on 2026-11-19, so check php.net for its status before you target it. Run `php -v` and `composer show --locked --direct` to see what is installed. Where the installed release is newer, its own `--help`, changelog and `UPGRADING` notes are right.
 
 ## References
 

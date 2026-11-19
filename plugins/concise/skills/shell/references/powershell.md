@@ -40,7 +40,7 @@ Set-StrictMode -Version 3.0
 
 ## Aliases and Windows PowerShell 5.1
 
-- `where`, `sort`, `diff`, `tee` and `kill` are aliases of `Where-Object`, `Sort-Object`, `Compare-Object`, `Tee-Object` and `Stop-Process`, so call `where.exe` to locate a program.
+- On Windows `where`, `sort`, `diff`, `tee` and `kill` are aliases of `Where-Object`, `Sort-Object`, `Compare-Object`, `Tee-Object` and `Stop-Process`, so call `where.exe` to locate a program. On Linux and macOS only `where` is an alias, and the other four run the native commands.
 - Windows PowerShell 5.1 also maps `curl` and `wget` to `Invoke-WebRequest` and `sc` to `Set-Content`, so call `curl.exe` there.
 - In Windows PowerShell 5.1, `2>&1` under `$ErrorActionPreference = 'Stop'` turns a native command's first stderr line, such as git progress output, into a terminating error. PowerShell 7.2 and later leave redirected stderr alone.
 - Claude Code starts its PowerShell tool with `-ExecutionPolicy Bypass` at process scope, so `.ps1` files run without a change to the machine policy, while Group Policy still applies.

@@ -15,7 +15,7 @@ Detail for ruff 0.17, ty 0.0.104 and mypy 2.4.
 
 ## ty
 
-- 0.0.97 renamed `unresolved-import` to `import-not-found`. The old name stays as an alias, and when one table sets both, the current name wins.
+- 0.0.97 renamed `unresolved-import` to `import-not-found`. The old name still works, and since 0.0.98 it warns and loses to the current name when one table sets both.
 - Configure with `[tool.ty.environment] python-version = "3.14"` and `[tool.ty.rules]`, where each rule is `"error"`, `"warn"` or `"ignore"` and the key `all` sets every rule. Without `python-version` ty uses the `requires-python` floor.
 - A `ty.toml` file wins over `pyproject.toml`, and the `[tool.ty]` table next to it is then ignored entirely.
 - Suppress with `# ty: ignore[rule]`. In a `# type: ignore[...]` comment ty reads only codes with a `ty:` prefix, so one comment such as `# type: ignore[arg-type, ty:invalid-argument-type]` serves mypy and ty. A bare `# type: ignore` silences every rule on the line.

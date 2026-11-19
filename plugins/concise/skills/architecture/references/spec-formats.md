@@ -2,9 +2,9 @@
 
 ## Detect the format
 
-- `.specify/` plus `specs/NNN-name/` is Spec Kit (specify-cli 1.4.0).
+- `.specify/` plus `specs/NNN-name/` is Spec Kit (specify-cli 1.4.2).
 - `.kiro/specs/<name>/` plus `.kiro/steering/` is Kiro.
-- `openspec/specs/` plus `openspec/changes/` is OpenSpec (2.0.0).
+- `openspec/specs/` plus `openspec/changes/` is OpenSpec (2.1.0).
 
 ## Spec Kit
 
@@ -33,11 +33,11 @@
 
 - 2.0.0 (2026-11-11) installs skills once in `.agents/skills/` with links from `.claude/skills/`, and removed the `/opsx:*` commands, so `/opsx:propose` is now `/openspec-propose`. Move a 1.x project with `openspec update` (preview with `--dry-run`) and commit the result, which overwrites edits made inside its own skills.
 - On Windows the committed links check out as small text files unless `core.symlinks=true` is set and Developer Mode allows links, and `openspec update` then replaces them with copies.
-- Install from npm as `@fission-ai/openspec` (Node 22.12+) or with Homebrew as `openspec`, then run `openspec init --tools claude`.
+- Install from npm as `@fission-ai/openspec` (Node 22.20+) or with Homebrew as `openspec`, then run `openspec init --tools claude`. Since 2.1.0 (2026-11-17) that installs the skills machine-wide in a new repo, and `--scope project` keeps them in the repo. Installing or refreshing skills needs Git and access to GitHub.
 - `openspec/specs/<capability>/spec.md` describes current behavior. A change is `openspec/changes/<change-id>/` with `proposal.md`, `design.md`, `tasks.md`, `.openspec.yaml` and delta specs under `specs/`. Archiving merges the deltas and moves the folder to `changes/archive/YYYY-MM-DD-<change-id>/`.
 - The default flow is `/openspec-explore` when the approach is open, then `/openspec-propose <change-id>`, `/openspec-apply-change` and `/openspec-archive-change`.
 - Each requirement is `### Requirement: <name>` with `#### Scenario:` blocks of WHEN and THEN bullets, and `--strict` validation fails a scenario that lacks either step.
-- A delta has `## ADDED Requirements` (appended), `## MODIFIED Requirements` (replaces the old requirement, so write its complete new text with every scenario) and `## REMOVED Requirements` (with a reason). Marking a changed requirement as added leaves two competing requirements, and any other `## ... Requirements` heading fails validation.
+- A delta has `## ADDED Requirements` (appended), `## MODIFIED Requirements` (replaces the old requirement, so write its complete new text with every scenario), `## REMOVED Requirements` (with a reason) and `## RENAMED Requirements` (`FROM:` and `TO:` lines). Marking a changed requirement as added makes archive fail with "already exists", and any other `## ... Requirements` heading fails validation.
 - A change without spec deltas fails validation unless `.openspec.yaml` sets `skip_specs: true`, which suits refactors, tooling and docs. Removing a capability's last requirement needs `retire_capabilities: true`.
-- Agents run `openspec validate <change-id> --strict --json`, `openspec list --json`, `openspec show <item> --json` and `openspec archive <change-id> --yes`. Without `--yes`, archive waits for a prompt that a non-interactive run cannot answer. `openspec validate --archived` fails when an archived change has unchecked tasks.
+- Agents run `openspec validate <change-id> --strict --json`, `openspec list --json`, `openspec show <item> --json` and `openspec archive <change-id> --yes`. Without `--yes`, archive stops with `archive_confirmation_required` when nothing can answer its confirmation prompt. `openspec validate --archived` fails when an archived change has unchecked tasks.
 - Give each change one intent that fits in one sentence.

@@ -4,7 +4,7 @@
 
 | Stack | Graph as data | Who depends on a module |
 |---|---|---|
-| JS, TS | dependency-cruiser 18.7: `npx depcruise src test --output-type json` | `--reaches '^src/billing/invoice\.ts$'`, or `--affected <base>` for modules changed since `<base>` plus all that reach them |
+| JS, TS | dependency-cruiser 18.8: `npx depcruise src test --output-type json` | `--reaches '^src/billing/invoice\.ts$'`, or `--affected <base>` for modules changed since `<base>` plus all that reach them |
 | JS, TS | madge 8.0: `npx madge --extensions ts,tsx --ts-config tsconfig.json --json src` | `--depends <id> --json`, with the id as `--json` prints it |
 | JS, TS | knip 6.45: `npx knip --reporter json` | `--trace-file <path>` or `--trace-export <name>` |
 | pnpm workspace | `pnpm --filter "...<pkg>" run typecheck` runs a script in the package and every package that depends on it | `"...^<pkg>"` selects the dependents only, `"...[origin/main]"` the changed packages and their dependents |
@@ -14,7 +14,7 @@
 | PHP | deptrac 4.7 with a `deptrac.php`: `vendor/bin/deptrac debug:dependencies <Layer> <TargetLayer>` prints one class dependency per line with `file:line` | the same with the layers swapped |
 | Java, Kotlin | `jdeps -R --class-path '<libs>/*' --dot-output <dir> <jars-or-classes>` | `jdeps --inverse --package <pkg> --class-path '<libs>/*' <jars-or-classes>` |
 
-Modules that import `pkg.billing`, directly or not, from grimp in the project environment (import-linter 2.16 installs it, otherwise add `--with grimp` after `uv run`):
+Modules that import `pkg.billing`, directly or not, from grimp in the project environment (import-linter 2.17 installs it, otherwise add `--with grimp` after `uv run`):
 
 ```bash
 uv run python -c 'import grimp; g = grimp.build_graph("pkg"); print(sorted(g.find_downstream_modules("pkg.billing", as_package=True)))'

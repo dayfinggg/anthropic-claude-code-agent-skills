@@ -53,6 +53,6 @@
 
 ## PgBouncer
 
-- 1.26.1 fixes CVE-2026-107350 (a client could log in as another SCRAM user, including admins), CVE-2026-107349 (a startup `options` value such as `-c=` spins a CPU core forever when `ignore_startup_parameters` is non-empty) and CVE-2026-107348.
+- 1.26.1 fixes CVE-2026-107350 (a client could log in as another SCRAM user, including admins), CVE-2026-107349 (a startup `options` value such as `-c=` spins a CPU core forever when `ignore_startup_parameters` is non-empty but lacks `options`) and CVE-2026-107348.
 - Since 1.26.0 `search_path` is tracked by default on PostgreSQL 18+, and `default_transaction_read_only` on 14+, so `SET search_path` in transaction pooling no longer leaks to other clients. In 1.26.1 listing `search_path` in `ignore_startup_parameters` restores the 1.25 behavior.
 - 1.26 sends `pgbouncer.version`, `pgbouncer.pool_mode` and `pgbouncer.max_prepared_statements` as `ParameterStatus` on login, so drivers can detect the pooler.
