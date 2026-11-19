@@ -10,7 +10,7 @@ These rules cover every piece of code you write, including tests, migrations, co
 
 ## Comments
 
-Write code that explains itself through names and structure, with no comments, docstrings or commented-out code, in tests, SQL and configuration too. The reason for a choice that looks odd goes into the commit message. Keep existing comments, and correct or remove one only when your change makes it wrong. Add a comment when the user asks for one or the project's written rules require it. A shebang or a lint directive is not a comment.
+Write code that explains itself through names and structure, with no comments, docstrings or commented-out code, in tests, SQL and configuration too. The reason for a choice that looks odd goes into the commit message. Keep existing comments, and correct or remove one only when your change makes it wrong. Add a comment when the user asks for one or the project's written rules require it. A shebang, a lint directive and a comment the language's tools require, such as `// SAFETY:` above an `unsafe` block, are exempt.
 
 ## Changing existing code
 
@@ -24,7 +24,7 @@ Write code that explains itself through names and structure, with no comments, d
 - Write a general solution that is correct for every valid input, and never hard-code an expected result or special-case a test.
 - Fix the root cause. Catching or silencing the error, a special case for the failing input, a default that hides the failure, a retry that masks it, switching the feature off or adding it to an ignore list only removes the symptom. Ship such a stopgap only when the user agrees to it, and call it temporary in the report.
 - When an error starts in a library or a framework, check that your code uses it as its documentation says, and whether a newer version or an upstream fix already solves it.
-- When a fix still fails its check after three rounds, stop patching and test the premise the fixes share. Bring the user in with the failing output and your next approach only when that test leaves no new approach.
+- When two fixes that rest on the same premise fail, test that premise before a third fix. When a fix still fails its check after three rounds, stop patching and bring the user in with the failing output, what the rounds changed and the approach you would try next.
 
 ## Scripts and commands
 

@@ -31,7 +31,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 - A rule that must hold every time: a hook or a permission deny rule. Text in any instruction file is a request. When emphasis keeps getting added to a line that is still missed, the line belongs in a hook. A hook that only encodes a preference can go back to text.
 - A focused helper with its own tools, model or context: a subagent definition in `.claude/agents/`.
 - How to build, start and drive the app to check a change: a project skill named `verify` in `.claude/skills/`, which Claude Code's commit instructions run before each commit. concise:testing covers it in `references/building-checks.md`.
-- Inside a plugin: no `CLAUDE.md` is loaded, so instructions go in skills and must-hold rules in plugin hooks. See [references/plugins-and-output-styles.md](references/plugins-and-output-styles.md).
+- Inside a plugin: no `CLAUDE.md` is loaded. Task instructions go in skills, always-on instruction files in a hooks module's `prompt.context` hook, and must-hold rules in plugin hooks. See [references/plugins-and-output-styles.md](references/plugins-and-output-styles.md).
 - Knowledge most tasks need belongs in `CLAUDE.md` as a short index of files to read. A pointer line names the material and the condition ("Read docs/billing.md before changing invoices"). Its wording, not the target, decides whether the agent goes there.
 
 ## Writing CLAUDE.md and rules
@@ -64,7 +64,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 - An instruction to write out reasoning in the reply can be refused on Opus 5.5 and Fable 5.2 with the `reasoning_extraction` category. Ask for a short explanation of the choice instead.
 - Cautions pile up in instruction files, notes and memory ("never retry", "stop at the first error"), and the model keeps obeying them. Delete each one whose reason has passed, list the routine steps that need no approval, and keep approval rules narrow: a broad one such as "messages to people outside this conversation" held back about half of routine requests in Anthropic's testing.
 - Standing "delegate this" lines in prompts, skills and agent files make Fable 5.2 start more subagents than the task needs. "You own this codebase" makes it refactor beyond scope, and a scope rule elsewhere does not cancel it.
-- Hard style limits ("one idea per sentence, under 20 words") make Fable 5.2 prose choppy.
+- Hard numeric style limits ("one instruction per sentence, in 20 words or fewer") make Fable 5.2 prose choppy.
 - Two contradicting lines, in one file or across files, make Claude pick one arbitrarily. Reconcile them in one place.
 - `CLAUDE.md` arrives as a user message after the system prompt. It is context, not enforcement.
 - A skill whose YAML does not parse still loads and runs as `/name`, but Claude can no longer match it by its description. A subagent file with bad YAML, no `name` or no `description` is skipped without a notice in the session.

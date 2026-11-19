@@ -60,7 +60,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 
 ## Answering review
 
-- Check each comment against the code before changing anything. Ask about every unclear item before implementing any.
+- Check each comment against the code before changing anything. Settle an unclear item from the code and the thread, and ask about one that stays unclear before you implement it.
 - Push back with evidence (`file:line`, a test, a doc), not agreement.
 - Fix every instance of the comment's bug class in the same push, not only the commented line.
 - Every finding ends in one of two states: fixed, or its thread resolved with a reply that gives the reason. Reply in the thread with what changed and the commit SHA.

@@ -29,7 +29,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 - `edition = "2024"` implies `resolver = "3"`, which prefers dependency versions whose `rust-version` fits yours. A virtual workspace has no edition, so write `resolver = "3"` in its `[workspace]` table.
 - Configure lints in `Cargo.toml` under `[lints.rust]`, `[lints.clippy]` and `[lints.cargo]`. Cargo's own lints are stable since 1.100 and include `unused_dependencies`. Write lint names with underscores, because Cargo 1.99 warns on hyphens.
 - Fail on warnings with `CARGO_BUILD_WARNINGS=deny` or `[build] warnings = "deny"` in `.cargo/config.toml` (1.97). `RUSTFLAGS=-Dwarnings` invalidates the build cache.
-- Set a dependency cooldown (1.100) in `.cargo/config.toml` with `[registry] global-min-publish-age = "3 days"`. Versions already in `Cargo.lock` stay usable. Take one newer version early with `CARGO_RESOLVER_INCOMPATIBLE_PUBLISH_AGE=allow cargo update <crate> --precise <version>`.
+- In a new workspace, or when the user asks for one, set a dependency cooldown (1.100) in `.cargo/config.toml` with `[registry] global-min-publish-age = "3 days"`. Versions already in `Cargo.lock` stay usable. Take one newer version early with `CARGO_RESOLVER_INCOMPATIBLE_PUBLISH_AGE=allow cargo update <crate> --precise <version>`.
 - Before adding a crate, check the std replacements in [references/std-apis.md](references/std-apis.md): `once_cell`, `lazy_static`, `cfg-if`, `scopeguard`, `itoa`, `fs2`, `filetime` and `allocator-api2` all have std equivalents now.
 
 ## Language
@@ -43,7 +43,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 ## Simple, safe and fast Rust
 
 - Release builds wrap integer overflow silently. Use `checked_*` where overflow is an expected case, `strict_*` (1.91, panics in every profile) where it is a bug, or `overflow-checks = true` in `[profile.release]` for code that handles money or sizes.
-- `as` truncates and wraps without a warning. Convert with `From` or `TryFrom` and turn on `clippy::cast_possible_truncation` and `cast_sign_loss` in crates that do arithmetic on sizes or offsets.
+- `as` truncates and wraps without a warning. Convert with `From` or `TryFrom` and, in new crates or when the user asks, turn on `clippy::cast_possible_truncation` and `cast_sign_loss` for arithmetic on sizes or offsets.
 - Put `#![forbid(unsafe_code)]` on crates that need no unsafe. Where unsafe is needed, enable `clippy::undocumented_unsafe_blocks` so every block carries a `// SAFETY:` argument.
 - Make invalid states unrepresentable with enums and newtypes, and mark public enums and all-public structs `#[non_exhaustive]` before the first release (see Gotchas).
 - Take `&str`, `&[T]` or `impl AsRef<Path>` and return owned values. Do not `.clone()` to quiet the borrow checker before checking whether a borrow or `std::mem::take` fits.

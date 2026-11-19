@@ -40,8 +40,8 @@
 
 ## Before building
 
-- Name the subject, the audience and the page's primary job, and confirm them when the brief leaves them open. Distinctive choices come from the subject's own world, its materials and vocabulary. Build with real content, not lorem ipsum.
-- Write a short plan first: four to six named colors with hex or `oklch` values, the typefaces and their roles, a layout idea with its alignment grid, and the two or three principles that make this page specific. Compare each choice with what you would produce for any similar prompt, and replace the ones that match.
+- Name the subject, the audience and the page's primary job. Take them from the brief and the project, and ask only when neither gives them. Distinctive choices come from the subject's own world, its materials and vocabulary. Build with real content, not lorem ipsum.
+- Write a short plan first: four to six named colors with hex or `oklch` values, the typefaces and their roles, a layout idea with its alignment grid, and the two or three principles that make this page specific. Check each choice against the table above and any pattern added for this task, and replace the ones that match.
 
 ## shadcn/ui without the stock look
 

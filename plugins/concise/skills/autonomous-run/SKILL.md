@@ -33,7 +33,7 @@ The user is not watching and cannot answer during the task. A question such as "
 ## Ending the run
 
 - Stay in the run until the finish line holds or only a real blocker remains. A slow job is a reason to wait for its completion notice, and a plateau is a reason to change the approach. Neither is a reason to end the turn, because nobody restarts a run that stopped.
-- A status note goes in the same message as the next tool call. A message without a tool call ends the turn.
+- A message without a tool call ends the turn.
 - Before you end the turn, read the progress file. If items are open and nothing blocks them, continue with them.
 - The final message holds the finish line and its state, the check that proves it, the decisions you made for the user, the open item if there is one with what it needs, and the path of the decision log. Keep the log file after the run ends.
 

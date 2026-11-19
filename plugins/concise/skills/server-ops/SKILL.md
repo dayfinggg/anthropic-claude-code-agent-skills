@@ -26,7 +26,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 
 - Scripted SSH needs `BatchMode`, which turns a password prompt or an unknown host key into an error instead of a hang, a connect timeout, and one shared connection per host (`ControlMaster auto`, `ControlPath ~/.ssh/cm-%C`, `ControlPersist 10m`), which saves the handshake of every call. See what `~/.ssh/config` already sets with `ssh -G host | grep -i -E 'batchmode|connecttimeout|controlmaster|controlpersist'`, and pass with `-o` only what is missing, so that most calls read `ssh -o BatchMode=yes host cmd`.
 - Roll one change out host by host, one loop iteration each: pre-production step, its check, production step, its check. Stop the loop at the first failed check, and test the exit status of every `ssh` call.
-- Before editing a config file or running `sed -i` on a host, copy the files to your machine (`scp host:/etc/nginx/sites-available/site.conf backup/`), so the old version can be restored.
+- Before editing a config file or running `sed -i` on a host, copy the files to your scratch directory (`scp host:/etc/nginx/sites-available/site.conf <scratch>/backup/`), so the old version can be restored.
 - Switch a release by building it in a new directory and replacing the `current` symlink: `ln -s NEW current.tmp && mv -T current.tmp current` is atomic everywhere, and GNU `ln -sfn` (coreutils 8.27+) is too. Without `-n` or `-T` the new link lands inside the old release directory. BusyBox `ln -f` deletes the link first.
 - `rsync --link-dest=PREV` hard-links unchanged files into the new release, so editing such a file in place also changes the previous release. `--delay-updates` only narrows the window of an in-place sync and is not atomic.
 

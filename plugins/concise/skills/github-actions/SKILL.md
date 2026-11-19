@@ -44,7 +44,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 ## Triggers, caches and concurrency
 
 - Build fork CI on `pull_request`. Do privileged follow-up in a separate `workflow_run` workflow that treats the upstream artifacts as untrusted data.
-- From 2026-12-02 public repositories block `pull_request_target` unless an Actions event policy allows it (Settings, Actions, Policies, with workflow file targeting). Brownouts block it on 2026-11-09 and 2026-11-16 from 16:00 to 18:00 UTC. Private and internal repositories are not affected.
+- From 2026-12-02 public repositories block `pull_request_target` unless an Actions event policy allows it (Settings, Actions, Policies, with workflow file targeting). Private and internal repositories are not affected.
 - Untrusted triggers that run in the default-branch scope (`pull_request_target`, `issue_comment`, `workflow_run` from forks and similar) get a read-only cache since 2026-06-26. Saves only log a warning. Warm caches from `push` or `schedule` and use `actions/cache/restore` in low-trust workflows.
 - `cache-mode: read`, `write`, `write-only` or `none` at workflow or job level (GA 2026-09-10) limits cache access, and a caller's mode caps its reusable workflows. Declaring `write` on a low-trust trigger reopens cache poisoning.
 - Turn off caching in release and publish jobs: `cache-mode: none`, or `package-manager-cache: false` on setup-node (which caches npm automatically when `package.json` names npm in `packageManager` or `devEngines.packageManager`) and `cache: false` on setup-go (default `true`).
@@ -66,7 +66,7 @@ concurrency:
 
 ## Runners and syntax
 
-- `ubuntu-latest` moves to Ubuntu 26.04 between 2026-10-19 and 2026-11-19. Pin `ubuntu-24.04` when the build depends on preinstalled tools. `macos-latest` is macOS 26, `macos-14` was retired on 2026-11-02, `windows-latest` is Windows Server 2025, and `windows-2025-vs2026` adds Visual Studio 2026. `ubuntu-slim` is an unprivileged 1 vCPU container without Docker-in-Docker.
+- `ubuntu-latest` is Ubuntu 26.04 after a migration that ran from 2026-10-19 to 2026-11-19. Pin `ubuntu-24.04` when the build depends on preinstalled tools. `macos-latest` is macOS 26, `macos-14` was retired on 2026-11-02, `windows-latest` is Windows Server 2025, and `windows-2025-vs2026` adds Visual Studio 2026. `ubuntu-slim` is an unprivileged 1 vCPU container without Docker-in-Docker.
 - Set `defaults.run.shell: bash`. A step without `shell:` runs `bash -e {0}` without pipefail, while `shell: bash` adds `-o pipefail`.
 - Use `case(cond1, val1, cond2, val2, default)` instead of `cond && 'a' || 'b'`, which yields `'b'` whenever `'a'` is falsy.
 - YAML anchors and aliases work. The workflow docs do not cover merge keys (`<<:`), so do not rely on them.

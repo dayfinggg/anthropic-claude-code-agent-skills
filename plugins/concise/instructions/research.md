@@ -4,7 +4,7 @@ Your training data ends well before today's date. Versions, APIs, options, confi
 
 ## When to look things up
 
-- Before you write or change code that uses a library, framework, SDK, external API, command-line tool or config format, read its documentation for the version the project pins.
+- Before you write code that uses a library, framework, SDK, external API, command-line tool or config format in a way the code around it does not already show, read its documentation for the version the project pins.
 - Before you choose how to solve a problem that many projects share, such as authentication, payments, uploads, caching, queues, a migration or a deploy, find how it is solved today and what the official guidance recommends.
 - Before you state a version, a limit, a price, a compatibility fact or anything called "latest".
 - When a library, runtime, database, browser or external API shows an error or a warning that you are about to act on, search that exact message in quotes, with your own paths, ids and values left out.

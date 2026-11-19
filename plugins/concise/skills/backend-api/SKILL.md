@@ -36,7 +36,8 @@ Sunset: Sat, 01 May 2027 00:00:00 GMT
 ## Idempotency keys
 
 - A write that clients may retry (payment, order, email, provisioning) accepts an `Idempotency-Key` header. The client creates one random key per intent (UUID v4), persists it, and sends the same key on every retry, including after a restart.
-- The draft defines the value as a structured-field String, so it is sent quoted: `Idempotency-Key: "8e03978e-40d5-43e8-bc93-6894a57f9324"`.- Status codes from the draft: missing key on an operation that requires one is 400, the same key with a different payload is 422, and the same key while the first request still runs is 409. Each comes with a problem details body.
+- The draft defines the value as a structured-field String, so it is sent quoted: `Idempotency-Key: "8e03978e-40d5-43e8-bc93-6894a57f9324"`.
+- Status codes from the draft: missing key on an operation that requires one is 400, the same key with a different payload is 422, and the same key while the first request still runs is 409. Each comes with a problem details body.
 - The server claims the key with one atomic insert under a unique constraint, not a SELECT then INSERT, storing a request fingerprint and an in-progress state, then stores the final status and body and replays them for later attempts.
 - Publish how long keys live, and keep them longer than the longest redelivery path (client retries, dead-letter replay, provider retry windows). A 24-hour key table behind a 7-day dead-letter replay charges twice.
 

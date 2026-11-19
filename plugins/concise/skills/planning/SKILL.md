@@ -16,8 +16,8 @@ This skill covers the path from a request to an approved design, a plan an imple
 
 - When the user asked for a plan or design, stop at the approved document. When they asked for the work itself, the plan is a step of that work: write it and continue, stopping only for decisions that change what gets built.
 - Look facts up yourself and ask the user only for decisions. State each call you make yourself, with its reason, so the user can correct it.
-- When the goal behind the request is unclear and would change the design, ask about it first, as one open question with no options. Options steer the answer away from the user's own intent.
-- After that, ask in rounds. A round holds every open decision whose prerequisites are settled. Number each question, give your recommended answer, and word it so "yes" accepts the recommendation. A question that depends on another open one waits for the next round. An unanswered question takes your recommendation, recorded as an assumption in the plan.
+- When the goal behind the request is unclear and would change the design, ask about it first, as one open question in the reply text with no options, in place of the AskUserQuestion format. Options steer the answer away from the user's own intent.
+- After that, ask in rounds through AskUserQuestion. A round holds every open decision whose prerequisites are settled, each with your recommended option first. A question that depends on another open one waits for the next round. An unanswered question takes your recommendation, recorded as an assumption in the plan.
 - For a design beyond a few lines, show 2 or 3 real approaches with their trade-offs and your pick, and wait for the choice. Drop options the existing code or the user's goal rules out. When only one approach fits, say why in one line and continue.
 - When the user says "just do it" or "skip the questions", stop asking. State any significant choice of platform, language or library in one line and proceed.
 

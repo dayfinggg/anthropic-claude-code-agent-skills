@@ -35,7 +35,7 @@ Each file below holds what this page only names. Read it in full with the Read t
 - Commit `uv.lock` for libraries too. It pins the development environment, not what users install.
 - Use `uvx <tool>` only for tools that do not import the project, such as ruff. `uvx pytest` and `uvx mypy` run without the project's dependencies.
 - A one-file script declares its own dependencies (PEP 723): `uv init --script tool.py --python 3.15`, then `uv add --script tool.py httpx`, then `uv run tool.py`. Such a script ignores the surrounding project's dependencies.
-- Set a dependency cooldown against hijacked releases: `[tool.uv] exclude-newer = "7 days"` ignores files uploaded in the last 7 days.
+- In a new project, or when the user asks for one, set a dependency cooldown against hijacked releases: `[tool.uv] exclude-newer = "7 days"` ignores files uploaded in the last 7 days.
 
 ## Lint, format and types
 
