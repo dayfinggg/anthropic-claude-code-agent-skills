@@ -11,6 +11,9 @@ const AGENTS_WITHOUT_RULES = ['Explore', 'Plan']
 const RULES_FOR_AGENT =
   'The working rules of this session follow. Built-in agents of your type do not load them on their own, so they come with the task. Follow them while you do it.'
 
+const NOTES_FOR_AGENT =
+  'Where these notes name the output style, they cover text for the user. Your report goes to the agent that started you and follows its brief.'
+
 const markdownFiles = async ($: EngineInterface, folder: string) =>
   (await $.fs.list(folder))
     .filter(entry => entry.kind === 'file' && entry.name.endsWith('.md'))
@@ -75,7 +78,9 @@ export const register: Register = on => {
     const notes = await readModelNotes($, e.model ?? e.parentModel)
     const additions = [
       ...(loadsNoInstructionFiles(e) ? [await rulesForAgent($)] : []),
-      ...(notes === undefined ? [] : [inTags('model-notes', notes)]),
+      ...(notes === undefined ? [] : [inTags('model-notes', `${NOTES_FOR_AGENT}
+
+${notes}`)]),
     ]
     if (additions.length === 0) return next(e)
     return next({ ...e, prompt: [e.prompt, ...additions].join('\n\n') })
