@@ -58,6 +58,7 @@ This skill matches Bash 5.x, PowerShell 7.7 and 7.6 LTS, ShellCheck 0.11.0 and P
 - A function called as an `if` or `while` condition, or with `&&`, `||` or `!`, runs its whole body with `set -e` off, so a failing step inside it does not stop it. End each step that must stop it with `|| return`.
 - A command substitution inside an argument hides its status, so with `set -e`, `cd "$(get_dir)/etc"` runs `cd /etc` when `get_dir` fails (SC2312). Assign it to a variable first.
 - `! cmd` never triggers `set -e` (SC2251), so write `if cmd; then exit 1; fi`.
+- A backtick inside double quotes is command substitution, so `` grep -rn "user `name`" . `` runs `name` as a command and searches for what it printed. Put a pattern with backticks or `$` in single quotes.
 - `(( i++ ))` exits under `set -e` when `i` is 0, because the expression evaluates to 0. Write `i=$((i + 1))`.
 - With `pipefail`, `producer | head -n1` fails with status 141 while the producer still writes, so the outcome depends on the output size. Write `head -n1 < <(producer)`.
 - zsh stops a command whose glob matches nothing, so quote `pip install 'pkg[extra]'` and expect `rm -f *.tmp` to fail when no file matches. zsh also leaves an unquoted `$var` unsplit, and its arrays start at 1.

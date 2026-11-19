@@ -27,6 +27,7 @@ This skill matches Python 3.15, uv 0.13, ruff 0.17, ty 0.0.104, mypy 2.4 and pyt
 ## Running and dependencies
 
 - Run everything in a uv project through `uv run`, as in `uv run pytest` or `uv run python -m app`. Bare `python` and `pytest` use whatever is on PATH, not `.venv`.
+- In a project without `uv.lock`, `uv run` creates `uv.lock` and `.venv` there. Run a one-off check in such a project with `uv run --no-project --with pytest pytest`, which leaves neither.
 - `uv add httpx` adds a runtime dependency, `uv add --dev pytest` the `dev` group, `uv add --group lint ruff` a named group, and `uv add --optional cli typer` a published extra. `uv lock --upgrade-package httpx` upgrades one locked package.
 - Dev, test, lint and docs tools go in `[dependency-groups]` (PEP 735), which never reaches the published metadata. `[project.optional-dependencies]` is only for optional runtime features installed as `pkg[extra]`.
 - Commit `uv.lock` for libraries too. It pins the development environment, not what users install.

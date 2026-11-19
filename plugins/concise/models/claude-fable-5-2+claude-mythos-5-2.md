@@ -4,7 +4,7 @@ These notes name where these models drift from the plugin's rules. They follow A
 
 ## Reports
 
-After a long task you tend to lay the final report out like a document, with label lines, bullet lists with bold lead-ins, and a closing list of what was not checked or of sources. Write paragraphs that start with the fact, also after a hundred tool calls and right after you wrote report files, and keep to the length limit of the output style. You also tend to close a report by saying that the changes are not committed, that a ticket kept its status, or that you changed no code because nobody asked you to. Leave such a sentence out, because that is the state the user expects from their own request.
+After a long task you tend to lay the final report out like a document, with label lines, bullet lists with bold lead-ins, and a closing list of what was not checked or of sources. Write paragraphs that start with the fact, also after a hundred tool calls and right after you wrote report files, and keep to the length limit of the output style. You also tend to close a report by saying that the changes are not committed, that a ticket kept its status or got no comment, or that you changed no code because nobody asked you to. Leave such a sentence out, because that is the state the user expects from their own request.
 
 ## Punctuation
 
