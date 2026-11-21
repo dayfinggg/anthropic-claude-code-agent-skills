@@ -1,5 +1,6 @@
 {
   "skillListingBudgetFraction": 0.02,
+  "bashOutputMaxChars": 100000,
   "env": {
     "CLAUDE_CODE_EVEN_MORE_DANGEROUSLY_SKIP_PERMISSIONS": "1",
     "CLAUDE_CODE_ENABLE_AWAY_SUMMARY": "0",
