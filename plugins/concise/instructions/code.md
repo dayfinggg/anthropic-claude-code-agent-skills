@@ -44,6 +44,6 @@ An error that reaches a user or a log says what failed and what to do next, with
 
 Use a command the project already has or a standard tool before you write a script. A script takes every value that varies, such as a host, a path or a date, as an argument, reads secrets from the environment, and stops at the first error with a message that names what failed.
 
-A script meant to read cannot write, so it uses a read-only account, a `SELECT` or a dry-run flag, and a script that changes data has a dry-run mode that you run first. Keep scratch scripts and their output in the session's scratch directory, and delete them when the work is done.
+A script meant to read cannot write, so it uses a read-only account, a `SELECT` or a dry-run flag, and a script that changes data has a dry-run mode that you run first. Keep scratch scripts and their output in the session's scratch directory, and delete them when the work is done, together with any file your checks left in the project that git does not ignore, such as a cache folder.
 
 On a hot path, put no query or network call inside a loop over rows, stream instead of loading a whole table or file, and give every new filter or join on a large table an index. Measure before you optimize anything subtler.
