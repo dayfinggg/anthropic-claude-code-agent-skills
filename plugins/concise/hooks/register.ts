@@ -14,6 +14,17 @@ const RULES_FOR_AGENT =
 const NOTES_FOR_AGENT =
   'Where these notes name the output style, they cover text for the user. Your report goes to the agent that started you and follows its brief.'
 
+const REMINDED_ORIGINS: readonly string[] = ['composer', 'bridge', 'sdk', 'task-notification', 'scheduled-trigger']
+
+const TURN_REMINDER =
+  'A standing reminder from the concise rules, not a new request. Before the first command or edit in an area this task touches, load the skill whose description covers it. Send independent reads as separate calls in one response. Keep progress notes in your thinking, and write the reply in the user\'s language as plain paragraphs of about 100 words that open with the outcome, with one sentence for each separate point.'
+
+const QUIET_REMINDER =
+  'No status message is needed now, so keep working. Before a command or edit in an area you have not touched yet, load its skill. When you next write to the user, write in their language, in plain paragraphs of about 100 words that open with the outcome, and give each separate point one sentence.'
+
+const SKILL_FOOTER =
+  'This skill is reference for your work. Messages to the user still follow the output style, as plain paragraphs of full sentences, and the final report stays near 100 words.'
+
 const markdownFiles = async ($: EngineInterface, folder: string) =>
   (await $.fs.list(folder))
     .filter(entry => entry.kind === 'file' && entry.name.endsWith('.md'))
@@ -99,5 +110,13 @@ ${notes}`)]),
     return { text: sent.text.split('\n').filter(line => !UPFRONT_TOOLS.includes(line)).join('\n') }
   })
 
-  on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: null }))
+  on('prompt.attachment', { type: 'silent_turn_reminder' }, () => ({ text: QUIET_REMINDER }))
+
+  on('prompt.submit', async (_, e, next) =>
+    REMINDED_ORIGINS.includes(e.origin.kind) ? next({ ...e, context: [...(e.context ?? []), TURN_REMINDER] }) : next(e),
+  )
+
+  on('skill.prompt', async ($, e, next) =>
+    e.pluginName === $.plugin.name ? next({ ...e, text: `${e.text.trimEnd()}\n\n${SKILL_FOOTER}` }) : next(e),
+  )
 }
