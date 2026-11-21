@@ -1,6 +1,6 @@
 ---
 name: containers-iac
-description: Dockerfiles and BuildKit, Docker Compose, Kubernetes manifests, Terraform and OpenTofu, and OpenTelemetry. Use when writing, reviewing or debugging a Dockerfile, compose.yaml, build secrets or cache, a container deploy of a Node or Next.js app, Kubernetes YAML or Helm output, .tf or .tofu files and state, or OTEL_* and Collector config, and on errors like "no matches for kind", "Error acquiring the state lock" or "too many open files". CI workflow files belong to concise:github-actions and host-level deploys to concise:server-ops.
+description: Load before writing, reviewing or debugging a Dockerfile, compose.yaml, a container deploy of a Node or Next.js app, Kubernetes YAML or Helm output, Terraform or OpenTofu files and state, or OpenTelemetry and Collector config, and on errors such as "no matches for kind" or "Error acquiring the state lock". CI workflows belong to github-actions, host-level deploys to server-ops.
 ---
 
 # Containers and infrastructure as code

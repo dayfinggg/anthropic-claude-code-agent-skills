@@ -1,6 +1,6 @@
 ---
 name: github-actions
-description: GitHub Actions workflow security, correctness and failing checks. Use when writing, reviewing or hardening .github/workflows files, action.yml, actions.lock or dependabot.yml, when a pull request check fails or a rerun is considered, when a required check waits forever or a workflow never starts, and for pull_request_target, GITHUB_TOKEN permissions, pinning, OIDC, npm trusted publishing, caches, zizmor findings or AI agent actions. Merging, merge queue setup and rulesets belong to git.
+description: Load before writing, reviewing or hardening .github/workflows files, action.yml, actions.lock or dependabot.yml, and when a pull request check fails, a rerun is considered, a required check waits forever or a workflow never starts, or for pull_request_target, GITHUB_TOKEN permissions, pinning, OIDC, npm trusted publishing, caches or zizmor findings. Merging and rulesets belong to git.
 ---
 
 # GitHub Actions

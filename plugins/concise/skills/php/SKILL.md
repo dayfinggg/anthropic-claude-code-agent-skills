@@ -1,6 +1,6 @@
 ---
 name: php
-description: PHP practice for the language, legacy and custom-CMS code with Smarty templates, Composer, PHPStan, PHPUnit, Rector, PHP-CS-Fixer, Symfony and Doctrine. Use when writing, reviewing, debugging or upgrading PHP code or .tpl templates, editing composer.json, phpstan.neon, phpunit.xml or rector.php, when Composer refuses an update, when PHPStan or PHPUnit report errors or deprecations, or when choosing a PHP version to target. PHP-FPM, OPcache and deploys belong to server-ops.
+description: Load before the first edit, review or upgrade of PHP code or Smarty .tpl templates, editing composer.json, phpstan.neon, phpunit.xml or rector.php, and when Composer refuses an update, PHPStan or PHPUnit report errors or deprecations, or a PHP version must be chosen. PHP-FPM, OPcache and deploys belong to server-ops.
 ---
 
 # PHP

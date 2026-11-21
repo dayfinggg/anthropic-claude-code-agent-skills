@@ -1,6 +1,6 @@
 ---
 name: react-next
-description: React and Next.js App Router practice covering Server and Client Components, Server Functions, Cache Components and use cache, revalidation, proxy.ts, Suspense streaming, view transitions and the React Compiler. Use when writing, reviewing or upgrading app/ routes, route.ts, proxy.ts, next.config.ts or files marked 'use client', 'use server' or 'use cache', or on hydration, blocking-prerender or next-request-in-use-cache errors. Styling and accessibility belong to frontend-ui, and tsconfig and the build tool chain to typescript-javascript.
+description: Load before writing, reviewing or upgrading React components, Next.js app/ routes, route.ts, proxy.ts, next.config.ts or files marked 'use client', 'use server' or 'use cache', and on hydration, blocking-prerender or next-request-in-use-cache errors. Styling and accessibility belong to frontend-ui, tsconfig and the build toolchain to typescript-javascript.
 ---
 
 # React and Next.js App Router

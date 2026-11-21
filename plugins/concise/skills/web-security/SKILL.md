@@ -1,6 +1,6 @@
 ---
 name: web-security
-description: Method and framework knowledge for finding exploitable vulnerabilities in web apps and APIs and judging whether a suspected one is real, adding to the built-in /security-review a reachability standard and traps in Django, DRF, FastAPI, Express, Next.js, Rails, Laravel, Symfony and Spring. Use when reviewing code, a PR or a diff for security, for IDOR, tenant leaks, SSRF, CSRF, XSS, injection or secrets in logs, and when triaging a scanner or bug-bounty finding. A whole-codebase audit with a threat model, a find-and-fix loop or a hunt through logs belongs to security-audit.
+description: Load before reviewing code, a PR or a diff for security, for IDOR, tenant leaks, SSRF, CSRF, XSS, injection or secrets in logs in Django, FastAPI, Express, Next.js, Rails, Laravel, Symfony or Spring, and when triaging a scanner or bug-bounty finding. A whole-codebase audit with a threat model or a hunt through logs belongs to security-audit.
 ---
 
 # Web application security review

@@ -1,6 +1,6 @@
 ---
 name: orchestration
-description: Delegating work to Claude Code subagents, forks, dynamic workflows, agent teams, host delegation tools and agent CLIs such as Codex, Gemini CLI, Cursor and claude -p. Use when deciding whether a task is worth delegating, choosing a worker's mechanism, model or provider, writing a brief, judging what an agent reports, running review and fix rounds, or giving parallel agents their own worktrees. Review method belongs to code-review, and splitting work into tickets to planning.
+description: Load before delegating work to subagents, forks, workflows, agent teams, host delegation tools or agent CLIs such as Codex, Gemini CLI, Cursor and claude -p, and when choosing a worker's model or provider, writing a brief, judging what an agent reports or running review and fix rounds. Review method belongs to code-review, splitting work into tickets to planning.
 ---
 
 # Delegating work to agents

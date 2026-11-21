@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Project structure, module boundaries, architecture style, system design and the decision and spec documents kept in a repo. Use when creating or reorganizing a project or monorepo, deciding where code and tests go, splitting a module or a service, designing for reliability, scale or data ownership, adding dependency rules (dependency-cruiser, deptrac, import-linter), breaking import cycles, or writing ADRs, C4 docs or Spec Kit, Kiro or OpenSpec specs. Plans and tickets belong to planning, and mapping existing code or a change's blast radius to codebase-analysis.
+description: Load before creating or reorganizing a project or monorepo, deciding where code and tests go, splitting a module or a service, adding dependency rules or breaking import cycles, designing for reliability, scale or data ownership, or writing ADRs, C4 docs or Spec Kit, Kiro or OpenSpec specs. Plans and tickets belong to planning, the blast radius of a change to codebase-analysis.
 ---
 
 # Architecture

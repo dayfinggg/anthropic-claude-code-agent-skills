@@ -1,6 +1,6 @@
 ---
 name: rust
-description: Stable Rust, edition 2024 and Cargo, covering Rust code, Cargo.toml and workspaces, lints, MSRV, async with tokio and unsafe code. Use when writing, reviewing, debugging or upgrading .rs files or Cargo projects, running cargo build, test, clippy, fmt, fix or update, fixing borrow checker or lifetime errors, raising rust-version or the toolchain, migrating to edition 2024, or deciding whether std replaces a crate. Property and mutation testing belong to the testing skill.
+description: Load before the first edit, build or review of Rust code or a Cargo project, before running cargo build, test, clippy, fmt, fix or update, and when fixing borrow checker or lifetime errors, raising rust-version or the toolchain, or migrating to edition 2024. Property and mutation testing belong to testing.
 ---
 
 # Rust

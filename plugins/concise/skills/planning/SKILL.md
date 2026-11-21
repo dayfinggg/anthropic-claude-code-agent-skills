@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Turning a software request into an approved design, an implementation plan and tracker tickets with blocking edges. Use when asked to plan, design, spec, scope or break down a feature, to interview the user before building, to split a PRD, spec or epic into GitHub issues, to sequence a wide refactor or migration across PRs, or when work will span several sessions. Covers gh issue create --blocked-by and --parent. ADRs and spec formats belong to architecture, and running plan tasks through subagents to orchestration.
+description: Load when asked to plan, design, spec, scope or break down a feature, to interview the user before building, to split a PRD, spec or epic into GitHub issues with blocking edges, to sequence a wide refactor or migration across PRs, or when work will span several sessions. ADRs and spec formats belong to architecture.
 ---
 
 # Planning

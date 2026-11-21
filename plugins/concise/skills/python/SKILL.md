@@ -1,6 +1,6 @@
 ---
 name: python
-description: Python code and projects with uv, ruff, ty, mypy and pytest, covering pyproject.toml, dependency groups, inline script metadata, packaging and the choice of Python version. Use when writing, reviewing, debugging or setting up Python code, adding or upgrading packages, running a .py script, configuring ruff, ty, mypy or pytest, moving off pip, Poetry, Black or Flake8, or on uv.lock, conftest.py and externally-managed-environment errors. What to test and how belongs to the testing skill.
+description: Load before the first edit, run or review of Python code in a task, before setting up a project, adding or upgrading packages or configuring uv, ruff, ty, mypy or pytest, and on uv.lock, conftest.py or externally-managed-environment errors. What to test and how belongs to testing.
 ---
 
 # Python

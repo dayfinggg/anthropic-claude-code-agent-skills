@@ -1,6 +1,6 @@
 ---
 name: debugging
-description: Diagnosing bugs, failing or flaky tests, crashes, hangs, wrong output and performance regressions by reproducing them, testing hypotheses, bisecting and measuring. Use when something is reported broken, failing, slow or intermittent, when a fix did not work, when a test fails only in CI or only in the full suite, for a crash, stack trace, race, leak or segfault, and when running git bisect or hyperfine, adding diagnostic logging or replacing sleeps in tests. Choosing what kind of test to write and proving a finished change end to end belong to concise:testing.
+description: Load when something is reported broken, failing, slow or intermittent, when a fix did not work, for a crash, stack trace, hang, race, leak or a test that fails only in CI or only in the full suite, and before running git bisect or hyperfine or adding diagnostic logging. Choosing what kind of test to write and proving a finished change belong to testing.
 ---
 
 # Debugging

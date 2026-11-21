@@ -1,6 +1,6 @@
 ---
 name: agent-docs
-description: Writing and auditing the instructions coding agents load, such as CLAUDE.md, AGENTS.md, .claude/rules, auto memory, skills, subagent definitions, output styles and the rules a plugin delivers through its hooks module. Use when creating, trimming or reviewing these files, when choosing between CLAUDE.md, a rule, a skill, an output style and a hook, when a skill does not trigger, when AGENTS.md is not loaded, or when Claude ignores or over-applies an instruction. Briefing a subagent at run time belongs to orchestration, and writing a verify skill or a REVIEW.md rule to testing.
+description: Load before writing, trimming or auditing the instructions coding agents load, such as CLAUDE.md, AGENTS.md, .claude/rules, auto memory, skills, subagent files, output styles and the rules a plugin delivers through its hooks module, and when a skill does not trigger or Claude ignores or over-applies an instruction. Briefing a subagent at run time belongs to orchestration.
 ---
 
 # Agent instruction files

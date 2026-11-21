@@ -1,6 +1,6 @@
 ---
 name: shell
-description: Shell commands and scripts in Bash, zsh, sh and PowerShell 7 on Linux, macOS and Windows with Git Bash, including commands sent to a remote host over ssh. Use when writing, reviewing or debugging a .sh or .ps1 script or a one-line command, for quoting, exit codes, set -euo pipefail or $LASTEXITCODE, when a command hangs on a prompt, Git Bash rewrites a path, a script fails with "bash\r", a command behaves differently on macOS, or ShellCheck or PSScriptAnalyzer reports a finding. Deploys, nginx, PHP-FPM and cron on servers belong to server-ops.
+description: Load before writing, reviewing or debugging a .sh or .ps1 script or a shell command that is more than a plain read, including commands sent over ssh, and when quoting, exit codes, set -euo pipefail, a hanging prompt, Git Bash path rewriting, CRLF line endings, macOS differences or ShellCheck findings are involved. Deploys, nginx and cron on servers belong to server-ops.
 ---
 
 # Shell

@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Test design that catches real bugs, proof that a change works end to end, and checks for a green run that was gamed, plus property-based, differential and mutation testing, Playwright, verify skills, commit gates and review rules. Use when writing, reviewing or strengthening tests, choosing what kind of test to write or what to mock, proving a fix with before and after evidence, reviewing a diff that touches tests or CI gates, writing a verify skill, a commit gate, a REVIEW.md rule or a reliability checklist, judging how well a check or reviewer catches bugs, or working with Hypothesis, fast-check, StrykerJS, mutmut, cargo-mutants, Infection, PIT or Playwright specs. Finding why a test fails or flakes belongs to debugging.
+description: Load before writing, reviewing or strengthening tests, choosing what to test or mock, proving a fix with before and after evidence, reviewing a diff that touches tests or CI gates, or writing a verify skill, a commit gate or a REVIEW.md rule, and for property-based, mutation or Playwright tests. Finding why a test fails or flakes belongs to debugging.
 ---
 
 # Testing

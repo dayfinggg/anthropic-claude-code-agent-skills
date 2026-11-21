@@ -1,6 +1,6 @@
 ---
 name: typescript-javascript
-description: JavaScript and TypeScript practice covering ECMAScript features and where they run, Temporal, tsconfig and type patterns, Node.js, npm, pnpm, Bun and Deno, and the Vite, Vitest, ESLint, Biome and Prettier toolchain. Use when writing, reviewing or upgrading .ts, .tsx, .js, .mjs or .cjs code, browser scripts and jQuery in an admin panel, package.json, tsconfig.json or tool configs, or when tsc, lint, build, test or install fails. React and Next.js code belongs to react-next, and CSS, accessibility and Web Vitals to frontend-ui.
+description: Load before the first edit, run or review of .ts, .tsx, .js, .mjs or .cjs code in a task, package.json, tsconfig.json or tool configs, and when tsc, lint, build, test or install fails with Node.js, npm, pnpm, Bun, Deno, Vite, Vitest, ESLint, Biome or Prettier. React and Next.js code belongs to react-next, CSS and accessibility to frontend-ui.
 ---
 
 # JavaScript and TypeScript

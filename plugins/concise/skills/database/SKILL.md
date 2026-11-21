@@ -1,6 +1,6 @@
 ---
 name: database
-description: PostgreSQL, MySQL, PgBouncer, Prisma and Drizzle practice for SQL, data fixes, schema migrations, locks, indexes, row level security, connection pooling and server upgrades. Use when writing or running SQL, psql or mysql commands, changing rows or schema in a database production uses, writing a migration, ALTER TABLE or CREATE INDEX, when a deploy hangs on a lock or a query is slow, when upgrading or patching a database server or PgBouncer, or on errors like lock timeout, prepared statement already exists or cached plan must not change result type.
+description: Load before the first SQL statement, psql or mysql command, data fix, migration, ALTER TABLE or CREATE INDEX in a task, before changing rows or schema in a database production uses, and when a deploy hangs on a lock, a query is slow, or PostgreSQL, MySQL, PgBouncer, Prisma or Drizzle report an error or need an upgrade.
 ---
 
 # Databases

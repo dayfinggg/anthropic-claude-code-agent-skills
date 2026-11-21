@@ -1,6 +1,6 @@
 ---
 name: frontend-ui
-description: Web UI practice for Tailwind CSS v4, shadcn/ui, native HTML and CSS features checked against a Baseline target, WCAG 2.2 accessibility, Core Web Vitals, images and visual design. Use when building, styling or reviewing pages, forms, dialogs, popovers, tooltips or animations, editing globals.css or components.json, migrating Tailwind v3 to v4, modernizing legacy front-end code, fixing contrast, focus, slow LCP, INP or layout shift, or making a page look less generic. React and Next.js component code belongs to concise:react-next.
+description: Load before building, styling or reviewing pages, forms, dialogs, popovers or animations, editing CSS, Tailwind CSS v4, globals.css or components.json, migrating Tailwind v3 to v4, fixing accessibility, contrast, focus, slow LCP, INP or layout shift, or making a page look less generic. React and Next.js component code belongs to react-next.
 ---
 
 # Web UI

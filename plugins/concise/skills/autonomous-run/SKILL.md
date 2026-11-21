@@ -1,6 +1,6 @@
 ---
 name: autonomous-run
-description: Carrying a long task to its end while nobody is there to answer. Use when work is handed over with words like "work until it's done", "no questions" or "I'll check later", for a scheduled, looped (/loop) or headless (claude -p) run, and when such a run resumes after compaction. Not for a task the user follows and answers in the chat, however long it is and however many servers, sites or repositories it touches.
+description: Load when work is handed over to finish without the user, with words like "work until it's done", "no questions" or "I'll check later", for a scheduled, looped (/loop) or headless (claude -p) run, and when such a run resumes after compaction. Not for a task the user follows and answers in the chat.
 ---
 
 # Autonomous run

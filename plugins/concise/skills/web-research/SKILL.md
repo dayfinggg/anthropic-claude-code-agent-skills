@@ -1,6 +1,6 @@
 ---
 name: web-research
-description: Method for finding current, primary sources on the web during engineering work, with query patterns, search operators, the order of sources, freshness checks and endpoints for sources that are hard to fetch, such as X posts through FxTwitter, the HN Algolia API, GitHub, package registries and the Wayback Machine. Use when answering a research question, comparing libraries, services or approaches, looking up an unfamiliar error or stack trace, the latest version or a breaking change of a dependency, a known bug or regression or a recommended practice, and whenever the user asks to search, look online, read the docs or check what other developers report. Diagnosing a bug in the project's own code belongs to debugging.
+description: Load before searching the web for a research question, a comparison of libraries, services or approaches, an unfamiliar error or stack trace, the latest version or a breaking change of a dependency, a known bug or a recommended practice, and whenever the user asks to search, look online, read the docs or check what other developers report. Diagnosing the project's own bug belongs to debugging.
 ---
 
 # Web research

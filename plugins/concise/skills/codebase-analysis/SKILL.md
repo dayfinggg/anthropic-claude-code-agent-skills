@@ -1,6 +1,6 @@
 ---
 name: codebase-analysis
-description: Mapping unfamiliar code, finding everything a change can break, and making one mechanical change across many files. Use when starting in code you have not read, when asked what calls or uses something or whether it is safe to remove, rename or retype, for the blast radius of a change, for a rename or replacement across many files, for codemods (ast-grep, ts-morph, jscodeshift, LibCST, Rector, OpenRewrite) and for framework or library upgrades. Not for designing module boundaries or dependency rules, which concise:architecture covers.
+description: Load before working in code you have not read, when asked what calls or uses something or whether it is safe to remove, rename or retype, for the blast radius of a change, a rename or replacement across many files, a codemod (ast-grep, ts-morph, jscodeshift, LibCST, Rector, OpenRewrite) or a framework or library upgrade. Module boundaries and dependency rules belong to architecture.
 ---
 
 # Codebase analysis

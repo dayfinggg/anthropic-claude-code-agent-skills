@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: Auditing a codebase or service for vulnerabilities as a find-and-fix loop of threat model, static scan, triage and patch, plus hunting an attacker in logs, after Anthropic's Defending Code Reference Harness. Use when asked to check a whole project for vulnerabilities or security problems, build a threat model, verify, dedupe and rank a pile of findings, write or verify security fixes, investigate signs of compromise in logs, or run vuln-pipeline. One diff, pull request or single finding in web code belongs to web-security.
+description: Load when asked to check a whole project or service for vulnerabilities, build a threat model, verify, dedupe and rank a pile of findings, write or verify security fixes, investigate signs of compromise in logs or run vuln-pipeline. One diff, pull request or single finding in web code belongs to web-security.
 ---
 
 # Security audit of a codebase

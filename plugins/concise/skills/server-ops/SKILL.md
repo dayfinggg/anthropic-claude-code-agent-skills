@@ -1,6 +1,6 @@
 ---
 name: server-ops
-description: Running PHP sites on Linux servers over SSH, covering deploys and rollbacks across several hosts, nginx and PHP-FPM configuration and reloads, OPcache, Memcached, Cloudflare caching and cron jobs or systemd timers. Use when deploying with ssh, git pull, rsync or a symlink switch, editing or reloading nginx or php-fpm, when a deployed change does not show up, on 502, 504 or 52x errors, or when adding or debugging a crontab or timer. Container images, Compose and Kubernetes belong to containers-iac.
+description: Load before the first ssh command on a server in a task, before a deploy or rollback with ssh, git pull, rsync or a symlink switch, before editing or reloading nginx or PHP-FPM, before adding or debugging a crontab or systemd timer, and when a deployed change does not show up or a site answers 502, 504 or 52x. Container images and Compose belong to containers-iac.
 ---
 
 # Linux servers for PHP sites

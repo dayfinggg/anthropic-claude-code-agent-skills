@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Method and judgment for reviewing a diff, branch or pull request beyond the built-in /code-review and /security-review passes, plus answering and resolving GitHub review threads with gh. Use when reviewing or re-reviewing a PR or commit range, judging whether a change is safe to merge, acting on or pushing back on human or bot review comments, handling Claude Code Review findings, or posting inline review comments through gh api reviewThreads and pulls endpoints. A security review of web code belongs to web-security, and opening or merging PRs to git.
+description: Load before reviewing or re-reviewing a diff, branch, commit range or pull request, judging whether a change is safe to merge, acting on or pushing back on human or bot review comments, or posting and resolving inline review comments with gh. A security review of web code belongs to web-security, opening or merging PRs to git.
 ---
 
 # Code review

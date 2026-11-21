@@ -1,6 +1,6 @@
 ---
 name: git
-description: Git and GitHub practice for commits and commit messages, history rewriting, force-pushes, commit signing, pull requests, stacked PRs with gh stack, merges and branch rules. Use when committing, rebasing, squashing, resolving conflicts, cleaning up branches or worktrees, opening or merging PRs with gh, when a push or merge is blocked by a rule, a commit shows Unverified, a secret landed in history, or line endings break on Windows. Failing CI checks and workflow files belong to github-actions.
+description: Load before the first git commit, rebase, merge, push or branch cleanup in a task, before writing a commit message, resolving a conflict or opening or merging a pull request with gh, and when a push or merge is blocked by a rule, a commit shows Unverified, a secret landed in history or line endings break on Windows. Failing CI checks belong to github-actions.
 ---
 
 # Git and GitHub

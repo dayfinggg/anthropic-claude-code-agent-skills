@@ -1,6 +1,6 @@
 ---
 name: backend-api
-description: HTTP API contract and reliability rules for RFC 9457 error bodies, the QUERY method, Idempotency-Key handling, retries and unknown outcomes, rate limit headers, pagination, versioning and deprecation, plus webhooks and Stripe. Use when designing or reviewing REST endpoints or an OpenAPI document, adding retries or timeouts, writing queue workers, building a webhook sender or receiver, integrating Stripe Checkout or Stripe webhooks, or choosing a status code or header. Access control and SSRF on endpoints belong to web-security, and transactions, locks and migrations to database.
+description: Load before designing or changing an HTTP API or an OpenAPI document, adding retries, timeouts, idempotency keys, pagination or rate limits, writing queue workers, building a webhook sender or receiver, integrating Stripe Checkout or Stripe webhooks, and when choosing a status code, an RFC 9457 error body or a header. Access control belongs to web-security, transactions and migrations to database.
 ---
 
 # HTTP APIs and reliability
