@@ -1,0 +1,1 @@
+Before you send anything the user reads in this turn, run the final check from your "Communicating clearly" instructions. Your "Grounding", "Research", "Writing code", "Running commands", "Delivering work", "Delegating", "Skills" and "Professional objectivity" instructions apply to the work in this turn.

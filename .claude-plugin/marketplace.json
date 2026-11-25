@@ -1,0 +1,11 @@
+{
+  "name": "vesper-sieve",
+  "owner": { "name": "dayfinggg" },
+  "plugins": [
+    {
+      "name": "vesper-sieve",
+      "source": "./",
+      "description": "What is not needed sleeps until it is called."
+    }
+  ]
+}

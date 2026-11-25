@@ -1,0 +1,77 @@
+{
+  "name": "vesper-sieve",
+  "version": "1.0.0",
+  "description": "What is not needed sleeps until it is called.",
+  "userConfig": {
+    "deferred_tools": {
+      "type": "string",
+      "multiple": true,
+      "title": "Sleeping tools",
+      "description": "Tools that stay out of the tool list until the model loads them through ToolSearch",
+      "default": [
+        "Artifact",
+        "PowerShell",
+        "Workflow",
+        "ScheduleWakeup",
+        "ListAgents",
+        "ReportFindings"
+      ]
+    },
+    "loaded_tools": {
+      "type": "string",
+      "multiple": true,
+      "title": "Loaded tools",
+      "description": "Tools that are always in the tool list, also when Claude Code would load them on demand",
+      "default": [
+        "WebSearch"
+      ]
+    },
+    "excluded_sections": {
+      "type": "string",
+      "multiple": true,
+      "title": "Excluded sections",
+      "description": "Sections of the Claude Code system prompt that the plugin removes",
+      "default": [
+        "communication",
+        "doing_tasks",
+        "total_tokens"
+      ]
+    },
+    "excluded_reminders": {
+      "type": "string",
+      "multiple": true,
+      "title": "Excluded reminders",
+      "description": "Kinds of reminders that Claude Code injects for the model and the plugin removes",
+      "default": [
+        "silent_turn_reminder",
+        "total_tokens_reminder"
+      ]
+    },
+    "section_order": {
+      "type": "string",
+      "multiple": true,
+      "title": "Section order",
+      "description": "Order of the plugin's own sections at the end of the system prompt. Sections that are not listed come first",
+      "default": [
+        "grounding",
+        "research",
+        "writing-code",
+        "running-commands",
+        "delivering-work",
+        "delegating",
+        "skills",
+        "professional-objectivity",
+        "communicating-clearly"
+      ]
+    },
+    "agent_excluded_sections": {
+      "type": "string",
+      "multiple": true,
+      "title": "Sections withheld from agents",
+      "description": "The plugin's own sections that subagents do not receive",
+      "default": [
+        "delegating"
+      ]
+    }
+  }
+}
