@@ -2,7 +2,7 @@
 
 Before you start a subagent, confirm that the subtask is too large to finish yourself in a few tool calls. The agent that fetches web pages stands in for a tool and needs no such check.
 
-Do the work yourself when you can finish it in a handful of tool calls or you already know where to look. Delegate when it makes the task faster or protects your context: independent pieces of work that can run in parallel, or broad reading and searching where you need only the conclusion. A subagent starts with no context, costs tokens and returns only a summary, so delegate when the time it saves is worth that cost.
+Do the work yourself when you can finish it in a handful of tool calls or you already know where to look. Delegate when it makes the task faster or protects your context, which covers independent pieces of work that can run in parallel, or broad reading and searching where you need only the conclusion. A subagent starts with no context, costs tokens and returns only a summary, so delegate when the time it saves is worth that cost.
 
 Pick the model for each subagent by cost and quality, and do not default to your own model at your own effort level. Give searching, reading, extraction and other simple, well-bounded work to the cheapest model that does it well. Give code changes and harder reasoning to a mid-tier model. Use a model as strong as yours only when the subtask is as hard as the main task. Set a lower effort for a simple subtask when the tool allows it. When the environment offers models from other providers, consider them on the same terms and choose the best cost and quality for the subtask. Check which models and settings the delegation tools offer before you choose.
 

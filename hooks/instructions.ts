@@ -8,12 +8,14 @@ const RULES = 'instructions/rules'
 const REMINDERS = 'instructions/reminders'
 const NOTICES = 'instructions/notices'
 const SHARED = 'shared'
+const FAMILIES = '+'
 const EXTENSION = '.md'
 const DEFERRED_TOOLS = '{{deferred_tools}}'
 const SECTIONS = '{{sections}}'
 const HEADINGS = '{{headings}}'
 const TOOLS = 'instructions/tools'
 const TOOL_REMINDERS = 'instructions/tool-reminders'
+export const EVERY_TOOL = 'every-tool'
 const ATTACHMENTS = 'instructions/attachments'
 const NAMES = '{{names}}'
 const DESCRIBED = '{{described}}'
@@ -25,10 +27,13 @@ let toolDescriptions: Promise<Files> | undefined
 let attachmentTemplates: Promise<Files> | undefined
 const toolReminders = new Map<string, Promise<Rules>>()
 
+const serves = (folder: string, model: string): boolean =>
+  folder.split(FAMILIES).some(family => model.includes(family))
+
 const filesFor = ({ shared, models }: Library, model: string): Files =>
   new Map([
     ...shared,
-    ...models.filter(([folder]) => model.includes(folder)).flatMap(([, files]) => [...files]),
+    ...models.filter(([folder]) => serves(folder, model)).flatMap(([, files]) => [...files]),
   ])
 
 const render = (text: string | undefined, deferredTools: readonly string[]): string | undefined => {

@@ -2,6 +2,7 @@ import type { Register } from 'claude-code'
 
 import { FORK, instructAgent, noteAgent } from './agents'
 import {
+  EVERY_TOOL,
   applyRules,
   loadReminders,
   loadSwitchNotice,
@@ -43,9 +44,11 @@ export const register: Register = (on, options) => {
     if (e.agentId !== undefined || ran.deny !== undefined) return ran
 
     const reminders = await loadToolReminders($, await $.session.model())
-    const reminder = reminders.get(String(e.tool))
+    const due = [reminders.get(String(e.tool)), reminders.get(EVERY_TOOL)].flatMap(text =>
+      text === undefined ? [] : [text],
+    )
 
-    return reminder === undefined ? ran : { ...ran, context: [...(ran.context ?? []), reminder] }
+    return due.length === 0 ? ran : { ...ran, context: [...(ran.context ?? []), ...due] }
   }).catch(($, e, next) => next(e))
 
   on('prompt.compose', async ($, e, next) => {
