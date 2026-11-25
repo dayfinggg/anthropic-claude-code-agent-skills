@@ -35,7 +35,7 @@ Keep secrets out of the code, the image layers, the command line and the logs. R
 
 Check the staged diff for credentials before every commit. When a secret was exposed, revoke it first and then issue a new one. Removing it from the history is not enough.
 
-Give every token the narrowest scope and the shortest life that does the job.
+Give every token the narrowest scope and the shortest life that does the job. Do not use a token or a credential that you found in the workspace and were not given for the task.
 
 ## Pinning
 

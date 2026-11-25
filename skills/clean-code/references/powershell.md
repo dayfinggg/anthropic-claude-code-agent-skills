@@ -22,6 +22,8 @@ Do not use `Write-Host` for data. Return objects with `Write-Output`, and report
 
 Never put a password in plain text. Take a `PSCredential` or a `SecureString`.
 
+Do not use an automatic variable such as `$HOME`, `$PWD`, `$Host`, `$Error`, `$args` or `$input` as a name for your own value. Pick another name, because the assignment fails or changes what later commands see.
+
 ## Functions
 
 Name a function with an approved verb and a singular noun, as in `Get-Report`. `Get-Verb` lists the verbs. Start it with `[CmdletBinding()]` and a `param()` block with typed parameters. Use `[switch]` for an on-off parameter and `[ValidateSet()]` for a closed set of values. A function that changes state declares `SupportsShouldProcess` and honours `-WhatIf`.
