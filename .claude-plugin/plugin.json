@@ -1,6 +1,6 @@
 {
   "name": "vesper-sieve",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "What is not needed sleeps until it is called.",
   "userConfig": {
     "deferred_tools": {
@@ -59,6 +59,7 @@
         "running-commands",
         "delivering-work",
         "delegating",
+        "security",
         "skills",
         "professional-objectivity",
         "communicating-clearly"
@@ -71,6 +72,15 @@
       "description": "The plugin's own sections that subagents do not receive",
       "default": [
         "delegating"
+      ]
+    },
+    "model_bound_skills": {
+      "type": "string",
+      "multiple": true,
+      "title": "Skills bound to a model",
+      "description": "Skills that are listed only for one model, written as skill=model, where model is a part of the model ID",
+      "default": [
+        "securing-code=claude-mythos"
       ]
     }
   }

@@ -13,9 +13,11 @@ Read the existing styles first. Use the project's tokens, components, spacing sc
 
 ## When there is no design
 
-Decide the direction before you write markup. Pick one typeface for text and at most one for headings, a spacing scale built on one base unit, one accent colour with a neutral scale, and one corner radius scale, and keep them in CSS variables.
+Take the direction from the subject, and decide it before you write markup. Note what the product is, who uses it and three words for its character. List five directions that all fit the subject, each in one sentence with a heading typeface, a palette and a layout idea, and make them differ from one another in all three. Then draw a random number from one to five with a shell command and build the direction with that number. A model that chooses for itself picks the same direction in every run, and the draw is what makes two pages differ.
 
-Models fall back on the same defaults, and readers recognise them. Name the ones you will avoid before you build. The usual ones are Inter, Roboto or Arial for everything, a purple gradient on white, a centred hero above three identical rounded cards with a soft shadow, a cream background with italic accent words, numbered section labels, monospace labels and pill-shaped buttons. After the first render, check which defaults came back, and replace them.
+Pick one typeface for text and at most one for headings, a spacing scale built on one base unit, one accent colour with a neutral scale, and one corner radius scale, and keep them in CSS variables. Choose a heading typeface with character that suits the subject. When the page may load from the network, load it as a web font with a system fallback.
+
+Models fall back on the same defaults, and readers recognise them. Name the ones you will avoid before you build. The usual ones are Inter, Roboto or Arial for everything, the system font stack with Georgia headings, a purple gradient on white, a cream or beige background with a brown or terracotta accent, a centred hero above three identical rounded cards with a soft shadow, italic accent words, numbered section labels, monospace labels and pill-shaped buttons. A safe choice that avoids every item on this list and still looks like any other page is also a default. After the first render, check which defaults came back, and replace them.
 
 ## Layout and type
 

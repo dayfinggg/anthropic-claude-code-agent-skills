@@ -184,6 +184,7 @@ export async function rewriteAttachment(
   $: EngineInterface,
   type: string,
   text: string,
+  hiddenSkills: ReadonlySet<string>,
 ): Promise<string> {
   attachmentTemplates ??= readFolder($, `${$.plugin.root}/${ATTACHMENTS}`)
 
@@ -192,8 +193,11 @@ export async function rewriteAttachment(
   if (template === undefined) return text
 
   const own = `${ITEM}${$.plugin.name}:`
+  const skillOf = (line: string): string => line.slice(own.length).split(NAME_END, 1)[0] ?? ''
   const items = text.split('\n').filter(line => line.startsWith(ITEM))
-  const described = items.filter(line => line.startsWith(own))
+  const described = items
+    .filter(line => line.startsWith(own))
+    .filter(line => !hiddenSkills.has(skillOf(line)))
   const names = items
     .filter(line => !line.startsWith(own))
     .map(line => line.slice(ITEM.length).split(NAME_END, 1)[0] ?? '')

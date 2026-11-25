@@ -9,7 +9,7 @@ import {
   loadToolReminders,
   rewriteAttachment,
 } from './instructions'
-import { namesIn, placed } from './options'
+import { bindingsIn, namesIn, placed } from './options'
 
 export const register: Register = (on, options) => {
   const deferredTools = namesIn(options.deferred_tools)
@@ -18,6 +18,10 @@ export const register: Register = (on, options) => {
   const excludedReminders = namesIn(options.excluded_reminders)
   const sectionOrder = [...namesIn(options.section_order)]
   const agentExcludedSections = namesIn(options.agent_excluded_sections)
+  const modelBoundSkills = bindingsIn(options.model_bound_skills)
+
+  const skillsHiddenFrom = (model: string): ReadonlySet<string> =>
+    new Set(modelBoundSkills.filter(([, bound]) => !model.includes(bound)).map(([skill]) => skill))
 
   const isDeferred = (tool: string): boolean | undefined => {
     if (deferredTools.has(tool)) return true
@@ -65,9 +69,11 @@ export const register: Register = (on, options) => {
 
     const attachment = await next(e)
 
-    return attachment.text === null
-      ? attachment
-      : { ...attachment, text: await rewriteAttachment($, e.type, attachment.text) }
+    if (attachment.text === null) return attachment
+
+    const hidden = skillsHiddenFrom(await $.session.model())
+
+    return { ...attachment, text: await rewriteAttachment($, e.type, attachment.text, hidden) }
   })
 
   on('prompt.submit', async ($, e, next) => {
