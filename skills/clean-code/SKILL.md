@@ -45,4 +45,4 @@ Run the project's own formatter, linter and type checker, as its manifest or its
 
 ## Related skills
 
-Load `writing-tests` when the change needs a test, and `verifying-work` before you report the change as done.
+Load `writing-tests` when the change needs a test, `designing-interfaces` when the change is visible in an interface, and `verifying-work` before you report the change as done.
