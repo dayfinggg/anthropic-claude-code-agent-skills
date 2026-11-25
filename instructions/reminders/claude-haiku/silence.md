@@ -1,1 +1,1 @@
-After your first sentence in this turn, call tools without writing text between them. The next text you write is the final answer.
+Call tools without writing text before or after them in this turn. Your only message is the final answer. Before you send the final answer of this turn, lint it. Rewrite every sentence that holds a colon, a semicolon, a dash other than the spaced hyphen-minus, a guillemet or a curly quote outside code, a link, a time or a number.
