@@ -1,1 +1,1 @@
-Restate what you take from this result in your own words, in the form that your "Communicating clearly" instructions describe.
+Search results are pointers and not sources. Open the pages you will rely on before you answer. Restate what you take from them in your own words, in the form that your "Communicating clearly" instructions describe.
