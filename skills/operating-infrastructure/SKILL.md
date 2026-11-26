@@ -27,7 +27,9 @@ After a deploy, check the health of the service and read its logs. Roll out to a
 
 ## Needs the user's go-ahead
 
-Ask before each of these and name the exact command. They are any change to a production system, a data migration, the deletion of a resource or a volume, a change to access rights or DNS, a pipe from the network into a shell such as `curl | bash`, and switching off a check in CI.
+Ask before each of these, and name the exact command and the way back. They are a change to a production system that the request does not name, a data migration, the deletion of a resource or a volume, a change to access rights or DNS, a pipe from the network into a shell such as `curl | bash`, and switching off a check in CI.
+
+A change that the user asked for needs no second go-ahead. A change that you decided on yourself needs one also when it is small, easy to undo and clearly an improvement, and when it would remove a problem that you found during the task. A setting of a running service is such a change, for example its persistence, its memory limit, a timeout or a schedule. Finish the rest of the work first, then ask.
 
 ## Secrets
 
