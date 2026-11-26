@@ -12,6 +12,8 @@ import {
 } from './instructions'
 import { bindingsIn, namesIn, placed } from './options'
 
+const DEFERRED_TOOLS_LIST = 'deferred_tools_delta'
+
 export const register: Register = (on, options) => {
   const deferredTools = namesIn(options.deferred_tools)
   const loadedTools = namesIn(options.loaded_tools)
@@ -29,6 +31,12 @@ export const register: Register = (on, options) => {
 
     return loadedTools.has(tool) ? false : undefined
   }
+
+  const withoutLoadedTools = (list: string): string =>
+    list
+      .split('\n')
+      .filter(line => !loadedTools.has(line.trim()))
+      .join('\n')
 
   on('tool.describe', async ($, e, next) => {
     const described = await next(e)
@@ -76,7 +84,9 @@ export const register: Register = (on, options) => {
 
     const hidden = skillsHiddenFrom(await $.session.model())
 
-    return { ...attachment, text: await rewriteAttachment($, e.type, attachment.text, hidden) }
+    const text = await rewriteAttachment($, e.type, attachment.text, hidden)
+
+    return { ...attachment, text: e.type === DEFERRED_TOOLS_LIST ? withoutLoadedTools(text) : text }
   })
 
   on('prompt.submit', async ($, e, next) => {
