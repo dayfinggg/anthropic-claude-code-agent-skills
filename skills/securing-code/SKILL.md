@@ -1,6 +1,7 @@
 ---
 name: securing-code
 description: Gives a method for finding, proving and fixing vulnerabilities in the code base at hand, with the current classes of web and backend flaws that scanners and quick reviews miss. Use when writing or changing code that handles input, identity, sessions, money, files, network calls, queries, templates, caches, queues or dependencies, when reviewing code or a diff, when the user asks about security, a vulnerability, hardening or an audit, and before reporting such a change as done.
+when_to_use: Load before the first edit of code at one of these boundaries and before a security review.
 ---
 
 # Securing code
