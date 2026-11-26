@@ -2,6 +2,13 @@ import type { Register } from 'claude-code'
 
 import { FORK, instructAgent, noteAgent } from './agents'
 import {
+  forgetRestoredSkills,
+  forgetSkillsBeforeSummary,
+  noteSkillsBeforeSummary,
+  summaryInstructions,
+  withSkillsBeforeSummary,
+} from './compaction'
+import {
   EVERY_TOOL,
   applyRules,
   loadReminders,
@@ -13,6 +20,9 @@ import {
 import { bindingsIn, namesIn, placed } from './options'
 
 const DEFERRED_TOOLS_LIST = 'deferred_tools_delta'
+const SKILL_LISTING = 'skill_listing'
+const RESTORED_SKILLS = 'invoked_skills'
+const PRECOMPUTE = 'precompute'
 
 export const register: Register = (on, options) => {
   const deferredTools = namesIn(options.deferred_tools)
@@ -81,12 +91,30 @@ export const register: Register = (on, options) => {
     const attachment = await next(e)
 
     if (attachment.text === null) return attachment
+    if (e.type === RESTORED_SKILLS) forgetRestoredSkills(attachment.text)
 
     const hidden = skillsHiddenFrom(await $.session.model())
 
     const text = await rewriteAttachment($, e.type, attachment.text, hidden)
 
-    return { ...attachment, text: e.type === DEFERRED_TOOLS_LIST ? withoutLoadedTools(text) : text }
+    if (e.type === DEFERRED_TOOLS_LIST) return { ...attachment, text: withoutLoadedTools(text) }
+    if (e.type === SKILL_LISTING) return { ...attachment, text: await withSkillsBeforeSummary($, text) }
+
+    return { ...attachment, text }
+  })
+
+  on('session.compact', async ($, e, next) => {
+    if (e.agentId !== undefined) return next(e)
+
+    const instructions = await summaryInstructions($, e.instructions)
+
+    if (e.trigger !== PRECOMPUTE) noteSkillsBeforeSummary(e.messages)
+
+    const compacted = await next(instructions === undefined ? e : { ...e, instructions })
+
+    if (compacted.skip !== undefined) forgetSkillsBeforeSummary()
+
+    return compacted
   })
 
   on('prompt.submit', async ($, e, next) => {

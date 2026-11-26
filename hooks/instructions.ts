@@ -166,6 +166,12 @@ export async function loadSwitchNotice(
   return (notices.get('model-switch') ?? '').replaceAll(SECTIONS, sections.join('\n\n'))
 }
 
+export async function loadNotice($: EngineInterface, name: string): Promise<string | undefined> {
+  const notice = (await readFolder($, `${$.plugin.root}/${NOTICES}`)).get(name)
+
+  return notice === '' ? undefined : notice
+}
+
 export async function loadAgentRules(
   $: EngineInterface,
   model: string,
