@@ -1,6 +1,7 @@
 ---
 name: verifying-work
 description: Shows how to prove that a change works before it is reported as done. Use after writing or changing code, a script, a configuration file or a build, before saying that a task is finished, fixed or working, and when the user asks to test, check or make sure that something works.
+when_to_use: Triggers after the last change and before a commit, a deploy or the final report.
 ---
 
 # Verifying work
