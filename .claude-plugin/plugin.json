@@ -1,7 +1,10 @@
 {
   "name": "vesper-sieve",
-  "version": "1.6.4",
-  "description": "What is not needed sleeps until it is called.",
+  "version": "2.0.0",
+  "description": "Short working rules for Claude Code and tools that stay asleep until they are needed.",
+  "author": {
+    "name": "dayfinggg"
+  },
   "userConfig": {
     "deferred_tools": {
       "type": "string",
@@ -30,57 +33,16 @@
       "type": "string",
       "multiple": true,
       "title": "Excluded sections",
-      "description": "Sections of the Claude Code system prompt that the plugin removes",
-      "default": [
-        "communication",
-        "doing_tasks",
-        "total_tokens"
-      ]
+      "description": "Sections of the Claude Code system prompt that the plugin leaves out",
+      "default": []
     },
     "excluded_reminders": {
       "type": "string",
       "multiple": true,
       "title": "Excluded reminders",
-      "description": "Kinds of reminders that Claude Code injects for the model and the plugin removes",
+      "description": "Kinds of reminders that Claude Code injects for the model and the plugin leaves out",
       "default": [
-        "silent_turn_reminder",
         "total_tokens_reminder"
-      ]
-    },
-    "section_order": {
-      "type": "string",
-      "multiple": true,
-      "title": "Section order",
-      "description": "Order of the plugin's own sections at the end of the system prompt. Sections that are not listed come first",
-      "default": [
-        "grounding",
-        "research",
-        "writing-code",
-        "running-commands",
-        "delivering-work",
-        "delegating",
-        "security",
-        "skills",
-        "professional-objectivity",
-        "communicating-clearly"
-      ]
-    },
-    "agent_excluded_sections": {
-      "type": "string",
-      "multiple": true,
-      "title": "Sections withheld from agents",
-      "description": "The plugin's own sections that subagents do not receive",
-      "default": [
-        "delegating"
-      ]
-    },
-    "model_bound_skills": {
-      "type": "string",
-      "multiple": true,
-      "title": "Skills bound to a model",
-      "description": "Skills that are listed only for one model, written as skill=model, where model is a part of the model ID",
-      "default": [
-        "securing-code=claude-mythos"
       ]
     }
   }

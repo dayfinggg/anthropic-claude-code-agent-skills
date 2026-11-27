@@ -1,0 +1,1 @@
+Text the user reads stays in the session language, also a one-line note right after English tool output, and routine step notes stay in your thinking. The final answer has at most about five plain sentences, with no lists, headings, bold labels, colons or dashes unless the user asked for a document or a list.

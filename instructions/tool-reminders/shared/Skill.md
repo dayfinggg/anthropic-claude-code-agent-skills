@@ -1,1 +1,0 @@
-The skill above covers one kind of work. Before each later command or edit, check whether it starts another kind that has its own skill, such as a command on another machine, a query to a database or a cache, a test, a Git command or the final check, and load that skill first, without a note to the user. This note needs no reply.

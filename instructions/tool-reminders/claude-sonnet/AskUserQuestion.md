@@ -1,1 +1,0 @@
-Before you act on the answers, load the skills for the first action that you are about to take. The options that the user did not pick are settled by this question, so the final answer names them in at most one sentence and does not list them. The final answer is at most five plain sentences, with no list, no bold label and no question. This note needs no reply.

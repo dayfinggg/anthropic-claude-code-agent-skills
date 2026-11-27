@@ -1,11 +1,12 @@
 {
   "name": "vesper-sieve",
   "owner": { "name": "dayfinggg" },
+  "description": "The vesper-sieve plugin for Claude Code.",
   "plugins": [
     {
       "name": "vesper-sieve",
       "source": "./",
-      "description": "What is not needed sleeps until it is called."
+      "description": "Short working rules for Claude Code and tools that stay asleep until they are needed."
     }
   ]
 }
