@@ -12,4 +12,4 @@ claude plugin install vesper-sieve --marketplace dayfinggg/anthropic-claude-code
 
 ## Options
 
-`deferred_tools` and `loaded_tools` choose which tools sleep and which are always loaded. `excluded_tool_lines` lists phrases, and a line of a tool description that holds one of them is left out. By default that is the WebSearch line asking for a separate "Sources:" list. `excluded_sections` and `excluded_reminders` name Claude Code prompt sections and reminders the plugin leaves out. By default it leaves out only `total_tokens_reminder`.
+`deferred_tools` and `loaded_tools` choose which tools sleep and which are always loaded. `excluded_tool_lines` lists phrases, and a line of a tool description that holds one of them is left out. By default these are the WebSearch line asking for a separate "Sources:" list and the Bash line asking for a new branch before a commit on the default branch. `excluded_sections` and `excluded_reminders` name Claude Code prompt sections and reminders the plugin leaves out. By default it leaves out only `total_tokens_reminder`.

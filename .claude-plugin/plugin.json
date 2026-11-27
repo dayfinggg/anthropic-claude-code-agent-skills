@@ -42,7 +42,8 @@
       "title": "Excluded tool lines",
       "description": "Phrases that mark lines of built-in tool descriptions the plugin leaves out because they conflict with its rules",
       "default": [
-        "end with a \"Sources:\" list"
+        "end with a \"Sources:\" list",
+        "If on the default branch, branch first"
       ]
     },
     "excluded_reminders": {

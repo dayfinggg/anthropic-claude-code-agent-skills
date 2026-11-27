@@ -6,7 +6,7 @@ when_to_use: Load before the first Git command that changes the index, the worki
 
 # Git workflow
 
-Do the Git step the user asked for and stop there.
+Do the Git step the user asked for and stop there. A commit goes on the current branch, and a push happens only when the user asks for it.
 
 ## Commits
 
