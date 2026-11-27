@@ -36,6 +36,15 @@
       "description": "Sections of the Claude Code system prompt that the plugin leaves out",
       "default": []
     },
+    "excluded_tool_lines": {
+      "type": "string",
+      "multiple": true,
+      "title": "Excluded tool lines",
+      "description": "Phrases that mark lines of built-in tool descriptions the plugin leaves out because they conflict with its rules",
+      "default": [
+        "end with a \"Sources:\" list"
+      ]
+    },
     "excluded_reminders": {
       "type": "string",
       "multiple": true,
