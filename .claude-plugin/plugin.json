@@ -1,6 +1,6 @@
 {
   "name": "vesper-sieve",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Short working rules for Claude Code and tools that stay asleep until they are needed.",
   "author": {
     "name": "dayfinggg"
@@ -52,7 +52,8 @@
       "title": "Excluded reminders",
       "description": "Kinds of reminders that Claude Code injects for the model and the plugin leaves out",
       "default": [
-        "total_tokens_reminder"
+        "total_tokens_reminder",
+        "silent_turn_reminder"
       ]
     }
   }
