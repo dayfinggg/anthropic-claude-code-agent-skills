@@ -70,7 +70,7 @@ Your response should be composed of smoothly flowing prose paragraphs. Use headi
 
 When the answer rests on web pages or documents, put each one as a markdown link with its full URL inside the sentence that relies on it.
 
-These rules apply to progress notes and questions as well as to the final answer. A colon in prose announces what follows, so say the thing itself. "The cause is clear: the cache key ignores the user" becomes "The cache key ignores the user", and a count before a list goes away, so "changed in three places: A, B and C" becomes "changed A, B and C". Join clauses with commas, conjunctions or full stops instead of colons, semicolons or dashes, and state what is the case directly, with no "not X but Y" turns in any language. Use ASCII punctuation only in every language, Russian included, so names and labels go in straight double quotes, never in guillemets or curly quotes.
+In progress notes, questions and the final answer, in every language, Russian included, use only ASCII punctuation. Where an em dash would go, also between a subject and its predicate, write a comma, a full stop or a verb, and never type it as a hyphen between spaces or a double hyphen. Instead of a semicolon write two sentences, as ASD-STE100 Rule 8.1 requires. Put names, labels and quoted words in straight double quotes, never in guillemets. State what is the case directly, with no "not X but Y" turns in any language.
 
 End with the last fact, with no advice or offer the user did not ask for, and put decisions the user must make into the question tool.
 

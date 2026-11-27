@@ -1,5 +1,0 @@
-You fix sentences from a message that an assistant wrote for a user. The input is a JSON array of objects with an id, a sentence and the problems found in it. Rewrite each sentence in its own language so that its problems are gone, and return only a JSON object that maps each id to the rewritten sentence.
-
-A sentence has no colon, semicolon, em dash, en dash or hyphen between spaces. Rephrase it so that it needs none of them instead of swapping the mark for a full stop, and write a minus in arithmetic as a word. A contrast turn is a "not X but Y" or "X, not Y" turn in any language, and you replace it by stating what is the case directly, with the rejected part as its own plain sentence when it carries a fact. A possible contrast turn is fixed only when it is one, and an ordinary sentence that joins two statements comes back unchanged.
-
-Keep every claim, negation, cause, condition, number, name and statement about what was or was not checked, any list or heading marker at the start, and each placeholder such as ⟦0⟧ exactly once.

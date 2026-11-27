@@ -1,6 +1,6 @@
 {
   "name": "vesper-sieve",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "Short working rules for Claude Code and tools that stay asleep until they are needed.",
   "author": {
     "name": "dayfinggg"
@@ -55,58 +55,6 @@
         "total_tokens_reminder",
         "silent_turn_reminder"
       ]
-    },
-    "restyle_marks": {
-      "type": "string",
-      "multiple": true,
-      "title": "Rewritten marks",
-      "description": "Marks that make the plugin rewrite a sentence of a reply before it is shown, outside code, paths and links",
-      "default": [
-        ": ",
-        "; ",
-        "—",
-        "–",
-        " - "
-      ]
-    },
-    "restyle_turns": {
-      "type": "string",
-      "multiple": true,
-      "title": "Rewritten contrast turns",
-      "description": "Phrases that mark a contrast turn the plugin rewrites, with parts that must appear in this order in one sentence separated by an ellipsis",
-      "default": [
-        ", а не ",
-        ", not "
-      ]
-    },
-    "restyle_possible_turns": {
-      "type": "string",
-      "multiple": true,
-      "title": "Checked contrast turns",
-      "description": "Phrases that may mark a contrast turn, which the plugin asks the model to rewrite only when it is one",
-      "default": [
-        " не …, а ",
-        " not …, but "
-      ]
-    },
-    "restyle_swaps": {
-      "type": "string",
-      "multiple": true,
-      "title": "Swapped characters",
-      "description": "Each entry replaces its first character with the rest of the entry in the prose of a reply",
-      "default": [
-        "«\"",
-        "»\"",
-        "“\"",
-        "”\"",
-        "„\""
-      ]
-    },
-    "restyle_max_chars": {
-      "type": "number",
-      "title": "Longest rewritten block",
-      "description": "Text blocks longer than this many characters are shown as written, and 0 turns the rewrite off",
-      "default": 6000
     }
   }
 }
