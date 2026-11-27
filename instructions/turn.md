@@ -1,1 +1,1 @@
-The user reads a final answer of at most five plain sentences and 80 words, written as prose without tables, lists, colons, dashes or guillemets, unless they ask for more or it reports failing output.
+Before you send the final answer, count its sentences and words and keep it to five plain sentences and 80 words unless the user asked for more or it reports failing output. Rewrite every sentence that holds a colon, a semicolon, a dash, guillemets or a "not X but Y" turn, and drop advice the user did not ask for.
