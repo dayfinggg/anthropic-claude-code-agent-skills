@@ -2,6 +2,7 @@ import type { EngineInterface, PluginOptions, PromptComposeSection, Register } f
 
 const RULES = 'instructions/rules.md'
 const TURN = 'instructions/turn.md'
+const TOOL = 'instructions/tool.md'
 const BARE = 'bare'
 
 export const register: Register = (on, options) => {
@@ -29,6 +30,17 @@ export const register: Register = (on, options) => {
     if (loadedTools.has(e.tool)) return { ...described, description, isDeferred: false }
 
     return { ...described, description }
+  })
+
+  on('tool.call', async ($, e, next) => {
+    if (e.agentId !== undefined) return next(e)
+
+    const reminder = await readOwn($, TOOL)
+    const called = await next(e)
+
+    if (called.deny !== undefined) return called
+
+    return { ...called, context: [...(called.context ?? []), reminder] }
   })
 
   on('prompt.attachment', ($, e, next) => (excludedReminders.has(e.type) ? { text: null } : next(e)))
