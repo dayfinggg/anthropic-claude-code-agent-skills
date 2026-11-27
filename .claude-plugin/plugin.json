@@ -1,6 +1,6 @@
 {
   "name": "vesper-sieve",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Short working rules for Claude Code and tools that stay asleep until they are needed.",
   "author": {
     "name": "dayfinggg"

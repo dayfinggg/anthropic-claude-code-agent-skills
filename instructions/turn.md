@@ -1,1 +1,1 @@
-The user reads a final answer of at most five plain sentences and 80 words, written as prose without lists in the session language, unless they ask for more.
+The user reads a final answer of at most five plain sentences and 80 words, written as prose without tables, lists, colons, dashes or guillemets, unless they ask for more or it reports failing output.

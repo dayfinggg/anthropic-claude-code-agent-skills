@@ -34,7 +34,7 @@ export const register: Register = (on, options) => {
   on('prompt.attachment', ($, e, next) => (excludedReminders.has(e.type) ? { text: null } : next(e)))
 
   on('prompt.submit', async ($, e, next) => {
-    if (e.turnId !== undefined || e.command !== undefined || e.isMeta === true) return next(e)
+    if ((e.turnId !== undefined && !e.wait) || e.command !== undefined || e.isMeta === true) return next(e)
 
     return next({ ...e, context: [...(e.context ?? []), await readOwn($, TURN)] })
   })

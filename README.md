@@ -13,3 +13,7 @@ claude plugin install vesper-sieve --marketplace dayfinggg/anthropic-claude-code
 ## Options
 
 `deferred_tools` and `loaded_tools` choose which tools sleep and which are always loaded. `excluded_tool_lines` lists phrases, and a line of a tool description that holds one of them is left out. By default these are the WebSearch line asking for a separate "Sources:" list and the Bash line asking for a new branch before a commit on the default branch. `excluded_sections` and `excluded_reminders` name Claude Code prompt sections and reminders the plugin leaves out. By default it leaves out only `total_tokens_reminder`.
+
+## Limits
+
+Where Claude Code loads its [built-in guard](https://code.claude.com/docs/en/plugins/mods/admin#know-which-hooks-of-a-users-mod-dont-run), on a machine with managed settings or in a session signed in to a Team or Enterprise plan, it skips the plugin's `prompt.compose` and `prompt.attachment` hooks, so the rules and the reminder exclusion do not apply there. A change to the rules reaches new sessions only, because a running session keeps the system prompt it started with.
