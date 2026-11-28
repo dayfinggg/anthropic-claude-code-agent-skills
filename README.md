@@ -2,7 +2,7 @@
 
 Short working rules for Claude Code and tools that stay asleep until they are needed.
 
-The plugin adds `instructions/rules.md` to the end of the Claude Code system prompt and keeps Claude Code's own sections, including the one that the `language` setting adds. A short note on the final answer, `instructions/turn.md`, goes with each message that starts a turn. A one-sentence punctuation reminder, `instructions/tool.md`, follows each tool result of the main conversation, because [Claude follows instructions best when they come after long input](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices). The plugin keeps rarely used tools out of the tool list until the model loads them, removes the lines of tool descriptions that conflict with its rules, and brings ten skills that load when their kind of work comes up.
+The plugin adds `instructions/rules.md` to the end of the Claude Code system prompt and keeps Claude Code's own sections, including the one that the `language` setting adds. A short note on the final answer, `instructions/turn.md`, goes with each message that starts a turn. A short reminder of the language, the limits on notes and on the final answer and the punctuation, `instructions/tool.md`, follows each tool result of the main conversation, because [Claude follows instructions best when they come after long input](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices). The plugin keeps rarely used tools out of the tool list until the model loads them, removes the lines of tool descriptions that conflict with its rules, and brings ten skills that load when their kind of work comes up.
 
 ## Install
 
